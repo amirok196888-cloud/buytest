@@ -228,16 +228,16 @@ footer{position:static;background:#edf2f4;border-top:1px solid #d9e2e6;color:#60
 </div>
 <div class="priceGrid">
 <div class="priceCard">
-<strong>בדיקה מלאה</strong>
+<strong>2 בדיקות רכב מלאות</strong>
 <div class="price">29 ₪</div>
-<small>שלבים 4–5 + סיכום ממצאים ב־PDF</small>
-<button class="planBtn primary" onclick="purchaseBasicChecked()">המשך לבדיקה – 29 ₪</button>
+<small>עד 2 רכבים שונים · שלבים 4–5 + סיכום ממצאים ב־PDF · ללא בלק״ר</small>
+<button class="planBtn primary" onclick="purchaseBasicChecked()">פתח 2 בדיקות – 29 ₪</button>
 </div>
 <div class="priceCard">
-<strong>בדיקה מלאה + בלק״ר</strong>
+<strong>2 בדיקות + בלק״ר לרכב אחד</strong>
 <div class="price">49 ₪</div>
-<small>שלבים 4–5 + סיכום PDF + דוח בלק״ר</small>
-<button class="planBtn primary" onclick="purchaseFullChecked()">המשך עם בלק״ר – 49 ₪</button>
+<small>עד 2 רכבים שונים · צ׳קליסט מלא לשניהם + בלק״ר לרכב אחד</small>
+<button class="planBtn primary" onclick="purchaseFullChecked()">2 בדיקות + בלק״ר – 49 ₪</button>
 </div>
 </div>
 <div class="devMsg" id="paymentDev"></div>
@@ -252,8 +252,8 @@ footer{position:static;background:#edf2f4;border-top:1px solid #d9e2e6;color:#60
 <div id="selfChecks"></div></section>
 <section class="card paidOnly" style="display:none"><h2>6 · בדיקה מורחבת – בלק״ר</h2>
 <div id="balcarBasicState">
-<p class="sub">פתחת את הבדיקה הבסיסית ב־29 ₪. ניתן לשדרג לדוח בלק״ר בתוספת 20 ₪ בלבד.</p>
-<button class="devBtn" onclick="demoUpgrade()">שדרוג לדוח בלק״ר – 20 ₪</button>
+<p class="sub">החבילה כוללת עד 2 רכבים. בלק״ר אינו כלול; ניתן להוסיף בלק״ר לרכב הנוכחי ב־20 ₪.</p>
+<button class="devBtn" onclick="openBitPayment('upgrade')">הוסף בלק״ר לרכב הזה – 20 ₪</button>
 </div>
 <div id="balcarActiveState" style="display:none">
 <div class="devMsg show">✓ מסלול בלק״ר פעיל</div>
@@ -262,6 +262,12 @@ footer{position:static;background:#edf2f4;border-top:1px solid #d9e2e6;color:#60
 </div>
 <div class="devMsg" id="balcarUpgradeMsg"></div>
 </section>
+
+<div class="info paidOnly" id="secondVehicleInfo" style="display:none;margin:18px 0">
+<b>החבילה שלך כוללת עד 2 רכבים.</b><br>
+אפשר לחזור לרכב שכבר בדקת בלי לנצל בדיקה נוספת. רכב חדש ושונה ייחשב כרכב השני.
+<button class="secondary full" type="button" onclick="saveCurrentChecklist();document.getElementById('plate').value='';window.scrollTo({top:0,behavior:'smooth'});">בדוק רכב נוסף</button>
+</div>
 <section class="card paidOnly" style="display:none"><h2>7 · סיכום ממצאים PDF</h2><p class="sub">הסיכום מתייחס למה שנמצא — לא לכמות סימוני ה־V. לאחר הפקת הסיכום ניתן לשמור אותו כקובץ PDF.</p>
 <button class="primary full" onclick="buildReport()">הפק סיכום בדיקה מקדימה</button>
 <div class="report" id="report"></div>
@@ -305,7 +311,7 @@ document.getElementById('vPlate').textContent=p;loadedKm=vr?.kilometer_test_ahar
 document.getElementById('vVin').textContent=ar?.misgeret||'לא צוין במאגר';
 document.getElementById('vEngine').textContent=vr?.mispar_manoa||'לא צוין במאגר';
 document.getElementById('owners').innerHTML=o.length?o.map(x=>'<div class="owner"><span>'+fmtDate(x.baalut_dt)+'</span><span class="badge">'+(x.baalut||'לא צוין')+'</span></div>').join(''):'לא נמצאו רשומות';
-document.getElementById('statusMsg').textContent='✓ הנתונים נטענו בהצלחה';document.getElementById('statusMsg').className='green';document.getElementById('vehicleData').style.display='block';document.querySelectorAll('.freeAfterLookup').forEach(x=>x.style.display='block');document.getElementById('purchaseBox').style.display='block'}catch(e){document.getElementById('statusMsg').textContent='לא הצלחתי לטעון את המידע כרגע.';document.getElementById('statusMsg').className='red'}}
+saveCurrentChecklist();currentVehiclePlate=p;document.getElementById('statusMsg').textContent='✓ הנתונים נטענו בהצלחה';document.getElementById('statusMsg').className='green';document.getElementById('vehicleData').style.display='block';document.querySelectorAll('.freeAfterLookup').forEach(x=>x.style.display='block');document.getElementById('purchaseBox').style.display='block';activateVehicleEntitlement(p)}catch(e){document.getElementById('statusMsg').textContent='לא הצלחתי לטעון את המידע כרגע.';document.getElementById('statusMsg').className='red'}}
 const seller=['כמה זמן הרכב אצל המוכר?','למה הרכב נמכר?','האם היו תאונות או תיקונים משמעותיים?','האם המוכר מתחייב בבדיקה לגבי מנוע, גיר, שלדה ותאונות משמעותיות?'];
 const external=['בדוק אם קיימים הבדלי גוון בצבע בין חלקי המרכב','בדוק אם קיימים סימני פתיחה או פירוק בברגי מכסה המנוע ומכסה תא המטען','בדוק אם קיימים סימני פתיחה או פירוק בברגי הדלתות והכנפיים הקדמיות'];
 const self=['לא נשארו נורות אזהרה חריגות לאחר התנעה','המזגן פועל ומקרר','חלונות, מראות וציוד חשמלי בסיסי פועלים','הבלאי בתא הנוסעים נראה סביר ביחס לק״מ','בהעברה ל־D ול־R אין מכה או רעש חריג','אין רעש, עשן או נזילה בולטים לעין','מצב שמן המנוע אינו מציג סימן ברור לבוצה חריגה'];
@@ -334,13 +340,82 @@ function requireConsent(id){
 }
 let pendingBitPlan=null;
 const bitApprovalHashes={basic:'63f43e788c32470c232fbd8f466278f649a5b38c14f23311c8f7a74a47128258',full:'677bd2eb1a50f9c3dc085e11c64ff8b32a899820ed6902d5b84642c6106d1a83',upgrade:'b070cf9621aa68bd31be79bd74584f9059a47cdd68e2584ffa7a9790b9365f9d'};
+
+const BUYTEST_STATE_KEY='buytestTwoVehicleStateV1';
+let currentVehiclePlate='';
+function getBuyState(){
+  try{return JSON.parse(localStorage.getItem(BUYTEST_STATE_KEY))||{plan:null,vehicles:[],balcarPlates:[],checks:{}}}
+  catch(e){return {plan:null,vehicles:[],balcarPlates:[],checks:{}}}
+}
+function putBuyState(st){localStorage.setItem(BUYTEST_STATE_KEY,JSON.stringify(st))}
+function saveCurrentChecklist(){
+  if(!currentVehiclePlate)return;
+  const st=getBuyState();
+  st.checks=st.checks||{};
+  st.checks[currentVehiclePlate]=[...document.querySelectorAll('.check')].map(c=>({
+    done:!!c.querySelector('.done')?.checked,
+    open:!!c.querySelector('.finding')?.classList.contains('open'),
+    text:c.querySelector('textarea')?.value||'',
+    sev:c.querySelector('input[type=radio]:checked')?.value||''
+  }));
+  putBuyState(st);
+}
+function restoreChecklist(p){
+  const st=getBuyState(), saved=st.checks?.[p];
+  if(!saved)return;
+  document.querySelectorAll('.check').forEach((c,i)=>{
+    const x=saved[i]; if(!x)return;
+    const d=c.querySelector('.done'); if(d)d.checked=!!x.done;
+    const f=c.querySelector('.finding'); if(f)f.classList.toggle('open',!!x.open);
+    const b=c.querySelector('.findingBtn'); if(b)b.textContent=x.open?'סגור ממצא':'יש ממצא';
+    const t=c.querySelector('textarea'); if(t)t.value=x.text||'';
+    if(x.sev){const r=[...c.querySelectorAll('input[type=radio]')].find(r=>r.value===x.sev);if(r)r.checked=true}
+  });
+}
+function activateVehicleEntitlement(p){
+  const st=getBuyState();
+  if(!st.plan)return;
+  if(!st.vehicles.includes(p)){
+    if(st.vehicles.length>=2){
+      alert('חבילת 2 הרכבים כבר נוצלה. לרכב נוסף יש לרכוש חבילה חדשה.');
+      return;
+    }
+    st.vehicles.push(p); putBuyState(st);
+  }
+  unlockPaidSections();
+  document.getElementById('purchaseBox').style.display='none';
+  const hasBalcar=(st.balcarPlates||[]).includes(p);
+  document.getElementById('balcarBasicState').style.display=hasBalcar?'none':'block';
+  document.getElementById('balcarActiveState').style.display=hasBalcar?'block':'none';
+  restoreChecklist(p);
+}
+function rememberPurchasedPlan(plan){
+  const p=plate(); if(!p)return;
+  const st=getBuyState();
+  st.plan=st.plan||'two';
+  if(!st.vehicles.includes(p) && st.vehicles.length<2)st.vehicles.push(p);
+  if(plan==='full' && !(st.balcarPlates||[]).includes(p)){
+    st.balcarPlates=st.balcarPlates||[]; st.balcarPlates.push(p);
+  }
+  putBuyState(st); currentVehiclePlate=p;
+}
+function rememberBalcarForCurrent(){
+  const p=plate(); if(!p)return;
+  const st=getBuyState(); st.balcarPlates=st.balcarPlates||[];
+  if(!st.balcarPlates.includes(p))st.balcarPlates.push(p);
+  putBuyState(st);
+}
+document.addEventListener('change',e=>{if(e.target.closest('.check'))saveCurrentChecklist()});
+document.addEventListener('input',e=>{if(e.target.closest('.check'))saveCurrentChecklist()});
+window.addEventListener('beforeunload',saveCurrentChecklist);
+
 function purchaseBasicChecked(){if(requireConsent('legalAccept'))openBitPayment('basic')}
 function purchaseFullChecked(){if(requireConsent('legalAccept'))openBitPayment('full')}
 function upgradeChecked(){if(requireConsent('upgradeAccept'))openBitPayment('upgrade')}
 function openBitPayment(plan){
  pendingBitPlan=plan;
  const amount=plan==='basic'?29:plan==='full'?49:20;
- const label=plan==='basic'?'בדיקה מלאה':plan==='full'?'בדיקה מלאה + בלק״ר':'שדרוג לבלק״ר';
+ const label=plan==='basic'?'2 בדיקות רכב מלאות':plan==='full'?'2 בדיקות + בלק״ר לרכב אחד':'בלק״ר לרכב הנוכחי';
  document.getElementById('bitPlanText').textContent=label;
  document.getElementById('bitAmount').textContent=amount+' ₪';
  document.getElementById('bitApprovalCode').value='';
@@ -418,18 +493,21 @@ function setBalcarPlan(){
   document.getElementById('balcarActiveState').style.display='block';
 }
 function demoPurchaseBasic(){
+  rememberPurchasedPlan('basic');
   setBasicPlan();
   showFeedback();
   document.getElementById('purchaseBox').style.display='none';
   document.querySelector('.paidOnly').scrollIntoView({behavior:'smooth',block:'start'});
 }
 function demoPurchaseFull(){
+  rememberPurchasedPlan('full');
   setBalcarPlan();
   showFeedback();
   document.getElementById('purchaseBox').style.display='none';
   document.getElementById('balcarActiveState').scrollIntoView({behavior:'smooth',block:'center'});
 }
 function demoUpgrade(){
+  rememberBalcarForCurrent();
   setBalcarPlan();
   showFeedback();
   const m=document.getElementById('balcarUpgradeMsg');
@@ -521,17 +599,17 @@ window.addEventListener('DOMContentLoaded',()=>{
 
     <div id="ownerCodesBox" style="display:none;text-align:right">
       <div class="info" style="margin:12px 0">
-        <b>29 ₪ · בדיקה מלאה</b><br>
+        <b>29 ₪ · 2 בדיקות רכב מלאות</b><br>
         קוד פתיחה: <b style="font-size:24px">381489</b>
         <button class="bitClose" type="button" onclick="copyOwnerCode('381489')">העתק</button>
       </div>
       <div class="info" style="margin:12px 0">
-        <b>49 ₪ · בדיקה מלאה + בלק״ר</b><br>
+        <b>49 ₪ · 2 בדיקות + בלק״ר לרכב אחד</b><br>
         קוד פתיחה: <b style="font-size:24px">734189</b>
         <button class="bitClose" type="button" onclick="copyOwnerCode('734189')">העתק</button>
       </div>
       <div class="info" style="margin:12px 0">
-        <b>20 ₪ · שדרוג לבלק״ר</b><br>
+        <b>20 ₪ · בלק״ר לרכב נוסף</b><br>
         קוד פתיחה: <b style="font-size:24px">541714</b>
         <button class="bitClose" type="button" onclick="copyOwnerCode('541714')">העתק</button>
       </div>
