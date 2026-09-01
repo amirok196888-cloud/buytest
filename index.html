@@ -74,7 +74,27 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#07131aef;border-top:1p
 /* BuyTest V15: single-page flow - summary/pricing -> app */
 #landing{padding:0!important;align-items:flex-start!important;background:#07161d!important}
 #landing .landingCard{width:100%!important;max-width:760px!important;margin:0 auto!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
-</style><style>#appShell{display:block!important}</style></head><body>
+</style><style>#appShell{display:block!important}</style>
+<style>
+#entryGate{position:fixed;inset:0;z-index:30000;background:#050b10;display:flex;align-items:center;justify-content:center;padding:0;overflow:auto}
+#entryGate .entryWrap{width:min(100%,760px);min-height:100%;display:flex;flex-direction:column;justify-content:center;background:#07161d}
+#entryGate .promo{width:100%;height:auto;display:block}
+#entryGate .ctaWrap{padding:14px 18px 24px;background:#07161d}
+#entryGate .entryBtn{width:100%;border:0;border-radius:18px;padding:17px 18px;background:#10ad54;color:white;font-size:22px;font-weight:900;box-shadow:0 8px 24px rgba(0,0,0,.3);cursor:pointer}
+#entryGate .entryHint{text-align:center;color:#cbd7dc;font-size:13px;margin:9px 0 0}
+body.entry-open{overflow:hidden}
+</style>
+</head><body class="entry-open">
+<div id="entryGate" role="dialog" aria-label="כניסה ל-BuyTest">
+ <div class="entryWrap">
+  <img class="promo" src="buytest-entry.png" alt="BuyTest - בדיקת רכב חכמה לפני קנייה">
+  <div class="ctaWrap">
+   <button class="entryBtn" type="button" onclick="enterBuyTest()">התחל בדיקת רכב עכשיו</button>
+   <div class="entryHint">לחיצה אחת ומתחילים בבדיקת הרכב</div>
+  </div>
+ </div>
+</div>
+
 
 <div id="appShell">
 <main>
@@ -85,6 +105,11 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#07131aef;border-top:1p
 <div class="plate"><input id="plate" inputmode="numeric" maxlength="8" placeholder="מספר רכב"><button class="primary" onclick="loadVehicle()">בדוק רכב</button></div>
 <div id="status" class="status"><div id="statusMsg">טוען...</div><div id="vehicleData" style="display:none"><div class="grid">
 <div class="box"><div class="label">מספר רכב</div><div id="vPlate" class="value">—</div></div>
+<div class="box"><div class="label">זיהוי רכב</div><div id="vFound" class="value">—</div></div>
+<div class="box"><div class="label">יצרן</div><div id="vMake" class="value">—</div></div>
+<div class="box"><div class="label">דגם</div><div id="vModel" class="value">—</div></div>
+<div class="box"><div class="label">שנת ייצור</div><div id="vYear" class="value">—</div></div>
+<div class="box"><div class="label">סוג / מצב</div><div id="vType" class="value">—</div></div>
 <div class="box"><div class="label">מקוריות</div><div id="vOrigin" class="value">—</div></div>
 <div class="box"><div class="label">צבע רכב</div><div id="vColor" class="value">לא זמין כרגע</div></div>
 <div class="box"><div class="label">מספר שלדה</div><div id="vVin" class="value">לא זמין כרגע</div></div>
@@ -198,18 +223,56 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#07131aef;border-top:1p
 const VEHICLE_ID='56063a99-8a3e-4ff4-912e-5966c0279bad';
 const OWNERS_ID='bb2355dc-9ec7-4f06-9c3f-3344672171da';
 const ACTIVE_ID='053cea08-09bc-40ec-8f7a-156f0677aff3';
+const INACTIVE_MODEL_ID='f6efe89a-fb3d-43a4-bb61-9bf12a9b9099';
+const INACTIVE_NO_MODEL_ID='6f6acd03-f351-4a8f-8ecf-df792f4f573a';
+const CANCELLED_ID='851ecab1-0622-4dbe-a6c7-f950cf82abf9';
+const PUBLIC_ID='cf29862d-ca25-4691-84f6-1be60dcb4a1e';
+const PERSONAL_IMPORT_ID='03adc637-b6fe-402b-9937-7c3d3afc9140';
+const MOTORCYCLE_ID='bf9df4e2-d90d-4c0a-a400-19e15af8e95f';
 let loadedKm=null, reportText='';
 function plate(){return document.getElementById('plate').value.replace(/\D/g,'')}
 function apiUrl(resource,p){return'https://data.gov.il/api/3/action/datastore_search?resource_id='+resource+'&filters='+encodeURIComponent(JSON.stringify({mispar_rechev:Number(p)}))+'&limit=20'}
 function fmtDate(v){if(!v)return'—';let s=String(v);if(/^\d{6}$/.test(s))return s.slice(4,6)+'/'+s.slice(0,4);let d=new Date(s);return isNaN(d)?s:d.toLocaleDateString('he-IL')}
 function fmtNum(v){return(v===null||v===undefined||v==='')?'—':Number(v).toLocaleString('he-IL')}
-async function loadVehicle(){const p=plate();if(!p){alert('הכנס מספר רכב');return}document.getElementById('status').classList.add('show');document.getElementById('vehicleData').style.display='none';document.getElementById('statusMsg').textContent='טוען נתונים...';document.getElementById('statusMsg').className='';
-try{const[r1,r2,r3]=await Promise.all([fetch(apiUrl(VEHICLE_ID,p)),fetch(apiUrl(OWNERS_ID,p)),fetch(apiUrl(ACTIVE_ID,p))]);const[j1,j2,j3]=await Promise.all([r1.json(),r2.json(),r3.json()]);const vr=j1.result?.records?.[0]||null,o=j2.result?.records||[],ar=j3.result?.records?.[0]||null;if(!vr&&!o.length&&!ar)throw 0;
-document.getElementById('vPlate').textContent=p;loadedKm=vr?.kilometer_test_aharon??null;document.getElementById('vOrigin').textContent=vr?.mkoriut_nm||'לא צוין במאגר';document.getElementById('vColor').textContent=ar?.tzeva_rechev||'לא צוין במאגר';
-document.getElementById('vVin').textContent=ar?.misgeret||'לא צוין במאגר';
-document.getElementById('vEngine').textContent=vr?.mispar_manoa||'לא צוין במאגר';
-document.getElementById('owners').innerHTML=o.length?o.map(x=>'<div class="owner"><span>'+fmtDate(x.baalut_dt)+'</span><span class="badge">'+(x.baalut||'לא צוין')+'</span></div>').join(''):'לא נמצאו רשומות';
-document.getElementById('statusMsg').textContent='✓ הנתונים נטענו בהצלחה';document.getElementById('statusMsg').className='green';document.getElementById('vehicleData').style.display='block';document.getElementById('purchaseBox').style.display='block'}catch(e){document.getElementById('statusMsg').textContent='לא הצלחתי לטעון את המידע כרגע.';document.getElementById('statusMsg').className='red'}}
+async function fetchRecords(id,p){try{const r=await fetch(apiUrl(id,p));if(!r.ok)return[];const j=await r.json();return j?.result?.records||[]}catch(e){return[]}}
+async function loadVehicle(){
+ const p=plate();if(!p){alert('הכנס מספר רכב');return}
+ document.getElementById('status').classList.add('show');document.getElementById('vehicleData').style.display='none';document.getElementById('statusMsg').textContent='מחפש את הרכב בכל מאגרי משרד התחבורה...';document.getElementById('statusMsg').className='';
+ try{
+  const ids=[VEHICLE_ID,OWNERS_ID,ACTIVE_ID,INACTIVE_MODEL_ID,INACTIVE_NO_MODEL_ID,CANCELLED_ID,PUBLIC_ID,PERSONAL_IMPORT_ID,MOTORCYCLE_ID];
+  const [hist,owners,active,inactiveModel,inactiveNoModel,cancelled,pub,personalImport,motorcycle]=await Promise.all(ids.map(id=>fetchRecords(id,p)));
+  const sources=[
+   {rows:active,label:'פעיל'},
+   {rows:pub,label:'רכב ציבורי פעיל'},
+   {rows:personalImport,label:'יבוא אישי'},
+   {rows:motorcycle,label:'דו־גלגלי פעיל'},
+   {rows:inactiveModel,label:'לא פעיל'},
+   {rows:inactiveNoModel,label:'לא פעיל'},
+   {rows:cancelled,label:'ביטול סופי'}
+  ];
+  const hit=sources.find(x=>x.rows.length);
+  const ar=hit?.rows?.[0]||null, vr=hist[0]||null, o=owners;
+  if(!ar&&!vr&&!o.length)throw new Error('not-found');
+  const make=ar?.tozeret_nm||ar?.tozar||'לא צוין במאגר';
+  const model=ar?.kinuy_mishari||ar?.degem_nm||'לא צוין במאגר';
+  const year=ar?.shnat_yitzur||'לא צוין במאגר';
+  const type=ar?.sug_rechev_nm||ar?.sug_degem||hit?.label||'לא צוין במאגר';
+  document.getElementById('vPlate').textContent=p;
+  document.getElementById('vFound').textContent=ar?'✓ הרכב זוהה':'✓ נמצאה היסטוריה לרכב';
+  document.getElementById('vMake').textContent=make;
+  document.getElementById('vModel').textContent=model;
+  document.getElementById('vYear').textContent=year;
+  document.getElementById('vType').textContent=(hit?.label?hit.label+' · ':'')+type;
+  loadedKm=vr?.kilometer_test_aharon??null;
+  document.getElementById('vOrigin').textContent=vr?.mkoriut_nm||'לא צוין במאגר';
+  document.getElementById('vColor').textContent=ar?.tzeva_rechev||'לא צוין במאגר';
+  document.getElementById('vVin').textContent=ar?.misgeret||ar?.mispar_shilda||'לא צוין במאגר';
+  document.getElementById('vEngine').textContent=vr?.mispar_manoa||ar?.mispar_manoa||'לא צוין במאגר';
+  document.getElementById('owners').innerHTML=o.length?o.map(x=>'<div class="owner"><span>'+fmtDate(x.baalut_dt)+'</span><span class="badge">'+(x.baalut||'לא צוין')+'</span></div>').join(''):'לא נמצאו רשומות היסטוריית בעלות';
+  document.getElementById('statusMsg').textContent='✓ הרכב זוהה והנתונים הזמינים נטענו';document.getElementById('statusMsg').className='green';document.getElementById('vehicleData').style.display='block';document.getElementById('purchaseBox').style.display='block';
+ }catch(e){document.getElementById('statusMsg').textContent='הרכב לא נמצא במאגרים הציבוריים שנבדקו.';document.getElementById('statusMsg').className='red'}
+}
+
 const seller=['כמה זמן הרכב אצל המוכר?','למה הרכב נמכר?','האם היו תאונות או תיקונים משמעותיים?','האם המוכר מתחייב בבדיקה לגבי מנוע, גיר, שלדה ותאונות משמעותיות?'];
 const external=['בדוק אם קיימים הבדלי גוון בצבע בין חלקי המרכב','בדוק אם קיימים סימני פתיחה או פירוק בברגי מכסה המנוע ומכסה תא המטען','בדוק אם קיימים סימני פתיחה או פירוק בברגי הדלתות והכנפיים הקדמיות'];
 const self=['לא נשארו נורות אזהרה חריגות לאחר התנעה','המזגן פועל ומקרר','חלונות, מראות וציוד חשמלי בסיסי פועלים','הבלאי בתא הנוסעים נראה סביר ביחס לק״מ','בהעברה ל־D ול־R אין מכה או רעש חריג','אין רעש, עשן או נזילה בולטים לעין','מצב שמן המנוע אינו מציג סימן ברור לבוצה חריגה'];
@@ -366,4 +429,8 @@ async function shareReport(){if(navigator.share){try{await navigator.share({titl
 <p>אין בנוסח זה כדי לגרוע מזכות קוגנטית המוקנית לצרכן לפי דין.</p>
 </div>
 </div></div>
+
+<script>
+function enterBuyTest(){const g=document.getElementById('entryGate');if(g){g.style.display='none';document.body.classList.remove('entry-open');window.scrollTo({top:0,behavior:'instant'});setTimeout(()=>document.getElementById('plate')?.focus(),80)}}
+</script>
 </body></html>
