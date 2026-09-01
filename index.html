@@ -231,17 +231,57 @@ const PERSONAL_IMPORT_ID='03adc637-b6fe-402b-9937-7c3d3afc9140';
 const MOTORCYCLE_ID='bf9df4e2-d90d-4c0a-a400-19e15af8e95f';
 let loadedKm=null, reportText='';
 function plate(){return document.getElementById('plate').value.replace(/\D/g,'')}
-function apiUrl(resource,p){return'https://data.gov.il/api/3/action/datastore_search?resource_id='+resource+'&filters='+encodeURIComponent(JSON.stringify({mispar_rechev:Number(p)}))+'&limit=20'}
+function apiUrl(resource,p,mode='number'){
+ const base='https://data.gov.il/api/3/action/datastore_search?resource_id='+resource+'&limit=20';
+ if(mode==='q') return base+'&q='+encodeURIComponent(String(p));
+ const value=(mode==='string')?String(p):Number(p);
+ return base+'&filters='+encodeURIComponent(JSON.stringify({mispar_rechev:value}));
+}
 function fmtDate(v){if(!v)return'—';let s=String(v);if(/^\d{6}$/.test(s))return s.slice(4,6)+'/'+s.slice(0,4);let d=new Date(s);return isNaN(d)?s:d.toLocaleDateString('he-IL')}
 function fmtNum(v){return(v===null||v===undefined||v==='')?'—':Number(v).toLocaleString('he-IL')}
-async function fetchRecords(id,p){try{const r=await fetch(apiUrl(id,p));if(!r.ok)return[];const j=await r.json();return j?.result?.records||[]}catch(e){return[]}}
+function samePlate(row,p){return String(row?.mispar_rechev??'').replace(/\D/g,'')===String(p)}
+async function fetchRecords(id,p){
+ // data.gov.il resources are not completely uniform: in some resources the plate is numeric,
+ // in others it may arrive as text. Try both exact filters, then a text query as fallback.
+ const modes=['number','string','q'];
+ for(const mode of modes){
+  try{
+   const r=await fetch(apiUrl(id,p,mode),{cache:'no-store'});
+   if(!r.ok)continue;
+   const j=await r.json();
+   const rows=j?.result?.records||[];
+   const exact=rows.filter(x=>samePlate(x,p));
+   if(exact.length)return exact;
+  }catch(e){}
+ }
+ return[];
+}
+function firstValue(rows,keys){
+ for(const row of rows){
+  for(const key of keys){
+   const v=row?.[key];
+   if(v!==undefined&&v!==null&&String(v).trim()!=='')return v;
+  }
+ }
+ return null;
+}
+function setVehicleField(id,value,showWhenMissing=false){
+ const el=document.getElementById(id);if(!el)return;
+ const box=el.closest('.box');
+ const has=value!==undefined&&value!==null&&String(value).trim()!=='';
+ if(has){el.textContent=String(value);if(box)box.style.display=''}
+ else{el.textContent='—';if(box&&!showWhenMissing)box.style.display='none'}
+}
 async function loadVehicle(){
  const p=plate();if(!p){alert('הכנס מספר רכב');return}
- document.getElementById('status').classList.add('show');document.getElementById('vehicleData').style.display='none';document.getElementById('statusMsg').textContent='מחפש את הרכב בכל מאגרי משרד התחבורה...';document.getElementById('statusMsg').className='';
+ document.getElementById('status').classList.add('show');
+ document.getElementById('vehicleData').style.display='none';
+ document.getElementById('statusMsg').textContent='מחפש את הרכב בכל מאגרי משרד התחבורה...';
+ document.getElementById('statusMsg').className='';
  try{
   const ids=[VEHICLE_ID,OWNERS_ID,ACTIVE_ID,INACTIVE_MODEL_ID,INACTIVE_NO_MODEL_ID,CANCELLED_ID,PUBLIC_ID,PERSONAL_IMPORT_ID,MOTORCYCLE_ID];
   const [hist,owners,active,inactiveModel,inactiveNoModel,cancelled,pub,personalImport,motorcycle]=await Promise.all(ids.map(id=>fetchRecords(id,p)));
-  const sources=[
+  const primarySources=[
    {rows:active,label:'פעיל'},
    {rows:pub,label:'רכב ציבורי פעיל'},
    {rows:personalImport,label:'יבוא אישי'},
@@ -250,27 +290,50 @@ async function loadVehicle(){
    {rows:inactiveNoModel,label:'לא פעיל'},
    {rows:cancelled,label:'ביטול סופי'}
   ];
-  const hit=sources.find(x=>x.rows.length);
-  const ar=hit?.rows?.[0]||null, vr=hist[0]||null, o=owners;
-  if(!ar&&!vr&&!o.length)throw new Error('not-found');
-  const make=ar?.tozeret_nm||ar?.tozar||'לא צוין במאגר';
-  const model=ar?.kinuy_mishari||ar?.degem_nm||'לא צוין במאגר';
-  const year=ar?.shnat_yitzur||'לא צוין במאגר';
-  const type=ar?.sug_rechev_nm||ar?.sug_degem||hit?.label||'לא צוין במאגר';
-  document.getElementById('vPlate').textContent=p;
-  document.getElementById('vFound').textContent=ar?'✓ הרכב זוהה':'✓ נמצאה היסטוריה לרכב';
-  document.getElementById('vMake').textContent=make;
-  document.getElementById('vModel').textContent=model;
-  document.getElementById('vYear').textContent=year;
-  document.getElementById('vType').textContent=(hit?.label?hit.label+' · ':'')+type;
-  loadedKm=vr?.kilometer_test_aharon??null;
-  document.getElementById('vOrigin').textContent=vr?.mkoriut_nm||'לא צוין במאגר';
-  document.getElementById('vColor').textContent=ar?.tzeva_rechev||'לא צוין במאגר';
-  document.getElementById('vVin').textContent=ar?.misgeret||ar?.mispar_shilda||'לא צוין במאגר';
-  document.getElementById('vEngine').textContent=vr?.mispar_manoa||ar?.mispar_manoa||'לא צוין במאגר';
-  document.getElementById('owners').innerHTML=o.length?o.map(x=>'<div class="owner"><span>'+fmtDate(x.baalut_dt)+'</span><span class="badge">'+(x.baalut||'לא צוין')+'</span></div>').join(''):'לא נמצאו רשומות היסטוריית בעלות';
-  document.getElementById('statusMsg').textContent='✓ הרכב זוהה והנתונים הזמינים נטענו';document.getElementById('statusMsg').className='green';document.getElementById('vehicleData').style.display='block';document.getElementById('purchaseBox').style.display='block';
- }catch(e){document.getElementById('statusMsg').textContent='הרכב לא נמצא במאגרים הציבוריים שנבדקו.';document.getElementById('statusMsg').className='red'}
+  const allPrimary=primarySources.flatMap(x=>x.rows);
+  const hit=primarySources.find(x=>x.rows.length);
+  const allRows=[...allPrimary,...hist,...owners];
+  if(!allRows.length)throw new Error('not-found');
+
+  // Merge basic identity data from every matching official resource instead of relying on one row only.
+  const make=firstValue(allRows,['tozeret_nm','tozar','tozeret','manufacturer_name']);
+  const model=firstValue(allRows,['kinuy_mishari','degem_nm','degem','sug_degem','model_name']);
+  const year=firstValue(allRows,['shnat_yitzur','shnat_yechur','year','model_year']);
+  const type=firstValue(allRows,['sug_rechev_nm','sug_rechev','sug_degem','vehicle_type']);
+  const origin=firstValue(allRows,['mkoriut_nm','mkoriut','baalut']);
+  const color=firstValue(allRows,['tzeva_rechev','tzeva_nm','color']);
+  const vin=firstValue(allRows,['misgeret','mispar_shilda','shilda']);
+  const engine=firstValue(allRows,['mispar_manoa','degem_manoa']);
+
+  setVehicleField('vPlate',p,true);
+  setVehicleField('vFound','✓ הרכב זוהה במאגר',true);
+  setVehicleField('vMake',make);
+  setVehicleField('vModel',model);
+  setVehicleField('vYear',year);
+  setVehicleField('vType',hit?.label?((type&&String(type)!==hit.label)?hit.label+' · '+type:hit.label):type);
+  setVehicleField('vOrigin',origin);
+  setVehicleField('vColor',color);
+  setVehicleField('vVin',vin);
+  setVehicleField('vEngine',engine);
+
+  loadedKm=firstValue(hist,['kilometer_test_aharon','kilometer','km']);
+  const ownersBox=document.getElementById('owners')?.closest('.box');
+  if(owners.length){
+   document.getElementById('owners').innerHTML=owners.map(x=>'<div class="owner"><span>'+fmtDate(x.baalut_dt||x.date)+'</span><span class="badge">'+(x.baalut||x.owner_type||'רשומת בעלות')+'</span></div>').join('');
+   if(ownersBox)ownersBox.style.display='';
+  }else if(ownersBox){ownersBox.style.display='none'}
+
+  const basics=[make,model,year].filter(Boolean).length;
+  document.getElementById('statusMsg').textContent=basics
+   ?'✓ הרכב זוהה והנתונים הבסיסיים נטענו'
+   :'✓ הרכב זוהה במאגר';
+  document.getElementById('statusMsg').className='green';
+  document.getElementById('vehicleData').style.display='block';
+  document.getElementById('purchaseBox').style.display='block';
+ }catch(e){
+  document.getElementById('statusMsg').textContent='הרכב לא נמצא במאגרים הציבוריים שנבדקו.';
+  document.getElementById('statusMsg').className='red';
+ }
 }
 
 const seller=['כמה זמן הרכב אצל המוכר?','למה הרכב נמכר?','האם היו תאונות או תיקונים משמעותיים?','האם המוכר מתחייב בבדיקה לגבי מנוע, גיר, שלדה ותאונות משמעותיות?'];
