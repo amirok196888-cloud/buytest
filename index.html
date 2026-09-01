@@ -117,7 +117,10 @@ footer{position:static;background:#edf2f4;border-top:1px solid #d9e2e6;color:#60
 .paywall{margin:30px 0;padding:24px}.paywall h3{font-size:24px}.paywall p{font-size:15px}
 @media(max-width:760px){.mktHero{padding:34px 0 28px}.mktHeroGrid,.mktAbout{grid-template-columns:1fr}.mktGrid3{grid-template-columns:1fr}.mktOutcome{grid-template-columns:1fr 1fr}.mktHeroCard{padding:18px}.mktSection{padding:46px 0}.mktLead{font-size:18px}.mktCtas{flex-direction:column}.mktBtn{width:100%}main{padding-top:24px}.card{padding:18px;margin:20px 0}}
 @media(max-width:460px){.mktOutcome{grid-template-columns:1fr}.priceGrid{grid-template-columns:1fr}.licenseGrid,.grid{grid-template-columns:1fr}.mktWrap{padding:0 14px}}
-</style></head><body>
+</style>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+</head><body>
 
 <section id="marketingLanding">
 <div class="mktHero">
@@ -191,7 +194,14 @@ footer{position:static;background:#edf2f4;border-top:1px solid #d9e2e6;color:#60
 <div class="box"><div class="label">מספר שלדה</div><div class="value" id="vVin">לא זמין כרגע</div></div>
 <div class="box"><div class="label">מספר מנוע</div><div class="value" id="vEngine">לא זמין כרגע</div></div>
 <div class="box wide"><div class="label">היסטוריית בעלויות</div><div id="owners">—</div></div>
-</div></div><div id="rawlink" style="display:none"></div></div>
+</div>
+<div class="info" style="margin-top:14px"><b>חשוב:</b> נא לבדוק ולאמת את נתוני הרכב מול רישיון הרכב — מספר רכב, מספר שלדה, מספר מנוע, צבע ושאר הפרטים המוצגים.</div>
+<div class="info" id="licenseGuide" style="margin-top:14px;text-align:center">
+  <b style="font-size:20px">איפה בודקים את הפרטים ברישיון הרכב?</b>
+  <div style="margin-top:8px">היעזר בדוגמה הבאה והשווה את הפרטים לרישיון הרכב שמציג המוכר.</div>
+  <img src="license-guide.jpg" alt="דוגמה לבדיקת פרטים ברישיון רכב" style="display:block;width:100%;height:auto;margin:14px auto 0;border-radius:12px;border:1px solid #d8e2e8">
+</div>
+</div><div id="rawlink" style="display:none"></div></div>
 </section>
 
 <div class="paywall" id="upgradeBox" style="display:none">
@@ -249,7 +259,9 @@ footer{position:static;background:#edf2f4;border-top:1px solid #d9e2e6;color:#60
 <section class="card paidOnly" style="display:none"><h2>4 · בדיקה חיצונית</h2><p class="sub">בדיקות פשוטות שניתן לראות בעין. סמן שביצעת, ואם נמצא משהו חריג — רשום אותו.</p>
 <div id="externalChecks"></div></section>
 <section class="card paidOnly" style="display:none"><h2>5 · בדיקה עצמית</h2><p class="sub">סמן שביצעת כל בדיקה, ורשום רק ממצאים שהתגלו.</p>
-<div id="selfChecks"></div></section>
+<div id="selfChecks"></div>
+<div class="info" style="margin-top:14px"><b>מצאנו משהו חריג?</b> לא מתעלמים — בודקים אותו במכון או במוסך לפני הקנייה.</div>
+</section>
 <section class="card paidOnly" style="display:none"><h2>6 · בדיקה מורחבת – בלק״ר</h2>
 <div id="balcarBasicState">
 <p class="sub">החבילה כוללת עד 2 רכבים. בלק״ר אינו כלול; ניתן להוסיף בלק״ר לרכב הנוכחי ב־20 ₪.</p>
@@ -271,7 +283,7 @@ footer{position:static;background:#edf2f4;border-top:1px solid #d9e2e6;color:#60
 <section class="card paidOnly" style="display:none"><h2>7 · סיכום ממצאים PDF</h2><p class="sub">הסיכום מתייחס למה שנמצא — לא לכמות סימוני ה־V. לאחר הפקת הסיכום ניתן לשמור אותו כקובץ PDF.</p>
 <button class="primary full" onclick="buildReport()">הפק סיכום בדיקה מקדימה</button>
 <div class="report" id="report"></div>
-<button class="primary full" id="pdfBtn" onclick="saveReportPdf()" style="display:none">שמור סיכום כ־PDF</button>
+<button class="primary full" id="pdfBtn" onclick="saveReportPdf()" style="display:none">צור ושתף PDF</button>
 <button class="secondary full" id="share" onclick="shareReport()" style="display:none">שתף סיכום</button>
 <div class="info"><b>חשוב:</b> זו בדיקה מקדימה בלבד. היא אינה קובעת שהרכב תקין, בטוח או כדאי לרכישה ואינה מחליפה בדיקת קנייה מקצועית.</div>
 </section>
@@ -313,8 +325,8 @@ document.getElementById('vEngine').textContent=vr?.mispar_manoa||'לא צוין 
 document.getElementById('owners').innerHTML=o.length?o.map(x=>'<div class="owner"><span>'+fmtDate(x.baalut_dt)+'</span><span class="badge">'+(x.baalut||'לא צוין')+'</span></div>').join(''):'לא נמצאו רשומות';
 saveCurrentChecklist();currentVehiclePlate=p;document.getElementById('statusMsg').textContent='✓ הנתונים נטענו בהצלחה';document.getElementById('statusMsg').className='green';document.getElementById('vehicleData').style.display='block';document.querySelectorAll('.freeAfterLookup').forEach(x=>x.style.display='block');document.getElementById('purchaseBox').style.display='block';activateVehicleEntitlement(p)}catch(e){document.getElementById('statusMsg').textContent='לא הצלחתי לטעון את המידע כרגע.';document.getElementById('statusMsg').className='red'}}
 const seller=['כמה זמן הרכב אצל המוכר?','למה הרכב נמכר?','האם היו תאונות או תיקונים משמעותיים?','האם המוכר מתחייב בבדיקה לגבי מנוע, גיר, שלדה ותאונות משמעותיות?'];
-const external=['בדוק אם קיימים הבדלי גוון בצבע בין חלקי המרכב','בדוק אם קיימים סימני פתיחה או פירוק בברגי מכסה המנוע ומכסה תא המטען','בדוק אם קיימים סימני פתיחה או פירוק בברגי הדלתות והכנפיים הקדמיות'];
-const self=['לא נשארו נורות אזהרה חריגות לאחר התנעה','המזגן פועל ומקרר','חלונות, מראות וציוד חשמלי בסיסי פועלים','הבלאי בתא הנוסעים נראה סביר ביחס לק״מ','בהעברה ל־D ול־R אין מכה או רעש חריג','אין רעש, עשן או נזילה בולטים לעין','מצב שמן המנוע אינו מציג סימן ברור לבוצה חריגה'];
+const external=['בדוק אם קיימים הבדלי גוון בצבע בין חלקי המרכב','בדוק אם קיימים סימני פתיחה או פירוק בברגי מכסה המנוע ומכסה תא המטען','בדוק אם קיימים סימני פתיחה או פירוק בברגי הדלתות והכנפיים הקדמיות','תקינות צמיגים','גלגל רזרבי וציוד החלפת גלגל'];
+const self=['לא נשארו נורות אזהרה חריגות לאחר התנעה','המזגן פועל ומקרר','חלונות, מראות וציוד חשמלי בסיסי פועלים','הבלאי בתא הנוסעים נראה סביר ביחס לק״מ','בהעברה ל־D ול־R אין מכה או רעש חריג','אין רעש, עשן או נזילה בולטים לעין','מצב שמן המנוע אינו מציג סימן ברור לבוצה חריגה','שני מפתחות','בצע נסיעה קצרה ובדוק רעשים ונקישות חריגים'];
 function makeChecks(arr,start){return arr.map((t,i)=>`<div class="check"><div class="checkTop"><input type="checkbox" class="done"><b>${t}</b><button class="findingBtn" onclick="toggleFinding(this)">יש ממצא</button></div><div class="finding"><textarea placeholder="מה נמצא?"></textarea><div class="severity"><label><input type="radio" name="s${start+i}" value="בירור">דורש בירור</label><label><input type="radio" name="s${start+i}" value="משמעותי">משמעותי</label></div></div></div>`).join('')}
 document.getElementById('sellerChecks').innerHTML=makeChecks(seller,10);
 document.getElementById('externalChecks').innerHTML=makeChecks(external,20);document.getElementById('selfChecks').innerHTML=makeChecks(self,30);
@@ -526,36 +538,111 @@ major=findings.filter(x=>x.sev==='משמעותי').length;let headline,cls,advic
 document.getElementById('report').style.display='block';document.getElementById('report').innerHTML=`<h3 class="${cls}">${headline}</h3><p>${advice}</p>`+(findings.length?'<ul>'+findings.map(x=>`<li><b>${x.title}:</b> ${x.text} (${x.sev})</li>`).join('')+'</ul>':'');
 reportText=`בדיקה לפני בדיקה\nרכב: ${plate()||'לא הוזן'}\n${headline}\n${advice}\n`+findings.map(x=>`• ${x.title}: ${x.text} (${x.sev})`).join('\n');document.getElementById('share').style.display='block';document.getElementById('pdfBtn').style.display='block';document.getElementById('report').scrollIntoView({behavior:'smooth'})}
 
-function saveReportPdf(){
+async function saveReportPdf(){
   if(!reportText){buildReport(); if(!reportText)return;}
-  const esc=s=>String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-  const lines=reportText.split('\n').filter(Boolean);
-  const title=lines.shift()||'BuyTest';
-  const vehicle=lines.shift()||'';
-  const body=lines.map((line,i)=>{
-    if(i===0) return `<h2>${esc(line)}</h2>`;
-    if(line.startsWith('•')) return `<li>${esc(line.substring(1).trim())}</li>`;
-    return `<p>${esc(line)}</p>`;
-  }).join('');
-  const w=window.open('','_blank');
-  if(!w){alert('יש לאפשר חלונות קופצים כדי לשמור PDF');return;}
-  w.document.write(`<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><title>BuyTest - סיכום בדיקה</title>
-  <style>
-  @page{size:A4;margin:16mm}
-  body{font-family:Arial,"Noto Sans Hebrew",sans-serif;color:#15212b;background:#fff;line-height:1.55;margin:0}
-  .head{border-bottom:3px solid #18b89a;padding-bottom:14px;margin-bottom:20px}
-  h1{font-size:28px;margin:0 0 6px} h2{font-size:21px;margin:18px 0 10px}
-  .vehicle{font-size:18px;font-weight:700}.box{border:1px solid #d8e2e8;border-radius:12px;padding:18px}
-  p,li{font-size:16px} ul{padding-right:22px}
-  .note{margin-top:24px;padding:14px;background:#f4f7f8;border-radius:10px;font-size:13px}
-  .brand{font-weight:800;color:#0d6f63}
-  </style></head><body>
-  <div class="head"><h1><span class="brand">BuyTest</span> · ${esc(title)}</h1><div class="vehicle">${esc(vehicle)}</div></div>
-  <div class="box">${body.includes('<li>')?body.replace(/(<li>.*<\/li>)/s,'<ul>$1</ul>'):body}</div>
-  <div class="note"><b>חשוב:</b> זהו סיכום של בדיקה מקדימה בלבד. הוא אינו קובע שהרכב תקין, בטוח או כדאי לרכישה ואינו מחליף בדיקת קנייה מקצועית.</div>
-  <script>window.onload=()=>setTimeout(()=>window.print(),250)<\/script>
-  </body></html>`);
-  w.document.close();
+
+  const btn=document.getElementById('pdfBtn');
+  const oldText=btn?.textContent||'צור ושתף PDF';
+  if(btn){btn.disabled=true;btn.textContent='מכין PDF...';}
+
+  try{
+    if(typeof html2canvas==='undefined' || !window.jspdf){
+      throw new Error('PDF_LIB_NOT_LOADED');
+    }
+
+    const esc=s=>String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    const lines=reportText.split('\n').filter(Boolean);
+    const title=lines.shift()||'בדיקה לפני בדיקה';
+    const vehicle=lines.shift()||'';
+    const body=lines.map((line,i)=>{
+      if(i===0) return `<h2 style="font-size:22px;margin:16px 0 10px">${esc(line)}</h2>`;
+      if(line.startsWith('•')) return `<li style="margin:8px 0">${esc(line.substring(1).trim())}</li>`;
+      return `<p style="margin:8px 0">${esc(line)}</p>`;
+    }).join('');
+
+    // Build an off-screen A4-like report. html2canvas captures the Hebrew exactly as shown.
+    const report=document.createElement('div');
+    report.setAttribute('dir','rtl');
+    report.style.cssText='position:fixed;left:-10000px;top:0;width:794px;background:#fff;color:#15212b;font-family:Arial,"Noto Sans Hebrew",sans-serif;line-height:1.55;padding:58px;box-sizing:border-box;z-index:-1';
+    report.innerHTML=`
+      <div style="border-bottom:4px solid #18b89a;padding-bottom:16px;margin-bottom:24px">
+        <div style="font-size:32px;font-weight:800"><span style="color:#0d6f63">BuyTest</span> · ${esc(title)}</div>
+        <div style="font-size:20px;font-weight:700;margin-top:8px">${esc(vehicle)}</div>
+      </div>
+      <div style="border:1px solid #d8e2e8;border-radius:14px;padding:22px;font-size:17px">
+        ${body.includes('<li')?`<ul style="padding-right:24px;margin:0">${body}</ul>`:body}
+      </div>
+      <div style="margin-top:26px;padding:16px;background:#f4f7f8;border-radius:10px;font-size:14px">
+        <b>חשוב:</b> זהו סיכום של בדיקה מקדימה בלבד. הוא אינו קובע שהרכב תקין, בטוח או כדאי לרכישה ואינו מחליף בדיקת קנייה מקצועית.
+      </div>`;
+    document.body.appendChild(report);
+
+    const canvas=await html2canvas(report,{
+      scale:2,
+      backgroundColor:'#ffffff',
+      useCORS:true,
+      logging:false
+    });
+    report.remove();
+
+    const {jsPDF}=window.jspdf;
+    const pdf=new jsPDF({orientation:'p',unit:'mm',format:'a4'});
+    const pageW=210, pageH=297, margin=10;
+    const imgData=canvas.toDataURL('image/jpeg',0.94);
+    const usableW=pageW-margin*2;
+    const imgH=canvas.height*usableW/canvas.width;
+
+    if(imgH <= pageH-margin*2){
+      pdf.addImage(imgData,'JPEG',margin,margin,usableW,imgH);
+    }else{
+      // Slice long reports across PDF pages.
+      const pxPerMm=canvas.width/usableW;
+      const slicePx=Math.floor((pageH-margin*2)*pxPerMm);
+      let y=0, page=0;
+      while(y<canvas.height){
+        const h=Math.min(slicePx,canvas.height-y);
+        const part=document.createElement('canvas');
+        part.width=canvas.width; part.height=h;
+        part.getContext('2d').drawImage(canvas,0,y,canvas.width,h,0,0,canvas.width,h);
+        const partData=part.toDataURL('image/jpeg',0.94);
+        const partHmm=h*usableW/canvas.width;
+        if(page>0)pdf.addPage();
+        pdf.addImage(partData,'JPEG',margin,margin,usableW,partHmm);
+        y+=h; page++;
+      }
+    }
+
+    const blob=pdf.output('blob');
+    const safePlate=(plate()||'רכב').replace(/\D/g,'');
+    const file=new File([blob],`BuyTest-${safePlate}.pdf`,{type:'application/pdf'});
+
+    // Android / supported browsers: open the normal share sheet (WhatsApp, Gmail, Drive, etc.).
+    if(navigator.share && (!navigator.canShare || navigator.canShare({files:[file]}))){
+      try{
+        await navigator.share({
+          title:'BuyTest · סיכום בדיקה',
+          text:'סיכום בדיקת רכב מ־BuyTest',
+          files:[file]
+        });
+        return;
+      }catch(e){
+        if(e?.name==='AbortError')return;
+      }
+    }
+
+    // Fallback: download the PDF if file-sharing isn't supported.
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;a.download=file.name;
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1500);
+    alert('ה־PDF נשמר במכשיר. אפשר לשתף אותו מיישום הקבצים.');
+  }catch(e){
+    console.error(e);
+    alert('לא הצלחתי ליצור את קובץ ה־PDF כרגע. בדוק שיש חיבור לאינטרנט ונסה שוב.');
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent=oldText;}
+  }
 }
 
 async function shareReport(){if(navigator.share){try{await navigator.share({title:'בדיקה לפני בדיקה',text:reportText});return}catch(e){}}try{await navigator.clipboard.writeText(reportText);alert('הסיכום הועתק')}catch(e){alert(reportText)}}
