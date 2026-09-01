@@ -75,6 +75,9 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#07131aef;border-top:1p
 /* BuyTest V15: single-page flow - summary/pricing -> app */
 #landing{padding:0!important;align-items:flex-start!important;background:#07161d!important}
 #landing .landingCard{width:100%!important;max-width:760px!important;margin:0 auto!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+
+.paidOnly{display:none!important}
+body.paid-open .paidOnly{display:block!important}
 </style><style>#appShell{display:block!important}
 /* BuyTest V20 – light commercial landing + improved value-first flow */
 :root{--bg:#f5f7f8;--card:#ffffff;--card2:#f8fafb;--line:#d9e2e6;--txt:#17242b;--muted:#60717a;--a:#0fa87e;--warn:#9b6b00;--bad:#bd3030}
@@ -116,63 +119,10 @@ footer{position:static;background:#edf2f4;border-top:1px solid #d9e2e6;color:#60
 @media(max-width:460px){.mktOutcome{grid-template-columns:1fr}.priceGrid{grid-template-columns:1fr}.licenseGrid,.grid{grid-template-columns:1fr}.mktWrap{padding:0 14px}}
 </style></head><body>
 
-<section id="marketingLanding">
-<div class="mktHero">
-<div class="mktWrap mktHeroGrid">
-<div>
-<span class="mktEyebrow">BuyTest · בדיקה לפני בדיקה</span>
-<h1>לפני שמשלמים על בדיקת רכב — <span>בודקים חכם</span></h1>
-<p class="mktLead">BuyTest מרכז עבורך נתוני רכב זמינים, שאלות חשובות למוכר ובדיקות פשוטות שאפשר לבצע לבד — כדי לזהות סימני אזהרה מוקדם ולהגיע לבדיקה המקצועית עם יותר מידע.</p>
-<div class="mktCtas">
-<a class="mktBtn mktBtnPrimary" href="#appShell">התחל בדיקה חינם</a>
-<a class="mktBtn mktBtnGhost" href="#howItWorks">איך זה עובד?</a>
-</div>
-</div>
-<div class="mktHeroCard">
-<h3>מה מקבלים כבר בתחילת הבדיקה?</h3>
-<div class="mktSteps">
-<div class="mktStep"><div class="mktNum">1</div><div><b>זיהוי הרכב</b><br/><span>נתונים זמינים ממאגרים ציבוריים לפי מספר רכב.</span></div></div>
-<div class="mktStep"><div class="mktNum">2</div><div><b>התאמת פרטים</b><br/><span>השוואה לרישיון ולמה שרואים ברכב בפועל.</span></div></div>
-<div class="mktStep"><div class="mktNum">3</div><div><b>שאלות למוכר</b><br/><span>שאלות שמטרתן להציף נקודות שכדאי לברר לפני שמתקדמים.</span></div></div>
-</div>
-</div>
-</div>
-</div>
-<div class="mktSection alt" id="howItWorks"><div class="mktWrap">
-<div class="mktTitle"><h2>מה BuyTest בעצם עושה?</h2><p>לא מחליף מכון בדיקה — אלא עוזר לך לדעת מה לבדוק לפני שמגיעים אליו.</p></div>
-<div class="mktGrid3">
-<div class="mktInfoCard"><div class="ico">🔎</div><h3>מרכז מידע</h3><p>מושך נתונים זמינים על הרכב ומציג אותם במקום אחד, בצורה ברורה ופשוטה.</p></div>
-<div class="mktInfoCard"><div class="ico">🧭</div><h3>מוביל אותך שלב־שלב</h3><p>שאלות ובדיקות פרקטיות שגם מי שאינו איש מקצוע יכול לבצע ולהבין.</p></div>
-<div class="mktInfoCard"><div class="ico">🚩</div><h3>מציף נקודות לבירור</h3><p>עוזר לארגן ממצאים ולזהות דברים שכדאי לברר לפני שמוציאים כסף נוסף.</p></div>
-</div>
-</div></div>
-<div class="mktSection"><div class="mktWrap mktAbout">
-<div class="mktProfile"><div class="big">👨‍🔧</div><h3>עמוס רוקח</h3><p>הנדסאי רכב · בוחן רכב לפני קנייה</p></div>
-<div class="mktBio"><h2>הניסיון שמאחורי BuyTest</h2><p><strong>יותר מ־15 שנות ניסיון בבדיקות רכב לפני קנייה.</strong> BuyTest נבנתה מתוך ניסיון מעשי בשטח — אחרי שנים של מפגש עם רכבים, מוכרים וקונים, ומתוך ההבנה שלפעמים אפשר לזהות נקודות חשובות עוד לפני הכניסה לבדיקה מקצועית.</p><p>המטרה היא לתת לקונה כלי מסודר, פשוט ונגיש שיעזור לו להגיע לשלב הבא עם יותר מידע ופחות סימני שאלה.</p></div>
-</div></div>
-<div class="mktSection alt"><div class="mktWrap">
-<div class="mktTitle"><h2>למה להשתמש באתר?</h2><p>כי גם כמה דקות של בדיקה מסודרת יכולות לשפר את איכות ההחלטה.</p></div>
-<div class="mktOutcome">
-<div class="mktOutcomeItem">💰<b>חוסך בדיקות מיותרות</b><span>אם מתגלים סימני אזהרה מוקדם, אפשר לברר אותם לפני שמתקדמים.</span></div>
-<div class="mktOutcomeItem">⏱️<b>חוסך זמן</b><span>כל התהליך בנוי לפי סדר ברור במקום לאסוף מידע מכמה מקומות.</span></div>
-<div class="mktOutcomeItem">🧠<b>נותן ידע</b><span>אתה מגיע למוכר ולמכון עם שאלות ממוקדות יותר.</span></div>
-<div class="mktOutcomeItem">📋<b>מסכם ממצאים</b><span>בסיום מתקבלת תמונה מסודרת של הנקודות שמצאת ושדורשות בירור.</span></div>
-</div>
-</div></div>
-<div class="mktSection"><div class="mktWrap">
-<div class="mktTitle"><h2>לקוחות ומשתמשים</h2><p>אנחנו מעדיפים להציג רק שמות והמלצות אמיתיים, באישור.</p></div>
-<div class="mktClients"><b>BuyTest נמצאת בשלב הרצה ושיפור</b> אזור זה מוכן להצגת לקוחות, שותפים והמלצות מאומתות ברגע שנקבל אישור לפרסמן — בלי להמציא לוגואים או ביקורות.</div>
-</div></div>
-<div class="mktSection alt"><div class="mktWrap">
-<div class="mktTitle"><h2>שאלות נפוצות</h2></div>
-<div class="mktFaq">
-<details><summary>האם BuyTest מחליף בדיקה במכון?</summary><p>לא. זו בדיקה מקדימה שנועדה לעזור לאסוף מידע, לבצע בדיקות בסיסיות ולזהות נקודות לבירור. לפני רכישה מומלץ לבצע בדיקה מקצועית מתאימה.</p></details>
-<details><summary>מה אפשר לבדוק בחינם?</summary><p>מתחילים בזיהוי הרכב, צפייה בנתונים הזמינים, התאמת פרטים בסיסיים ושאלות חשובות למוכר. רק לאחר שקיבלת ערך ראשוני מוצגים המסלולים המורחבים.</p></details>
-<details><summary>מה קורה אם חסר מידע על הרכב?</summary><p>מאגרים ציבוריים אינם תמיד מלאים. כאשר נתון אינו זמין, BuyTest מציגה זאת במקום להמציא מידע, וממליצה לאמת פרטים מהותיים מול מסמכי הרכב והגורמים המתאימים.</p></details>
-<details><summary>מה מקבלים במסלול המלא?</summary><p>צ'קליסט מורחב, בדיקות נוספות וסיכום ממצאים מסודר. מסלול בלק״ר יכלול גם את רכיב בלק״ר כאשר החיבור המסחרי יאושר ויופעל.</p></details>
-</div>
-</div></div>
-<div class="mktSection"><div class="mktWrap"><div class="mktFinal"><h2>קונה רכב יד שנייה?</h2><p>התחל קודם בבדיקה המקדימה — ורק אחר כך תחליט אם ואיך ממשיכים.</p><a class="mktBtn mktBtnPrimary" href="#appShell">התחל בדיקה חינם</a></div></div></div>
+<section id="marketingLanding" style="margin:0;padding:0;background:#061927;text-align:center;">
+  <a href="#appShell" aria-label="התחל בדיקה" style="display:block;line-height:0;">
+    <img src="בודקים רכב בביטחון עם BuyTest.png" alt="BuyTest" style="display:block;width:100%;height:auto;margin:0 auto;max-width:1536px;">
+  </a>
 </section>
 <div id="appShell">
 <main>
@@ -212,10 +162,10 @@ footer{position:static;background:#edf2f4;border-top:1px solid #d9e2e6;color:#60
 <div class="info">האפליקציה תשווה בסיכום בין הק״מ שהזנת לבין הק״מ האחרון במאגר, וגם תתריע אם הצבע שהזנת אינו תואם.</div>
 </section>
 <section class="card freeAfterLookup" style="display:none"><h2>3 · שאלות למוכר</h2><p class="sub">סמן שביצעת את השאלה. אם עלה משהו חריג — לחץ „יש ממצא”.</p>
-<div id="sellerChecks"></div></section><div class="valueFirstNote">✓ עד כאן קיבלת זיהוי רכב, התאמת פרטים ושאלות למוכר ללא תשלום. התשלום מופיע רק אם תרצה להמשיך לבדיקה המורחבת ולסיכום.</div><div class="paywall" id="purchaseBox" style="display:none">
+<div id="sellerChecks"></div></section><div class="valueFirstNote"><b>✓ שלבים 1–3 ללא תשלום.</b><br>מכאן, שלבים 4–7 הם במסלול בתשלום: בדיקה חיצונית, בדיקה עצמית, בלק״ר לפי המסלול וסיכום PDF.</div><div class="paywall" id="purchaseBox" style="display:none">
 <div style="font-size:34px">🔒</div>
 <h3>רוצה להמשיך לבדיקה המורחבת?</h3>
-<p>כבר ביצעת את שלבי הבסיס בחינם. מכאן אפשר לפתוח את הבדיקות המורחבות, הצ'קליסט וסיכום הממצאים.</p>
+<p>שלבים 1–3 הסתיימו ללא תשלום. כדי לפתוח את <b>שלבים 4–7</b> — הבדיקה החיצונית, הבדיקה העצמית, בלק״ר לפי המסלול וסיכום PDF — יש לבחור מסלול.</p>
 <div class="legalConsent">
 <label><input id="legalAccept" type="checkbox"/>
 <span>אני מאשר/ת שקראתי את <button onclick="openLegal('terms')" style="background:none;border:0;color:#52d6ba;text-decoration:underline;padding:0" type="button">תנאי השימוש</button>
@@ -226,13 +176,13 @@ footer{position:static;background:#edf2f4;border-top:1px solid #d9e2e6;color:#60
 <div class="priceCard">
 <strong>בדיקה מלאה</strong>
 <div class="price">29 ₪</div>
-<small>כל שלבי הבדיקה + סיכום ממצאים</small>
+<small>שלבים 4–5 + סיכום ממצאים ב־PDF</small>
 <button class="planBtn primary" onclick="purchaseBasicChecked()">המשך לבדיקה – 29 ₪</button>
 </div>
 <div class="priceCard">
 <strong>בדיקה מלאה + בלק״ר</strong>
 <div class="price">49 ₪</div>
-<small>הבדיקה המלאה + דוח בלק״ר</small>
+<small>שלבים 4–5 + סיכום PDF + דוח בלק״ר</small>
 <button class="planBtn primary" onclick="purchaseFullChecked()">המשך עם בלק״ר – 49 ₪</button>
 </div>
 </div>
@@ -254,9 +204,10 @@ footer{position:static;background:#edf2f4;border-top:1px solid #d9e2e6;color:#60
 </div>
 <div class="devMsg" id="balcarUpgradeMsg"></div>
 </section>
-<section class="card paidOnly" style="display:none"><h2>7 · סיכום ממצאים</h2><p class="sub">הסיכום מתייחס למה שנמצא — לא לכמות סימוני ה־V.</p>
+<section class="card paidOnly" style="display:none"><h2>7 · סיכום ממצאים PDF</h2><p class="sub">הסיכום מתייחס למה שנמצא — לא לכמות סימוני ה־V. לאחר הפקת הסיכום ניתן לשמור אותו כקובץ PDF.</p>
 <button class="primary full" onclick="buildReport()">הפק סיכום בדיקה מקדימה</button>
 <div class="report" id="report"></div>
+<button class="primary full" id="pdfBtn" onclick="saveReportPdf()" style="display:none">שמור סיכום כ־PDF</button>
 <button class="secondary full" id="share" onclick="shareReport()" style="display:none">שתף סיכום</button>
 <div class="info"><b>חשוב:</b> זו בדיקה מקדימה בלבד. היא אינה קובעת שהרכב תקין, בטוח או כדאי לרכישה ואינה מחליפה בדיקת קנייה מקצועית.</div>
 </section>
@@ -362,6 +313,7 @@ function openLegal(which){
 }
 function closeLegal(){document.getElementById('legalModal').classList.remove('open')}
 function unlockPaidSections(){
+  document.body.classList.add('paid-open');
   document.querySelectorAll('.paidOnly').forEach(x=>x.style.display='block');
 }
 function setBasicPlan(){
@@ -405,16 +357,51 @@ const lc=document.getElementById('licColor').value.trim(),ac=document.getElement
 const dk=Number(document.getElementById('dashKm').value.replace(/\D/g,'')),lk=Number(document.getElementById('licKm').value.replace(/\D/g,''));if(loadedKm&&dk&&dk<loadedKm)findings.push({title:'קילומטראז׳',text:`הק״מ בלוח (${fmtNum(dk)}) נמוך מהק״מ האחרון במאגר (${fmtNum(loadedKm)})`,sev:'משמעותי'});if(lk&&dk&&dk<lk)findings.push({title:'קילומטראז׳',text:`הק״מ בלוח (${fmtNum(dk)}) נמוך מהק״מ שהוזן מהמסמך (${fmtNum(lk)})`,sev:'משמעותי'});
 major=findings.filter(x=>x.sev==='משמעותי').length;let headline,cls,advice;if(!findings.length){headline='🟢 לא הוזנו ממצאים חריגים';cls='green';advice='אם השלמת את הבדיקה ולא עלו סימני אזהרה, ניתן לשקול להמשיך לבדיקה מקצועית.'}else if(major){headline='🔴 נמצאו סימני אזהרה משמעותיים';cls='red';advice='מומלץ לברר את הממצאים לפני שמוציאים כסף על בדיקה מקצועית.'}else{headline='🟡 נמצאו נקודות הדורשות בירור';cls='warn';advice='כדאי לברר את הנקודות שסומנו לפני שממשיכים לבדיקה מקצועית.'}
 document.getElementById('report').style.display='block';document.getElementById('report').innerHTML=`<h3 class="${cls}">${headline}</h3><p>${advice}</p>`+(findings.length?'<ul>'+findings.map(x=>`<li><b>${x.title}:</b> ${x.text} (${x.sev})</li>`).join('')+'</ul>':'');
-reportText=`בדיקה לפני בדיקה\nרכב: ${plate()||'לא הוזן'}\n${headline}\n${advice}\n`+findings.map(x=>`• ${x.title}: ${x.text} (${x.sev})`).join('\n');document.getElementById('share').style.display='block';document.getElementById('report').scrollIntoView({behavior:'smooth'})}
+reportText=`בדיקה לפני בדיקה\nרכב: ${plate()||'לא הוזן'}\n${headline}\n${advice}\n`+findings.map(x=>`• ${x.title}: ${x.text} (${x.sev})`).join('\n');document.getElementById('share').style.display='block';document.getElementById('pdfBtn').style.display='block';document.getElementById('report').scrollIntoView({behavior:'smooth'})}
+
+function saveReportPdf(){
+  if(!reportText){buildReport(); if(!reportText)return;}
+  const esc=s=>String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  const lines=reportText.split('\n').filter(Boolean);
+  const title=lines.shift()||'BuyTest';
+  const vehicle=lines.shift()||'';
+  const body=lines.map((line,i)=>{
+    if(i===0) return `<h2>${esc(line)}</h2>`;
+    if(line.startsWith('•')) return `<li>${esc(line.substring(1).trim())}</li>`;
+    return `<p>${esc(line)}</p>`;
+  }).join('');
+  const w=window.open('','_blank');
+  if(!w){alert('יש לאפשר חלונות קופצים כדי לשמור PDF');return;}
+  w.document.write(`<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><title>BuyTest - סיכום בדיקה</title>
+  <style>
+  @page{size:A4;margin:16mm}
+  body{font-family:Arial,"Noto Sans Hebrew",sans-serif;color:#15212b;background:#fff;line-height:1.55;margin:0}
+  .head{border-bottom:3px solid #18b89a;padding-bottom:14px;margin-bottom:20px}
+  h1{font-size:28px;margin:0 0 6px} h2{font-size:21px;margin:18px 0 10px}
+  .vehicle{font-size:18px;font-weight:700}.box{border:1px solid #d8e2e8;border-radius:12px;padding:18px}
+  p,li{font-size:16px} ul{padding-right:22px}
+  .note{margin-top:24px;padding:14px;background:#f4f7f8;border-radius:10px;font-size:13px}
+  .brand{font-weight:800;color:#0d6f63}
+  </style></head><body>
+  <div class="head"><h1><span class="brand">BuyTest</span> · ${esc(title)}</h1><div class="vehicle">${esc(vehicle)}</div></div>
+  <div class="box">${body.includes('<li>')?body.replace(/(<li>.*<\/li>)/s,'<ul>$1</ul>'):body}</div>
+  <div class="note"><b>חשוב:</b> זהו סיכום של בדיקה מקדימה בלבד. הוא אינו קובע שהרכב תקין, בטוח או כדאי לרכישה ואינו מחליף בדיקת קנייה מקצועית.</div>
+  <script>window.onload=()=>setTimeout(()=>window.print(),250)<\/script>
+  </body></html>`);
+  w.document.close();
+}
+
 async function shareReport(){if(navigator.share){try{await navigator.share({title:'בדיקה לפני בדיקה',text:reportText});return}catch(e){}}try{await navigator.clipboard.writeText(reportText);alert('הסיכום הועתק')}catch(e){alert(reportText)}}
 
-// מצב בדיקות זמני: פתיחת כל חלקי האפליקציה ללא תשלום אמיתי.
+// מצב רגיל: שלבים 1–3 חינם; שלבים 4–7 נשארים נעולים עד אישור מסלול.
 window.addEventListener('DOMContentLoaded',()=>{
-  setBalcarPlan();
-  const purchase=document.getElementById('purchaseBox');
-  if(purchase) purchase.style.display='none';
-  const up=document.getElementById('upgradeBox');
-  if(up) up.style.display='none';
+  document.querySelectorAll('.paidOnly').forEach(x=>x.style.display='none');
+  const purchaseBox=document.getElementById('purchaseBox');
+  if(purchaseBox) purchaseBox.style.display='block';
+  const upgradeBox=document.getElementById('upgradeBox');
+  if(upgradeBox) upgradeBox.style.display='none';
+  const feedbackBox=document.getElementById('feedbackBox');
+  if(feedbackBox) feedbackBox.style.display='none';
 });
 </script>
 </div>
