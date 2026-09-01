@@ -229,6 +229,8 @@ const CANCELLED_ID='851ecab1-0622-4dbe-a6c7-f950cf82abf9';
 const PUBLIC_ID='cf29862d-ca25-4691-84f6-1be60dcb4a1e';
 const PERSONAL_IMPORT_ID='03adc637-b6fe-402b-9937-7c3d3afc9140';
 const MOTORCYCLE_ID='bf9df4e2-d90d-4c0a-a400-19e15af8e95f';
+const WLTP_ID='142afde2-6228-49f9-8a29-9b6c3a0cbe40';
+const TOZERET_ID='d00812f4-58c5-4ce8-b16c-ac13ae52f9d8';
 let loadedKm=null, reportText='';
 function plate(){return document.getElementById('plate').value.replace(/\D/g,'')}
 function apiUrl(resource,p,mode='number'){
@@ -255,6 +257,13 @@ async function fetchRecords(id,p){
   }catch(e){}
  }
  return[];
+}
+async function fetchByFilters(id,filters,limit=20){
+ try{
+  const url='https://data.gov.il/api/3/action/datastore_search?resource_id='+id+'&limit='+limit+'&filters='+encodeURIComponent(JSON.stringify(filters));
+  const r=await fetch(url,{cache:'no-store'});if(!r.ok)return[];
+  const j=await r.json();return j?.result?.records||[];
+ }catch(e){return[]}
 }
 function firstValue(rows,keys){
  for(const row of rows){
@@ -296,14 +305,41 @@ async function loadVehicle(){
   if(!allRows.length)throw new Error('not-found');
 
   // Merge basic identity data from every matching official resource instead of relying on one row only.
-  const make=firstValue(allRows,['tozeret_nm','tozar','tozeret','manufacturer_name']);
-  const model=firstValue(allRows,['kinuy_mishari','degem_nm','degem','sug_degem','model_name']);
-  const year=firstValue(allRows,['shnat_yitzur','shnat_yechur','year','model_year']);
-  const type=firstValue(allRows,['sug_rechev_nm','sug_rechev','sug_degem','vehicle_type']);
-  const origin=firstValue(allRows,['mkoriut_nm','mkoriut','baalut']);
-  const color=firstValue(allRows,['tzeva_rechev','tzeva_nm','color']);
-  const vin=firstValue(allRows,['misgeret','mispar_shilda','shilda']);
-  const engine=firstValue(allRows,['mispar_manoa','degem_manoa']);
+  let make=firstValue(allRows,['tozeret_nm','tozar','tozeret','shem_tozeret','teur_tozeret','manufacturer_name']);
+  let model=firstValue(allRows,['kinuy_mishari','degem_nm','degem','degem_rechev','shem_degem','model_name']);
+  let year=firstValue(allRows,['shnat_yitzur','shnat_yechur','shnat_yitzur_rechev','year','model_year']);
+  let type=firstValue(allRows,['sug_rechev_nm','sug_rechev','sug_degem','teur_sug_rechev','vehicle_type']);
+  let origin=firstValue(allRows,['mkoriut_nm','mkoriut','sug_yevu','sug_yevu_nm']);
+  let color=firstValue(allRows,['tzeva_rechev','tzeva_nm','tzeva','color']);
+  let vin=firstValue(allRows,['misgeret','mispar_shilda','shilda','vin']);
+  let engine=firstValue(allRows,['mispar_manoa','mispar_manoa_nm','engine_number']);
+
+  // Vehicles that are no longer in the active registry often contain only product/model codes.
+  // Use those codes to enrich the identity from the official WLTP/model catalogue.
+  const tozeretCd=firstValue(allRows,['tozeret_cd','kod_tozeret']);
+  const degemCd=firstValue(allRows,['degem_cd','kod_degem']);
+  const sugDegem=firstValue(allRows,['sug_degem']);
+  let catalogRows=[];
+  if((!make||!model) && tozeretCd!==null && degemCd!==null){
+   const f={tozeret_cd:Number(tozeretCd),degem_cd:Number(degemCd)};
+   if(year!==null && year!==undefined && String(year).trim()!=='')f.shnat_yitzur=Number(year);
+   if(sugDegem)f.sug_degem=sugDegem;
+   catalogRows=await fetchByFilters(WLTP_ID,f,10);
+   // Some catalogue combinations are stored without year/type; retry by the two stable model codes.
+   if(!catalogRows.length)catalogRows=await fetchByFilters(WLTP_ID,{tozeret_cd:Number(tozeretCd),degem_cd:Number(degemCd)},10);
+  }
+  if(catalogRows.length){
+   const enriched=[...catalogRows,...allRows];
+   make=make||firstValue(enriched,['tozeret_nm','tozar','tozeret','shem_tozeret']);
+   model=model||firstValue(enriched,['kinuy_mishari','degem_nm','degem','degem_rechev','shem_degem']);
+   year=year||firstValue(enriched,['shnat_yitzur','year','model_year']);
+   type=type||firstValue(enriched,['sug_rechev_nm','sug_rechev','sug_degem']);
+  }
+  if(!make && tozeretCd!==null){
+   const prod=await fetchByFilters(TOZERET_ID,{tozeret_cd:Number(tozeretCd)},10);
+   make=firstValue(prod,['tozeret_nm','tozar','tozeret','shem_tozeret'])||make;
+  }
+  if(!model && degemCd!==null)model='קוד דגם '+degemCd;
 
   setVehicleField('vPlate',p,true);
   setVehicleField('vFound','✓ הרכב זוהה במאגר',true);
