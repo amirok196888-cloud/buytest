@@ -254,7 +254,14 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 <div class="devMsg" id="paymentMsg" role="status" aria-live="polite"></div>
 </section>
 
+<section class="card" id="managerPreviewBox" style="padding:14px">
+  <button class="devBtn" type="button" onclick="openManagerPreview()">🔐 כניסת מנהל לבדיקה</button>
+</section>
 
+
+<section class="card" id="managerActiveNotice" style="display:none;border:2px solid #0ea67b;background:#e8f7f2;color:#075e48">
+  <b>מצב מנהל פעיל.</b> כל חלקי הבדיקה פתוחים ללא תשלום לצורך בדיקה וניהול.
+</section>
 
 <section class="card paidOnly" id="licenseMatchSection" style="display:none;border:2px solid #0ea67b;">
   <h2 style="margin-bottom:8px;">א. התאמת רישיון הרכב לרכב ולמוכר</h2>
@@ -506,6 +513,30 @@ function openLegal(which){
 function closeLegal(){document.getElementById('legalModal').classList.remove('open')}
 function unlockFreeSections(){document.querySelectorAll('.freeAfterLookup').forEach(x=>x.style.display='block');}
 function startPayment(){const m=document.getElementById('paymentMsg');m.classList.add('show');m.textContent='תיק הבדיקה המלא יעלה 49 ₪ ויכלול את שלבי “לפני” ו“אחרי” לאותו רכב. החיבור המאובטח ל־Grow יופעל לאחר קבלת פרטי ה־API; כרגע לא נגבה תשלום והבדיקה אינה נפתחת ללקוח.';}
+async function managerCodeDigest(value){
+  const bytes=new TextEncoder().encode(String(value||'').trim());
+  const digest=await crypto.subtle.digest('SHA-256',bytes);
+  return [...new Uint8Array(digest)].map(byte=>byte.toString(16).padStart(2,'0')).join('');
+}
+async function openManagerPreview(){
+  const code=prompt('קוד מנהל:');
+  if(code===null) return;
+  const digest=await managerCodeDigest(code);
+  if(digest!=='46a30a10bf067f6c3bede12312c987e43ec06920de6cbbe15617079c1f19ab10'){
+    alert('קוד מנהל שגוי');
+    return;
+  }
+  document.body.classList.add('paid-open','manager-mode');
+  document.querySelectorAll('.paidOnly').forEach(section=>section.style.display='block');
+  const purchaseBox=document.getElementById('purchaseBox');
+  if(purchaseBox) purchaseBox.style.display='none';
+  const managerBox=document.getElementById('managerPreviewBox');
+  if(managerBox) managerBox.style.display='none';
+  const offer=document.getElementById('fullCheckOffer');
+  if(offer) offer.style.display='none';
+  const notice=document.getElementById('managerActiveNotice');
+  if(notice){notice.style.display='block';notice.scrollIntoView({behavior:'smooth',block:'start'});}
+}
 let vehiclePhotoData=[];
 let btPreparedPdfFile=null, btPdfPreparing=null;
 function addVehiclePhotos(input){[...(input.files||[])].forEach(f=>{const r=new FileReader();r.onload=()=>{vehiclePhotoData.push(r.result);renderVehiclePhotos()};r.readAsDataURL(f)})}
