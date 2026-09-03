@@ -155,7 +155,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 .formulaAdmin{display:none;border:2px solid #285f7a;background:#f2f8fb}.formulaAdminGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.formulaAdmin .wide{grid-column:1/-1}.formulaAdmin input,.formulaAdmin select,.formulaAdmin textarea{width:100%;background:#fff}.formulaAdmin textarea{min-height:80px}.formulaAdminStats{padding:11px 13px;border-radius:12px;background:#e7f3f8;color:#173f52;font-weight:800;margin:10px 0}.formulaAdminList{max-height:270px;overflow:auto;border:1px solid #d9e2e6;border-radius:12px;background:#fff;margin-top:12px}.formulaAdminItem{padding:10px 12px;border-bottom:1px solid #e6edef}.formulaAdminItem:last-child{border-bottom:0}.formulaAdminItem small{display:block;color:#60717a;margin-top:3px}.formulaAdminActions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}.formulaAdminActions button{flex:1;min-width:150px}.contextNote{margin-top:8px;padding:9px 11px;border-radius:10px;background:#eef4f6;color:#35515c}.matchSource{font-size:12px;color:#60717a;margin-top:7px}
 @media(max-width:760px){.mktHero{padding:30px 0 24px}.mktHeroGrid,.mktAbout,.afterGrid{grid-template-columns:1fr}.mktGrid3{grid-template-columns:1fr}.mktOutcome{grid-template-columns:1fr 1fr}.mktHeroCard{padding:18px}.mktLead{font-size:18px}.mktCtas{flex-direction:column}.mktBtn{width:100%}main{padding-top:12px}.card{padding:18px;margin:20px 0}.credentials strong{font-size:22px}.credentials span{font-size:15px}.scopeStrip{grid-template-columns:1fr}}
 @media(max-width:460px){.mktOutcome{grid-template-columns:1fr}.priceGrid{grid-template-columns:1fr}.licenseGrid,.grid,.formulaAdminGrid{grid-template-columns:1fr}.formulaAdmin .wide{grid-column:auto}.mktWrap{padding:0 14px}}
-</style><meta name="buytest-build" content="formula-database-beta4-severity-hierarchy-auto-analysis">
+</style><meta name="buytest-build" content="formula-database-beta5-ocr-quality-pdf-auto-analysis">
 </head><body>
 
 <section id="marketingLanding">
@@ -359,9 +359,9 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 <div class="afterGrid">
   <div class="uploadPanel required">
     <h3>סיכום הבוחן · חובה</h3>
-    <p class="sub">צלם מקרוב את אזור הסיכום בלבד. רצוי שלא לכלול לוגו, חתימה, תעודת זהות או פרטי קשר.</p>
-    <button class="secondary full" type="button" onclick="document.getElementById('examinerSummaryFile').click()">📷 העלאת סיכום הבוחן</button>
-    <input id="examinerSummaryFile" type="file" accept="image/*,application/pdf" capture="environment" style="display:none" onchange="handleInspectionFile(this,'summary')">
+    <p class="sub">עדיפות ל־PDF המקורי. אם מצלמים, יש לצלם ישר ומקרוב את כל טבלת הסיכום - לא צילום מסך שבו הדוח מופיע מרחוק.</p>
+    <button class="secondary full" type="button" onclick="document.getElementById('examinerSummaryFile').click()">📄 העלאת PDF או צילום ברור</button>
+    <input id="examinerSummaryFile" type="file" accept="image/*,application/pdf" style="display:none" onchange="handleInspectionFile(this,'summary')">
     <div class="uploadState" id="summaryUploadState" role="status" aria-live="polite"></div>
     <div class="ocrReview" id="summaryReviewArea">
       <textarea class="reportInput" id="examinerSummaryText" hidden aria-hidden="true"></textarea>
@@ -372,7 +372,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
     <h3>בדיקה ממוחשבת · אופציונלי</h3>
     <p class="sub">אפשר לצרף רק את הדף עם התוצאות, קודי התקלה והסימון תקין/לא תקין או טווחי הייחוס.</p>
     <button class="secondary full" type="button" onclick="document.getElementById('computerTestFile').click()">📄 העלאת בדיקה ממוחשבת</button>
-    <input id="computerTestFile" type="file" accept="image/*,application/pdf" capture="environment" style="display:none" onchange="handleInspectionFile(this,'computer')">
+    <input id="computerTestFile" type="file" accept="image/*,application/pdf" style="display:none" onchange="handleInspectionFile(this,'computer')">
     <div class="uploadState" id="computerUploadState" role="status" aria-live="polite"></div>
     <div class="ocrReview" id="computerReviewArea">
       <textarea class="reportInput" id="computerTestText" hidden aria-hidden="true"></textarea>
@@ -438,6 +438,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
   <img id="licenseImageLarge" alt="דוגמה מוגדלת לרישיון רכב">
 </div>
 <footer>© 2026 BuyTest · כל הזכויות שמורות · קונה? בודק!</footer>
+<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@7.0.0/dist/tesseract.min.js" crossorigin="anonymous"></script>
 <script>
 const VEHICLE_ID='56063a99-8a3e-4ff4-912e-5966c0279bad';
@@ -446,6 +447,7 @@ const ACTIVE_ID='053cea08-09bc-40ec-8f7a-156f0677aff3';
 let loadedKm=null, reportText='', preReportText='', afterReportText='';
 let externalVehicleData={kmHistory:[]};
 const inspectionFiles={summary:null,computer:null};
+const inspectionOcrMeta={summary:null,computer:null};
 function setExternalVehicleData(data={}){
   externalVehicleData={kmHistory:Array.isArray(data.kmHistory)?data.kmHistory:[]};
   const kh=document.getElementById('kmHistory');
@@ -630,18 +632,107 @@ async function scanPlatePhoto(input){
   }
 }
 
-async function imageForDocumentOcr(file){
+async function loadImageFile(file){
   const dataUrl=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(file)});
-  const image=await new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=reject;img.src=dataUrl});
-  const maxSide=2400;
-  const scale=Math.min(1,maxSide/Math.max(image.naturalWidth,image.naturalHeight));
+  return new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=reject;img.src=dataUrl});
+}
+
+async function imageForDocumentOcr(file){
+  const image=await loadImageFile(file);
+  const width=image.naturalWidth,height=image.naturalHeight,ratio=height/Math.max(1,width);
+  if(width<1100&&ratio>1.9) throw new Error('LOW_RES_SCREENSHOT');
+  const maxSide=3600;
+  const scale=Math.min(4,maxSide/Math.max(width,height));
   const canvas=document.createElement('canvas');
-  canvas.width=Math.max(1,Math.round(image.naturalWidth*scale));
-  canvas.height=Math.max(1,Math.round(image.naturalHeight*scale));
-  const ctx=canvas.getContext('2d');
-  ctx.filter='grayscale(1) contrast(1.55) brightness(1.08)';
+  canvas.width=Math.max(1,Math.round(width*scale));
+  canvas.height=Math.max(1,Math.round(height*scale));
+  const ctx=canvas.getContext('2d',{willReadFrequently:false});
+  ctx.imageSmoothingEnabled=true;
+  ctx.imageSmoothingQuality='high';
+  ctx.filter='grayscale(1) contrast(1.65) brightness(1.08)';
   ctx.drawImage(image,0,0,canvas.width,canvas.height);
-  return canvas.toDataURL('image/jpeg',0.94);
+  return canvas.toDataURL('image/png');
+}
+
+function pdfPageText(textContent){
+  const rows=[];
+  (textContent?.items||[]).forEach(item=>{
+    const value=String(item?.str||'').trim();
+    if(!value) return;
+    const y=Math.round(Number(item?.transform?.[5]||0)/3)*3;
+    let row=rows.find(candidate=>Math.abs(candidate.y-y)<=3);
+    if(!row){row={y,items:[]};rows.push(row);}
+    row.items.push({x:Number(item?.transform?.[4]||0),value});
+  });
+  return rows.sort((a,b)=>b.y-a.y).map(row=>row.items.sort((a,b)=>b.x-a.x).map(item=>item.value).join(' ')).join('\n');
+}
+
+async function pdfForDocumentOcr(file,qualityFunction){
+  if(!window.pdfjsLib) throw new Error('PDF_UNAVAILABLE');
+  pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+  const bytes=new Uint8Array(await file.arrayBuffer());
+  const pdf=await pdfjsLib.getDocument({data:bytes}).promise;
+  const pageLimit=Math.min(pdf.numPages,3);
+  const extracted=[];
+  for(let pageNumber=1;pageNumber<=pageLimit;pageNumber++){
+    const page=await pdf.getPage(pageNumber);
+    extracted.push(pdfPageText(await page.getTextContent()));
+  }
+  const directText=cleanOcrText(extracted.join('\n'));
+  if((directText.match(/[א-ת]{2,}/g)||[]).length>=20&&qualityFunction(directText).ok) return {text:directText,sources:[]};
+  const sources=[];
+  for(let pageNumber=1;pageNumber<=pageLimit;pageNumber++){
+    const page=await pdf.getPage(pageNumber);
+    const baseViewport=page.getViewport({scale:1});
+    const scale=Math.min(4,3400/Math.max(baseViewport.width,baseViewport.height));
+    const viewport=page.getViewport({scale});
+    const canvas=document.createElement('canvas');
+    canvas.width=Math.round(viewport.width);
+    canvas.height=Math.round(viewport.height);
+    const ctx=canvas.getContext('2d');
+    await page.render({canvasContext:ctx,viewport}).promise;
+    sources.push(canvas.toDataURL('image/png'));
+  }
+  return {text:'',sources};
+}
+
+function reportReadQuality(text){
+  const cleaned=cleanOcrText(text);
+  const analysis=interpretSummaryText(cleaned);
+  const hebrewWords=(cleaned.match(/[א-ת]{2,}/g)||[]).length;
+  const compact=normalizeFindingText(cleaned).replace(/\s/g,'');
+  const categoryCount=formulaCategoryDefinitions.filter(category=>category.name!=='הערות כלליות'&&compact.includes(normalizeFindingText(category.name).replace(/\s/g,''))).length;
+  const score=(analysis.findings.length*100)+(categoryCount*20)+Math.min(hebrewWords,100)-analysis.unknown.length;
+  const ok=categoryCount>=3&&hebrewWords>=20&&(analysis.findings.length>=1||/(^|\s)(תקין|עבר)(\s|$)/.test(normalizeFindingText(cleaned)));
+  return {ok,score,findings:analysis.findings.length,categories:categoryCount,unknown:analysis.unknown.length};
+}
+
+function computerReadQuality(text){
+  const cleaned=cleanOcrText(text);
+  const analysis=interpretComputerText(cleaned);
+  const hebrewWords=(cleaned.match(/[א-ת]{2,}/g)||[]).length;
+  const values=(cleaned.match(/\d+(?:[.,]\d+)?/g)||[]).length;
+  const score=(analysis.findings.length*100)+Math.min(hebrewWords,60)+Math.min(values*3,60)-analysis.unknown.length;
+  const ok=analysis.findings.length>=1||(hebrewWords>=10&&values>=3);
+  return {ok,score,findings:analysis.findings.length,categories:0,unknown:analysis.unknown.length};
+}
+
+async function recognizeDocumentSources(worker,sources,state,setPass,qualityFunction){
+  const candidates=[];
+  for(const psm of ['6','11']){
+    setPass(psm);
+    await worker.setParameters({preserve_interword_spaces:'1',tessedit_pageseg_mode:psm});
+    const pageTexts=[];
+    for(let index=0;index<sources.length;index++){
+      state.textContent=`מזהה את דוח הבדיקה... מעבר ${psm==='6'?'ראשון':'נוסף'}, עמוד ${index+1} מתוך ${sources.length}`;
+      const result=await worker.recognize(sources[index]);
+      pageTexts.push(cleanOcrText(result?.data?.text));
+    }
+    const text=cleanOcrText(pageTexts.join('\n'));
+    candidates.push({text,quality:qualityFunction(text)});
+  }
+  candidates.sort((a,b)=>b.quality.score-a.quality.score);
+  return candidates[0]||{text:'',quality:{ok:false,score:0,findings:0,categories:0,unknown:0}};
 }
 
 function cleanOcrText(text){
@@ -655,6 +746,7 @@ function cleanOcrText(text){
 function clearInspectionFile(kind){
   const isSummary=kind==='summary';
   inspectionFiles[kind]=null;
+  inspectionOcrMeta[kind]=null;
   const input=document.getElementById(isSummary?'examinerSummaryFile':'computerTestFile');
   const state=document.getElementById(isSummary?'summaryUploadState':'computerUploadState');
   const textArea=document.getElementById(isSummary?'examinerSummaryText':'computerTestText');
@@ -672,6 +764,7 @@ async function handleInspectionFile(input,kind){
   const textArea=document.getElementById(isSummary?'examinerSummaryText':'computerTestText');
   const review=document.getElementById(isSummary?'summaryReviewArea':'computerReviewArea');
   if(!file) return;
+  inspectionOcrMeta[kind]=null;
   textArea.value='';
   if(review) review.style.display='none';
   if(file.size>12*1024*1024){
@@ -691,34 +784,42 @@ async function handleInspectionFile(input,kind){
   inspectionFiles[kind]=file;
   state.classList.add('show');
   state.textContent='✓ הקובץ נבחר: '+file.name+'. קובץ המקור לא יצורף לפלט.';
-  if(file.type==='application/pdf'){
-    state.textContent+=' בגרסה זו יש להעתיק ידנית מה־PDF את הטקסט לאזור האימות שמתחת.';
-    if(review) review.style.display='block';
-    textArea.focus();
-    return;
-  }
   let worker=null;
   try{
-    if(!window.Tesseract) throw new Error('OCR_UNAVAILABLE');
-    state.textContent='הקובץ נבחר. מזהה טקסט במכשיר...';
-    const source=await imageForDocumentOcr(file);
-    worker=await Tesseract.createWorker('heb+eng',1,{
-      logger:m=>{
-        if(m.status==='recognizing text') state.textContent='מזהה טקסט במכשיר... '+Math.round((m.progress||0)*100)+'%';
-      }
-    });
-    await worker.setParameters({preserve_interword_spaces:'1',tessedit_pageseg_mode:'6'});
-    const result=await worker.recognize(source);
-    const recognized=cleanOcrText(result?.data?.text);
+    state.textContent='מכין את דוח הבדיקה לקריאה...';
+    const qualityFunction=isSummary?reportReadQuality:computerReadQuality;
+    const prepared=file.type==='application/pdf'
+      ? await pdfForDocumentOcr(file,qualityFunction)
+      : {text:'',sources:[await imageForDocumentOcr(file)]};
+    let recognized=cleanOcrText(prepared.text);
+    let quality=recognized?qualityFunction(recognized):null;
+    if(!recognized){
+      if(!window.Tesseract) throw new Error('OCR_UNAVAILABLE');
+      let currentPass='6';
+      worker=await Tesseract.createWorker('heb+eng',1,{
+        logger:m=>{
+          if(m.status==='recognizing text') state.textContent=`מזהה את דוח הבדיקה... מעבר ${currentPass==='6'?'ראשון':'נוסף'} ${Math.round((m.progress||0)*100)}%`;
+        }
+      });
+      const best=await recognizeDocumentSources(worker,prepared.sources,state,value=>{currentPass=value;},qualityFunction);
+      recognized=best.text;
+      quality=best.quality;
+    }
     if(!recognized) throw new Error('TEXT_NOT_FOUND');
+    if(!quality?.ok) throw new Error('OCR_LOW_QUALITY');
     textArea.value=recognized;
-    state.textContent='✓ הקובץ נקרא בהצלחה. המערכת מוכנה לפענוח אוטומטי.';
+    inspectionOcrMeta[kind]=quality;
+    state.textContent=`✓ הדוח נקרא. זוהו ${quality.findings} ממצאים לפענוח מקצועי.`;
     if(review) review.style.display='block';
   }catch(error){
     console.warn('BuyTest document OCR unavailable:',error);
-    state.textContent=error?.message==='TEXT_NOT_FOUND'
-      ? 'הקובץ נקרא, אך לא זוהה בו טקסט ברור. נסה צילום ישר וקרוב יותר של אזור סיכום הבוחן.'
-      : 'לא הצלחנו להפעיל את זיהוי העברית. ודא שיש חיבור לאינטרנט ונסה שוב.';
+    textArea.value='';
+    inspectionOcrMeta[kind]=null;
+    if(error?.message==='LOW_RES_SCREENSHOT') state.textContent='התמונה היא צילום מסך מרחוק והטקסט בדוח קטן מדי. יש להעלות את קובץ ה־PDF המקורי, או לצלם מקרוב רק את טבלת סיכום הבוחן.';
+    else if(error?.message==='OCR_LOW_QUALITY') state.textContent='הדוח לא נקרא ברמת דיוק שמאפשרת מסקנות. יש להעלות PDF מקורי או צילום ישר וקרוב של טבלת הסיכום בלבד.';
+    else if(error?.message==='TEXT_NOT_FOUND') state.textContent='לא זוהה טקסט ברור. יש להעלות PDF מקורי או צילום ישר וקרוב של טבלת הסיכום בלבד.';
+    else if(error?.message==='PDF_UNAVAILABLE') state.textContent='קורא ה־PDF לא נטען. ודא שיש חיבור לאינטרנט ונסה שוב.';
+    else state.textContent='לא הצלחנו להפעיל את זיהוי הדוח. ודא שיש חיבור לאינטרנט ונסה שוב.';
     if(review) review.style.display='block';
   }finally{
     if(worker) await worker.terminate().catch(()=>{});
@@ -1131,9 +1232,24 @@ function findKnowledgeRules(line,categoryHint=''){
     }
   }
 
+  const preferred=[];
+  const sourcePositions=new Map();
+  [...curated,...additions].forEach(item=>{
+    if(item.matchSource==='מאגר מקצועי'){preferred.push(item);return;}
+    const sourceKey=normalizeFindingText(item.sourceText||'');
+    if(!sourceKey){preferred.push(item);return;}
+    if(!sourcePositions.has(sourceKey)){
+      sourcePositions.set(sourceKey,preferred.length);
+      preferred.push(item);
+      return;
+    }
+    const position=sourcePositions.get(sourceKey);
+    if(categoryHint&&item.category===categoryHint&&preferred[position]?.category!==categoryHint) preferred[position]=item;
+  });
+
   const unique=[];
   const seen=new Set();
-  [...curated,...additions].forEach(item=>{
+  preferred.forEach(item=>{
     const semanticKey=item.matchSource==='מאגר מקצועי'
       ? item.id
       : [item.category,item.classification,normalizeFindingText(item.sourceText||item.matchedTerm||item.id)].join('|');
@@ -1149,11 +1265,13 @@ function findKnowledgeRules(line,categoryHint=''){
 
 function reportCategoryFromLine(line){
   const n=normalizeFindingText(line).replace(/^\d+\s+/,'').trim();
-  if(n.includes('הערות כלליות')) return 'הערות כלליות';
+  const compact=n.replace(/\s/g,'');
+  if(compact.includes('הערותכלליות')) return 'הערות כלליות';
   const matches=formulaCategoryDefinitions.filter(category=>{
     const categoryText=normalizeFindingText(category.name);
     if(!categoryText) return false;
-    return n===categoryText||n.startsWith(categoryText+' ')||n.endsWith(' '+categoryText);
+    const categoryCompact=categoryText.replace(/\s/g,'');
+    return n===categoryText||n.startsWith(categoryText+' ')||n.endsWith(' '+categoryText)||(categoryCompact.length>=6&&compact.includes(categoryCompact));
   }).sort((a,b)=>b.name.length-a.name.length);
   return matches[0]?.name||'';
 }
@@ -1196,6 +1314,8 @@ function safeUnknownExcerpt(line){
 
 function interpretSummaryText(text){
   const findings=[],unknown=[],seen=new Set();
+  const compactReport=normalizeFindingText(text).replace(/\s/g,'');
+  const chassisHint=compactReport.includes('סוגשלדהשלדהנפרדת')?'שלדה נפרדת':compactReport.includes('סוגשלדהשלדתמרכב')?'שלדת מרכב':'';
   let currentCategory='',currentSeverity=null,skipSection=false;
   reportLines(text).forEach(line=>{
     const lineCategory=reportCategoryFromLine(line);
@@ -1206,16 +1326,19 @@ function interpretSummaryText(text){
     }
     if(skipSection||lineCategory==='הערות כלליות') return;
     const lineSeverity=reportSeverityFromLine(line);
-    if(lineSeverity) currentSeverity=lineSeverity;
+    if(lineSeverity){
+      currentSeverity=lineSeverity;
+      if(chassisHint) currentCategory=chassisHint;
+    }
     const contentLine=stripReportScaffolding(line,lineCategory,lineSeverity);
-    if(!contentLine||(isMetadataLine(contentLine)&&!currentCategory)||isExplicitlyNormal(contentLine)) return;
+    if(!contentLine||isExplicitlyNormal(contentLine)) return;
     const rules=findKnowledgeRules(contentLine,currentCategory);
     if(rules.length){
       rules.forEach(rule=>{
         const enriched=applyReportSeverity(rule,currentSeverity,currentCategory);
         if(!seen.has(enriched.id)){findings.push(enriched);seen.add(enriched.id);}
       });
-    }else{
+    }else if(!isMetadataLine(contentLine)){
       const excerpt=safeUnknownExcerpt(contentLine);
       if(excerpt&&!unknown.includes(excerpt)) unknown.push(excerpt);
     }
@@ -1260,9 +1383,6 @@ function analysisTextBlock(title,result){
   }else{
     text+='• לא זוהה ניסוח שניתן לפרש בבטחה מתוך המאגר המקצועי.\n';
   }
-  if(result.unknown.length){
-    text+='קטעים שלא נקראו בוודאות ולא נכללו במסקנות:\n'+result.unknown.map(x=>'• '+x).join('\n')+'\n';
-  }
   return text.trim();
 }
 
@@ -1276,6 +1396,8 @@ function analyseInspectionReport(){
   if(!ownership){alert('יש לאשר שהדוח על שמך או שיש לך הרשאה מתאימה.');return;}
   if(summaryText.length<5){alert('לא זוהה טקסט מסיכום הבוחן. יש לצלם מחדש, ישר וקרוב יותר, את אזור הסיכום.');return;}
   if(inspectionFiles.computer&&!computerText){alert('דף הבדיקה הממוחשבת לא נקרא. יש לצלם אותו מחדש או להסיר את הקובץ.');return;}
+  if(!inspectionOcrMeta.summary?.ok){alert('הדוח לא נקרא ברמת דיוק שמאפשרת מסקנות. יש להעלות PDF מקורי או צילום קרוב יותר.');return;}
+  if(inspectionFiles.computer&&!inspectionOcrMeta.computer?.ok){alert('הבדיקה הממוחשבת לא נקראה ברמת דיוק מספקת. יש להעלות קובץ ברור יותר או להסיר אותה.');return;}
 
   const summaryResult=interpretSummaryText(summaryText);
   const computerResult=computerText?interpretComputerText(computerText):{findings:[],unknown:[]};
@@ -1288,12 +1410,8 @@ function analyseInspectionReport(){
   if(computerText){
     html+='<h4>בדיקה ממוחשבת</h4>'+(computerResult.findings.length?computerResult.findings.map(meaningCardHtml).join(''):'<p>לא נמצא בדף סימון מפורש או קוד שניתן לשקף בבטחה.</p>');
   }
-  const allUnknown=[...summaryResult.unknown,...computerResult.unknown];
-  if(allUnknown.length){
-    html+='<div class="unknownList"><h4>קטעים שלא נקראו בוודאות</h4><p>קטעים אלה לא נכללו במסקנות כדי למנוע קביעה שגויה:</p><ul>'+allUnknown.map(x=>'<li>'+escapeHtml(x)+'</li>').join('')+'</ul></div>';
-  }
-  if(!totalFindings&&!allUnknown.length){
-    html+='<div class="unknownList"><b>לא זוהו ממצאים לפענוח.</b> נסה צילום ישר וקרוב יותר של אזור סיכום הבוחן.</div>';
+  if(!totalFindings){
+    html+='<div class="unknownList"><b>לא זוהו בדוח ניסוחים של ליקוי מתוך המאגר המקצועי.</b></div>';
   }
   html+='<div class="info"><b>איך להשתמש במסקנות:</b> לכל ממצא מוצגים סוג הממצא, חומרתו והמשקל שלו בהחלטת הקנייה. ההחלטה הסופית והמחיר נשארים בידי המשתמש.</div>';
 
