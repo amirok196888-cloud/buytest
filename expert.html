@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b7d6e">
+  <meta name="buytest-build" content="expert-calibration-engine-pilot-v1">
+  <title>BuyTest - כיול הידע המקצועי</title>
+  <style>
+    :root{--green:#0b7d6e;--green2:#075e52;--ink:#17242b;--muted:#66747b;--line:#dce4e7;--paper:#fff;--bg:#f3f6f5;--amber:#f0aa00;--red:#c63b32;--blue:#286d91}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,"Noto Sans Hebrew",sans-serif;line-height:1.45}
+    button,textarea,input{font:inherit}
+    button{cursor:pointer}
+    .shell{max-width:760px;margin:auto;padding:18px 14px 90px}
+    .hero,.card{background:var(--paper);border:1px solid var(--line);border-radius:20px;box-shadow:0 5px 18px rgba(22,51,58,.06)}
+    .hero{padding:22px;margin-bottom:14px;border-top:6px solid var(--green)}
+    h1{font-size:29px;margin:0 0 5px}.hero p{margin:6px 0;color:var(--muted)}
+    .pill{display:inline-block;padding:5px 10px;border-radius:999px;background:#e5f5f1;color:var(--green2);font-size:13px;font-weight:800}
+    .progressText{display:flex;justify-content:space-between;gap:12px;margin-top:18px;font-weight:800}
+    .progress{height:11px;background:#e5ebed;border-radius:999px;overflow:hidden;margin-top:7px}
+    .progress>div{height:100%;background:linear-gradient(90deg,var(--green),#20a78f);width:0;transition:width .25s ease}
+    .card{padding:20px;margin-top:14px}
+    .sectionName{font-size:14px;color:var(--green2);font-weight:900}
+    h2{font-size:26px;line-height:1.2;margin:5px 0 10px}
+    .lead{color:var(--muted);margin:0 0 14px}
+    .phrases{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 18px}
+    .phrase{background:#f2f6f7;border:1px solid #dae4e6;border-radius:10px;padding:7px 10px;font-weight:700}
+    .question{margin-top:22px;border-top:1px solid var(--line);padding-top:18px}
+    .question h3{font-size:18px;margin:0 0 4px}.hint{font-size:14px;color:var(--muted);margin:0 0 10px}
+    .choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+    .choice{min-height:55px;border:2px solid var(--line);background:#fff;border-radius:13px;padding:10px 8px;font-weight:850;color:var(--ink)}
+    .choice.selected{border-color:var(--green);background:#e9f7f3;color:var(--green2)}
+    .choice[data-value="disclaimer"].selected{border-color:#6e7c82;background:#f0f3f4;color:#33464e}
+    .choice[data-value="actual"].selected,.choice[data-value="high"].selected{border-color:var(--red);background:#fff0ee;color:#8f251f}
+    .choice[data-value="context"].selected,.choice[data-value="medium"].selected{border-color:var(--amber);background:#fff7df;color:#765000}
+    .choice[data-value="split"].selected{border-color:var(--blue);background:#edf6fb;color:#174f6b}
+    .choice[data-value="safety"].selected{border-color:#8c1c4d;background:#faedf3;color:#751640}
+    textarea{width:100%;min-height:90px;border:2px solid var(--line);border-radius:13px;padding:12px;resize:vertical;background:#fff}
+    textarea:focus{outline:none;border-color:var(--green)}
+    .known{background:#eaf8f4;border:1px solid #a9dfd1;border-radius:13px;padding:12px;margin:14px 0;color:#075e48;font-weight:700}
+    .actions{display:grid;grid-template-columns:1fr 1.35fr 1fr;gap:9px;margin-top:22px}
+    .btn{border:0;border-radius:13px;padding:13px 10px;font-weight:900;min-height:51px}
+    .primary{background:var(--green);color:#fff}.secondary{background:#e9eef0;color:#243941}.outline{background:#fff;border:2px solid var(--line);color:#34474f}
+    .status{min-height:24px;text-align:center;color:var(--green2);font-weight:800;margin-top:10px}
+    details{margin-top:14px}.review{display:grid;gap:8px;margin-top:12px}
+    .reviewRow{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:11px;border:1px solid var(--line);border-radius:12px;background:#fff}
+    .reviewRow button{border:0;background:none;text-align:right;color:inherit;font-weight:800;flex:1}
+    .done{color:var(--green2);font-weight:900}.pending{color:#8b5a00;font-weight:900}
+    .exportBox{background:#edf7fa;border:1px solid #b8d8e3}
+    .exportBox h2{font-size:22px}.exportBox p{color:#3f5e69}
+    .exportActions{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+    .fileInput{display:none}
+    .small{font-size:13px;color:var(--muted)}
+    .footer{text-align:center;color:#718087;font-size:12px;margin-top:18px}
+    @media(max-width:520px){.shell{padding:10px 9px 80px}.hero,.card{border-radius:16px}.hero,.card{padding:16px}h1{font-size:25px}h2{font-size:23px}.choices{grid-template-columns:1fr}.actions{grid-template-columns:1fr 1fr}.actions .saveNext{grid-column:1/-1;grid-row:1}.exportActions{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<main class="shell">
+  <section class="hero">
+    <span class="pill">כלי מנהל - אינו מיועד ללקוחות</span>
+    <h1>כיול הידע המקצועי של BuyTest</h1>
+    <p>פיילוט ראשון למערכת המנוע. כל כרטיס מאחד כמה נוסחים שמתארים אותו ממצא מקצועי.</p>
+    <div class="progressText"><span id="progressLabel">0 מתוך 20 קבוצות הושלמו</span><span id="savedLabel">נשמר במכשיר</span></div>
+    <div class="progress"><div id="progressBar"></div></div>
+  </section>
+
+  <section class="card" id="editorCard">
+    <div class="sectionName">מערכת מנוע · קבוצה <span id="position">1</span></div>
+    <h2 id="conceptTitle"></h2>
+    <p class="lead" id="conceptDescription"></p>
+    <div class="phrases" id="phrases"></div>
+    <div class="known" id="knownRule" hidden></div>
+
+    <div class="question">
+      <h3>1. מה הסיווג המקצועי של הממצא?</h3>
+      <p class="hint">בחר לפי משמעותו המקצועית בדוח, לא לפי חומרת הניסוח.</p>
+      <div class="choices" id="classificationChoices">
+        <button class="choice" data-field="classification" data-value="disclaimer">כסת״ח / ניסוח הגנה</button>
+        <button class="choice" data-field="classification" data-value="actual">תקלה ממשית</button>
+        <button class="choice" data-field="classification" data-value="context">תלוי בממצאים נוספים</button>
+        <button class="choice" data-field="classification" data-value="wear">בלאי או תחזוקה בלבד</button>
+        <button class="choice" data-field="classification" data-value="history">מידע / היסטוריית תיקון</button>
+        <button class="choice" data-field="classification" data-value="split">הקבוצה אינה אחידה - לפצל</button>
+      </div>
+    </div>
+
+    <div class="question" id="severityQuestion">
+      <h3>2. מה חומרת התקלה, אם היא אכן קיימת?</h3>
+      <p class="hint">זהו הציון המכני של התקלה עצמה. גיל הרכב אינו מוריד חומרה מכנית.</p>
+      <div class="choices">
+        <button class="choice" data-field="severity" data-value="none">אין חומרת תקלה</button>
+        <button class="choice" data-field="severity" data-value="low">נמוכה</button>
+        <button class="choice" data-field="severity" data-value="medium">בינונית</button>
+        <button class="choice" data-field="severity" data-value="high">גבוהה</button>
+        <button class="choice" data-field="severity" data-value="safety">בטיחותית / קריטית</button>
+      </div>
+    </div>
+
+    <div class="question">
+      <h3>3. כיצד גיל וקילומטראז׳ משפיעים?</h3>
+      <p class="hint">מפרידים בין עצם התקלה לבין ההשפעה הכלכלית שלה על הקנייה.</p>
+      <div class="choices">
+        <button class="choice" data-field="agePolicy" data-value="no_effect">לא משנים את עצם התקלה</button>
+        <button class="choice" data-field="agePolicy" data-value="economic_only">משפיעים רק על כדאיות ומחיר</button>
+        <button class="choice" data-field="agePolicy" data-value="expected_wear">יכולים להפוך את הממצא לבלאי צפוי</button>
+        <button class="choice" data-field="agePolicy" data-value="not_relevant">לא רלוונטיים לממצא</button>
+      </div>
+    </div>
+
+    <div class="question">
+      <h3>4. כלל מקצועי או תנאי שמשנה את ההחלטה</h3>
+      <p class="hint">רשות. לדוגמה: "כסת״ח כשהוא מופיע לבדו; משמעותי רק יחד עם..."</p>
+      <textarea id="expertNote" placeholder="כתוב כאן רק אם יש כלל, חריג או שילוב חשוב"></textarea>
+    </div>
+
+    <div class="actions">
+      <button class="btn secondary" id="prevButton">הקודם</button>
+      <button class="btn primary saveNext" id="saveButton">שמור ועבור לבא</button>
+      <button class="btn secondary" id="nextButton">הבא</button>
+    </div>
+    <div class="status" id="status" aria-live="polite"></div>
+  </section>
+
+  <section class="card">
+    <details>
+      <summary><b>הצג את כל קבוצות המנוע והסטטוס שלהן</b></summary>
+      <div class="review" id="reviewList"></div>
+    </details>
+  </section>
+
+  <section class="card exportBox">
+    <h2>שמירת הכיול והעברה למנוע הניתוח</h2>
+    <p>בסיום הורד את קובץ הכיול ושלח אותו אליי. הקובץ כולל רק את הסיווגים המקצועיים שבחרת.</p>
+    <div class="exportActions">
+      <button class="btn primary" id="exportButton">הורד קובץ כיול</button>
+      <button class="btn outline" id="importButton">החזר קובץ כיול שנשמר</button>
+      <input class="fileInput" id="importFile" type="file" accept="application/json,.json">
+    </div>
+    <p class="small">ההחלטות נשמרות אוטומטית גם בדפדפן של המכשיר הזה.</p>
+  </section>
+  <div class="footer">BuyTest · פיילוט כיול מקצועי · מנוע בלבד</div>
+</main>
+
+<script>
+const BUILD='expert-calibration-engine-pilot-v1';
+const STORAGE_KEY='buytestExpertCalibrationEngineV1';
+const concepts=[
+  {id:'engine_block_damage',title:'נזק או תיקון בבלוק המנוע',description:'נזק פיזי או תיקון בגוף המנוע.',phrases:['הלחמות בבלוק המנוע','סדק בגוף המנוע','קורוזיה ואבנית בבלוק המנוע']},
+  {id:'oil_burning',title:'שריפת שמן ותצרוכת שמן',description:'נוסחים הקשורים לשריפת שמן או לצורך במעקב אחר צריכת שמן.',phrases:['שריפות שמן ממובילי שסתומים','מנוע שורף שמן','לבדוק תצרוכת שמן בנסיעה ממושכת']},
+  {id:'internal_wear',title:'בלאי פנימי או מנוע לפני שיפוץ',description:'ניסוחים מפורשים לגבי מצב פנימי ירוד של המנוע.',phrases:['בלאי פנימי גבוה','מנוע לפני שיפוץ']},
+  {id:'oil_pressure',title:'לחץ שמן נמוך',description:'ממצא הקשור ללחץ הסיכה במנוע.',phrases:['לחץ שמן נמוך']},
+  {id:'valve_train_noise',title:'רעש מערכת שסתומים',description:'נוסח נפוץ בדוחות מכון המתייחס לרעש ממערכת השסתומים.',phrases:['רעש מערכת שסתומים'],preset:{classification:'disclaimer',severity:'none',agePolicy:'not_relevant',note:'כסת״ח של המכון. לא תקלה משמעותית ולא משפיע לבדו על מסקנת הקנייה.'}},
+  {id:'engine_vapor_blowby',title:'אידוי במנוע / לחץ עוקה',description:'אדים, נשיפה או לחץ עוקה המעידים על מצב פנימי של המנוע.',phrases:['אידוי במנוע','אדים במנוע','לחץ עוקה גבוה','לחץ עוקה גבוה (מבלאי)'],preset:{classification:'actual',severity:'high',agePolicy:'economic_only',note:'תקלה ממשית ומשמעותית בכל גיל. גיל הרכב משפיע רק על כדאיות התיקון והקנייה.'}},
+  {id:'timing_noise',title:'רעש מערכת תזמון',description:'רעש שמיוחס למערכת התזמון או לתזמון ולשסתומים יחד.',phrases:['רעש מערכת תזמון','רעש מערכת תזמון ושסתומים']},
+  {id:'internal_knocks',title:'רעשים ונקישות פנימיים',description:'נוסחים המתייחסים למסבים, גל ארכובה, גל זיזים או נקישות פנימיות.',phrases:['מנוע מצלצל','רעש פנימי ממסבים','רעשים ונקישות פנימיים','חופש גל ארכובה','נקישות גל זיזים']},
+  {id:'general_engine_noise',title:'רעש כללי או חיצוני במנוע',description:'נוסח שאינו מזהה רכיב מסוים.',phrases:['רעשים במנוע','רעש חיצוני']},
+  {id:'compression_leakdown',title:'דחיסה ודליפות בצילינדרים',description:'תוצאות הנוגעות ללחצי דחיסה או בדיקת דליפות.',phrases:['דליפות לחץ גבוהות בצילינדרים','דליפות לחץ בינוניות בצילינדרים','לחץ דחיסה נמוך','לחץ דחיסה גבוה','לחץ דחיסה לא זהה']},
+  {id:'oil_leaks',title:'נזילות ורטיבות שמן',description:'נזילה או רטיבות חיצונית, לרבות בין המנוע לתיבת ההילוכים.',phrases:['נזילות שמן','רטיבות שמן','סימני נזילת שמן בין בלוק מנוע לתיבת הילוכים']},
+  {id:'oil_level_condition',title:'מפלס ומצב שמן המנוע',description:'חוסר, עודף או מצב חריג של שמן המנוע.',phrases:['חוסר שמן במנוע','חוסר שמן מתחת למינימום','חוסר שמן','עודף שמן','שמן כהה','בוצה במנוע']},
+  {id:'coolant_engine_mix',title:'מים, שמן ולחץ בין מערכות',description:'סימנים לערבוב נוזלים או למעבר לחץ בין המנוע למערכת הקירור.',phrases:['סימני דליפה בין ראש מנוע והבלוק','סימני מים בנשם מנוע','מעבר לחץ למערכת קירור','נוזל קירור בשמן']},
+  {id:'engine_output',title:'הספק ירוד או סחיבה חלשה',description:'תפקוד חלש של המנוע כפי שנרשם בבדיקה.',phrases:['הספק מנוע ירוד','סחיבה חלשה','מנוע נכבה באיחור']},
+  {id:'mounts',title:'תושבות מנוע',description:'ממצא פיזי בתושבות המנוע.',phrases:['תושבות מנוע פגומות']},
+  {id:'accessory_drive',title:'גלגלות, מותחנים ורצועות אביזרים',description:'ממצאים במערכת ההנעה החיצונית של אביזרי המנוע.',phrases:['פולי מנוע זורק','רעש גלגלות אביזרים ומותחנים','רצועת מנוע פגומה/סדוקה']},
+  {id:'engine_repair_history',title:'סימני פירוק או החלפת מנוע',description:'סימנים לעבודה קודמת, פירוק או החלפה.',phrases:['סימני פירוק אגן שמן','סימני פירוק/החלפת מנוע','סימני פירוק בין מנוע לגיר']},
+  {id:'timing_service',title:'בדיקת רצועת תזמון ומעקב טיפולים',description:'המלצות לאימות היסטוריית תחזוקה או מועד החלפה.',phrases:['בדוק רצועת תזמון במוסך מורשה','לבדוק מעקב טיפולים']},
+  {id:'engine_warning_computer',title:'נורת מנוע ותקלת מחשב',description:'נורת ניהול מנוע או הפניה לבדיקת מחשב.',phrases:['נורת ניהול מנוע דולקת','לבדוק תקלת מחשב במערכת המנוע']},
+  {id:'engine_other_physical',title:'ממצאים פיזיים נלווים במנוע',description:'קבוצת פיילוט שעשויה לדרוש פיצול לפי החלטתך.',phrases:['פקקי מים פגומים','נזילת מים מפקקי מים','מעיכות אגן שמן','נזק ומעיכות אגן שמן מנוע','רטיבות שמן במסנן אוויר','צינור נשם מנותק','מצתים רטובים בשמן','מדיד שמן פגום','הברגות פגומות בראש מנוע','מספר מנוע לא תואם לרישיון הרכב']}
+];
+
+const labels={classification:{disclaimer:'כסת״ח',actual:'תקלה ממשית',context:'תלוי בממצאים',wear:'בלאי/תחזוקה',history:'מידע/עבר תיקון',split:'לפצל קבוצה'},severity:{none:'ללא חומרת תקלה',low:'נמוכה',medium:'בינונית',high:'גבוהה',safety:'בטיחותית/קריטית'},agePolicy:{no_effect:'לא משנה תקלה',economic_only:'כלכלי בלבד',expected_wear:'עשוי להיות בלאי צפוי',not_relevant:'לא רלוונטי'}};
+let current=0;
+let answers=loadAnswers();
+
+function loadAnswers(){
+  try{
+    const parsed=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
+    return parsed&&typeof parsed==='object'?parsed:{};
+  }catch(_){return {}}
+}
+function answerFor(concept){return answers[concept.id]||concept.preset||{classification:'',severity:'',agePolicy:'',note:''}}
+function isComplete(answer){
+  if(!answer||!answer.classification||!answer.agePolicy) return false;
+  if(answer.classification==='split') return Boolean((answer.note||'').trim());
+  return Boolean(answer.severity);
+}
+function saveLocal(){
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(answers));
+  document.getElementById('savedLabel').textContent='נשמר במכשיר ✓';
+}
+function collectCurrent(){
+  const concept=concepts[current];
+  const selected=field=>document.querySelector(`.choice[data-field="${field}"].selected`)?.dataset.value||'';
+  return {classification:selected('classification'),severity:selected('severity'),agePolicy:selected('agePolicy'),note:document.getElementById('expertNote').value.trim(),updatedAt:new Date().toISOString()};
+}
+function setSelected(field,value){
+  document.querySelectorAll(`.choice[data-field="${field}"]`).forEach(button=>button.classList.toggle('selected',button.dataset.value===value));
+}
+function render(){
+  const concept=concepts[current],answer=answerFor(concept);
+  document.getElementById('position').textContent=`${current+1} מתוך ${concepts.length}`;
+  document.getElementById('conceptTitle').textContent=concept.title;
+  document.getElementById('conceptDescription').textContent=concept.description;
+  document.getElementById('phrases').innerHTML=concept.phrases.map(text=>`<span class="phrase">${escapeHtml(text)}</span>`).join('');
+  const known=document.getElementById('knownRule');
+  if(concept.preset){known.hidden=false;known.textContent='כבר נקבע בשיחה: '+concept.preset.note}else{known.hidden=true;known.textContent=''}
+  setSelected('classification',answer.classification||'');setSelected('severity',answer.severity||'');setSelected('agePolicy',answer.agePolicy||'');
+  document.getElementById('expertNote').value=answer.note||'';
+  document.getElementById('prevButton').disabled=current===0;
+  document.getElementById('nextButton').disabled=current===concepts.length-1;
+  document.getElementById('status').textContent='';
+  updateProgress();renderReview();window.scrollTo({top:0,behavior:'smooth'});
+}
+function updateProgress(){
+  const completed=concepts.filter(concept=>isComplete(answerFor(concept))).length;
+  document.getElementById('progressLabel').textContent=`${completed} מתוך ${concepts.length} קבוצות הושלמו`;
+  document.getElementById('progressBar').style.width=`${Math.round(completed/concepts.length*100)}%`;
+}
+function renderReview(){
+  document.getElementById('reviewList').innerHTML=concepts.map((concept,index)=>{
+    const answer=answerFor(concept),done=isComplete(answer);
+    const short=done?`${labels.classification[answer.classification]||''}${answer.severity?' · '+(labels.severity[answer.severity]||''):''}`:'ממתין לסיווג';
+    return `<div class="reviewRow"><button type="button" data-index="${index}">${index+1}. ${escapeHtml(concept.title)}</button><span class="${done?'done':'pending'}">${escapeHtml(short)}</span></div>`;
+  }).join('');
+  document.querySelectorAll('.reviewRow button').forEach(button=>button.onclick=()=>{current=Number(button.dataset.index);render()});
+}
+function saveAndNext(){
+  const answer=collectCurrent();
+  if(!answer.classification){showStatus('יש לבחור סיווג מקצועי.');return}
+  if(!answer.severity){showStatus('יש לבחור גם את חומרת התקלה.');return}
+  if(!answer.agePolicy){showStatus('יש לבחור כיצד גיל וקילומטראז׳ משפיעים.');return}
+  if(answer.classification==='split'&&!answer.note){showStatus('כאשר הקבוצה אינה אחידה, כתוב בקצרה כיצד לפצל אותה.');return}
+  answers[concepts[current].id]=answer;saveLocal();updateProgress();renderReview();
+  showStatus('הקבוצה נשמרה ✓');
+  if(current<concepts.length-1){current++;setTimeout(render,250)}
+}
+function showStatus(text){const box=document.getElementById('status');box.textContent=text}
+function exportCalibration(){
+  Object.assign(answers,{[concepts[current].id]:collectCurrent()});saveLocal();
+  const payload={schemaVersion:'1.0',build:BUILD,system:'מנוע',exportedAt:new Date().toISOString(),completed:concepts.filter(c=>isComplete(answerFor(c))).length,total:concepts.length,decisions:concepts.map(concept=>({id:concept.id,title:concept.title,phrases:concept.phrases,...answerFor(concept)}))};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'});
+  const link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download='BuyTest-engine-expert-calibration.json';document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(link.href),1000);
+  showStatus(`קובץ הכיול הורד. הושלמו ${payload.completed} מתוך ${payload.total} קבוצות.`);
+}
+function importCalibration(file){
+  if(!file)return;const reader=new FileReader();
+  reader.onload=()=>{try{const data=JSON.parse(reader.result);if(!Array.isArray(data.decisions))throw new Error('invalid');data.decisions.forEach(item=>{if(concepts.some(c=>c.id===item.id))answers[item.id]={classification:item.classification||'',severity:item.severity||'',agePolicy:item.agePolicy||'',note:item.note||'',updatedAt:item.updatedAt||new Date().toISOString()}});saveLocal();render();showStatus('קובץ הכיול נטען בהצלחה ✓')}catch(_){showStatus('הקובץ אינו קובץ כיול תקין.')}};reader.readAsText(file,'utf-8');
+}
+function escapeHtml(value){return String(value||'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]))}
+
+document.querySelectorAll('.choice').forEach(button=>button.addEventListener('click',()=>{
+  setSelected(button.dataset.field,button.dataset.value);
+  document.getElementById('savedLabel').textContent='יש שינוי שטרם נשמר';
+}));
+document.getElementById('expertNote').addEventListener('input',()=>document.getElementById('savedLabel').textContent='יש שינוי שטרם נשמר');
+document.getElementById('saveButton').addEventListener('click',saveAndNext);
+document.getElementById('prevButton').addEventListener('click',()=>{if(current>0){answers[concepts[current].id]=collectCurrent();saveLocal();current--;render()}});
+document.getElementById('nextButton').addEventListener('click',()=>{if(current<concepts.length-1){answers[concepts[current].id]=collectCurrent();saveLocal();current++;render()}});
+document.getElementById('exportButton').addEventListener('click',exportCalibration);
+document.getElementById('importButton').addEventListener('click',()=>document.getElementById('importFile').click());
+document.getElementById('importFile').addEventListener('change',event=>importCalibration(event.target.files?.[0]));
+
+concepts.filter(concept=>concept.preset&&!answers[concept.id]).forEach(concept=>{answers[concept.id]={...concept.preset,updatedAt:new Date().toISOString()}});saveLocal();render();
+</script>
+</body>
+</html>
