@@ -136,6 +136,7 @@ footer{position:static;background:#edf2f4;border-top:1px solid #d9e2e6;color:#60
 button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #ffbd18;outline-offset:3px}
 .paywall{margin:30px 0;padding:24px}.paywall h3{font-size:24px}.paywall p{font-size:15px}
 .afterGrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}.uploadPanel{border:1px solid #d9e2e6;border-radius:16px;padding:16px;background:#f8fafb}.uploadPanel.required{border-color:#0fa87e}.uploadPanel h3{margin:0 0 6px;font-size:18px}.uploadState{display:none;margin-top:10px;padding:10px 12px;border-radius:10px;background:#e8f7f2;color:#075e48;font-weight:700;line-height:1.5}.uploadState.show{display:block}.reportInput{min-height:150px;margin-top:10px;background:#fff}.ownershipBox{display:flex;gap:10px;align-items:flex-start;padding:14px;border:1px solid #f0cf8a;border-radius:12px;background:#fff7e8;line-height:1.55}.ownershipBox input{width:22px;height:22px;flex:0 0 auto;margin-top:2px;accent-color:#0fa87e}.interpretation{display:none;margin-top:18px}.interpretation.show{display:block}.meaningCard{border:1px solid #d9e2e6;border-right:5px solid #0fa87e;border-radius:14px;padding:14px;margin:10px 0;background:#fff}.meaningCard.safety{border-right-color:#c9362b;background:#fff8f7}.meaningCard.clarify{border-right-color:#e3a400;background:#fffdf5}.meaningCard h4{margin:0 0 6px}.meaningCard p{margin:5px 0;line-height:1.6}.meaningTag{display:inline-block;padding:4px 9px;border-radius:999px;background:#e8f7f2;color:#075e48;font-size:12px;font-weight:800}.unknownList{background:#fff7e8;border:1px solid #f0cf8a;border-radius:12px;padding:14px;margin-top:14px}.privacyStrip{margin:12px 0;padding:12px;border-radius:12px;background:#eef7fb;color:#183c4d;line-height:1.6}.scopeStrip{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:12px 0}.scopeStrip span{padding:10px;border-radius:10px;background:#edf8f4;text-align:center;font-weight:800;color:#075e48}.caseLabel{display:inline-flex;gap:7px;align-items:center;padding:7px 11px;border-radius:999px;background:#17352d;color:#fff;font-weight:800;font-size:13px}
+.ocrReview{display:none;margin-top:12px;padding-top:12px;border-top:1px solid #d9e2e6}.ocrReview .secondary{margin-top:8px}
 @media(max-width:760px){.mktHero{padding:30px 0 24px}.mktHeroGrid,.mktAbout,.afterGrid{grid-template-columns:1fr}.mktGrid3{grid-template-columns:1fr}.mktOutcome{grid-template-columns:1fr 1fr}.mktHeroCard{padding:18px}.mktLead{font-size:18px}.mktCtas{flex-direction:column}.mktBtn{width:100%}main{padding-top:12px}.card{padding:18px;margin:20px 0}.credentials strong{font-size:22px}.credentials span{font-size:15px}.scopeStrip{grid-template-columns:1fr}}
 @media(max-width:460px){.mktOutcome{grid-template-columns:1fr}.priceGrid{grid-template-columns:1fr}.licenseGrid,.grid{grid-template-columns:1fr}.mktWrap{padding:0 14px}}
 </style><meta name="buytest-build" content="combined-before-after-v1">
@@ -329,9 +330,11 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
     <button class="secondary full" type="button" onclick="document.getElementById('examinerSummaryFile').click()">📷 העלאת סיכום הבוחן</button>
     <input id="examinerSummaryFile" type="file" accept="image/*,application/pdf" capture="environment" style="display:none" onchange="handleInspectionFile(this,'summary')">
     <div class="uploadState" id="summaryUploadState" role="status" aria-live="polite"></div>
-    <button class="secondary full" type="button" onclick="clearInspectionFile('summary')">הסר קובץ וטקסט</button>
-    <label for="examinerSummaryText"><b>הטקסט שזוהה — יש לבדוק ולתקן</b></label>
-    <textarea class="reportInput" id="examinerSummaryText" placeholder="לאחר ההעלאה יופיע כאן הטקסט. אם הזיהוי לא זמין, יש להקליד רק את סיכום הבוחן."></textarea>
+    <div class="ocrReview" id="summaryReviewArea">
+      <label for="examinerSummaryText"><b>בדיקת הטקסט שזוהה</b><br><span class="sub">ברוב המקרים אין צורך להקליד. יש להשוות לסיכום המקורי ולתקן רק טעות בזיהוי.</span></label>
+      <textarea class="reportInput" id="examinerSummaryText" placeholder="הטקסט שזוהה יופיע כאן."></textarea>
+      <button class="secondary full" type="button" onclick="clearInspectionFile('summary')">הסר את הקובץ</button>
+    </div>
   </div>
   <div class="uploadPanel">
     <h3>בדיקה ממוחשבת · אופציונלי</h3>
@@ -339,14 +342,17 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
     <button class="secondary full" type="button" onclick="document.getElementById('computerTestFile').click()">📄 העלאת בדיקה ממוחשבת</button>
     <input id="computerTestFile" type="file" accept="image/*,application/pdf" capture="environment" style="display:none" onchange="handleInspectionFile(this,'computer')">
     <div class="uploadState" id="computerUploadState" role="status" aria-live="polite"></div>
-    <button class="secondary full" type="button" onclick="clearInspectionFile('computer')">הסר קובץ וטקסט</button>
-    <label for="computerTestText"><b>הטקסט שזוהה — יש לבדוק ולתקן</b></label>
-    <textarea class="reportInput" id="computerTestText" placeholder="אופציונלי. נתון מספרי ללא טווח ייחוס או סימון מפורש לא יפורש."></textarea>
+    <div class="ocrReview" id="computerReviewArea">
+      <label for="computerTestText"><b>בדיקת הטקסט שזוהה</b><br><span class="sub">יש לתקן רק אם הזיהוי שונה מהדף המקורי.</span></label>
+      <textarea class="reportInput" id="computerTestText" placeholder="הטקסט שזוהה יופיע כאן. נתון ללא טווח ייחוס או סימון מפורש לא יפורש."></textarea>
+      <button class="secondary full" type="button" onclick="clearInspectionFile('computer')">הסר את הקובץ</button>
+    </div>
   </div>
 </div>
 
 <div class="info"><b>כלל הפענוח:</b> המערכת מסבירה רק ניסוחים שקיימים במאגר המקצועי. אם ניסוח אינו מוכר, היא תכתוב שיש לברר אותו מול הבוחן — ולא תנחש.</div>
-<button class="primary full" type="button" onclick="analyseInspectionReport()">הסבר את תוצאות הבדיקה</button>
+<button class="primary full" type="button" onclick="analyseInspectionReport()">הצג את משמעות הממצאים</button>
+<p class="sub" style="text-align:center;margin-top:8px">ההסבר יוצג מיד על המסך. לאחר מכן ניתן לשתף סיכום משולב כקובץ PDF.</p>
 <div class="interpretation" id="afterInterpretation"></div>
 <button class="primary full" id="finalPdfBtn" onclick="shareReportPdf('finalPdfBtn')" style="display:none">שיתוף סיכום משולב כ־PDF</button>
 <button class="secondary full returnBtn" type="button" onclick="returnToVehicle()">חזרה לנתוני הרכב</button>
@@ -622,9 +628,11 @@ function clearInspectionFile(kind){
   const input=document.getElementById(isSummary?'examinerSummaryFile':'computerTestFile');
   const state=document.getElementById(isSummary?'summaryUploadState':'computerUploadState');
   const textArea=document.getElementById(isSummary?'examinerSummaryText':'computerTestText');
+  const review=document.getElementById(isSummary?'summaryReviewArea':'computerReviewArea');
   if(input) input.value='';
   if(textArea) textArea.value='';
   if(state){state.textContent='';state.classList.remove('show');}
+  if(review) review.style.display='none';
 }
 
 async function handleInspectionFile(input,kind){
@@ -632,7 +640,10 @@ async function handleInspectionFile(input,kind){
   const isSummary=kind==='summary';
   const state=document.getElementById(isSummary?'summaryUploadState':'computerUploadState');
   const textArea=document.getElementById(isSummary?'examinerSummaryText':'computerTestText');
+  const review=document.getElementById(isSummary?'summaryReviewArea':'computerReviewArea');
   if(!file) return;
+  textArea.value='';
+  if(review) review.style.display='none';
   if(file.size>12*1024*1024){
     inspectionFiles[kind]=null;
     input.value='';
@@ -652,6 +663,7 @@ async function handleInspectionFile(input,kind){
   state.textContent='✓ הקובץ נבחר: '+file.name+'. קובץ המקור לא יצורף לפלט.';
   if(file.type==='application/pdf'){
     state.textContent+=' בגרסה זו יש להעתיק ידנית מה־PDF את הטקסט לאזור האימות שמתחת.';
+    if(review) review.style.display='block';
     textArea.focus();
     return;
   }
@@ -675,10 +687,12 @@ async function handleInspectionFile(input,kind){
     if(!recognized) throw new Error('TEXT_NOT_FOUND');
     textArea.value=recognized;
     state.textContent='✓ הטקסט זוהה במכשיר. חובה להשוות למקור ולתקן טעויות לפני הפענוח.';
+    if(review) review.style.display='block';
     textArea.focus();
   }catch(error){
     console.warn('BuyTest document OCR unavailable:',error);
     state.textContent='✓ הקובץ נבחר. זיהוי הטקסט אינו זמין כרגע; יש להקליד או להדביק את הטקסט המדויק באזור שמתחת.';
+    if(review) review.style.display='block';
     textArea.focus();
   }finally{
     if(worker) await worker.terminate().catch(()=>{});
