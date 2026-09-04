@@ -10,8 +10,8 @@
 <meta property="og:site_name" content="BuyTest">
 <meta property="og:title" content="BuyTest | בדיקה לפני בדיקה">
 <meta property="og:description" content="בדיקת רכב חכמה לפני ואחרי המכון, מבית עמוס רוקח.">
-<meta property="og:image" content="https://amirok196888-cloud.github.io/buytest/buytest-facebook-1200x630-v1.png">
-<meta property="og:image:secure_url" content="https://amirok196888-cloud.github.io/buytest/buytest-facebook-1200x630-v1.png">
+<meta property="og:image" content="https://amirok196888-cloud.github.io/buytest/buytest-facebook-1200x630-v2.png">
+<meta property="og:image:secure_url" content="https://amirok196888-cloud.github.io/buytest/buytest-facebook-1200x630-v2.png">
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -19,7 +19,9 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="BuyTest | בדיקה לפני בדיקה">
 <meta name="twitter:description" content="בדיקת רכב חכמה לפני ואחרי המכון, מבית עמוס רוקח.">
-<meta name="twitter:image" content="https://amirok196888-cloud.github.io/buytest/buytest-facebook-1200x630-v1.png">
+<meta name="twitter:image" content="https://amirok196888-cloud.github.io/buytest/buytest-facebook-1200x630-v2.png">
+<link rel="icon" type="image/png" href="buytest-icon-512.png">
+<link rel="apple-touch-icon" href="buytest-icon-512.png">
 <title>BuyTest | בדיקה לפני בדיקה</title>
 <style>
 :root{--bg:#09151d;--card:#132a35;--card2:#0d2029;--line:#2a4652;--txt:#f7fafb;--muted:#aebcc3;--a:#28cba2;--warn:#f3c35e;--bad:#f47f7f}
@@ -155,7 +157,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 .formulaAdmin{display:none;border:2px solid #285f7a;background:#f2f8fb}.formulaAdminGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.formulaAdmin .wide{grid-column:1/-1}.formulaAdmin input,.formulaAdmin select,.formulaAdmin textarea{width:100%;background:#fff}.formulaAdmin textarea{min-height:80px}.formulaAdminStats{padding:11px 13px;border-radius:12px;background:#e7f3f8;color:#173f52;font-weight:800;margin:10px 0}.formulaAdminList{max-height:270px;overflow:auto;border:1px solid #d9e2e6;border-radius:12px;background:#fff;margin-top:12px}.formulaAdminItem{padding:10px 12px;border-bottom:1px solid #e6edef}.formulaAdminItem:last-child{border-bottom:0}.formulaAdminItem small{display:block;color:#60717a;margin-top:3px}.formulaAdminActions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}.formulaAdminActions button{flex:1;min-width:150px}.contextNote{margin-top:8px;padding:9px 11px;border-radius:10px;background:#eef4f6;color:#35515c}.matchSource{font-size:12px;color:#60717a;margin-top:7px}
 @media(max-width:760px){.mktHero{padding:30px 0 24px}.mktHeroGrid,.mktAbout,.afterGrid{grid-template-columns:1fr}.mktGrid3{grid-template-columns:1fr}.mktOutcome{grid-template-columns:1fr 1fr}.mktHeroCard{padding:18px}.mktLead{font-size:18px}.mktCtas{flex-direction:column}.mktBtn{width:100%}main{padding-top:12px}.card{padding:18px;margin:20px 0}.credentials strong{font-size:22px}.credentials span{font-size:15px}.scopeStrip{grid-template-columns:1fr}}
 @media(max-width:460px){.mktOutcome{grid-template-columns:1fr}.priceGrid{grid-template-columns:1fr}.licenseGrid,.grid,.formulaAdminGrid{grid-template-columns:1fr}.formulaAdmin .wide{grid-column:auto}.mktWrap{padding:0 14px}}
-</style><meta name="buytest-build" content="expert-calibration-239-v39-auto-crop-ocr">
+</style><meta name="buytest-build" content="expert-calibration-239-v40-brand-assets">
 </head><body>
 
 <section id="marketingLanding">
@@ -1728,7 +1730,15 @@ async function btBuildPdfBlob(){
   function rule(){ensure(30);ctx.fillStyle='#10a77b';ctx.fillRect(margin,y,W-margin*2,5);y+=30}
 
   newPage();
-  textBlock('BuyTest',58,true,4);
+  const brandLogo=await btLoadImage('buytest-logo-compact.png');
+  if(brandLogo){
+    const logoW=520;
+    const logoH=Math.round(logoW*brandLogo.height/brandLogo.width);
+    ctx.drawImage(brandLogo,W-margin-logoW,y,logoW,logoH);
+    y+=logoH+20;
+  }else{
+    textBlock('BuyTest',58,true,4);
+  }
   textBlock(afterReportText?'סיכום משולב — לפני ואחרי המכון':'סיכום לפני המכון',34,true,18);
   rule();
 
