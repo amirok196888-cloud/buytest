@@ -159,7 +159,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 @media(max-width:500px){.quickChoices{grid-template-columns:1fr}.quickChoice{font-size:14px}.guidedSection>summary{font-size:18px}}
 @media(max-width:760px){.mktHero{padding:30px 0 24px}.mktHeroGrid,.mktAbout,.afterGrid{grid-template-columns:1fr}.mktGrid3{grid-template-columns:1fr}.mktOutcome{grid-template-columns:1fr 1fr}.mktHeroCard{padding:18px}.mktLead{font-size:18px}.mktCtas{flex-direction:column}.mktBtn{width:100%}main{padding-top:12px}.card{padding:18px;margin:20px 0}.credentials strong{font-size:22px}.credentials span{font-size:15px}.scopeStrip{grid-template-columns:1fr}}
 @media(max-width:460px){.mktOutcome{grid-template-columns:1fr}.priceGrid{grid-template-columns:1fr}.licenseGrid,.grid,.formulaAdminGrid{grid-template-columns:1fr}.formulaAdmin .wide{grid-column:auto}.mktWrap{padding:0 14px}}
-</style><meta name="buytest-build" content="expert-calibration-239-v44-complete-report-interpretation">
+</style><meta name="buytest-build" content="expert-calibration-239-v45-severity-headings-only">
 </head><body>
 
 <section id="marketingLanding">
@@ -879,8 +879,6 @@ const findingKnowledgeBase=[
   {id:'inspection-limited',terms:['לא ניתן לבדוק','לא נבדק','לא ניתן היה לבדוק','לא בוצעה נסיעת מבחן','לא ניתן לבצע נסיעת מבחן','דרוש פירוק'],category:'מגבלת בדיקה',tag:'דורש השלמה',tone:'clarify',meaning:'הטופס מציין שהרכיב או המצב לא הוערכו באופן מלא. אין להסיק מכך שהרכיב תקין או לא תקין.',question:'לבקש מהבוחן לציין מה לא נבדק, מדוע, ואיזו בדיקה נוספת נדרשת.'},
   {id:'frame-edge',terms:['פגיעה בקצות שלדה','תיקון בקצות שלדה','מעיכה בקצה שלדה','מעיכות בקצות שלדה','קצה שלדה'],category:'שלדה ומבנה',tag:'מבני',tone:'safety',meaning:'הבוחן סימן פגיעה או תיקון באזור קצה שלדה. הניסוח לבדו אינו קובע את היקף הפגיעה או את השפעתה.',question:'לבקש מיקום מדויק, תיאור התיקון, מדידות שבוצעו והאם קיימת השפעה על נקודות חיבור או גאומטריית המרכב.'},
   {id:'frame',terms:['פגיעה בשלדה','תיקון שלדה','תיקונים בשלדה','ריתוך בשלדה','עיוות בשלדה','סימני פגיעה בשלדה','שילדה'],category:'שלדה ומבנה',tag:'מבני',tone:'safety',meaning:'נרשם ממצא הנוגע למבנה הנושא של הרכב. יש חשיבות למיקום, להיקף ולשיטת הבדיקה, שאינם נלמדים מהביטוי הקצר בלבד.',question:'לבקש מהבוחן להראות את האזור, להסביר את חומרת הממצא ומה נבדק כדי לקבוע אותו.'},
-  {id:'high-meaning',terms:['משמעות גבוהה'],category:'סיווג המכון',tag:'דורש הסבר',tone:'safety',meaning:'זהו סיווג של המכון לממצא מסוים, אך בלי תיאור הממצא המקורי אי אפשר להבין את הסיבה או ההיקף.',question:'לבקש מהבוחן לקשור את הסיווג לסעיף המדויק ולהסביר מה נמצא בפועל.'},
-  {id:'low-meaning',terms:['משמעות נמוכה'],category:'סיווג המכון',tag:'דורש הסבר',tone:'clarify',meaning:'זהו סיווג של המכון לממצא מסוים. הוא אינו מחליף תיאור של החלק שנפגע או תוקן.',question:'לבקש מהבוחן להסביר איזה ממצא קיבל את הסיווג ומה משמעותו ברכב הספציפי.'},
   {id:'body-paint-poor',terms:['צבע ופחחות כללית במצב ירוד'],category:'שלדת מרכב',tag:'משמעות גבוהה',tone:'safety',classification:'actual_finding',reportSeverity:'high',suppresses:['body-repair'],meaning:'נרשם במפורש שמצב הפחחות והצבע הכללי ירוד.',decision:'זהו ממצא בעל משמעות גבוהה. יש לברר את היקף התיקונים, מצב המרכב והעלות הצפויה.'},
   {id:'body-repair',terms:['החלפת חלקי מרכב','תיקוני מרכב','חלקי מרכב הוחלפו','סימני תיקון במרכב'],category:'מרכב',tag:'סימן לתיקון או החלפה',tone:'clarify',meaning:'נמצאו סימנים לכך שחלקי מרכב תוקנו או הוחלפו. הביטוי אינו מציין לבדו אם מדובר בחלק חיצוני מתפרק או באזור מבני.',question:'לבקש פירוט של החלקים, אופן החיבור והאם הממצא חיצוני בלבד או קשור למבנה הרכב.'},
   {id:'body-paint-repairs-report',terms:['תיקוני פחחות וצבע','תיקוני פח וצבע'],category:'שלדת מרכב',tag:'משמעות נמוכה',tone:'clarify',classification:'actual_finding',reportSeverity:'low',suppresses:['body-repair','paint'],meaning:'נרשמו תיקוני פחחות וצבע חיצוניים. הנוסח לבדו אינו מעיד על החלפת חלק, ריתוך או פגיעה מבנית.',decision:'זהו ממצא חיצוני במשמעות נמוכה. יש להביא בחשבון את מצב הפח והצבע ואת עלות התיקון הקוסמטי, בלי להסיק ממנו נזק מבני.'},
@@ -942,7 +940,7 @@ const findingKnowledgeBase=[
 ];
 
 const ruleClassification={
-  'inspection-limited':'limitation_or_disclaimer','frame-edge':'actual_finding','frame':'actual_finding','high-meaning':'context_dependent','low-meaning':'context_dependent','body-repair':'repair_history_or_evidence','paint':'repair_history_or_evidence','engine-noise':'context_dependent','oil-sweat':'context_dependent','oil-leak':'actual_finding','crankcase-pressure':'context_dependent','coolant-leak':'actual_finding','cooling-system':'context_dependent','gear-shift':'actual_finding','gear-slip':'actual_finding','clutch':'actual_finding','brake-balance':'actual_finding','brakes':'actual_finding','steering-play':'actual_finding','suspension':'actual_finding','driveline':'context_dependent','tires':'actual_finding','tire-size':'actual_finding','warning-light':'actual_finding','airbag':'actual_finding','abs-esp':'actual_finding','battery':'actual_finding','aircon':'actual_finding','computer-fault':'context_dependent','faults-cleared':'context_dependent','emissions':'context_dependent'
+  'inspection-limited':'limitation_or_disclaimer','frame-edge':'actual_finding','frame':'actual_finding','body-repair':'repair_history_or_evidence','paint':'repair_history_or_evidence','engine-noise':'context_dependent','oil-sweat':'context_dependent','oil-leak':'actual_finding','crankcase-pressure':'context_dependent','coolant-leak':'actual_finding','cooling-system':'context_dependent','gear-shift':'actual_finding','gear-slip':'actual_finding','clutch':'actual_finding','brake-balance':'actual_finding','brakes':'actual_finding','steering-play':'actual_finding','suspension':'actual_finding','driveline':'context_dependent','tires':'actual_finding','tire-size':'actual_finding','warning-light':'actual_finding','airbag':'actual_finding','abs-esp':'actual_finding','battery':'actual_finding','aircon':'actual_finding','computer-fault':'context_dependent','faults-cleared':'context_dependent','emissions':'context_dependent'
 };
 
 const formulaClassificationLabels={actual_finding:'ליקוי או ממצא ממשי',limitation_or_disclaimer:'הסתייגות כללית',recommendation:'המלצה לבדיקה נוספת',maintenance_recommendation:'תחזוקה / כיוון',repair_history_or_evidence:'סימן לתיקון או החלפה',information:'מידע בלבד',context_dependent:'תלוי הקשר'};
@@ -2368,8 +2366,8 @@ function reportCategoryFromLine(line){
 
 function reportSeverityFromLine(line){
   const n=normalizeFindingText(line);
-  if(/משמעות\s+גבוהה/.test(n)) return 'high';
-  if(/משמעות\s+נמוכה/.test(n)) return 'low';
+  if(/משמעות\s*גבוהה/.test(n)) return 'high';
+  if(/משמעות\s*נמוכה/.test(n)) return 'low';
   if(/ליקויים?\s+שוליים?|ליקוי\s+שולי/.test(n)) return 'minor';
   return null;
 }
@@ -2380,7 +2378,7 @@ function stripReportScaffolding(line,category,severity){
     const categoryText=normalizeFindingText(category);
     if(cleaned===categoryText) cleaned='';
   }
-  if(severity) cleaned=cleaned.replace(/משמעות\s+(?:גבוהה|נמוכה)|ליקויים?\s+שוליים?|ליקוי\s+שולי/g,' ');
+  if(severity) cleaned=cleaned.replace(/משמעות\s*(?:גבוהה|נמוכה)|ליקויים?\s+שוליים?|ליקוי\s+שולי/g,' ');
   return cleaned.replace(/^\s*\d+\s*/,' ').replace(/\s+/g,' ').trim();
 }
 
