@@ -3,6 +3,9 @@
 <html dir="rtl" lang="he">
 <head>
 <meta charset="utf-8"/><meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta content="#f5f7f8" name="theme-color"/>
 <meta name="description" content="BuyTest — נתוני רכב ובדיקה מקדימה מודרכת לפני קניית רכב יד שנייה, מבית עמוס רוקח.">
 <meta property="og:locale" content="he_IL">
@@ -159,7 +162,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 @media(max-width:500px){.quickChoices{grid-template-columns:1fr}.quickChoice{font-size:14px}.guidedSection>summary{font-size:18px}}
 @media(max-width:760px){.mktHero{padding:30px 0 24px}.mktHeroGrid,.mktAbout,.afterGrid{grid-template-columns:1fr}.mktGrid3{grid-template-columns:1fr}.mktOutcome{grid-template-columns:1fr 1fr}.mktHeroCard{padding:18px}.mktLead{font-size:18px}.mktCtas{flex-direction:column}.mktBtn{width:100%}main{padding-top:12px}.card{padding:18px;margin:20px 0}.credentials strong{font-size:22px}.credentials span{font-size:15px}.scopeStrip{grid-template-columns:1fr}}
 @media(max-width:460px){.mktOutcome{grid-template-columns:1fr}.priceGrid{grid-template-columns:1fr}.licenseGrid,.grid,.formulaAdminGrid{grid-template-columns:1fr}.formulaAdmin .wide{grid-column:auto}.mktWrap{padding:0 14px}}
-</style><meta name="buytest-build" content="expert-calibration-239-v46-finding-first-explanations">
+</style><meta name="buytest-build" content="expert-calibration-239-v48-manager-conclusion-overrides">
 </head><body>
 
 <section id="marketingLanding">
@@ -278,13 +281,14 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 
 <section class="card formulaAdmin" id="managerFormulaPanel">
   <h2 style="margin-bottom:6px">ניהול מאגר נוסחי הבדיקות</h2>
-  <p class="sub">חפש נוסח קיים או הוסף נוסח חדש לקבוצה המתאימה. תוספות הבטא נשמרות במכשיר זה וייכללו מיד בפענוח.</p>
+  <p class="sub">חפש כל נוסח קיים וערוך את ההסבר והמסקנה שיוצגו ללקוח. התיקונים נשמרים במכשיר, נכנסים מיד לפענוח ומשמשים גם בבדיקות הבאות.</p>
   <div class="formulaAdminStats" id="formulaAdminStats">טוען את המאגר...</div>
   <div class="formulaAdminGrid">
     <div class="field"><label for="formulaCategory"><b>קבוצה</b></label><select id="formulaCategory" onchange="renderFormulaAdminList()"></select></div>
     <div class="field"><label for="formulaType"><b>סוג הממצא</b></label><select id="formulaType"><option value="actual_finding">ליקוי או ממצא ממשי</option><option value="context_dependent">תלוי הקשר</option><option value="limitation_or_disclaimer">הסתייגות כללית</option><option value="recommendation">המלצה לבדיקה נוספת</option><option value="maintenance_recommendation">תחזוקה / כיוון</option><option value="repair_history_or_evidence">סימן לתיקון או החלפה</option><option value="information">מידע בלבד</option></select></div>
     <div class="field wide"><label for="formulaText"><b>הנוסח כפי שהוא עשוי להופיע בדוח</b></label><input id="formulaText" placeholder="לדוגמה: רעש באביזרי מנוע"></div>
     <div class="field wide"><label for="formulaMeaning"><b>הסבר ללקוח</b></label><textarea id="formulaMeaning" placeholder="מה ניתן לומר בבטחה על הנוסח"></textarea></div>
+    <div class="field wide"><label for="formulaDecision"><b>המסקנה שתוצג ללקוח</b></label><textarea id="formulaDecision" placeholder="כתוב כאן את המסקנה המקצועית המדויקת"></textarea></div>
     <div class="field wide"><label for="formulaQuestion"><b>מה כדאי לברר</b></label><textarea id="formulaQuestion" placeholder="איזו שאלה או בדיקת המשך נדרשת"></textarea></div>
     <div class="field wide"><label for="formulaSearch"><b>חיפוש במאגר</b></label><input id="formulaSearch" oninput="renderFormulaAdminList()" placeholder="חפש לפי מילה או נוסח"></div>
   </div>
@@ -1959,6 +1963,7 @@ function applyEngineWarrantyContext(result,text){
 }
 
 const CUSTOM_FORMULA_STORAGE_KEY='buytestCustomFormulasV1';
+const FORMULA_OVERRIDE_STORAGE_KEY='buytestFormulaOverridesV1';
 
 function normalizeFindingText(value){
   return String(value||'').toLowerCase()
@@ -2004,7 +2009,47 @@ function loadCustomFormulas(){
   }
 }
 
+function loadFormulaOverrides(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(FORMULA_OVERRIDE_STORAGE_KEY)||'[]');
+    return Array.isArray(saved)?saved.filter(item=>item&&item.text&&item.category):[];
+  }catch(error){
+    console.warn('BuyTest formula overrides could not be read:',error);
+    return [];
+  }
+}
+
+function formulaOverrideKey(category,text){
+  return normalizeFindingText(category)+'|'+normalizeFindingText(text);
+}
+
+function formulaOverrideFor(category,text){
+  const key=formulaOverrideKey(category,text);
+  return loadFormulaOverrides().find(item=>formulaOverrideKey(item.category,item.text)===key)||null;
+}
+
+function saveFormulaOverrideRows(rows){
+  localStorage.setItem(FORMULA_OVERRIDE_STORAGE_KEY,JSON.stringify(rows));
+}
+
+function applyManagerFormulaOverride(item){
+  if(!item) return item;
+  const source=item.sourceText||item.matchedTerm||'';
+  const override=formulaOverrideFor(item.category,source);
+  const managerMeaning=item.managerMeaning||override?.meaning||'';
+  const managerDecision=item.managerDecision||override?.decision||'';
+  if(!override&&!managerMeaning&&!managerDecision) return item;
+  return {
+    ...item,
+    classification:override?.classification_type||item.classification,
+    meaning:managerMeaning||item.meaning,
+    decision:managerDecision||item.decision,
+    managerEdited:true
+  };
+}
+
 let editingCustomFormulaId=null;
+let editingFormulaTarget=null;
 
 function formulaAdminMessage(text,isError=false){
   const box=document.getElementById('formulaAdminMessage');
@@ -2034,10 +2079,10 @@ function initFormulaAdmin(){
 }
 
 function formulaAdminRows(){
-  const base=rawFormulaDatabase.filter(isOperationalFormula).map(item=>({kind:'base',id:item.id,text:item.text,category:item.category,type:item.classification?.type||'context_dependent',procedure127:Boolean(item.procedure_127)}));
-  const observed=observedFormulaAliases.filter(isOperationalFormula).map(item=>({kind:'observed',id:item.id,text:item.text,category:item.category,type:item.classification_type||'context_dependent'}));
-  const custom=loadCustomFormulas().filter(isOperationalFormula).map(item=>({kind:'custom',id:item.id,text:item.text,category:item.category,type:item.classification_type||'context_dependent'}));
-  return [...custom,...observed,...base];
+  const base=rawFormulaDatabase.filter(isOperationalFormula).map(item=>({kind:'base',id:item.id,text:item.text,category:item.category,type:item.classification?.type||'context_dependent',meaning:item.meaning||'',decision:item.decision||'',question:item.question||'',procedure127:Boolean(item.procedure_127)}));
+  const observed=observedFormulaAliases.filter(isOperationalFormula).map(item=>({kind:'observed',id:item.id,text:item.text,category:item.category,type:item.classification_type||'context_dependent',meaning:item.meaning||'',decision:item.decision||'',question:item.question||''}));
+  const custom=loadCustomFormulas().filter(isOperationalFormula).map(item=>({kind:'custom',id:item.id,text:item.text,category:item.category,type:item.classification_type||'context_dependent',meaning:item.meaning||'',decision:item.decision||'',question:item.question||''}));
+  return [...custom,...observed,...base].map(item=>({...item,override:formulaOverrideFor(item.category,item.text)}));
 }
 
 function renderFormulaAdminList(){
@@ -2046,9 +2091,10 @@ function renderFormulaAdminList(){
   const select=document.getElementById('formulaCategory');
   if(!list||!stats||!select) return;
   const customCount=loadCustomFormulas().length;
+  const overrideCount=loadFormulaOverrides().length;
   const operationalSourceCount=rawFormulaDatabase.filter(isOperationalFormula).length;
   const excludedGeneralCount=rawFormulaDatabase.length-operationalSourceCount;
-  stats.textContent=`${operationalSourceCount} נוסחי מקור פעילים · ${observedFormulaAliases.length} נוסחים שנצפו בדוחות · ${excludedGeneralCount} הערות כלליות מוחרגות · ${customCount} תוספות מנהל · ${formulaCategoryDefinitions.length} קבוצות`;
+  stats.textContent=`${operationalSourceCount} נוסחי מקור פעילים · ${observedFormulaAliases.length} נוסחים שנצפו בדוחות · ${overrideCount} מסקנות שתוקנו · ${customCount} תוספות מנהל · ${formulaCategoryDefinitions.length} קבוצות`;
   const category=select.value;
   const query=normalizeFindingText(document.getElementById('formulaSearch')?.value||'');
   const rows=formulaAdminRows()
@@ -2059,15 +2105,23 @@ function renderFormulaAdminList(){
   list.innerHTML=visible.length?visible.map(item=>{
     const source=item.kind==='custom'?'תוספת מנהל':item.kind==='observed'?'נצפה בדוח לדוגמה':'קטלוג טכנוטסט';
     const procedure=item.procedure127?' · מסומן בנוהל 127':'';
-    const controls=item.kind==='custom'?`<div style="margin-top:7px;display:flex;gap:6px"><button class="secondary" type="button" onclick="editCustomFormula('${item.id}')">עריכה</button><button class="secondary" type="button" onclick="deleteCustomFormula('${item.id}')">מחיקה</button></div>`:'';
-    return `<div class="formulaAdminItem"><b>${escapeHtml(item.text)}</b><small>${escapeHtml(formulaClassificationLabels[item.type]||'תלוי הקשר')} · ${source}${procedure}</small>${controls}</div>`;
+    const edited=item.override?' · המסקנה נערכה על ידך':'';
+    const reset=item.override?`<button class="secondary" type="button" onclick="deleteFormulaOverride('${item.override.id}')">איפוס התיקון</button>`:'';
+    const remove=item.kind==='custom'?`<button class="secondary" type="button" onclick="deleteCustomFormula('${item.id}')">מחיקה</button>`:'';
+    const controls=`<div style="margin-top:7px;display:flex;gap:6px;flex-wrap:wrap"><button class="secondary" type="button" onclick="editFormulaEntry('${item.kind}','${item.id}')">עריכת הסבר ומסקנה</button>${reset}${remove}</div>`;
+    return `<div class="formulaAdminItem"><b>${escapeHtml(item.text)}</b><small>${escapeHtml(formulaClassificationLabels[item.type]||'תלוי הקשר')} · ${source}${procedure}${edited}</small>${controls}</div>`;
   }).join(''):'<div class="formulaAdminItem">לא נמצאו נוסחים התואמים לחיפוש בקבוצה זו.</div>';
   if(rows.length>visible.length) list.insertAdjacentHTML('beforeend',`<div class="formulaAdminItem"><small>מוצגים ${visible.length} מתוך ${rows.length} תוצאות. אפשר לצמצם באמצעות החיפוש.</small></div>`);
 }
 
 function resetFormulaEditor(){
   editingCustomFormulaId=null;
-  ['formulaText','formulaMeaning','formulaQuestion'].forEach(id=>{const field=document.getElementById(id);if(field) field.value='';});
+  editingFormulaTarget=null;
+  ['formulaText','formulaMeaning','formulaDecision','formulaQuestion'].forEach(id=>{const field=document.getElementById(id);if(field){field.value='';field.readOnly=false;field.disabled=false;}});
+  const category=document.getElementById('formulaCategory');
+  const type=document.getElementById('formulaType');
+  if(category) category.disabled=false;
+  if(type) type.disabled=false;
   const saveButton=document.getElementById('formulaSaveButton');
   const cancelButton=document.getElementById('formulaCancelEdit');
   if(saveButton) saveButton.textContent='הוסף נוסח למאגר';
@@ -2079,8 +2133,34 @@ function saveCustomFormula(){
   const type=document.getElementById('formulaType')?.value||'context_dependent';
   const textValue=document.getElementById('formulaText')?.value.trim()||'';
   const meaningValue=document.getElementById('formulaMeaning')?.value.trim()||'';
+  const decisionValue=document.getElementById('formulaDecision')?.value.trim()||'';
   const questionValue=document.getElementById('formulaQuestion')?.value.trim()||'';
   if(!category||textValue.length<3){formulaAdminMessage('יש לבחור קבוצה ולהזין נוסח בן שלושה תווים לפחות.',true);return;}
+
+  if(editingFormulaTarget&&editingFormulaTarget.kind!=='custom'){
+    const overrides=loadFormulaOverrides();
+    const existingIndex=overrides.findIndex(item=>formulaOverrideKey(item.category,item.text)===formulaOverrideKey(editingFormulaTarget.category,editingFormulaTarget.text));
+    const template=classificationTemplate(type,category,textValue);
+    const value={
+      id:existingIndex>=0?overrides[existingIndex].id:('override-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7)),
+      source_kind:editingFormulaTarget.kind,
+      source_id:editingFormulaTarget.id,
+      category:editingFormulaTarget.category,
+      text:editingFormulaTarget.text,
+      classification_type:type,
+      meaning:meaningValue||template.meaning,
+      decision:decisionValue||professionalDecision({category,type,classification:type,meaning:meaningValue||template.meaning}),
+      question:questionValue,
+      updated_at:new Date().toISOString()
+    };
+    if(existingIndex>=0) overrides[existingIndex]=value; else overrides.unshift(value);
+    saveFormulaOverrideRows(overrides);
+    formulaAdminMessage('ההסבר והמסקנה נשמרו וישמשו מעכשיו גם בבדיקות הבאות.');
+    resetFormulaEditor();
+    renderFormulaAdminList();
+    return;
+  }
+
   const duplicate=formulaAdminRows().find(item=>normalizeFindingText(item.text)===normalizeFindingText(textValue)&&!(item.kind==='custom'&&item.id===editingCustomFormulaId));
   if(duplicate){formulaAdminMessage('הנוסח כבר קיים במאגר תחת הקבוצה „'+duplicate.category+'”.',true);return;}
   const template=classificationTemplate(type,category,textValue);
@@ -2091,6 +2171,7 @@ function saveCustomFormula(){
     text:textValue,
     classification_type:type,
     meaning:meaningValue||template.meaning,
+    decision:decisionValue,
     question:questionValue||template.question,
     updated_at:new Date().toISOString()
   };
@@ -2102,18 +2183,52 @@ function saveCustomFormula(){
   renderFormulaAdminList();
 }
 
-function editCustomFormula(id){
-  const item=loadCustomFormulas().find(row=>row.id===id);
+function adminRulePreview(item){
+  if(item.kind==='custom'){
+    const source=loadCustomFormulas().find(row=>row.id===item.id)||item;
+    return customFormulaToRule(source);
+  }
+  if(item.kind==='observed'){
+    const source=observedFormulaAliases.find(row=>row.id===item.id)||item;
+    return rawFormulaToRule({...source,id:'alias-'+source.id,classification:{type:source.classification_type||item.type}},'נוסח שנמצא בבדיקות לדוגמה');
+  }
+  const source=rawFormulaDatabase.find(row=>row.id===item.id)||item;
+  return rawFormulaToRule(source);
+}
+
+function editFormulaEntry(kind,id){
+  const item=formulaAdminRows().find(row=>row.kind===kind&&row.id===id);
   if(!item) return;
-  editingCustomFormulaId=id;
+  editingFormulaTarget={kind,id,category:item.category,text:item.text};
+  editingCustomFormulaId=kind==='custom'?id:null;
+  const preview=adminRulePreview(item);
+  const override=item.override;
   document.getElementById('formulaCategory').value=item.category;
-  document.getElementById('formulaType').value=item.classification_type||'context_dependent';
+  document.getElementById('formulaType').value=override?.classification_type||item.type||'context_dependent';
   document.getElementById('formulaText').value=item.text||'';
-  document.getElementById('formulaMeaning').value=item.meaning||'';
-  document.getElementById('formulaQuestion').value=item.question||'';
+  document.getElementById('formulaMeaning').value=override?.meaning||item.meaning||preview.meaning||'';
+  document.getElementById('formulaDecision').value=override?.decision||item.decision||preview.decision||professionalDecision(preview);
+  document.getElementById('formulaQuestion').value=override?.question||item.question||preview.question||'';
+  if(kind!=='custom'){
+    document.getElementById('formulaCategory').disabled=true;
+    document.getElementById('formulaText').readOnly=true;
+  }
   document.getElementById('formulaSaveButton').textContent='שמור שינויים';
   document.getElementById('formulaCancelEdit').style.display='inline-block';
-  document.getElementById('formulaText').focus();
+  document.getElementById('formulaDecision').focus();
+  document.getElementById('formulaDecision').scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+function editCustomFormula(id){editFormulaEntry('custom',id);}
+
+function deleteFormulaOverride(id){
+  const rows=loadFormulaOverrides();
+  const item=rows.find(row=>row.id===id);
+  if(!item||!confirm('לאפס את ההסבר והמסקנה שתיקנת עבור „'+item.text+'”?')) return;
+  saveFormulaOverrideRows(rows.filter(row=>row.id!==id));
+  if(editingFormulaTarget&&formulaOverrideKey(editingFormulaTarget.category,editingFormulaTarget.text)===formulaOverrideKey(item.category,item.text)) resetFormulaEditor();
+  formulaAdminMessage('התיקון אופס. המערכת חזרה למסקנה המקורית.');
+  renderFormulaAdminList();
 }
 
 function deleteCustomFormula(id){
@@ -2121,6 +2236,7 @@ function deleteCustomFormula(id){
   const item=rows.find(row=>row.id===id);
   if(!item||!confirm('למחוק את הנוסח „'+item.text+'” ממאגר הבטא?')) return;
   saveCustomFormulaRows(rows.filter(row=>row.id!==id));
+  saveFormulaOverrideRows(loadFormulaOverrides().filter(row=>formulaOverrideKey(row.category,row.text)!==formulaOverrideKey(item.category,item.text)));
   if(editingCustomFormulaId===id) resetFormulaEditor();
   formulaAdminMessage('הנוסח נמחק ממאגר הבטא המקומי.');
   renderFormulaAdminList();
@@ -2128,13 +2244,14 @@ function deleteCustomFormula(id){
 
 function exportFormulaDatabase(){
   const exportData={
-    schema_version:'1.0',
-    database_version:'buytest-formulas-v1-with-local-admin',
+    schema_version:'1.1',
+    database_version:'buytest-formulas-v1-1-with-manager-conclusions',
     exported_at:new Date().toISOString(),
     categories:formulaCategoryDefinitions,
     formulas:rawFormulaDatabase,
     observed_aliases:observedFormulaAliases,
-    custom_formulas:loadCustomFormulas()
+    custom_formulas:loadCustomFormulas(),
+    manager_overrides:loadFormulaOverrides()
   };
   const blob=new Blob([JSON.stringify(exportData,null,2)],{type:'application/json;charset=utf-8'});
   const url=URL.createObjectURL(blob);
@@ -2223,22 +2340,26 @@ function rawFormulaToRule(formula,sourceLabel='מאגר הנוסחים'){
     reportSeverity:formulaSeverity,
     contextPolicy:formula.classification?.context_policy||null,
     meaning:formula.meaning||template.meaning,
+    decision:formula.decision||'',
     question:formula.question||template.question,
     sourceText:formula.text,
     matchSource:sourceLabel
   };
   if(normalizeFindingText(formula.text)==='ריפוד'){
-    rule.meaning='נרשם ממצא בריפוד תא הנוסעים. לפי סיווג הנוסח הוא בעל משמעות נמוכה ואינו ממצא מבני או מכני.';
+    rule.meaning='נרשם ממצא בריפוד תא הנוסעים. זהו ממצא בריפוד בלבד ואינו ממצא מבני או מכני.';
   }
   return applyExpertCalibration(rule,formula);
 }
 
 function customFormulaToRule(formula){
-  return rawFormulaToRule({
+  const rule=rawFormulaToRule({
     ...formula,
     id:'custom-'+formula.id,
     classification:{type:formula.classification_type||'context_dependent',context_policy:formula.classification_type==='context_dependent'?'vehicle_age_and_mileage':null}
   },'נוסח שהוסף בניהול');
+  rule.managerMeaning=formula.meaning||'';
+  rule.managerDecision=formula.decision||'';
+  return rule;
 }
 
 function formulaMatchTokens(value){
@@ -2444,6 +2565,31 @@ function safeUnknownExcerpt(line){
     .slice(0,180);
 }
 
+function isSeverityHeadingOnly(value){
+  const compact=normalizeFindingText(value).replace(/[^א-ת]/g,'');
+  return compact==='משמעותנמוכה'||compact==='משמעותגבוהה'||compact==='ליקוישולי'||compact==='ליקוייםשוליים';
+}
+
+function finalizeReportFinding(item){
+  if(!item) return null;
+  const source=item.sourceText||item.matchedTerm||'';
+  if(isSeverityHeadingOnly(source)||/^(?:high|low)-meaning$/.test(String(item.id||''))) return null;
+  const headingDiagnosis=/הממצא מופיע בדוח המכון תחת|זהו הסיווג שנשמר|ממצא בדרגת משמעות (?:נמוכה|גבוהה) לפי סיווג המכון/;
+  let cleaned={...item};
+  if(headingDiagnosis.test((cleaned.meaning||'')+' '+(cleaned.decision||''))){
+    if(!source) return null;
+    const specific=specificFindingInterpretation(cleaned);
+    if(specific){
+      cleaned.meaning=specific.meaning;
+      cleaned.decision=specific.decision;
+    }else{
+      cleaned.meaning='נרשם בדוח הממצא: „'+source+'”.';
+      cleaned.decision=professionalDecision({...cleaned,meaning:cleaned.meaning,decision:''});
+    }
+  }
+  return applyManagerFormulaOverride(cleaned);
+}
+
 function interpretSummaryText(text){
   const findings=[],unknown=[],seen=new Set();
   const compactReport=normalizeFindingText(text).replace(/\s/g,'');
@@ -2493,7 +2639,8 @@ function interpretSummaryText(text){
       if(excerpt&&!unknown.includes(excerpt)) unknown.push(excerpt);
     }
   });
-  return applyEngineWarrantyContext({findings,unknown},text);
+  const finalFindings=findings.map(finalizeReportFinding).filter(Boolean);
+  return applyEngineWarrantyContext({findings:finalFindings,unknown},text);
 }
 
 function interpretComputerText(text){
@@ -2520,6 +2667,8 @@ function interpretComputerText(text){
 }
 
 function meaningCardHtml(item){
+  item=finalizeReportFinding(item);
+  if(!item) return '';
   const context=item.contextNote?`<div class="contextNote"><b>בהתאם לרכב:</b> ${escapeHtml(item.contextNote)}</div>`:'';
   const source=item.sourceText?`<div class="matchSource">הנוסח שזוהה: ${escapeHtml(item.sourceText)}</div>`:'';
   const decision=item.decision||professionalDecision(item);
@@ -2528,8 +2677,9 @@ function meaningCardHtml(item){
 
 function analysisTextBlock(title,result){
   let text=title+'\n';
-  if(result.findings.length){
-    text+=result.findings.map(item=>`• ${item.category} [${item.tag||formulaClassificationLabels[item.classification]||'סיווג מקצועי'}] — ${item.meaning} מסקנה: ${item.decision||professionalDecision(item)}${item.contextNote?' התאמה לרכב: '+item.contextNote:''}`).join('\n')+'\n';
+  const findings=result.findings.map(finalizeReportFinding).filter(Boolean);
+  if(findings.length){
+    text+=findings.map(item=>`• ${item.category} [${item.tag||formulaClassificationLabels[item.classification]||'סיווג מקצועי'}] — ${item.meaning} מסקנה: ${item.decision||professionalDecision(item)}${item.contextNote?' התאמה לרכב: '+item.contextNote:''}`).join('\n')+'\n';
   }else{
     text+='• לא זוהה ניסוח שניתן לפרש בבטחה מתוך המאגר המקצועי.\n';
   }
