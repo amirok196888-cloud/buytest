@@ -159,7 +159,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 @media(max-width:500px){.quickChoices{grid-template-columns:1fr}.quickChoice{font-size:14px}.guidedSection>summary{font-size:18px}}
 @media(max-width:760px){.mktHero{padding:30px 0 24px}.mktHeroGrid,.mktAbout,.afterGrid{grid-template-columns:1fr}.mktGrid3{grid-template-columns:1fr}.mktOutcome{grid-template-columns:1fr 1fr}.mktHeroCard{padding:18px}.mktLead{font-size:18px}.mktCtas{flex-direction:column}.mktBtn{width:100%}main{padding-top:12px}.card{padding:18px;margin:20px 0}.credentials strong{font-size:22px}.credentials span{font-size:15px}.scopeStrip{grid-template-columns:1fr}}
 @media(max-width:460px){.mktOutcome{grid-template-columns:1fr}.priceGrid{grid-template-columns:1fr}.licenseGrid,.grid,.formulaAdminGrid{grid-template-columns:1fr}.formulaAdmin .wide{grid-column:auto}.mktWrap{padding:0 14px}}
-</style><meta name="buytest-build" content="expert-calibration-239-v45-severity-headings-only">
+</style><meta name="buytest-build" content="expert-calibration-239-v46-finding-first-explanations">
 </head><body>
 
 <section id="marketingLanding">
@@ -881,7 +881,7 @@ const findingKnowledgeBase=[
   {id:'frame',terms:['פגיעה בשלדה','תיקון שלדה','תיקונים בשלדה','ריתוך בשלדה','עיוות בשלדה','סימני פגיעה בשלדה','שילדה'],category:'שלדה ומבנה',tag:'מבני',tone:'safety',meaning:'נרשם ממצא הנוגע למבנה הנושא של הרכב. יש חשיבות למיקום, להיקף ולשיטת הבדיקה, שאינם נלמדים מהביטוי הקצר בלבד.',question:'לבקש מהבוחן להראות את האזור, להסביר את חומרת הממצא ומה נבדק כדי לקבוע אותו.'},
   {id:'body-paint-poor',terms:['צבע ופחחות כללית במצב ירוד'],category:'שלדת מרכב',tag:'משמעות גבוהה',tone:'safety',classification:'actual_finding',reportSeverity:'high',suppresses:['body-repair'],meaning:'נרשם במפורש שמצב הפחחות והצבע הכללי ירוד.',decision:'זהו ממצא בעל משמעות גבוהה. יש לברר את היקף התיקונים, מצב המרכב והעלות הצפויה.'},
   {id:'body-repair',terms:['החלפת חלקי מרכב','תיקוני מרכב','חלקי מרכב הוחלפו','סימני תיקון במרכב'],category:'מרכב',tag:'סימן לתיקון או החלפה',tone:'clarify',meaning:'נמצאו סימנים לכך שחלקי מרכב תוקנו או הוחלפו. הביטוי אינו מציין לבדו אם מדובר בחלק חיצוני מתפרק או באזור מבני.',question:'לבקש פירוט של החלקים, אופן החיבור והאם הממצא חיצוני בלבד או קשור למבנה הרכב.'},
-  {id:'body-paint-repairs-report',terms:['תיקוני פחחות וצבע','תיקוני פח וצבע'],category:'שלדת מרכב',tag:'משמעות נמוכה',tone:'clarify',classification:'actual_finding',reportSeverity:'low',suppresses:['body-repair','paint'],meaning:'נרשמו תיקוני פחחות וצבע חיצוניים. הנוסח לבדו אינו מעיד על החלפת חלק, ריתוך או פגיעה מבנית.',decision:'זהו ממצא חיצוני במשמעות נמוכה. יש להביא בחשבון את מצב הפח והצבע ואת עלות התיקון הקוסמטי, בלי להסיק ממנו נזק מבני.'},
+  {id:'body-paint-repairs-report',terms:['תיקוני פחחות וצבע','תיקוני פח וצבע'],category:'שלדת מרכב',tag:'משמעות נמוכה',tone:'clarify',classification:'actual_finding',reportSeverity:'low',suppresses:['body-repair','paint'],meaning:'נרשמו תיקוני פחחות וצבע חיצוניים. הנוסח לבדו אינו מעיד על החלפת חלק, ריתוך או פגיעה מבנית.',decision:'יש להביא בחשבון את מצב הפח והצבע ואת עלות התיקון הקוסמטי, בלי להסיק ממנו נזק מבני.'},
   {id:'roof-paint',terms:['צבע בגג','תיקון צבע בגג','צביעת גג'],category:'שלדת מרכב',tag:'משמעות גבוהה',tone:'safety',classification:'actual_finding',reportSeverity:'high',meaning:'נמצאו סימני צבע או תיקון בגג. לפי סיווג מכון הבדיקה, „צבע בגג” שייך לקבוצת משמעות גבוהה בשלדת המרכב. הממצא אינו מוכיח לבדו נזק מבני, אך הוא מהותי משום שהגג אינו חלק חיצוני מתפרק כמו דלת או כנף.',decision:'זהו ממצא בעל משקל גבוה בהערכת מצב הרכב והעלויות. יש להביא בחשבון היסטוריית תיקון משמעותית באזור הגג, פגיעה אפשרית בסחירות ובשווי, והצורך לוודא שהמחיר מגלם את הסיכון.'},
   {id:'paint',terms:['תיקוני צבע','הבדלי גוון','צביעה חוזרת','עובי צבע','חומר מילוי','חומר פחחים'],category:'מרכב וצבע',tag:'ממצא חזותי',tone:'clarify',meaning:'נמצאו סימנים לצביעה או לעבודת פחחות קודמת. הסיבה והיקף העבודה אינם נקבעים מהניסוח בלבד.',question:'לבקש מהבוחן להראות באילו חלקים נמצא הממצא ואם נמצאו גם סימני פירוק, החלפה או תיקון מבני.'},
   {id:'engine-noise',terms:['רעש מנוע','נקישות במנוע','רעש חריג במנוע','פעולת מנוע לא תקינה'],category:'מנוע',tag:'מכני',tone:'safety',meaning:'הבוחן ציין רעש או פעולה שאינם רגילים לדעתו בזמן הבדיקה. המקור המדויק אינו נקבע מהביטוי בלבד.',question:'לבקש לתאר מתי הרעש הופיע, האם המנוע היה קר או חם ואיזו בדיקה ממוקדת נדרשת לאיתור המקור.'},
@@ -899,8 +899,8 @@ const findingKnowledgeBase=[
   {id:'clutch',terms:['מצמד שחוק','בלאי מצמד','קלאץ שחוק','הפרדה לא תקינה של המצמד'],category:'מצמד',tag:'בלאי',tone:'clarify',meaning:'נרשם בלאי או תפקוד חריג של המצמד. דרגת הבלאי לא נקבעת מהביטוי בלבד.',question:'לבקש כיצד נבדק המצמד ומה היו הסימנים בפועל.'},
   {id:'brake-balance',terms:['סטייה בבלימה','הפרש בלימה','כוח בלימה לא מאוזן','בלימה לא מאוזנת'],category:'מערכת בלמים',tag:'בטיחות',tone:'safety',meaning:'נמדד או הורגש הבדל בבלימה בין צדדים. יש לזהות את הגלגלים והרכיבים הקשורים.',question:'לבקש את תוצאות המדידה, הצד שבו נמצא ההפרש ומה נדרש לבדוק במערכת.'},
   {id:'brakes',terms:['רפידות בלם','רפידות שחוקות','דיסקים שחוקים','צלחות בלם','בלמים שחוקים','בלם יד לא תקין'],category:'מערכת בלמים',tag:'בטיחות',tone:'safety',meaning:'נרשם בלאי או תפקוד חריג ברכיב של מערכת הבלמים. היקף הבלאי דורש פירוט ומדידה.',question:'לבקש מהבוחן לציין אילו גלגלים ורכיבים, מה נמדד ומה הסיבה לסיווג.'},
-  {id:'control-arm-bushings',terms:['תותבים למשולשים','תותבים ומשולשים','תותבי משולשים','תותבים משולשים','בלאי תותבים למשולשים','רעש יתר תותבים ומשולשים','תותבים למשולשים קד פגומים','תותבים למשולשים קדמיים פגומים'],category:'מערכת מתלה קדמי',tag:'משמעות נמוכה',tone:'clarify',classification:'actual_finding',reportSeverity:'low',suppresses:['suspension'],meaning:'התותבים מחברים ומבודדים את זרועות המתלה. בלאי או חופש בהם עלולים לגרום לנקישות, חוסר דיוק בהיגוי ושחיקת צמיגים לא אחידה.',decision:'זהו ליקוי במתלה הקדמי במשמעות נמוכה. יש להביא בחשבון את הצורך בטיפול ואת העלות.'},
-  {id:'front-suspension-noise-report',terms:['רעש ממתלה קדמי','רעש יתר ממתלה קדמי'],patterns:[/רעש.*ממתלה\s*קדמי/],category:'מערכת מתלה קדמי',tag:'משמעות נמוכה',tone:'clarify',classification:'context_dependent',reportSeverity:'low',meaning:'נרשם רעש מהמתלה הקדמי. הניסוח מצביע על רעש שנשמע בבדיקה, אך אינו מזהה לבדו את הרכיב שגורם לו.',decision:'זהו ממצא במשמעות נמוכה לפי הנוסח הקיים. יש לאתר את מקור הרעש ולהביא בחשבון את עלות הטיפול.'},
+  {id:'control-arm-bushings',terms:['תותבים למשולשים','תותבים ומשולשים','תותבי משולשים','תותבים משולשים','בלאי תותבים למשולשים','רעש יתר תותבים ומשולשים','תותבים למשולשים קד פגומים','תותבים למשולשים קדמיים פגומים'],category:'מערכת מתלה קדמי',tag:'משמעות נמוכה',tone:'clarify',classification:'actual_finding',reportSeverity:'low',suppresses:['suspension'],meaning:'התותבים מחברים ומבודדים את זרועות המתלה. בלאי או חופש בהם עלולים לגרום לנקישות, חוסר דיוק בהיגוי ושחיקת צמיגים לא אחידה.',decision:'נמצא ליקוי בתותבים או במשולשים במתלה הקדמי. יש להביא בחשבון את הצורך בטיפול ואת העלות.'},
+  {id:'front-suspension-noise-report',terms:['רעש ממתלה קדמי','רעש יתר ממתלה קדמי'],patterns:[/רעש.*ממתלה\s*קדמי/],category:'מערכת מתלה קדמי',tag:'משמעות נמוכה',tone:'clarify',classification:'context_dependent',reportSeverity:'low',meaning:'נרשם רעש מהמתלה הקדמי. הניסוח מצביע על רעש שנשמע בבדיקה, אך אינו מזהה לבדו את הרכיב שגורם לו.',decision:'יש לאתר את מקור הרעש ולהביא בחשבון את עלות הטיפול.'},
   {id:'steering-alignment-report',terms:['זוויות היגוי כיוון','זויות היגוי כיוון','ויות היגוי כיוון'],category:'מערכת ההיגוי',tag:'משמעות בינונית',tone:'clarify',classification:'actual_finding',reportSeverity:'medium',meaning:'נרשם צורך בכיוון זוויות ההיגוי.',decision:'זהו ממצא במשקל בינוני שמחייב כיוון פרונט ובדיקה אם קיימת שחיקת צמיגים או סטייה נוספת.'},
   {id:'steering-play',terms:['חופש בהגה','חופש במערכת ההיגוי','מסרק הגה','נקישות בהגה','הגה לא חוזר'],category:'היגוי',tag:'בטיחות',tone:'safety',meaning:'נרשם חופש, רעש או תפקוד חריג במערכת ההיגוי. יש חשיבות לזיהוי הרכיב המדויק.',question:'לבקש מהבוחן להראות את מקור החופש או הרעש ולציין את בדיקת ההמשך.'},
   {id:'steering-knock',terms:['נקישה בהגה','נקישות בהגה','נקישה בתיבת הגה','נקישות בתיבת הגה','חופש ונקישה בתיבת הגה'],category:'מערכת ההיגוי',tag:'ליקוי בטיחותי',tone:'safety',classification:'actual_finding',suppresses:['steering-play'],meaning:'נקישה בהגה מצביעה על חופש או שחיקה באחד מרכיבי ההיגוי, כגון תיבת ההגה, מסרק, מפרק או חיבור. כשהיא מופיעה יחד עם חופש, הדיוק והיציבות עלולים להיפגע.',decision:'זהו ממצא בעל משקל בטיחותי ואינו בלאי קוסמטי. יש להתייחס אליו כתיקון נדרש לפני שימוש רגיל ולשקלל את חומרתו בהערכת מצב הרכב והעלויות.'},
@@ -929,12 +929,12 @@ const findingKnowledgeBase=[
   {id:'front-shock-leak',terms:['בולמים קדמיים נוזלים','בולם קדמי נוזל','נזילת שמן בולם קדמי'],category:'מערכת מתלה קדמי',tag:'ליקוי ממשי',tone:'safety',classification:'actual_finding',suppresses:['suspension'],meaning:'נרשמה נזילת שמן מבולם קדמי. זהו ממצא ממשי ברכיב מתלה, אך יש להבחין בין הזעה קלה לנזילה פעילה.',question:'לבקש באיזה צד נמצאה הנזילה, האם הבולם חלש והאם נדרשת החלפה בזוג.'},
   {id:'tire-profile-mismatch',terms:['חתך צמיגים לא תואם','חתך צמיג לא תואם','צמיגים לא זהים'],category:'צמיגים ורישוי',tag:'ליקוי ממשי',tone:'safety',classification:'actual_finding',meaning:'נרשמה אי־התאמה בין הצמיגים או בחתך שלהם. יש לוודא התאמה בין הסרנים ולמידות המאושרות ברישיון.',question:'לבקש את המידות המלאות של כל ארבעת הצמיגים ולהשוות לרישיון הרכב.'},
   {id:'fog-lamp-broken',terms:['פנס ערפל קדמי שבור','פנס ערפל שבור'],category:'מערכת תאורה',tag:'ליקוי ממשי',tone:'clarify',classification:'actual_finding',meaning:'נרשם נזק פיזי בפנס הערפל הקדמי.',question:'לבדוק אם הפנס פועל, אם בית הפנס או התושבות נפגעו ואם קיימת חדירת מים.'},
-  {id:'rear-lamp-cracked',terms:['פנס אחורי סדוק','פנס אחורי עם סדק'],category:'מערכת תאורה',tag:'משמעות נמוכה',tone:'clarify',classification:'actual_finding',reportSeverity:'low',meaning:'נרשם סדק בפנס האחורי.',decision:'זהו ליקוי נקודתי במשמעות נמוכה. יש לבדוק שהפנס פועל ושאין חדירת מים, ולהביא בחשבון תיקון או החלפה.'},
+  {id:'rear-lamp-cracked',terms:['פנס אחורי סדוק','פנס אחורי עם סדק'],category:'מערכת תאורה',tag:'משמעות נמוכה',tone:'clarify',classification:'actual_finding',reportSeverity:'low',meaning:'נרשם סדק בפנס האחורי.',decision:'יש לבדוק שהפנס פועל ושאין חדירת מים, ולהביא בחשבון תיקון או החלפה.'},
   {id:'window-switch-fault',terms:['מתג חלונות לקוי','מתג חלון לקוי','חלונות לקוי'],category:'מערכת ההתנעה (כולל מצבר)',tag:'משמעות בינונית',tone:'clarify',classification:'actual_finding',reportSeverity:'medium',meaning:'נרשם ליקוי בהפעלת החלונות. הנוסח אינו קובע אם התקלה במתג, בחיווט או במנגנון החלון.',decision:'זהו ליקוי חשמלי ממשי במשקל בינוני. יש לבדוק את הפעלת החלונות ולהביא בחשבון תיקון נקודתי.'},
   {id:'tpms-warning-report',terms:['מנורת בקרת לחץ אוויר בצמיגים דולקת','נורת בקרת לחץ אוויר בצמיגים דולקת','מנורת לחץ אוויר בצמיגים דולקת'],patterns:[/מנורת\s+בקרת.*בצמיגים.*דולקת/],category:'צמיגים וחישוקים',tag:'משמעות בינונית',tone:'clarify',classification:'actual_finding',reportSeverity:'medium',meaning:'נורת בקרת לחץ האוויר בצמיגים דולקת. הסיבה יכולה להיות לחץ לא תקין, חיישן תקול או צורך באיפוס.',decision:'יש לבדוק מיד את לחצי האוויר ואת מצב הצמיגים, ולאחר מכן את חיישני המערכת. זהו ממצא במשקל בינוני עד לבירור.'},
-  {id:'rear-tires-damaged-report',terms:['צמיגים אחוריים פגומים'],patterns:[/צמיגים\s+אחוריים.*פגומים/],category:'צמיגים וחישוקים',tag:'משמעות נמוכה',tone:'clarify',classification:'actual_finding',reportSeverity:'low',meaning:'בדוח נרשם שהצמיגים האחוריים פגומים.',decision:'זהו ליקוי במשמעות נמוכה לפי הסיווג המקצועי, אך יש לבדוק את סוג הנזק ואת עומק הסוליה ולהביא בחשבון החלפה.'},
-  {id:'hood-bolt-opening-signs',terms:['סימני פתיחת ברגים מכסה מנוע','סימני פתיחת ברגים במכסה מנוע'],category:'שלדת מרכב',tag:'משמעות נמוכה',tone:'clarify',classification:'repair_history_or_evidence',reportSeverity:'low',meaning:'נמצאו סימני פתיחת ברגים במכסה המנוע. זה מעיד שהמכסה פורק או כוון בעבר, אך אינו מוכיח לבדו החלפה או פגיעה מבנית.',decision:'זהו סימן לפירוק או לכיוון קודם במשמעות נמוכה. יש לבדוק את התאמת המכסה והחיבורים, בלי להסיק ממנו פגיעה מבנית.'},
-  {id:'vehicle-components-rust',terms:['חלודה במכללי הרכב','קורוזיה במכללי הרכב'],category:'מרכב ומכלולים',tag:'משמעות נמוכה',tone:'clarify',classification:'actual_finding',reportSeverity:'low',meaning:'נרשמה חלודה במכלולי הרכב, בלי פירוט של המיקום או ההיקף.',decision:'זהו ממצא במשמעות נמוכה כל עוד לא תוארה פגיעה מבנית או תפקודית. יש לראות את האזור ולבדוק אם החלודה שטחית או מתקדמת.'},
+  {id:'rear-tires-damaged-report',terms:['צמיגים אחוריים פגומים'],patterns:[/צמיגים\s+אחוריים.*פגומים/],category:'צמיגים וחישוקים',tag:'משמעות נמוכה',tone:'clarify',classification:'actual_finding',reportSeverity:'low',meaning:'בדוח נרשם שהצמיגים האחוריים פגומים.',decision:'יש לבדוק את סוג הנזק ואת עומק הסוליה ולהביא בחשבון החלפה.'},
+  {id:'hood-bolt-opening-signs',terms:['סימני פתיחת ברגים מכסה מנוע','סימני פתיחת ברגים במכסה מנוע'],category:'שלדת מרכב',tag:'משמעות נמוכה',tone:'clarify',classification:'repair_history_or_evidence',reportSeverity:'low',meaning:'נמצאו סימני פתיחת ברגים במכסה המנוע. זה מעיד שהמכסה פורק או כוון בעבר, אך אינו מוכיח לבדו החלפה או פגיעה מבנית.',decision:'יש לבדוק את התאמת המכסה והחיבורים, בלי להסיק ממנו פגיעה מבנית.'},
+  {id:'vehicle-components-rust',terms:['חלודה במכללי הרכב','קורוזיה במכללי הרכב'],category:'מרכב ומכלולים',tag:'משמעות נמוכה',tone:'clarify',classification:'actual_finding',reportSeverity:'low',meaning:'נרשמה חלודה במכלולי הרכב, בלי פירוט של המיקום או ההיקף.',decision:'יש לראות את האזור ולבדוק אם החלודה שטחית או מתקדמת ואם היא משפיעה על תפקוד החלק.'},
   {id:'body-cosmetic-damage',terms:['מעיכות ושריטות סביב הרכב','מעיכות ושריטות','שפשוף פגושים','תיקון שפשוף פגושים'],category:'מרכב וצבע',tag:'ממצא חזותי',tone:'clarify',classification:'actual_finding',meaning:'נרשמו פגיעות חיצוניות או תיקונים קוסמטיים. הנוסח לבדו אינו מצביע על נזק מבני.',question:'לבקש לראות את האזורים ולוודא אם מדובר בצבע ופח חיצוני בלבד או שקיימים סימני תיקון עמוקים יותר.'},
   {id:'repair-disassembly-signs',terms:['סימני פתיחת ברגים בין המנוע לגיר','סימני שיפוץ והחלפת מנוע','סימני פירוק בין מנוע לגיר','סימני פירוק החלפת מנוע'],category:'מנוע',tag:'סימן לתיקון / החלפה',tone:'clarify',classification:'repair_history_or_evidence',meaning:'נמצאו סימנים לפירוק, תיקון או החלפה קודמים. זהו מידע על היסטוריית העבודה ואינו מוכיח לבדו תקלה פעילה.',question:'לברר מה בוצע, מתי, מדוע, האם קיימות חשבוניות והאם מספר המנוע תואם לרישיון.'}
 ];
@@ -1875,7 +1875,7 @@ function expertSeverityFor(decision,formula){
 
 function expertConclusion(decision,severity){
   if(decision.id==='engine_warranty') return 'ללא ממצא תומך, הנוסח „אין אחריות על המנוע” הוא הסתייגות כללית ואינו מקבל משקל עצמאי.';
-  if(decision.id==='control_arm_bushings') return 'זהו ליקוי במתלה הקדמי במשמעות נמוכה. יש להביא בחשבון את הצורך בטיפול ואת העלות.';
+  if(decision.id==='control_arm_bushings') return 'נמצא ליקוי בתותבים או במשולשים במתלה הקדמי. יש להביא בחשבון את הצורך בטיפול ואת העלות.';
   if((decision.id==='body_paint_repairs'||decision.id==='frame_cosmetic') && severity==='high') return 'ניסוח מפורש של מצב פחחות וצבע ירוד הוא ממצא בעל משמעות גבוהה, ויש לברר את היקף התיקונים והעלות.';
   let base='';
   if(decision.classification==='disclaimer') base='זהו ניסוח הסתייגות או מגבלת בדיקה, ואין לספור אותו לבדו כליקוי ברכב.';
@@ -1885,7 +1885,7 @@ function expertConclusion(decision,severity){
   else if(severity==='safety') base='זהו ליקוי ממשי בעל השלכה בטיחותית שדורש טיפול או בירור מקצועי.';
   else if(severity==='high') base='זהו ממצא ממשי ומשמעותי שדורש בירור מקצועי והתייחסות להיקף הטיפול והעלות.';
   else if(severity==='medium') base='זהו ממצא ממשי במשקל בינוני; יש להביא בחשבון את הצורך בטיפול ואת העלות.';
-  else if(severity==='low') base='זהו ממצא ממשי במשקל נמוך; בדרך כלל אינו מכריע לבדו.';
+  else if(severity==='low') base='יש לבדוק את מצב החלק ולהביא בחשבון את הצורך בטיפול ואת העלות.';
   else base='לממצא אין משקל עצמאי ללא ממצא נוסף שמחזק אותו.';
   const note=severity==='low'&&/גבוה/.test(decision.note||'')?'':decision.note;
   return note?base+' '+note:base;
@@ -1897,7 +1897,7 @@ function applyExpertCalibration(rule,formula){
   const severity=expertSeverityFor(decision,formula);
   const classification=expertClassificationMap[decision.classification]||'context_dependent';
   const sourceText=formula?.text||rule.sourceText||rule.matchedTerm||'';
-  return {
+  const calibrated={
     ...rule,
     id:'expert-'+decision.id,
     category:decision.category||rule.category,
@@ -1912,6 +1912,12 @@ function applyExpertCalibration(rule,formula){
     sourceText,
     expertDecision:decision
   };
+  const specific=specificFindingInterpretation(calibrated);
+  if(specific){
+    calibrated.meaning=specific.meaning;
+    calibrated.decision=specific.decision;
+  }
+  return calibrated;
 }
 
 function reportKmForEngineWarranty(text){
@@ -2165,7 +2171,7 @@ function classificationTemplate(type,category,text){
 function professionalDecision(item){
   if(item.decision) return item.decision;
   if(item.reportSeverity==='high') return 'ממצא מהותי בהערכת מצב הרכב והעלויות. הוא אינו מוכיח לבדו נזק מבני, אך יש לייחס לו משקל גבוה בסיכון, בסחירות ובשווי הרכב.';
-  if(item.reportSeverity==='low') return 'ממצא בדרגת משמעות נמוכה לפי סיווג המכון. יש להביא בחשבון את מצב החלק ואת עלות הטיפול הצפויה.';
+  if(item.reportSeverity==='low') return 'יש להביא בחשבון את מצב החלק ואת עלות הטיפול הצפויה. הממצא אינו מכריע לבדו.';
   if(item.reportSeverity==='minor') return 'ליקוי שולי או קוסמטי. בדרך כלל השפעתו נמוכה כל עוד אינו מצטרף לממצאים מהותיים יותר.';
   if(item.classification==='limitation_or_disclaimer') return 'אין לספור את הנוסח כליקוי. הוא רק מצמצם את ודאות הבדיקה באותו רכיב.';
   if(item.classification==='recommendation') return 'אין לספור את הנוסח כתקלה שנמצאה. הוא מציין פעולה מומלצת בלבד.';
@@ -2344,7 +2350,13 @@ function findKnowledgeRules(line,categoryHint=''){
     if(!seen.has(semanticKey)){
       seen.add(semanticKey);
       const enriched={...item,contextNote:contextNoteFor(item)};
-      enriched.decision=professionalDecision(enriched);
+      const specific=specificFindingInterpretation(enriched);
+      if(specific){
+        enriched.meaning=specific.meaning;
+        enriched.decision=specific.decision;
+      }else{
+        enriched.decision=professionalDecision(enriched);
+      }
       unique.push(enriched);
     }
   });
@@ -2382,16 +2394,44 @@ function stripReportScaffolding(line,category,severity){
   return cleaned.replace(/^\s*\d+\s*/,' ').replace(/\s+/g,' ').trim();
 }
 
+function specificFindingInterpretation(item){
+  const source=normalizeFindingText(item?.sourceText||item?.matchedTerm||'');
+  if(/תיקוני פח(?:חות)? וצבע|בוצעו תיקוני פח וצבע/.test(source)) return {
+    meaning:'נמצאו סימנים לעבודות פחחות וצבע בחלקים החיצוניים של הרכב. הנוסח אינו מצביע לבדו על החלפת חלק או על פגיעה מבנית.',
+    decision:'יש לבדוק את איכות הצבע והפחחות ולהביא בחשבון תיקון קוסמטי אם נדרש.'
+  };
+  if(/מעיכות.*שריטות|שריטות.*מעיכות|פגמים ושריטות בצבע|שריטות קלות/.test(source)) return {
+    meaning:'נמצאו מעיכות, שריטות או פגמי צבע בחלקים החיצוניים של הרכב. מדובר בתיאור של מצב המרכב החיצוני, ללא קביעה של נזק מבני.',
+    decision:'יש להביא בחשבון את המצב הקוסמטי ואת עלות תיקוני הפח והצבע הרצויים.'
+  };
+  if(/שפשוף פגושים|תיקון נזק לפגושים|תיקון פגיעה בפגוש/.test(source)) return {
+    meaning:'נרשם שפשוף או תיקון בפגוש. הפגוש הוא חלק חיצוני, והנוסח אינו מעיד לבדו על פגיעה במבנה הרכב.',
+    decision:'יש לבדוק את מצב הפגוש, החיבורים והצבע ולהביא בחשבון תיקון קוסמטי לפי הצורך.'
+  };
+  if(/חלקי פלסטיק פגומים|פלסטיקה פגומה/.test(source)) return {
+    meaning:'נרשם נזק בחלקי פלסטיק ברכב. הנוסח אינו מפרט אילו חלקים נפגעו או אם קיימת השפעה תפקודית.',
+    decision:'יש לזהות את החלקים הפגומים ולבדוק אם נדרש חיזוק, תיקון או החלפה.'
+  };
+  if(/סימני פתיחת ברגים.*מכסה מנוע/.test(source)) return {
+    meaning:'נמצאו סימני פתיחת ברגים במכסה המנוע. הדבר מצביע על פירוק או כיוון שבוצעו בעבר, אך אינו מוכיח לבדו החלפה או פגיעה מבנית.',
+    decision:'יש לבדוק את התאמת המכסה, המרווחים והחיבורים, בלי להסיק מכך נזק מבני שלא נכתב בדוח.'
+  };
+  if(/חלודה במכללי הרכב|קורוזיה במכללי הרכב/.test(source)) return {
+    meaning:'נרשמה חלודה במכלולי הרכב, אך הדוח אינו מפרט את מיקומה ואת היקפה.',
+    decision:'יש לראות את האזור ולבדוק אם החלודה שטחית או מתקדמת ואם היא משפיעה על תפקוד החלק.'
+  };
+  return null;
+}
+
 function applyReportSeverity(item,severity,categoryHint){
   const chassisCategories=['שלדת מרכב','שלדה נפרדת'];
   if(!severity||!chassisCategories.includes(item.category)) return item;
   const resolvedCategory=chassisCategories.includes(categoryHint)?categoryHint:item.category;
   const enriched={...item,category:resolvedCategory,reportSeverity:severity,tag:reportSeverityLabels[severity]||item.tag};
   enriched.tone=severity==='high'?'safety':'clarify';
-  if(severity==='high') enriched.meaning='הממצא מופיע בדוח המכון תחת „משמעות גבוהה”, ולכן זהו הסיווג שנשמר.';
-  else if(severity==='low') enriched.meaning='הממצא מופיע בדוח המכון תחת „משמעות נמוכה”, ולכן זהו הסיווג שנשמר.';
-  else if(severity==='minor') enriched.meaning='הממצא מופיע בדוח המכון תחת „ליקויים שוליים”, ולכן זהו הסיווג שנשמר.';
-  enriched.decision=professionalDecision({...enriched,decision:''});
+  const specific=specificFindingInterpretation(enriched);
+  if(specific) enriched.meaning=specific.meaning;
+  enriched.decision=specific?.decision||professionalDecision({...enriched,decision:''});
   return enriched;
 }
 
