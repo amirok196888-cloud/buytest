@@ -159,7 +159,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 @media(max-width:500px){.quickChoices{grid-template-columns:1fr}.quickChoice{font-size:14px}.guidedSection>summary{font-size:18px}}
 @media(max-width:760px){.mktHero{padding:30px 0 24px}.mktHeroGrid,.mktAbout,.afterGrid{grid-template-columns:1fr}.mktGrid3{grid-template-columns:1fr}.mktOutcome{grid-template-columns:1fr 1fr}.mktHeroCard{padding:18px}.mktLead{font-size:18px}.mktCtas{flex-direction:column}.mktBtn{width:100%}main{padding-top:12px}.card{padding:18px;margin:20px 0}.credentials strong{font-size:22px}.credentials span{font-size:15px}.scopeStrip{grid-template-columns:1fr}}
 @media(max-width:460px){.mktOutcome{grid-template-columns:1fr}.priceGrid{grid-template-columns:1fr}.licenseGrid,.grid,.formulaAdminGrid{grid-template-columns:1fr}.formulaAdmin .wide{grid-column:auto}.mktWrap{padding:0 14px}}
-</style><meta name="buytest-build" content="expert-calibration-239-v42-low-severity-clean">
+</style><meta name="buytest-build" content="expert-calibration-239-v43-chassis-section-authority">
 </head><body>
 
 <section id="marketingLanding">
@@ -2154,8 +2154,8 @@ function classificationTemplate(type,category,text){
 function professionalDecision(item){
   if(item.decision) return item.decision;
   if(item.reportSeverity==='high') return 'ממצא מהותי בהערכת מצב הרכב והעלויות. הוא אינו מוכיח לבדו נזק מבני, אך יש לייחס לו משקל גבוה בסיכון, בסחירות ובשווי הרכב.';
-  if(item.reportSeverity==='low') return 'ממצא בדרגת משמעות נמוכה לפי סיווג המכון. בדרך כלל אינו סיבה יחידה לפסילת הרכב, אך הוא משפיע על מצבו ועל המחיר הראוי.';
-  if(item.reportSeverity==='minor') return 'ליקוי שולי או קוסמטי. בדרך כלל השפעתו על החלטת הקנייה נמוכה, כל עוד אינו מצטרף לממצאים מהותיים יותר.';
+  if(item.reportSeverity==='low') return 'ממצא בדרגת משמעות נמוכה לפי סיווג המכון. יש להביא בחשבון את מצב החלק ואת עלות הטיפול הצפויה.';
+  if(item.reportSeverity==='minor') return 'ליקוי שולי או קוסמטי. בדרך כלל השפעתו נמוכה כל עוד אינו מצטרף לממצאים מהותיים יותר.';
   if(item.classification==='limitation_or_disclaimer') return 'אין לספור את הנוסח כליקוי. הוא רק מצמצם את ודאות הבדיקה באותו רכיב.';
   if(item.classification==='recommendation') return 'אין לספור את הנוסח כתקלה שנמצאה. הוא מציין פעולה מומלצת בלבד.';
   if(item.classification==='maintenance_recommendation') return 'זהו צורך תחזוקתי צפוי ולא בהכרח כשל. משקלו בקנייה הוא בעיקר הוצאה קרובה.';
@@ -2356,12 +2356,14 @@ function stripReportScaffolding(line,category,severity){
 }
 
 function applyReportSeverity(item,severity,categoryHint){
-  if(item.expertDecision) return item;
   const chassisCategories=['שלדת מרכב','שלדה נפרדת'];
   if(!severity||(!chassisCategories.includes(categoryHint)&&!chassisCategories.includes(item.category))) return item;
-  const enriched={...item,reportSeverity:severity,tag:reportSeverityLabels[severity]||item.tag};
-  if(severity==='high') enriched.tone='safety';
-  enriched.decision=professionalDecision({...enriched,decision:item.id==='roof-paint'?item.decision:''});
+  const enriched={...item,category:categoryHint||item.category,reportSeverity:severity,tag:reportSeverityLabels[severity]||item.tag};
+  enriched.tone=severity==='high'?'safety':'clarify';
+  if(severity==='high') enriched.meaning='הממצא מופיע בדוח המכון תחת „משמעות גבוהה”, ולכן זהו הסיווג שנשמר.';
+  else if(severity==='low') enriched.meaning='הממצא מופיע בדוח המכון תחת „משמעות נמוכה”, ולכן זהו הסיווג שנשמר.';
+  else if(severity==='minor') enriched.meaning='הממצא מופיע בדוח המכון תחת „ליקויים שוליים”, ולכן זהו הסיווג שנשמר.';
+  enriched.decision=professionalDecision({...enriched,decision:''});
   return enriched;
 }
 
@@ -2378,12 +2380,13 @@ function interpretSummaryText(text){
   const findings=[],unknown=[],seen=new Set();
   const compactReport=normalizeFindingText(text).replace(/\s/g,'');
   const chassisHint=compactReport.includes('סוגשלדהשלדהנפרדת')?'שלדה נפרדת':compactReport.includes('סוגשלדהשלדתמרכב')?'שלדת מרכב':'';
+  const chassisCategories=['שלדת מרכב','שלדה נפרדת'];
   let currentCategory='',currentSeverity=null,skipSection=false;
   reportLines(text).forEach(line=>{
     const lineCategory=reportCategoryFromLine(line);
     if(lineCategory){
       currentCategory=lineCategory;
-      currentSeverity=null;
+      currentSeverity=chassisCategories.includes(lineCategory)?'low':null;
       skipSection=lineCategory==='הערות כלליות';
     }
     if(skipSection||lineCategory==='הערות כלליות') return;
