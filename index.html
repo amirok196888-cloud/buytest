@@ -519,10 +519,13 @@ let loadedKm=null, reportText='', preReportText='', afterReportText='', interpre
 let externalVehicleData={kmHistory:[]};
 const inspectionFiles={summary:null,computer:null};
 const inspectionOcrMeta={summary:null,computer:null};
-// Google Cloud Vision key. Keep the surrounding quotes and replace only the text below.
-const GOOGLE_VISION_API_KEY='AIzaSyDWVjQ9a3Q9iqEWWzuQmqFgUKJGKRlewT0';
+// Google Vision runs through the BuyTest Supabase Edge Function so the private
+// Google API key is never exposed in the public GitHub Pages source.
+const GOOGLE_VISION_PROXY_ENDPOINT='https://tjxjxavxrmvbofvtnsaj.supabase.co/functions/v1/vision-ocr';
+const BUYTEST_SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqeGp4YXZ4cm12Ym9mdnRuc2FqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzMjk3NjMsImV4cCI6MjEwMzkwNTc2M30.AWPEga4E1CQQ9QqqMyw1gTJn__aqV_fCx_raQhGjMck';
 function googleVisionReady(){
-  return /^AIza[\w-]{20,}$/.test(String(GOOGLE_VISION_API_KEY||'').trim());
+  return /^https:\/\/.+\/functions\/v1\/vision-ocr$/.test(GOOGLE_VISION_PROXY_ENDPOINT)
+    && String(BUYTEST_SUPABASE_ANON_KEY||'').length>40;
 }
 function ocrEngineLabel(engine){
   return ({
@@ -549,16 +552,20 @@ function googleVisionImageContent(source){
   return comma>=0?String(source).slice(comma+1):String(source||'');
 }
 async function googleVisionRecognize(sources,state,featureType='DOCUMENT_TEXT_DETECTION'){
-  if(!googleVisionReady()) throw new Error('GOOGLE_VISION_KEY_MISSING');
+  if(!googleVisionReady()) throw new Error('GOOGLE_VISION_PROXY_MISSING');
   const usable=(sources||[]).filter(Boolean);
   if(!usable.length) return '';
   const texts=[];
   for(let offset=0;offset<usable.length;offset+=1){
     const batch=usable.slice(offset,offset+1);
     if(state) state.textContent=`קורא את הדוח באמצעות Google Vision... חלק ${offset+1}–${offset+batch.length} מתוך ${usable.length}`;
-    const response=await fetch('https://vision.googleapis.com/v1/images:annotate?key='+encodeURIComponent(GOOGLE_VISION_API_KEY),{
+    const response=await fetch(GOOGLE_VISION_PROXY_ENDPOINT,{
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:{
+        'Content-Type':'application/json',
+        'apikey':BUYTEST_SUPABASE_ANON_KEY,
+        'Authorization':'Bearer '+BUYTEST_SUPABASE_ANON_KEY
+      },
       body:JSON.stringify({requests:batch.map(source=>({
         image:{content:googleVisionImageContent(source)},
         features:[{type:featureType,maxResults:1}],
@@ -566,7 +573,7 @@ async function googleVisionRecognize(sources,state,featureType='DOCUMENT_TEXT_DE
       }))})
     });
     const payload=await response.json().catch(()=>({}));
-    if(!response.ok||payload?.error) throw new Error('GOOGLE_VISION_FAILED');
+    if(!response.ok||payload?.error) throw new Error('GOOGLE_VISION_PROXY_FAILED');
     (payload.responses||[]).forEach(item=>{
       if(item?.error) throw new Error('GOOGLE_VISION_FAILED');
       const value=item?.fullTextAnnotation?.text||item?.textAnnotations?.[0]?.description||'';
