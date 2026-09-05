@@ -1240,9 +1240,11 @@ function reportReadQuality(text){
   const hebrewWords=(cleaned.match(/[א-ת]{2,}/g)||[]).length;
   const compact=normalizeFindingText(cleaned).replace(/\s/g,'');
   const categoryCount=formulaCategoryDefinitions.filter(category=>category.name!=='הערות כלליות'&&compact.includes(normalizeFindingText(category.name).replace(/\s/g,''))).length;
-  const score=(analysis.findings.length*100)+(categoryCount*20)+Math.min(hebrewWords,100)-analysis.unknown.length;
-  const hasNormalResult=/(^|\s)(תקין|עבר)(\s|$)/.test(normalizeFindingText(cleaned));
-  const ok=(analysis.findings.length>=1&&hebrewWords>=10)||(categoryCount>=2&&hebrewWords>=18&&hasNormalResult);
+  const reportSignals=/(מנוע|תיבת|הילוכ|בלמ|שלד|מרכב|היגוי|מתל|צמיג|תאורה|מערכת|ליקוי|תקין|קילומטראז)/.test(normalizeFindingText(cleaned));
+  // More recognized text is evidence of a better OCR result. Unknown wording must
+  // not penalize Google Vision, otherwise a partial Tesseract result can win.
+  const score=(analysis.findings.length*100)+(categoryCount*25)+Math.min(hebrewWords,160)+Math.min(analysis.unknown.length*4,60);
+  const ok=hebrewWords>=12&&(analysis.findings.length>=1||categoryCount>=1||reportSignals);
   return {ok,score,findings:analysis.findings.length,categories:categoryCount,unknown:analysis.unknown.length};
 }
 
@@ -1251,7 +1253,7 @@ function computerReadQuality(text){
   const analysis=interpretComputerText(cleaned);
   const hebrewWords=(cleaned.match(/[א-ת]{2,}/g)||[]).length;
   const values=(cleaned.match(/\d+(?:[.,]\d+)?/g)||[]).length;
-  const score=(analysis.findings.length*100)+Math.min(hebrewWords,60)+Math.min(values*3,60)-analysis.unknown.length;
+  const score=(analysis.findings.length*100)+Math.min(hebrewWords,80)+Math.min(values*3,80)+Math.min(analysis.unknown.length*3,45);
   const ok=analysis.findings.length>=1||(hebrewWords>=10&&values>=3);
   return {ok,score,findings:analysis.findings.length,categories:0,unknown:analysis.unknown.length};
 }
@@ -1347,17 +1349,23 @@ async function handleInspectionFile(input,kind){
     let selectedEngine=recognized?'pdf-text':'';
     let visionAttempted=false,tesseractAttempted=false;
     let quality=recognized?qualityFunction(recognized):{ok:false,score:0,findings:0,categories:0,unknown:0};
+    let visionUsable=false;
     if(!quality.ok&&prepared.sources?.length&&googleVisionReady()){
       visionAttempted=true;
       try{
         const visionText=diagnosticTableText(await googleVisionRecognize(prepared.sources,state));
         const visionQuality=qualityFunction(visionText);
-        if(visionQuality.score>quality.score){recognized=visionText;quality=visionQuality;selectedEngine='google-vision';}
+        const visionHebrewWords=(visionText.match(/[א-ת]{2,}/g)||[]).length;
+        const visionValues=(visionText.match(/\d+(?:[.,]\d+)?/g)||[]).length;
+        visionUsable=visionQuality.ok||(isSummary?visionHebrewWords>=12:(visionHebrewWords>=8&&visionValues>=2));
+        if(visionUsable){recognized=visionText;quality={...visionQuality,ok:true};selectedEngine='google-vision';}
       }catch(error){
         console.warn('Google Vision document OCR fallback:',error);
       }
     }
-    if(!quality.ok){
+    // Tesseract is a real fallback: use it only when Vision failed or returned
+    // no usable document text, not merely because a phrase is new to the rules DB.
+    if(!quality.ok&&!visionUsable){
       if(!window.Tesseract) throw new Error('OCR_UNAVAILABLE');
       tesseractAttempted=true;
       let currentPass='6';
@@ -1373,7 +1381,7 @@ async function handleInspectionFile(input,kind){
     if(!quality?.ok) throw new Error('OCR_LOW_QUALITY');
     textArea.value=recognized;
     inspectionOcrMeta[kind]={...quality,engine:selectedEngine,visionAttempted,tesseractAttempted};
-    state.innerHTML=ocrSuccessHtml(selectedEngine,quality.findings);
+    state.innerHTML=ocrSuccessHtml(selectedEngine,quality.findings+quality.unknown);
     if(isSummary) refreshInspectionHeader(reportKmForEngineWarranty(recognized));
     if(review) review.style.display='block';
   }catch(error){
@@ -3334,10 +3342,21 @@ function analysisTextBlock(title,result){
   const findings=result.findings.map(finalizeReportFinding).filter(Boolean);
   if(findings.length){
     text+=findings.map(item=>`• ${item.category} [${item.tag||formulaClassificationLabels[item.classification]||'סיווג מקצועי'}] — ${item.meaning} מסקנה: ${item.decision||professionalDecision(item)}${item.contextNote?' התאמה לרכב: '+item.contextNote:''}`).join('\n')+'\n';
-  }else{
+  }
+  if(result.unknown?.length){
+    text+=result.unknown.map(item=>`• עניין לבירור — ${item}`).join('\n')+'\n';
+  }
+  if(!findings.length&&!result.unknown?.length){
     text+='• לא זוהה ניסוח שניתן לפרש בבטחה מתוך המאגר המקצועי.\n';
   }
   return text.trim();
+}
+
+function unknownFindingsHtml(items){
+  const rows=(items||[]).filter(Boolean);
+  if(!rows.length) return '';
+  return '<div class="unknownList"><b>עניינים לבירור — הטקסט נקרא, אך הניסוח עדיין אינו מזוהה במאגר:</b><ul>'
+    +rows.map(item=>`<li>${escapeHtml(item)}</li>`).join('')+'</ul></div>';
 }
 
 function analyseInspectionReport(){
@@ -3356,6 +3375,7 @@ function analyseInspectionReport(){
   const summaryResult=interpretSummaryText(summaryText);
   const computerResult=computerText?interpretComputerText(computerText):{findings:[],unknown:[]};
   const totalFindings=summaryResult.findings.length+computerResult.findings.length;
+  const totalUnknown=(summaryResult.unknown?.length||0)+(computerResult.unknown?.length||0);
   interpretedReportKm=summaryResult.reportKm||null;
   const displayedKm=summaryResult.reportKm||Number(loadedKm||externalVehicleData.kmHistory?.[0]?.km||0);
   const kmSource=summaryResult.reportKm?'נקרא מסיכום הבוחן':'ממאגר הרישוי';
@@ -3377,10 +3397,12 @@ function analyseInspectionReport(){
   if(summaryResult.findings.length){
     html+='<h4>סיכום הבוחן</h4>'+summaryResult.findings.map(meaningCardHtml).join('');
   }
+  html+=unknownFindingsHtml(summaryResult.unknown);
   if(computerText){
     html+='<h4>בדיקה ממוחשבת</h4>'+(computerResult.findings.length?computerResult.findings.map(meaningCardHtml).join(''):'<p>לא נמצא בדף סימון מפורש או קוד שניתן לשקף בבטחה.</p>');
+    html+=unknownFindingsHtml(computerResult.unknown);
   }
-  if(!totalFindings){
+  if(!totalFindings&&!totalUnknown){
     html+='<div class="unknownList"><b>לא זוהו בדוח ניסוחים של ליקוי מתוך המאגר המקצועי.</b></div>';
   }
   html+='<div class="info"><b>איך להשתמש במסקנות:</b> לכל ממצא מוצגים סוג הממצא, חומרתו והמשקל שלו בהערכת מצב הרכב והעלויות. ההחלטה הסופית והמחיר נשארים בידי המשתמש.</div>';
