@@ -65,6 +65,13 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#07131aef;border-top:1p
 
 .feedbackBox{display:none;margin:18px 0;padding:18px;border:1px solid #31515c;border-radius:16px;background:#102832}
 .feedbackBox h3{margin:0 0 8px}.feedbackBox textarea{width:100%;min-height:110px;box-sizing:border-box;border-radius:12px;padding:12px;font:inherit}
+.clarificationBox{display:none;margin-top:18px;padding:18px;border:2px solid #0fa87e;border-radius:18px;background:#f4fbf9}
+.clarificationBox.show{display:block}.clarificationBox h3{margin:0 0 7px;font-size:22px}.clarificationBox>.sub{margin-bottom:14px}
+.clarificationChoices{display:grid;grid-template-columns:1fr 1fr;gap:12px}.clarificationChoice{border:1px solid #cbd8dd;border-radius:15px;padding:15px;background:#fff;display:flex;flex-direction:column;align-items:stretch}
+.clarificationChoice.paid{border-color:#e3a400;background:#fffdf5}.clarificationChoice h4{margin:0 0 7px;font-size:18px}.clarificationChoice p{margin:0 0 12px;line-height:1.55;color:#50666f}.clarificationChoice button{margin-top:auto}
+.clarificationPrice{display:inline-block;align-self:flex-start;margin-bottom:9px;padding:5px 9px;border-radius:999px;background:#e8f7f2;color:#075e48;font-size:13px;font-weight:900}
+.clarificationChoice.paid .clarificationPrice{background:#fff0c8;color:#7a5700}.clarificationForm{display:none;margin-top:14px;padding-top:14px;border-top:1px solid #d9e2e6}.clarificationForm.show{display:block}
+.clarificationForm textarea{width:100%;min-height:120px;background:#fff}.clarificationForm .formNote{margin:8px 0;color:#50666f;font-size:14px;line-height:1.5}.clarificationAdminPending{display:none;margin-top:18px;padding:14px;border:1px dashed #7d98a3;border-radius:14px;background:#eef4f6;color:#35515c}
 .stars{display:flex;gap:7px;justify-content:flex-start;direction:ltr;margin:10px 0 14px}
 .star{font-size:30px;background:none;border:0;cursor:pointer;opacity:.45;padding:2px}.star.on{opacity:1}
 .feedbackThanks{display:none;margin-top:10px;color:#52d6ba;font-weight:700}
@@ -158,11 +165,12 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 .afterGrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}.uploadPanel{border:1px solid #d9e2e6;border-radius:16px;padding:16px;background:#f8fafb}.uploadPanel.required{border-color:#0fa87e}.uploadPanel h3{margin:0 0 6px;font-size:18px}.uploadState{display:none;margin-top:10px;padding:10px 12px;border-radius:10px;background:#e8f7f2;color:#075e48;font-weight:700;line-height:1.5}.uploadState.show{display:block}.reportInput{min-height:150px;margin-top:10px;background:#fff}.ownershipBox{display:flex;gap:10px;align-items:flex-start;padding:14px;border:1px solid #f0cf8a;border-radius:12px;background:#fff7e8;line-height:1.55}.ownershipBox input{width:22px;height:22px;flex:0 0 auto;margin-top:2px;accent-color:#0fa87e}.interpretation{display:none;margin-top:18px}.interpretation.show{display:block}.meaningCard{border:1px solid #d9e2e6;border-right:5px solid #0fa87e;border-radius:14px;padding:14px;margin:10px 0;background:#fff}.meaningCard.safety{border-right-color:#c9362b;background:#fff8f7}.meaningCard.clarify{border-right-color:#e3a400;background:#fffdf5}.meaningCard h4{margin:0 0 6px}.meaningCard p{margin:5px 0;line-height:1.6}.meaningTag{display:inline-block;padding:4px 9px;border-radius:999px;background:#e8f7f2;color:#075e48;font-size:12px;font-weight:800}.unknownList{background:#fff7e8;border:1px solid #f0cf8a;border-radius:12px;padding:14px;margin-top:14px}.privacyStrip{margin:12px 0;padding:12px;border-radius:12px;background:#eef7fb;color:#183c4d;line-height:1.6}.scopeStrip{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:12px 0}.scopeStrip span{padding:10px;border-radius:10px;background:#edf8f4;text-align:center;font-weight:800;color:#075e48}.caseLabel{display:inline-flex;gap:7px;align-items:center;padding:7px 11px;border-radius:999px;background:#17352d;color:#fff;font-weight:800;font-size:13px}
 .ocrReview{display:none;margin-top:12px;padding-top:12px;border-top:1px solid #d9e2e6}.ocrReview .secondary{margin-top:8px}
 .formulaAdmin{display:none;border:2px solid #285f7a;background:#f2f8fb}.formulaAdminGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.formulaAdmin .wide{grid-column:1/-1}.formulaAdmin input,.formulaAdmin select,.formulaAdmin textarea{width:100%;background:#fff}.formulaAdmin textarea{min-height:80px}.formulaAdminStats{padding:11px 13px;border-radius:12px;background:#e7f3f8;color:#173f52;font-weight:800;margin:10px 0}.formulaAdminList{max-height:270px;overflow:auto;border:1px solid #d9e2e6;border-radius:12px;background:#fff;margin-top:12px}.formulaAdminItem{padding:10px 12px;border-bottom:1px solid #e6edef}.formulaAdminItem:last-child{border-bottom:0}.formulaAdminItem small{display:block;color:#60717a;margin-top:3px}.formulaAdminActions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}.formulaAdminActions button{flex:1;min-width:150px}.contextNote{margin-top:8px;padding:9px 11px;border-radius:10px;background:#eef4f6;color:#35515c}.matchSource{font-size:12px;color:#60717a;margin-top:7px}
+.customerReplyAdmin{display:none;border:2px solid #285f7a;background:#f2f8fb}.customerReplyAdmin h2{margin-bottom:6px}.replyTable{width:100%;border-collapse:separate;border-spacing:0 9px}.replyTable th{width:160px;text-align:right;vertical-align:top;padding:12px 0 0 10px;color:#35515c}.replyTable td{padding:0}.replyTable input,.replyTable textarea{width:100%;box-sizing:border-box;background:#fff}.replyTable textarea{min-height:92px}.replyTable textarea.replyAnswer{min-height:170px}.replyActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.replyActions button{flex:1;min-width:150px}.replyDrafts{margin-top:16px;border-top:1px solid #cbd8dd;padding-top:14px}.replyDraftItem{background:#fff;border:1px solid #d9e2e6;border-radius:12px;padding:12px;margin:9px 0}.replyDraftItem small{display:block;color:#60717a;margin:4px 0 8px}.replyDraftItem .miniActions{display:flex;gap:7px;flex-wrap:wrap}.replyDraftItem .miniActions button{padding:8px 11px;font-size:13px}.replySafetyNote{margin:10px 0;padding:11px 13px;border-radius:12px;background:#fff7e8;border:1px solid #f0cf8a;color:#694d13;line-height:1.55}
 .guidedSection{padding:0!important;overflow:hidden}.guidedSection>summary{list-style:none;cursor:pointer;padding:18px;display:flex;align-items:center;gap:12px;font-size:20px;font-weight:900}.guidedSection>summary::-webkit-details-marker{display:none}.guidedSection>summary:after{content:'פתיחה';margin-right:auto;font-size:12px;color:#0b7f67;background:#e8f7f2;border-radius:999px;padding:6px 10px}.guidedSection[open]>summary:after{content:'סגירה'}.guidedSection>.stepContent{padding:0 18px 18px}.questionCount{color:#60717a;font-size:13px;font-weight:800;margin-bottom:9px}.guidedChecks .check{display:none}.guidedChecks .check.active{display:block}.checkTitle{display:block;font-size:18px;line-height:1.55;margin-bottom:14px}.quickChoices{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.quickChoice{background:#eef4f6;color:#17323c;border:1px solid #cbd8dd;padding:11px 7px;font-size:13px}.quickChoice.selected{background:#0fa87e;color:#fff;border-color:#0b8d6b}.quickChoice.issue.selected{background:#d97b24;border-color:#bd671b}.quickChoice.skip.selected{background:#71818a;border-color:#5f6e76}.guidedNav{display:flex;align-items:center;gap:10px;margin-top:12px}.guidedNav button{flex:1;background:#eaf2f5;color:#17323c;border:1px solid #cbd8dd}.guidedProgress{font-size:13px;font-weight:800;color:#60717a;white-space:nowrap}.licenseDetails{margin:12px 0;border:1px solid #d9e2e6;border-radius:12px;background:#f8fafb}.licenseDetails>summary{padding:13px;font-weight:900;cursor:pointer}.licenseDetails>div{padding:0 13px 13px}.legalCompact{margin:12px 0 0!important;padding:12px!important}.legalCompact p{margin:0 0 9px;color:#50666f}.legalCompact a,.legalCompact button{color:#0b7f67;background:none;border:0;text-decoration:underline;padding:0;font:inherit;font-weight:800}.simpleFinding textarea{background:#fff;color:#17242b}.managerOnly{display:none}
 @media(max-width:500px){.quickChoices{grid-template-columns:1fr}.quickChoice{font-size:14px}.guidedSection>summary{font-size:18px}}
-@media(max-width:760px){.mktHero{padding:30px 0 24px}.mktHeroGrid,.mktAbout,.afterGrid{grid-template-columns:1fr}.mktGrid3{grid-template-columns:1fr}.mktOutcome{grid-template-columns:1fr 1fr}.mktHeroCard{padding:18px}.mktLead{font-size:18px}.mktCtas{flex-direction:column}.mktBtn{width:100%}main{padding-top:12px}.card{padding:18px;margin:20px 0}.credentials strong{font-size:22px}.credentials span{font-size:15px}.scopeStrip{grid-template-columns:1fr}}
-@media(max-width:460px){.mktOutcome{grid-template-columns:1fr}.priceGrid{grid-template-columns:1fr}.licenseGrid,.grid,.formulaAdminGrid{grid-template-columns:1fr}.formulaAdmin .wide{grid-column:auto}.mktWrap{padding:0 14px}}
-</style><meta name="buytest-build" content="expert-calibration-239-v49-report-mileage-context">
+@media(max-width:760px){.mktHero{padding:30px 0 24px}.mktHeroGrid,.mktAbout,.afterGrid,.clarificationChoices{grid-template-columns:1fr}.mktGrid3{grid-template-columns:1fr}.mktOutcome{grid-template-columns:1fr 1fr}.mktHeroCard{padding:18px}.mktLead{font-size:18px}.mktCtas{flex-direction:column}.mktBtn{width:100%}main{padding-top:12px}.card{padding:18px;margin:20px 0}.credentials strong{font-size:22px}.credentials span{font-size:15px}.scopeStrip{grid-template-columns:1fr}}
+@media(max-width:460px){.mktOutcome{grid-template-columns:1fr}.priceGrid{grid-template-columns:1fr}.licenseGrid,.grid,.formulaAdminGrid{grid-template-columns:1fr}.formulaAdmin .wide{grid-column:auto}.mktWrap{padding:0 14px}.replyTable,.replyTable tbody,.replyTable tr,.replyTable th,.replyTable td{display:block;width:100%}.replyTable th{padding:9px 0 5px}}
+</style><meta name="buytest-build" content="expert-calibration-239-v53-admin-customer-replies">
 </head><body>
 
 <section id="marketingLanding">
@@ -221,7 +229,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 <div class="mktFaq">
 <details><summary>האם BuyTest מחליף בדיקה במכון?</summary><p>לא. השלב הראשון מארגן בדיקות בסיסיות ודגשים למכון; השלב השני מסביר את סיכום הבוחן. השירות אינו בודק את הרכב פיזית ואינו מאשר תקינות.</p></details>
 <details><summary>מה מקבלים לפני התשלום?</summary><p>מזינים או סורקים מספר רכב ומקבלים את נתוני הרכב הזמינים ממאגרים ציבוריים. הבדיקה המקצועית המודרכת נפתחת לאחר התשלום.</p></details>
-<details><summary>מה כלול בתשלום?</summary><p>בדיקת BuyTest אחת ב־49 ₪ לרכב אחד: התאמת רישיון, שאלות ובדיקות לפני המכון, דגשים לבוחן, העלאת סיכום הבוחן, העלאה אופציונלית של הבדיקה הממוחשבת, הסבר ממצאים ו־PDF משולב.</p></details>
+<details><summary>מה כלול בתשלום?</summary><p>בדיקת BuyTest אחת ב־49 ₪ לרכב אחד: התאמת רישיון, שאלות ובדיקות לפני המכון, דגשים לבוחן, העלאת סיכום הבוחן, העלאה אופציונלית של הבדיקה הממוחשבת, הסבר ממצאים, PDF משולב והבהרה קצרה אחת במייל. מעבר אישי ומפורט על הדוח הוא שירות נפרד בתוספת 39 ₪.</p></details>
 <details><summary>מה קורה אם חסר מידע על הרכב?</summary><p>מאגרים ציבוריים אינם תמיד מלאים. כאשר נתון אינו זמין, BuyTest מציגה זאת במקום להמציא מידע, וממליצה לאמת פרטים מהותיים מול מסמכי הרכב והגורמים המתאימים.</p></details>
 <details><summary>האם BuyTest אומר אם לקנות את הרכב?</summary><p>לא. אין המלצת קנייה או אי־קנייה, אין הערכת שווי או עלות תיקון ואין קביעה לגבי ירידת ערך. BuyTest משקף משמעויות ושאלות לבירור בלבד; ההחלטה היא של המשתמש.</p></details>
 </div>
@@ -264,7 +272,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 </section>
 <section class="card" id="fullCheckOffer" style="display:none">
 <h2>תיק BuyTest מלא לרכב אחד · 49 ₪</h2>
-<p class="sub"><b>אותו תיק נשאר פתוח לשלב שלפני המכון ולשלב שאחרי המכון.</b><br>כלולים בדיקת רישיון וצ׳קליסט, דגשים לבוחן, העלאת סיכום הבוחן, בדיקה ממוחשבת אופציונלית והסבר משולב ב־PDF.</p>
+<p class="sub"><b>אותו תיק נשאר פתוח לשלב שלפני המכון ולשלב שאחרי המכון.</b><br>כלולים בדיקת רישיון וצ׳קליסט, דגשים לבוחן, העלאת סיכום הבוחן, בדיקה ממוחשבת אופציונלית, הסבר משולב ב־PDF והבהרה קצרה אחת במייל.</p>
 <div class="scopeStrip"><span>לפני המכון</span><span>דגשים לבוחן</span><span>אחרי המכון</span></div>
 <button class="primary full" type="button" onclick="startPayment()">פתח תיק בדיקה – 49 ₪</button>
 <div class="devMsg" id="paymentMsg" role="status" aria-live="polite"></div>
@@ -295,6 +303,29 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
   <div class="formulaAdminActions"><button class="primary" id="formulaSaveButton" type="button" onclick="saveCustomFormula()">הוסף נוסח למאגר</button><button class="secondary" id="formulaCancelEdit" type="button" onclick="resetFormulaEditor()" style="display:none">ביטול עריכה</button><button class="secondary" type="button" onclick="exportFormulaDatabase()">ייצוא המאגר המעודכן</button></div>
   <div class="devMsg" id="formulaAdminMessage" role="status" aria-live="polite"></div>
   <div class="formulaAdminList" id="formulaAdminList"></div>
+</section>
+
+<section class="card customerReplyAdmin" id="customerReplyAdmin">
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <img src="buytest-logo-compact.png" alt="BuyTest" width="120" height="120" style="width:86px;height:auto;object-fit:contain">
+    <div><h2>טבלת מענה ללקוחות</h2><p class="sub" style="margin:0">הזן את פרטי הפנייה ואת ההסבר שלך. ניתן לשמור טיוטה, להפיק תשובה ממותגת עם הלוגו ולפתוח מייל מוכן לשליחה.</p></div>
+  </div>
+  <table class="replyTable" aria-label="פרטי המענה ללקוח"><tbody>
+    <tr><th><label for="replyCustomerEmail">מייל הלקוח</label></th><td><input id="replyCustomerEmail" type="email" autocomplete="email" placeholder="customer@example.com"></td></tr>
+    <tr><th><label for="replyCustomerName">שם הלקוח</label></th><td><input id="replyCustomerName" autocomplete="name" placeholder="שם הלקוח או הלקוחה"></td></tr>
+    <tr><th><label for="replyVehiclePlate">מספר הרכב</label></th><td><input id="replyVehiclePlate" inputmode="numeric" maxlength="8" placeholder="מספר הרכב"></td></tr>
+    <tr><th><label for="replyCustomerQuestion">שאלת הלקוח</label></th><td><textarea id="replyCustomerQuestion" placeholder="הדבק כאן את השאלה שהתקבלה"></textarea></td></tr>
+    <tr><th><label for="replyProfessionalAnswer">ההסבר שלך</label></th><td><textarea class="replyAnswer" id="replyProfessionalAnswer" placeholder="כתוב כאן את ההסבר המקצועי שיישלח ללקוח"></textarea></td></tr>
+  </tbody></table>
+  <div class="replySafetyNote"><b>הבהרה משפטית שתצורף אוטומטית:</b> המענה מבוסס על דוח הבדיקה והמידע שנמסר בלבד. הוא אינו בדיקה פיזית, שמאות, אומדן מחייב לעלות תיקון או המלצה לקנות או לא לקנות את הרכב.</div>
+  <div class="replyActions">
+    <button class="secondary" type="button" onclick="saveCustomerReplyDraft()">שמור טיוטה</button>
+    <button class="secondary" type="button" onclick="downloadCustomerReplyPdf()">הורד תשובה עם לוגו כ־PDF</button>
+    <button class="primary" type="button" onclick="openPreparedCustomerEmail()">פתח מייל מוכן לשליחה</button>
+    <button class="secondary" type="button" onclick="clearCustomerReplyForm()">נקה טופס</button>
+  </div>
+  <div class="devMsg" id="customerReplyMessage" role="status" aria-live="polite"></div>
+  <div class="replyDrafts"><h3 style="margin:0 0 5px">טיוטות שנשמרו במכשיר זה</h3><div id="customerReplyDrafts"></div></div>
 </section>
 
 <details class="card paidOnly guidedSection" id="licenseMatchSection" style="display:none;border:2px solid #0ea67b;" open>
@@ -393,6 +424,30 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 <p class="sub" style="text-align:center;margin-top:8px">ההסבר יוצג מיד על המסך. לאחר מכן ניתן לשתף סיכום משולב כקובץ PDF.</p>
 <div class="interpretation" id="afterInterpretation"></div>
 <button class="primary full" id="finalPdfBtn" onclick="shareReportPdf('finalPdfBtn')" style="display:none">שיתוף סיכום משולב כ־PDF</button>
+<section class="clarificationBox" id="clarificationBox" aria-labelledby="clarificationTitle">
+  <h3 id="clarificationTitle">יש לך שאלה על הסיכום?</h3>
+  <p class="sub">בחר את סוג המענה המתאים. הפנייה מתבצעת במייל בלבד, ללא חשיפת מספר טלפון פרטי.</p>
+  <div class="clarificationChoices">
+    <article class="clarificationChoice">
+      <span class="clarificationPrice">כלול במחיר</span>
+      <h4>הבהרה קצרה אחת</h4>
+      <p>שאלה קצרה אחת על מסקנה שמופיעה בסיכום, עד 500 תווים.</p>
+      <button class="secondary" type="button" onclick="selectClarification('included')">שליחת שאלה קצרה</button>
+    </article>
+    <article class="clarificationChoice paid">
+      <span class="clarificationPrice">תוספת 39 ₪</span>
+      <h4>הבהרה אישית מקצועית</h4>
+      <p>מעבר אישי על הדוח ומענה מפורט לעד שלוש שאלות. המענה ניתן בשעות העבודה המקובלות.</p>
+      <button class="primary" type="button" onclick="selectClarification('paid')">בקשת הבהרה אישית</button>
+    </article>
+  </div>
+  <div class="clarificationForm" id="clarificationForm">
+    <div class="field"><label for="clarificationQuestion"><b id="clarificationQuestionLabel">השאלה שלך</b></label><textarea id="clarificationQuestion" maxlength="500" placeholder="כתוב כאן את השאלה בקצרה"></textarea></div>
+    <p class="formNote" id="clarificationFormNote">לאחר הלחיצה תיפתח אפליקציית המייל. מומלץ לצרף להודעה את קובץ ה־PDF של BuyTest.</p>
+    <button class="primary full" type="button" onclick="sendClarificationEmail()">פתיחת הודעת מייל</button>
+  </div>
+</section>
+<div class="clarificationAdminPending" id="clarificationAdminPending"><b>הגדרת מנהל:</b> אזור הפניות מוכן, והוא יוצג ללקוחות לאחר הכנסת כתובת המייל העסקית.</div>
 <button class="secondary full returnBtn" type="button" onclick="returnToVehicle()">חזרה לנתוני הרכב</button>
 </section>
 </main>
@@ -426,6 +481,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
       <p>זיהוי טקסט מתמונה עלול לשגות. המערכת מנתחת אוטומטית רק קטעים שנקראו ברמת ודאות מספקת; קטע שלא נקרא או שלא נמצא לו פירוש מקצועי לא ייכלל במסקנות. נתון ממוחשב ללא טווח ייחוס או סימון מפורש לא יקבל קביעה שאינה נתמכת בדף.</p>
       <p>בהעלאת דוח המשתמש מצהיר שהבדיקה הוזמנה על שמו או שיש לו הרשאה מתאימה מבעל הבדיקה לעשות שימוש בקובץ לצורך השירות. BuyTest אינו טוען לבעלות בדוח המכון ואינו מפרסם או מצרף את טופס המקור לפלט. המשתמש מתבקש להעלות רק את אזור סיכום הבוחן, ללא לוגו ופרטים אישיים שאינם דרושים.</p>
       <p>BuyTest אינו קשור למכון הבדיקה ואינו מדבר בשמו. ההסבר נגזר מן הטקסט שזוהה בדוח וממאגר הסיווג המקצועי של המערכת.</p>
+      <p>התשלום לתיק BuyTest כולל הבהרה קצרה אחת במייל על מסקנה שמופיעה בסיכום. הבהרה אישית ומפורטת היא שירות נפרד בתשלום. שני סוגי המענה מבוססים על הדוח שהמשתמש העלה בלבד ואינם בדיקה פיזית, שמאות, התחייבות לעלות תיקון או המלצה לקנות או לא לקנות את הרכב.</p>
       <p>כל הזכויות באתר, בתוכן, במבנה הבדיקה, בצ׳קליסטים, בעיצוב ובסימני BuyTest שמורות ל־BuyTest. אין להעתיק, להפיץ או לעשות בהם שימוש מסחרי ללא אישור מראש ובכתב.</p>
     </div>
     <div id="privacyText" class="legalPage" style="display:none">
@@ -562,6 +618,228 @@ document.querySelectorAll('.guidedChecks').forEach(renderGuided);
 
 
 
+// כתובת המייל העסקית תוזן כאן לאחר פתיחתה. כל עוד השדה ריק,
+// אזור הפניות אינו מוצג ללקוחות ואינו יוצר כפתור שאינו עובד.
+const BUYTEST_CONTACT_EMAIL='buytest2026@gmail.com';
+let clarificationType='included';
+function showClarificationOptions(){
+  const box=document.getElementById('clarificationBox');
+  const pending=document.getElementById('clarificationAdminPending');
+  const hasEmail=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(BUYTEST_CONTACT_EMAIL);
+  if(box) box.classList.toggle('show',hasEmail);
+  if(pending) pending.style.display=!hasEmail&&document.body.classList.contains('manager-mode')?'block':'none';
+}
+function selectClarification(type){
+  clarificationType=type==='paid'?'paid':'included';
+  const form=document.getElementById('clarificationForm');
+  const question=document.getElementById('clarificationQuestion');
+  const label=document.getElementById('clarificationQuestionLabel');
+  const note=document.getElementById('clarificationFormNote');
+  if(clarificationType==='paid'){
+    question.maxLength=1500;
+    question.placeholder='כתוב עד שלוש שאלות שתרצה שאבדוק באופן אישי';
+    label.textContent='השאלות שלך לבדיקה אישית';
+    note.textContent='לאחר הלחיצה תיפתח אפליקציית המייל עם בקשת ההזמנה. יש לצרף את קובץ ה־PDF של BuyTest; פרטי התשלום בסך 39 ₪ יישלחו לפני תחילת המענה.';
+  }else{
+    question.maxLength=500;
+    question.placeholder='כתוב כאן שאלה קצרה אחת על מסקנה שמופיעה בסיכום';
+    label.textContent='השאלה הקצרה שלך';
+    note.textContent='לאחר הלחיצה תיפתח אפליקציית המייל. מומלץ לצרף להודעה את קובץ ה־PDF של BuyTest.';
+  }
+  form.classList.add('show');
+  form.scrollIntoView({behavior:'smooth',block:'nearest'});
+  setTimeout(()=>question.focus({preventScroll:true}),350);
+}
+function sendClarificationEmail(){
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(BUYTEST_CONTACT_EMAIL)){
+    alert('כתובת המייל העסקית עדיין לא הוגדרה.');
+    return;
+  }
+  const question=document.getElementById('clarificationQuestion').value.trim();
+  if(question.length<5){alert('יש לכתוב את השאלה לפני פתיחת הודעת המייל.');return;}
+  const vehiclePlate=plate()||'לא הוזן';
+  const owner=document.getElementById('inspectionOwnerName')?.value.trim()||'לא הוזן';
+  const paid=clarificationType==='paid';
+  const subject=paid?`בקשה להבהרה אישית בתשלום · רכב ${vehiclePlate}`:`הבהרה קצרה על סיכום BuyTest · רכב ${vehiclePlate}`;
+  const body=[
+    paid?'סוג הפנייה: הבהרה אישית מקצועית בתוספת 39 ₪':'סוג הפנייה: הבהרה קצרה אחת הכלולה במחיר',
+    `מספר רכב: ${vehiclePlate}`,
+    `שם מזמין הבדיקה: ${owner}`,
+    '',
+    'השאלה:',
+    question,
+    '',
+    'יש לצרף להודעה את קובץ ה־PDF של BuyTest.'
+  ].join('\n');
+  location.href=`mailto:${BUYTEST_CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+const CUSTOMER_REPLY_STORAGE_KEY='buytestCustomerReplyDraftsV1';
+const CUSTOMER_REPLY_LEGAL='המענה מבוסס על דוח הבדיקה והמידע שנמסר בלבד. הוא אינו בדיקה פיזית, שמאות, אומדן מחייב לעלות תיקון או המלצה לקנות או לא לקנות את הרכב.';
+function customerReplyData(){
+  return {
+    email:document.getElementById('replyCustomerEmail')?.value.trim()||'',
+    name:document.getElementById('replyCustomerName')?.value.trim()||'',
+    vehiclePlate:document.getElementById('replyVehiclePlate')?.value.replace(/\D/g,'')||'',
+    question:document.getElementById('replyCustomerQuestion')?.value.trim()||'',
+    answer:document.getElementById('replyProfessionalAnswer')?.value.trim()||''
+  };
+}
+function customerReplyMessage(text,isError=false){
+  const box=document.getElementById('customerReplyMessage');
+  if(!box) return;
+  box.textContent=text;
+  box.classList.add('show');
+  box.style.background=isError?'#fff0f0':'#e8f7f2';
+  box.style.color=isError?'#8f2525':'#075e48';
+}
+function customerReplyDrafts(){
+  try{return JSON.parse(localStorage.getItem(CUSTOMER_REPLY_STORAGE_KEY)||'[]')}catch(_){return []}
+}
+function writeCustomerReplyDrafts(items){
+  localStorage.setItem(CUSTOMER_REPLY_STORAGE_KEY,JSON.stringify(items.slice(0,50)));
+}
+function saveCustomerReplyDraft(silent=false){
+  const data=customerReplyData();
+  if(!data.email&&!data.question&&!data.answer){if(!silent)customerReplyMessage('יש להזין לפחות פרט אחד לפני שמירת טיוטה.',true);return null;}
+  const items=customerReplyDrafts();
+  const activeId=document.getElementById('customerReplyAdmin')?.dataset.editingId||'';
+  const record={...data,id:activeId||String(Date.now()),updatedAt:new Date().toISOString()};
+  const existing=items.findIndex(item=>item.id===record.id);
+  if(existing>=0) items.splice(existing,1);
+  items.unshift(record);
+  writeCustomerReplyDrafts(items);
+  const panel=document.getElementById('customerReplyAdmin');
+  if(panel) panel.dataset.editingId=record.id;
+  renderCustomerReplyDrafts();
+  if(!silent) customerReplyMessage('הטיוטה נשמרה במכשיר זה.');
+  return record;
+}
+function renderCustomerReplyDrafts(){
+  const list=document.getElementById('customerReplyDrafts');
+  if(!list) return;
+  const items=customerReplyDrafts();
+  if(!items.length){list.innerHTML='<p class="sub">עדיין לא נשמרו טיוטות.</p>';return;}
+  list.innerHTML=items.map(item=>{
+    const date=item.updatedAt?new Date(item.updatedAt).toLocaleString('he-IL'):'';
+    const title=[item.name||item.email||'לקוח',item.vehiclePlate?'רכב '+item.vehiclePlate:''].filter(Boolean).join(' · ');
+    return `<article class="replyDraftItem"><b>${escapeHtml(title)}</b><small>${escapeHtml(date)}${item.email?' · '+escapeHtml(item.email):''}</small><div class="miniActions"><button class="secondary" type="button" onclick="editCustomerReplyDraft('${item.id}')">פתח לעריכה</button><button class="secondary" type="button" onclick="deleteCustomerReplyDraft('${item.id}')">מחק</button></div></article>`;
+  }).join('');
+}
+function editCustomerReplyDraft(id){
+  const item=customerReplyDrafts().find(record=>record.id===id);
+  if(!item) return;
+  document.getElementById('replyCustomerEmail').value=item.email||'';
+  document.getElementById('replyCustomerName').value=item.name||'';
+  document.getElementById('replyVehiclePlate').value=item.vehiclePlate||'';
+  document.getElementById('replyCustomerQuestion').value=item.question||'';
+  document.getElementById('replyProfessionalAnswer').value=item.answer||'';
+  document.getElementById('customerReplyAdmin').dataset.editingId=item.id;
+  document.getElementById('customerReplyAdmin').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function deleteCustomerReplyDraft(id){
+  if(!confirm('למחוק את טיוטת המענה הזו?')) return;
+  writeCustomerReplyDrafts(customerReplyDrafts().filter(item=>item.id!==id));
+  if(document.getElementById('customerReplyAdmin')?.dataset.editingId===id) clearCustomerReplyForm();
+  renderCustomerReplyDrafts();
+}
+function clearCustomerReplyForm(){
+  ['replyCustomerEmail','replyCustomerName','replyVehiclePlate','replyCustomerQuestion','replyProfessionalAnswer'].forEach(id=>{const field=document.getElementById(id);if(field)field.value=''});
+  const panel=document.getElementById('customerReplyAdmin');
+  if(panel) delete panel.dataset.editingId;
+  customerReplyMessage('הטופס נוקה.');
+}
+function validCustomerReply(requireEmail=true){
+  const data=customerReplyData();
+  if(requireEmail&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)){customerReplyMessage('יש להזין כתובת מייל תקינה של הלקוח.',true);return null;}
+  if(data.answer.length<5){customerReplyMessage('יש לכתוב את ההסבר שלך לפני ההפקה או השליחה.',true);return null;}
+  return data;
+}
+function openPreparedCustomerEmail(){
+  const data=validCustomerReply(true);
+  if(!data) return;
+  saveCustomerReplyDraft(true);
+  const subject=`מענה BuyTest${data.vehiclePlate?' · רכב '+data.vehiclePlate:''}`;
+  const greeting=data.name?`שלום ${data.name},`:'שלום,';
+  const body=[
+    greeting,
+    '',
+    data.vehiclePlate?`בהמשך לפנייתך לגבי רכב מספר ${data.vehiclePlate}:`:'בהמשך לפנייתך:',
+    data.question?'השאלה שנשלחה:\n'+data.question:'',
+    '',
+    'המענה המקצועי:',
+    data.answer,
+    '',
+    CUSTOMER_REPLY_LEGAL,
+    'המענה ניתן בשעות העבודה המקובלות.',
+    '',
+    'בברכה,',
+    'עמוס רוקח · BuyTest',
+    BUYTEST_CONTACT_EMAIL
+  ].filter(line=>line!==null&&line!==undefined).join('\n');
+  customerReplyMessage('המייל מוכן. לפני השליחה יש לוודא שחשבון השולח הוא '+BUYTEST_CONTACT_EMAIL+'.');
+  location.href=`mailto:${data.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+async function downloadCustomerReplyPdf(){
+  const data=validCustomerReply(false);
+  if(!data) return;
+  saveCustomerReplyDraft(true);
+  try{
+    const W=1240,H=1754,margin=90,pages=[];
+    let canvas,ctx,y;
+    function newPage(){
+      canvas=document.createElement('canvas');canvas.width=W;canvas.height=H;
+      ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);
+      ctx.direction='rtl';ctx.textAlign='right';ctx.textBaseline='top';y=75;
+    }
+    function finishPage(){const url=canvas.toDataURL('image/jpeg',0.92);pages.push({bytes:btDataUrlBytes(url),width:W,height:H});}
+    function ensure(height){if(y+height>H-105){finishPage();newPage();drawPageHeader(false)}}
+    function textBlock(text,size=32,bold=false,gap=18,color='#182126'){
+      ctx.font=`${bold?'700':'400'} ${size}px Arial, sans-serif`;ctx.fillStyle=color;
+      const paragraphs=String(text||'').split(/\n+/);
+      for(const paragraph of paragraphs){
+        const lines=btWrapRtl(ctx,paragraph,W-margin*2);
+        ensure(lines.length*(size*1.55)+gap);
+        lines.forEach(line=>{ctx.fillText(line,W-margin,y);y+=size*1.55});
+        y+=gap;
+      }
+    }
+    function drawPageHeader(first){
+      ctx.fillStyle='#0fa87e';ctx.fillRect(0,0,W,18);
+      if(first) return;
+      ctx.font='700 26px Arial, sans-serif';ctx.fillStyle='#0b6f58';ctx.fillText('BuyTest · מענה ללקוח',W-margin,y);y+=55;
+    }
+    newPage();drawPageHeader(true);
+    const logo=await btLoadImage('buytest-logo-compact.png');
+    if(logo){
+      const maxW=300,maxH=150,scale=Math.min(maxW/logo.width,maxH/logo.height);
+      const iw=Math.round(logo.width*scale),ih=Math.round(logo.height*scale);
+      ctx.drawImage(logo,W-margin-iw,y,iw,ih);y+=ih+25;
+    }
+    textBlock('מענה מקצועי ללקוח',42,true,8,'#102d35');
+    textBlock(new Date().toLocaleDateString('he-IL'),24,false,24,'#60717a');
+    if(data.name) textBlock('לכבוד: '+data.name,30,true,8);
+    if(data.vehiclePlate) textBlock('מספר רכב: '+data.vehiclePlate,28,true,22);
+    if(data.question){textBlock('השאלה שהתקבלה',29,true,8,'#0b6f58');textBlock(data.question,29,false,24);}
+    textBlock('המענה',31,true,8,'#0b6f58');
+    textBlock(data.answer,31,false,28);
+    ensure(180);
+    ctx.fillStyle='#fff7e8';ctx.fillRect(margin,y-4,W-margin*2,10);y+=18;
+    textBlock('הבהרה משפטית',27,true,7,'#694d13');
+    textBlock(CUSTOMER_REPLY_LEGAL,24,false,18,'#694d13');
+    textBlock('המענה ניתן בשעות העבודה המקובלות.',24,false,24,'#694d13');
+    textBlock('עמוס רוקח · BuyTest · '+BUYTEST_CONTACT_EMAIL,23,true,0,'#0b6f58');
+    finishPage();
+    const blob=btPdfFromJpegs(pages);
+    const fileName=`BuyTest-response-${data.vehiclePlate||'customer'}.pdf`;
+    downloadPdfFile(new File([blob],fileName,{type:'application/pdf'}));
+    customerReplyMessage('התשובה עם הלוגו וההבהרה המשפטית הורדה כ־PDF. יש לצרף אותה למייל המוכן.');
+  }catch(error){
+    console.error('BuyTest customer reply PDF error:',error);
+    customerReplyMessage('לא הצלחנו להפיק את קובץ התשובה. נסה שוב.',true);
+  }
+}
+
 let feedbackRating=0;
 function showFeedback(){document.getElementById('feedbackBox').style.display='block'}
 function setRating(n){
@@ -608,7 +886,11 @@ async function openManagerPreview(){
   if(notice){notice.style.display='block';notice.scrollIntoView({behavior:'smooth',block:'start'});}
   const formulaPanel=document.getElementById('managerFormulaPanel');
   if(formulaPanel) formulaPanel.style.display='block';
+  const replyPanel=document.getElementById('customerReplyAdmin');
+  if(replyPanel) replyPanel.style.display='block';
   initFormulaAdmin();
+  renderCustomerReplyDrafts();
+  showClarificationOptions();
 }
 let vehiclePhotoData=[];
 let btPreparedPdfFile=null, btPdfPreparing=null;
@@ -672,9 +954,11 @@ function documentOcrTilePlan(width,height){
   const safeWidth=Math.max(1,Number(width)||1),safeHeight=Math.max(1,Number(height)||1);
   const ratio=safeHeight/safeWidth;
   if(ratio<=1.65&&safeWidth>=1100) return [{x:0,y:0,width:safeWidth,height:safeHeight}];
-  const tileHeight=Math.min(safeHeight,Math.max(Math.round(safeWidth*1.35),Math.round(safeHeight/4)));
+  const tileHeight=ratio>1.05
+    ? Math.min(safeHeight,Math.max(Math.round(safeWidth*0.70),Math.round(safeHeight*0.48)))
+    : Math.min(safeHeight,Math.max(Math.round(safeWidth*1.35),Math.round(safeHeight/4)));
   if(tileHeight>=safeHeight) return [{x:0,y:0,width:safeWidth,height:safeHeight}];
-  const step=Math.max(1,Math.round(tileHeight*0.78));
+  const step=Math.max(1,Math.round(tileHeight*0.70));
   const tiles=[];
   for(let y=0;y<safeHeight;){
     const start=Math.min(y,Math.max(0,safeHeight-tileHeight));
@@ -683,6 +967,61 @@ function documentOcrTilePlan(width,height){
     y+=step;
   }
   return tiles.slice(0,6);
+}
+
+function longestOcrRun(flags){
+  let best={start:0,end:0,length:0},start=-1;
+  flags.forEach((active,index)=>{
+    if(active&&start<0) start=index;
+    if((!active||index===flags.length-1)&&start>=0){
+      const end=active&&index===flags.length-1?index+1:index;
+      if(end-start>best.length) best={start,end,length:end-start};
+      start=-1;
+    }
+  });
+  return best;
+}
+
+function detectDocumentBounds(image){
+  const width=image.naturalWidth,height=image.naturalHeight;
+  const probeWidth=Math.min(260,width);
+  const scale=probeWidth/Math.max(1,width);
+  const probeHeight=Math.max(1,Math.round(height*scale));
+  const canvas=document.createElement('canvas');
+  canvas.width=probeWidth;canvas.height=probeHeight;
+  const ctx=canvas.getContext('2d',{willReadFrequently:true});
+  ctx.drawImage(image,0,0,probeWidth,probeHeight);
+  let pixels;
+  try{pixels=ctx.getImageData(0,0,probeWidth,probeHeight).data;}catch(_){return {x:0,y:0,width,height};}
+  const bright=(x,y)=>{
+    const offset=(y*probeWidth+x)*4;
+    return (pixels[offset]*0.299)+(pixels[offset+1]*0.587)+(pixels[offset+2]*0.114)>58;
+  };
+  const rowFlags=[];
+  for(let y=0;y<probeHeight;y++){
+    let count=0;
+    for(let x=0;x<probeWidth;x++) if(bright(x,y)) count++;
+    rowFlags.push(count/probeWidth>=0.42);
+  }
+  const rows=longestOcrRun(rowFlags);
+  if(rows.length<probeHeight*0.28) return {x:0,y:0,width,height};
+  const columnFlags=[];
+  for(let x=0;x<probeWidth;x++){
+    let count=0;
+    for(let y=rows.start;y<rows.end;y++) if(bright(x,y)) count++;
+    columnFlags.push(count/Math.max(1,rows.length)>=0.38);
+  }
+  const columns=longestOcrRun(columnFlags);
+  if(columns.length<probeWidth*0.45) return {x:0,y:0,width,height};
+  const marginX=Math.round(probeWidth*0.015),marginY=Math.round(probeHeight*0.012);
+  const left=Math.max(0,columns.start-marginX),right=Math.min(probeWidth,columns.end+marginX);
+  const top=Math.max(0,rows.start-marginY),bottom=Math.min(probeHeight,rows.end+marginY);
+  const result={
+    x:Math.round(left/scale),y:Math.round(top/scale),
+    width:Math.round((right-left)/scale),height:Math.round((bottom-top)/scale)
+  };
+  if(result.width*result.height>width*height*0.94) return {x:0,y:0,width,height};
+  return result;
 }
 
 function renderDocumentOcrTile(image,tile){
@@ -696,15 +1035,16 @@ function renderDocumentOcrTile(image,tile){
   ctx.imageSmoothingQuality='high';
   ctx.fillStyle='#fff';
   ctx.fillRect(0,0,canvas.width,canvas.height);
-  ctx.filter='grayscale(1) contrast(1.8) brightness(1.12)';
+  ctx.filter='grayscale(1) contrast(1.38) brightness(1.06)';
   ctx.drawImage(image,tile.x,tile.y,tile.width,tile.height,0,0,canvas.width,canvas.height);
   return canvas.toDataURL('image/png');
 }
 
 async function imageForDocumentOcr(file){
   const image=await loadImageFile(file);
-  const width=image.naturalWidth,height=image.naturalHeight;
-  return documentOcrTilePlan(width,height).map(tile=>renderDocumentOcrTile(image,tile));
+  const bounds=detectDocumentBounds(image);
+  return documentOcrTilePlan(bounds.width,bounds.height)
+    .map(tile=>renderDocumentOcrTile(image,{x:bounds.x+tile.x,y:bounds.y+tile.y,width:tile.width,height:tile.height}));
 }
 
 function pdfPageText(textContent){
@@ -750,7 +1090,7 @@ async function pdfForDocumentOcr(file,qualityFunction){
 }
 
 function reportReadQuality(text){
-  const cleaned=cleanOcrText(text);
+  const cleaned=diagnosticTableText(text);
   const analysis=interpretSummaryText(cleaned);
   const hebrewWords=(cleaned.match(/[א-ת]{2,}/g)||[]).length;
   const compact=normalizeFindingText(cleaned).replace(/\s/g,'');
@@ -773,17 +1113,22 @@ function computerReadQuality(text){
 
 async function recognizeDocumentSources(worker,sources,state,setPass,qualityFunction){
   const candidates=[];
-  for(const psm of ['6','11']){
+  for(const psm of ['3','6','11']){
     setPass(psm);
     await worker.setParameters({preserve_interword_spaces:'1',tessedit_pageseg_mode:psm});
     const pageTexts=[];
     for(let index=0;index<sources.length;index++){
-      state.textContent=`מזהה את דוח הבדיקה... מעבר ${psm==='6'?'ראשון':'נוסף'}, חלק ${index+1} מתוך ${sources.length}`;
+      state.textContent=`מזהה את דוח הבדיקה... מעבר ${psm==='3'?'ראשון':psm==='6'?'שני':'נוסף'}, חלק ${index+1} מתוך ${sources.length}`;
       const result=await worker.recognize(sources[index]);
       pageTexts.push(cleanOcrText(result?.data?.text));
     }
-    const text=cleanOcrText(pageTexts.join('\n'));
+    const text=diagnosticTableText(pageTexts.join('\n'));
     candidates.push({text,quality:qualityFunction(text)});
+  }
+  if(candidates.length>1){
+    const diagnosticParts=candidates.map(candidate=>diagnosticTableText(candidate.text)).filter(Boolean);
+    const mergedText=cleanOcrText(diagnosticParts.join('\n'));
+    if(mergedText) candidates.push({text:mergedText,quality:qualityFunction(mergedText)});
   }
   candidates.sort((a,b)=>b.quality.score-a.quality.score);
   return candidates[0]||{text:'',quality:{ok:false,score:0,findings:0,categories:0,unknown:0}};
@@ -795,6 +1140,13 @@ function cleanOcrText(text){
     .replace(/[ \t]+\n/g,'\n')
     .replace(/\n{3,}/g,'\n\n')
     .trim();
+}
+
+function diagnosticTableText(text){
+  const cleaned=cleanOcrText(text);
+  const marker=/הערות\s*כלליות|לחזור\s+לה\s*משך\s+בדיקה\s+לאחר\s+תיקון|יש\s+לברר\s+זמני\s+טיפולים/i;
+  const match=marker.exec(cleaned);
+  return match&&match.index>180?cleaned.slice(0,match.index).trim():cleaned;
 }
 
 function clearInspectionFile(kind){
@@ -845,18 +1197,18 @@ async function handleInspectionFile(input,kind){
     const prepared=file.type==='application/pdf'
       ? await pdfForDocumentOcr(file,qualityFunction)
       : {text:'',sources:await imageForDocumentOcr(file)};
-    let recognized=cleanOcrText(prepared.text);
+    let recognized=diagnosticTableText(prepared.text);
     let quality=recognized?qualityFunction(recognized):null;
     if(!recognized){
       if(!window.Tesseract) throw new Error('OCR_UNAVAILABLE');
       let currentPass='6';
       worker=await Tesseract.createWorker('heb+eng',1,{
         logger:m=>{
-          if(m.status==='recognizing text') state.textContent=`מזהה את דוח הבדיקה... מעבר ${currentPass==='6'?'ראשון':'נוסף'} ${Math.round((m.progress||0)*100)}%`;
+      if(m.status==='recognizing text') state.textContent=`מזהה את דוח הבדיקה... מעבר ${currentPass==='3'?'ראשון':currentPass==='6'?'שני':'נוסף'} ${Math.round((m.progress||0)*100)}%`;
         }
       });
       const best=await recognizeDocumentSources(worker,prepared.sources,state,value=>{currentPass=value;},qualityFunction);
-      recognized=best.text;
+      recognized=diagnosticTableText(best.text);
       quality=best.quality;
     }
     if(!recognized) throw new Error('TEXT_NOT_FOUND');
@@ -880,9 +1232,39 @@ async function handleInspectionFile(input,kind){
 }
 
 const findingKnowledgeBase=[
+  {id:'engine-oil-sweat-report',terms:['סימני הזעה שמן מנוע','סימני הזעת שמן מנוע'],patterns:[/סימני\s*הזע[הת]?\s*שמן/],category:'מנוע',tag:'משמעות בינונית',tone:'clarify',classification:'actual_finding',reportSeverity:'medium',suppresses:['oil-sweat'],meaning:'נרשמו סימני הזעת שמן במנוע. זו לחות שמנונית, ויש להבדיל בינה לבין נזילה פעילה.',decision:'יש לאתר את מקור ההזעה ולבדוק אם היא קלה ויבשה או פעילה. יש להביא בחשבון טיפול באטימה לפי הממצאים.'},
+  {id:'engine-internal-knocks-report',terms:['נקישות פנימיות','רעשים ונקישות פנימיות'],patterns:[/נקיש[א-ת]*\s*פנימ/],category:'מנוע',tag:'משמעות גבוהה',tone:'safety',classification:'actual_finding',reportSeverity:'high',meaning:'נרשמו נקישות פנימיות במנוע. זהו ממצא מכני ממשי, גם כאשר מקורו המדויק עדיין לא אובחן.',decision:'יש לבצע אבחון מנוע ממוקד ולהעריך את מקור הנקישות ואת עלות הטיפול לפני קבלת החלטה.'},
+  {id:'cooling-corrosion-connections-report',terms:['קורוזיה וסימני נזילה בחיבורים','קורוזיה בחיבורים','קורוזיה וסימני'],patterns:[/קורוזיה.*(?:חיבור|וסימני)/],category:'מערכת הקירור',tag:'משמעות בינונית',tone:'clarify',classification:'actual_finding',reportSeverity:'medium',meaning:'נרשמה קורוזיה באזור חיבורי מערכת הקירור.',decision:'יש לבדוק את החיבורים, הצנרת ומקור סימני הרטיבות ולהביא בחשבון תיקון ודליפה אפשרית.'},
+  {id:'coolant-shortage-report',terms:['חוסר בנוזל קירור','חוסר נוזל קירור'],patterns:[/חוסר.*נוזל.*קירור/],category:'מערכת הקירור',tag:'משמעות בינונית',tone:'safety',classification:'actual_finding',reportSeverity:'medium',suppresses:['coolant-leak'],meaning:'נרשם חוסר בנוזל קירור. החוסר עצמו הוא ממצא, אך הסיבה אינה ידועה מהנוסח.',decision:'יש לבצע בדיקת לחץ ולאתר אם קיימת דליפה או סיבה אחרת לירידת המפלס לפני שימוש ממושך.'},
+  {id:'cooling-defective-report',terms:['מערכת קירור לקויה','מערכת הקירור לקויה'],patterns:[/מערכת\s*ה?קירור.*לקוי/],category:'מערכת הקירור',tag:'משמעות בינונית',tone:'safety',classification:'actual_finding',reportSeverity:'medium',suppresses:['cooling-system'],meaning:'הבוחן סימן במפורש שמערכת הקירור לקויה, בלי לציין בנוסח את הרכיב המדויק.',decision:'נדרש בירור ממוקד של התקלה במערכת הקירור והערכת עלות התיקון.'},
+  {id:'steering-rear-axis-check-report',terms:['לבדוק כיוון זוויות היגוי / ציר אחורי','לבדוק כיוון זוויות היגוי','ציר אחורי'],patterns:[/כיו[נן].*היגוי.*ציר.*אחור/],category:'מערכת ההיגוי',tag:'משמעות בינונית',tone:'clarify',classification:'maintenance_recommendation',reportSeverity:'medium',suppresses:['steering-alignment-report','wheel-alignment'],meaning:'נרשמה דרישה לבדוק או לכוון את זוויות ההיגוי ואת הציר האחורי.',decision:'יש לבצע בדיקת כיוון פרונט וגאומטריית ציר אחורי ולברר אם קיימת סטייה, שחיקת צמיגים או פגיעה ברכיב.'},
+  {id:'suspension-noise-play-report',terms:['נקישות רעשים חופשים במתלה','רעשים חופשים במתלה'],patterns:[/(?:נקיש|רעש).*חופש.*מתלה/],category:'מתלים והיגוי',tag:'משמעות בינונית',tone:'safety',classification:'actual_finding',reportSeverity:'medium',suppresses:['suspension'],meaning:'נרשמו רעשים, נקישות או חופשים במתלה.',decision:'יש לזהות את הרכיבים והצדדים שבהם נמצא החופש ולהביא בחשבון תיקון במערכת המתלה.'},
+  {id:'weak-shock-absorbers-report',terms:['בולמי זעזועים חלשים'],patterns:[/בולמי\s*זעזועים.*חלשים/],category:'מתלים והיגוי',tag:'משמעות בינונית',tone:'safety',classification:'actual_finding',reportSeverity:'medium',suppresses:['suspension'],meaning:'הבוחן ציין שבולמי הזעזועים חלשים.',decision:'יש לבדוק את יעילות הבולמים ולהביא בחשבון החלפה בזוג בהתאם למיקום ולמצב.'},
+  {id:'rear-left-shock-failed-report',terms:['בולם אחורי שמאל פסול','בולם אחורי שמאל פגום'],patterns:[/בולם.*(?:אחורי|אפורי|ארי).*שמאל.*(?:פסול|פגום)/],category:'מתלים והיגוי',tag:'משמעות בינונית',tone:'safety',classification:'actual_finding',reportSeverity:'medium',suppresses:['suspension'],meaning:'הבולם האחורי השמאלי סומן כפסול או פגום.',decision:'יש לבדוק את שני הבולמים האחוריים ולהביא בחשבון החלפה בזוג.'},
+  {id:'body-filler-report',terms:['מילוי חומר'],patterns:[/מילוי\s*חומר/],category:'שלדת מרכב',tag:'משמעות נמוכה',tone:'clarify',classification:'repair_history_or_evidence',reportSeverity:'low',suppresses:['paint'],meaning:'נמצאו סימני מילוי חומר בעבודת פחחות בחלקים החיצוניים.',decision:'יש לבדוק את מיקום המילוי ואת איכות התיקון. תחת משמעות נמוכה אין להסיק מכך פגיעה מבנית.'},
+  {id:'front-impact-low-report',terms:['פגיעה בחזית שמאל','פגיעה בחזית'],patterns:[/פגיעה\s*בחזית/],category:'שלדת מרכב',tag:'משמעות נמוכה',tone:'clarify',classification:'repair_history_or_evidence',reportSeverity:'low',meaning:'נרשמה פגיעה בחזית במסגרת קבוצת משמעות נמוכה.',decision:'יש לבדוק את היקף התיקון בחלקים החיצוניים; אין לייחס לפגיעה משמעות מבנית גבוהה שלא נרשמה בדוח.'},
+  {id:'broken-plastic-report',terms:['פלסטיקה שבור','פלסטיקה שבורה','חלקי פלסטיק שבורים'],patterns:[/פלסטיק[הא]?\s*שבור/],category:'שלדת מרכב',tag:'משמעות נמוכה',tone:'clarify',classification:'actual_finding',reportSeverity:'low',meaning:'נרשם שבר בחלק פלסטיק ברכב.',decision:'יש לזהות את החלק השבור ולהביא בחשבון תיקון או החלפה.'},
+  {id:'front-windshield-replaced-report',terms:['שמשה קדמית מוחלפת','שמשה קדמית הוחלפה','הוחלפה שמשה קדמית'],patterns:[/שמשה\s*קדמית.*(?:מוחלפת|הוחלפה)/],category:'שלדת מרכב',tag:'משמעות נמוכה',tone:'clarify',classification:'repair_history_or_evidence',reportSeverity:'low',suppresses:['expert-glass_windows'],meaning:'נרשם שהשמשה הקדמית הוחלפה.',decision:'יש לבדוק את איכות ההתקנה, האטימה והאם קיימים סימני נזק או תיקון נוספים מסביבה.'},
+  {id:'brake-discs-worn-ocr-report',terms:['צלחות שחוקות','צ קת שחוקות'],patterns:[/(?:צלחות|צלועת|צ\s*קת|צלו\s*[א-ת]*)\s*שחוקות/,/לפרק\s*גלגלים\s*לבדיקה.*שחוקות/],category:'מערכת הבלמים (ללא פירוק גלגלים)',tag:'ליקוי בטיחותי',tone:'safety',classification:'actual_finding',reportSeverity:'safety',suppresses:['brakes','brake-discs-worn'],meaning:'נרשמה שחיקה בצלחות הבלם.',decision:'יש לבדוק באילו גלגלים נמצאה השחיקה ולהביא בחשבון החלפת צלחות ורפידות לפי המדידה.'},
+  {id:'rim-scuffs-report',terms:['שפשופים בחישוקים','שפשופים חישוקים'],patterns:[/שפשופ[א-ת]*.*חישוק/],category:'צמיגים וחישוקים',tag:'משמעות נמוכה',tone:'clarify',classification:'actual_finding',reportSeverity:'low',meaning:'נרשמו שפשופים בחישוקים.',decision:'זהו בדרך כלל ממצא קוסמטי, אך יש לוודא שאין עיקום, סדק או איבוד לחץ.'},
+  {id:'front-lamps-damaged-report',terms:['פנס חזית פגומים','פנסי חזית פגומים','פנס חזית פגום','מיחקת פגומים'],patterns:[/פנס[י]?\s*חזית.*פגומ/,/מיחקת\s*פגומ/],category:'מערכת תאורה',tag:'משמעות נמוכה',tone:'clarify',classification:'actual_finding',reportSeverity:'low',meaning:'נרשם נזק בפנסי החזית.',decision:'יש לבדוק את פעולת הפנסים, התושבות והאטימה ולהביא בחשבון תיקון או החלפה.'},
+  {id:'transmission-disc-wear-report',terms:['נקישות בלאי דיסקיות בתיבת הילוכים','בלאי דיסקיות בתיבת הילוכים'],patterns:[/(?:נקיש[א-ת]*\s*)?בלאי\s*דיסק[א-ת]*.*הילוכים/],category:'תיבת העברת הכוח',tag:'משמעות בינונית',tone:'clarify',classification:'actual_finding',reportSeverity:'medium',meaning:'נרשמו נקישות ובלאי בדיסקיות תיבת ההילוכים.',decision:'יש לבצע בדיקת תיבה ממוקדת ולהביא בחשבון תיקון אפשרי ועלות במערכת ההילוכים.'},
+  {id:'engine-gear-mounts-report',terms:['לבדוק תושבות מנוע וגיר','תושבות מנוע וגיר'],patterns:[/תושבות.*מנוע.*גיר/,/לבדוק\s*תושבות.*גיר/],category:'תיבת העברת הכוח',tag:'משמעות נמוכה',tone:'clarify',classification:'actual_finding',reportSeverity:'low',meaning:'נרשמה דרישה לבדוק את תושבות המנוע והגיר, לצד סימון של תושבת פגומה.',decision:'יש לזהות איזו תושבת פגומה ולהביא בחשבון החלפה.'},
+  {id:'gearbox-software-update-report',terms:['לבדוק עידכון גירסה לגיר','לבדוק עדכון גרסה לגיר'],patterns:[/לבדוק.*(?:עידכון|עדכון).*גירס?ה.*גיר/],category:'תיבת העברת הכוח',tag:'בדיקת המשך',tone:'clarify',classification:'recommendation',meaning:'הדוח ממליץ לבדוק אם נדרש עדכון תוכנה לתיבת ההילוכים.',decision:'אין לספור זאת לבדה כתקלה מכנית; יש לבדוק במוסך לפי מספר השלדה אם קיים עדכון רלוונטי.'},
+  {id:'clutch-condition-check-report',terms:['בדיקת תקינות מצמדים','לבדוק תקינות מצמדים'],patterns:[/בדיקת\s*תקינות\s*מצמדים/],category:'תיבת העברת הכוח',tag:'בדיקת המשך',tone:'clarify',classification:'recommendation',meaning:'נרשמה דרישה לבדוק את תקינות המצמדים.',decision:'אין לקבוע מהמשפט בלבד שהמצמדים פגומים; יש לבצע בדיקה ממוקדת ולהעריך עלות רק אם תימצא תקלה.'},
+  {id:'expert-internal_wear',terms:['בלאי פנימי','בלאי פנימץ','בלאי פנימצ','בלאי פנימ'],patterns:[/בלאי\s*פנימ[א-ת]*/],category:'מנוע',tag:'משמעות גבוהה',tone:'safety',classification:'actual_finding',reportSeverity:'high',contextPolicy:'no_effect',meaning:'נרשם בדוח בלאי פנימי במנוע. זהו ממצא ממשי הנוגע למצבו המכני של המנוע.',decision:'זהו ממצא בעל משמעות גבוהה. יש לברר את מצב המנוע והיקף הטיפול האפשרי ולהביא בחשבון את הסיכון והעלות.'},
+  {id:'crankcase-internal-noise-report',terms:['רעש בבית ארכובה','רעש בית ארכובה','רפש בבית ארכובה'],patterns:[/ר(?:עש|פש)\s*בבית\s*ארכובה/],category:'מנוע',tag:'משמעות גבוהה',tone:'safety',classification:'actual_finding',reportSeverity:'high',meaning:'נרשם רעש מבית הארכובה, אזור המכיל רכיבים פנימיים מרכזיים של המנוע.',decision:'זהו ממצא משמעותי שמחייב בירור ממוקד של מקור הרעש והערכת היקף הטיפול והעלות.'},
+  {id:'damaged-engine-belt-report',terms:['רצועה פגומה','רצועת מנוע פגומה','צועה פגומה'],patterns:[/(?:ר|^)צועה\s*פגומה/],category:'מנוע ואביזרים',tag:'משמעות נמוכה',tone:'clarify',classification:'actual_finding',reportSeverity:'low',meaning:'נרשמה רצועה פגומה במערכת אביזרי המנוע.',decision:'יש לזהות איזו רצועה נפגעה ולהביא בחשבון החלפה קרובה.'},
+  {id:'air-filter-housing-tied-report',terms:['בית מסנן אוויר תפוס באזיקון','מסנן אוויר תפוס באזיקון','בית מסנן אוויר קשור באזיקון','אוויר תפוס באזיקון'],patterns:[/(?:מסנן\s*)?אוויר.*אזיקון/],category:'מנוע',tag:'משמעות נמוכה',tone:'clarify',classification:'actual_finding',reportSeverity:'low',meaning:'בית מסנן האוויר מקובע באזיקון במקום בחיבור תקין.',decision:'יש לבדוק את בית המסנן, התושבות והאטימה ולהביא בחשבון תיקון של החיבור.'},
+  {id:'sill-impact-report',terms:['פגיעה בסף','נגיעה בסף'],category:'שלדת מרכב',tag:'משמעות נמוכה',tone:'clarify',classification:'actual_finding',reportSeverity:'low',meaning:'נרשמה פגיעה באזור הסף.',decision:'יש לבדוק את מצב הסף ולהביא בחשבון תיקון, בלי לייחס לממצא משמעות מבנית גבוהה שלא נרשמה בדוח.'},
+  {id:'front-bumper-replaced-report',terms:['הוחלף פגוש קדמי','החלפת פגוש קדמי','חלף פגוש קדמי'],category:'שלדת מרכב',tag:'משמעות נמוכה',tone:'clarify',classification:'repair_history_or_evidence',reportSeverity:'low',meaning:'נרשם שפגוש קדמי הוחלף. הפגוש הוא חלק חיצוני ואינו חלק מבני.',decision:'יש לבדוק את איכות ההתקנה והצבע; ההחלפה לבדה אינה מעידה על פגיעה מבנית.'},
+  {id:'bumper-damage-report',terms:['פגיעות בפגושים','פגיעות פגושים'],category:'שלדת מרכב',tag:'משמעות נמוכה',tone:'clarify',classification:'actual_finding',reportSeverity:'low',meaning:'נרשמו פגיעות בפגושים החיצוניים.',decision:'יש להביא בחשבון תיקון קוסמטי או החלפת חלקי פלסטיק לפי מצבם.'},
+  {id:'parking-light-repair-report',terms:['לתקן אור חניה','תיקון אור חניה'],category:'מערכת תאורה',tag:'משמעות נמוכה',tone:'clarify',classification:'actual_finding',reportSeverity:'low',meaning:'נרשם צורך בתיקון אור החניה.',decision:'יש לבדוק את הנורה, בית הנורה והחיווט ולהביא בחשבון תיקון נקודתי.'},
+  {id:'faded-headlights-ocr-report',terms:['פנסים ראשיים דהויים','ראשיים דהויים'],category:'מערכת תאורה',tag:'משמעות נמוכה',tone:'clarify',classification:'actual_finding',reportSeverity:'low',meaning:'נרשם שפנסי החזית דהויים.',decision:'יש להביא בחשבון ליטוש או החלפה ולוודא שעוצמת התאורה תקינה.'},
+  {id:'power-transfer-boots-ocr-report',terms:['גומיות מגן'],categoryHints:['תיבת העברת הכוח'],category:'תיבת העברת הכוח',tag:'משמעות בינונית',tone:'clarify',classification:'actual_finding',reportSeverity:'medium',meaning:'נרשם ממצא בגומיות המגן של מערכת העברת הכוח.',decision:'יש לזהות אילו גומיות פגומות ולהביא בחשבון טיפול לפני חדירת לכלוך ואובדן חומר סיכה.'},
   {id:'inspection-limited',terms:['לא ניתן לבדוק','לא נבדק','לא ניתן היה לבדוק','לא בוצעה נסיעת מבחן','לא ניתן לבצע נסיעת מבחן','דרוש פירוק'],category:'מגבלת בדיקה',tag:'דורש השלמה',tone:'clarify',meaning:'הטופס מציין שהרכיב או המצב לא הוערכו באופן מלא. אין להסיק מכך שהרכיב תקין או לא תקין.',question:'לבקש מהבוחן לציין מה לא נבדק, מדוע, ואיזו בדיקה נוספת נדרשת.'},
   {id:'frame-edge',terms:['פגיעה בקצות שלדה','תיקון בקצות שלדה','מעיכה בקצה שלדה','מעיכות בקצות שלדה','קצה שלדה'],category:'שלדה ומבנה',tag:'מבני',tone:'safety',meaning:'הבוחן סימן פגיעה או תיקון באזור קצה שלדה. הניסוח לבדו אינו קובע את היקף הפגיעה או את השפעתה.',question:'לבקש מיקום מדויק, תיאור התיקון, מדידות שבוצעו והאם קיימת השפעה על נקודות חיבור או גאומטריית המרכב.'},
-  {id:'frame',terms:['פגיעה בשלדה','תיקון שלדה','תיקונים בשלדה','ריתוך בשלדה','עיוות בשלדה','סימני פגיעה בשלדה','שילדה'],category:'שלדה ומבנה',tag:'מבני',tone:'safety',meaning:'נרשם ממצא הנוגע למבנה הנושא של הרכב. יש חשיבות למיקום, להיקף ולשיטת הבדיקה, שאינם נלמדים מהביטוי הקצר בלבד.',question:'לבקש מהבוחן להראות את האזור, להסביר את חומרת הממצא ומה נבדק כדי לקבוע אותו.'},
+  {id:'frame',terms:['פגיעה בשלדה','תיקון שלדה','תיקונים בשלדה','ריתוך בשלדה','עיוות בשלדה','סימני פגיעה בשלדה'],category:'שלדה ומבנה',tag:'מבני',tone:'safety',meaning:'נרשם ממצא הנוגע למבנה הנושא של הרכב. יש חשיבות למיקום, להיקף ולשיטת הבדיקה, שאינם נלמדים מהביטוי הקצר בלבד.',question:'לבקש מהבוחן להראות את האזור, להסביר את חומרת הממצא ומה נבדק כדי לקבוע אותו.'},
   {id:'body-paint-poor',terms:['צבע ופחחות כללית במצב ירוד'],category:'שלדת מרכב',tag:'משמעות גבוהה',tone:'safety',classification:'actual_finding',reportSeverity:'high',suppresses:['body-repair'],meaning:'נרשם במפורש שמצב הפחחות והצבע הכללי ירוד.',decision:'זהו ממצא בעל משמעות גבוהה. יש לברר את היקף התיקונים, מצב המרכב והעלות הצפויה.'},
   {id:'body-repair',terms:['החלפת חלקי מרכב','תיקוני מרכב','חלקי מרכב הוחלפו','סימני תיקון במרכב'],category:'מרכב',tag:'סימן לתיקון או החלפה',tone:'clarify',meaning:'נמצאו סימנים לכך שחלקי מרכב תוקנו או הוחלפו. הביטוי אינו מציין לבדו אם מדובר בחלק חיצוני מתפרק או באזור מבני.',question:'לבקש פירוט של החלקים, אופן החיבור והאם הממצא חיצוני בלבד או קשור למבנה הרכב.'},
   {id:'body-paint-repairs-report',terms:['תיקוני פחחות וצבע','תיקוני פח וצבע'],category:'שלדת מרכב',tag:'משמעות נמוכה',tone:'clarify',classification:'actual_finding',reportSeverity:'low',suppresses:['body-repair','paint'],meaning:'נרשמו תיקוני פחחות וצבע חיצוניים. הנוסח לבדו אינו מעיד על החלפת חלק, ריתוך או פגיעה מבנית.',decision:'יש להביא בחשבון את מצב הפח והצבע ואת עלות התיקון הקוסמטי, בלי להסיק ממנו נזק מבני.'},
@@ -892,20 +1274,20 @@ const findingKnowledgeBase=[
   {id:'turbo-oil-sweat',terms:['הזעת שמן מהטורבו','הזעת שמן בטורבו'],category:'מערכת גידוש המנוע',tag:'משמעות בינונית',tone:'clarify',classification:'actual_finding',reportSeverity:'medium',suppresses:['oil-sweat'],meaning:'נרשמה הזעת שמן באזור הטורבו. זו לחות שמנונית במערכת הגידוש, ולא בהכרח נזילה פעילה או הוכחה שהטורבו עצמו פגום.',decision:'זהו ממצא ממשי במשקל בינוני. יש לבדוק את מקור ההזעה ואת היקפה ולהביא בחשבון טיפול אפשרי במערכת הטורבו או בצנרת.'},
   {id:'oil-sweat',terms:['הזעת שמן','הזעות שמן'],category:'מנוע ואטימה',tag:'אטימה',tone:'clarify',meaning:'נראתה לחות שמנונית באזור אטימה. יש להבחין בין סימן ישן וקל לבין נזילה פעילה.',question:'לבקש מהבוחן להראות את המקור ולציין אם קיימת טפטפת פעילה או ירידת מפלס.'},
   {id:'starter-computer-fault',terms:['תקלת מחשב במערכת ההתנעה','תקלת מחשב במערכת התנעה','תקלת מחשב מערכת ההתנעה','תקלת מחשב מערכת התנעה','לבדוק תקלת מחשב במערכת ההתנעה','לבדוק תקלת מחשב במערכת התנעה'],category:'מערכת ההתנעה (כולל מצבר)',tag:'משמעות בינונית',tone:'clarify',classification:'actual_finding',reportSeverity:'medium',meaning:'הדוח מפנה לתקלת מחשב במערכת ההתנעה. הנוסח אינו מזהה לבדו אם המקור במצבר, במתנע, בחיווט, בחיישן או ביחידת הבקרה.',decision:'יש לבצע סריקת תקלות ובדיקת מערכת ההתנעה. עד לאבחון, יש להביא בחשבון ליקוי חשמלי במשקל בינוני ועלות טיפול אפשרית.'},
-  {id:'battery-date-check',terms:['לבדוק תאריך מצבר','בדיקת תאריך מצבר'],category:'מערכת ההתנעה (כולל מצבר)',tag:'בדיקה נדרשת',tone:'clarify',classification:'recommendation',meaning:'הדוח ממליץ לבדוק את תאריך המצבר כדי להעריך את גילו. זה אינו קובע שהמצבר פגום.',decision:'אין לספור זאת כתקלה בפני עצמה; יש לאמת את גיל המצבר ולהביא בחשבון החלפה קרובה רק אם הוא ותיק או חלש.'},
+  {id:'battery-date-check',terms:['לבדוק תאריך מצבר','בדיקת תאריך מצבר','תאריך מצבר'],category:'מערכת ההתנעה (כולל מצבר)',tag:'בדיקה נדרשת',tone:'clarify',classification:'recommendation',meaning:'הדוח מציין את תאריך המצבר כדי להעריך את גילו. זה אינו קובע שהמצבר פגום.',decision:'אין לספור זאת כתקלה בפני עצמה; יש להביא בחשבון החלפה קרובה רק אם המצבר ותיק או חלש.'},
   {id:'gearbox-computer-fault',terms:['תקלת מחשב בתיבת ההילוכים','תקלת מחשב בתיבת הילוכים','לבדוק תקלת מחשב בתיבת ההילוכים','לבדוק תקלת מחשב בתיבת הילוכים'],category:'תיבת הילוכים',tag:'משמעות בינונית',tone:'clarify',classification:'actual_finding',reportSeverity:'medium',meaning:'הדוח מפנה לתקלת מחשב בתיבת ההילוכים. הנוסח אינו מוכיח לבדו תקלה מכנית בתיבה ואינו מציין אם הקוד פעיל או היסטורי.',decision:'יש לבצע סריקת תקלות ממוקדת לתיבת ההילוכים ולברר את הקוד והמצב הפעיל. עד לאבחון, יש להביא בחשבון סיכון והוצאה אפשרית במשקל בינוני.'},
   {id:'oil-leak',terms:['נזילת שמן','נזילות שמן','דליפת שמן'],category:'מנוע ואטימה',tag:'נזילה',tone:'safety',meaning:'נמצא שמן מחוץ למערכת הסגורה. משמעות הממצא תלויה במקור, בקצב הדליפה ובמפלס השמן.',question:'לבקש לזהות את מקור הנזילה, אם היא פעילה ומה הבדיקה הנוספת הנדרשת.'},
   {id:'crankcase-pressure',terms:['לחץ עוקה','לחץ קרנק','נשימת מנוע'],category:'מנוע',tag:'דורש אבחון',tone:'clarify',meaning:'נרשם ממצא הקשור ללחצים או לאדים בבית גל הארכובה. בדיקה זו לבדה אינה אבחון מלא של מצב המנוע.',question:'לבקש מהבוחן להסביר באיזו שיטה נבדק ומה נדרש כדי לאמת את הסיבה.'},
   {id:'coolant-leak',terms:['נזילת מים','נזילת נוזל קירור','דליפת נוזל קירור','חוסר נוזל קירור'],category:'מערכת קירור',tag:'קירור',tone:'safety',meaning:'נמצא חוסר או סימן לדליפה במערכת הקירור. חשוב לזהות מקור ולהבין אם מדובר בממצא פעיל.',question:'לבקש מקור מדויק, מצב מפלס הנוזל והאם בוצעה בדיקת לחץ למערכת.'},
-  {id:'cooling-system',terms:['מערכת קירור','קורוזיה במערכת הקירור','חלודה במערכת הקירור','התחממות מנוע'],category:'מערכת קירור',tag:'קירור',tone:'safety',meaning:'נרשם ממצא במערכת שמווסתת את טמפרטורת המנוע. הניסוח הכללי אינו מזהה לבדו את הרכיב או הסיבה.',question:'לבקש מהבוחן לציין את הרכיב, סימני התחממות שנמצאו והבדיקה הנוספת הנדרשת.'},
+  {id:'cooling-system',terms:['קורוזיה במערכת הקירור','חלודה במערכת הקירור','התחממות מנוע'],category:'מערכת קירור',tag:'קירור',tone:'safety',meaning:'נרשם ממצא במערכת שמווסתת את טמפרטורת המנוע. הניסוח הכללי אינו מזהה לבדו את הרכיב או הסיבה.',question:'לבקש מהבוחן לציין את הרכיב, סימני התחממות שנמצאו והבדיקה הנוספת הנדרשת.'},
   {id:'gear-shift',terms:['מכה בהעברת הילוכים','מכות בהעברת הילוכים','העברת הילוכים לא תקינה','שילוב הילוכים לא תקין','השהיה בשילוב הילוכים'],category:'תיבת הילוכים',tag:'מכני',tone:'safety',meaning:'נרשמה פעולה חריגה בעת שילוב או העברת הילוכים. המקור עשוי להיות בתיבה או במערכות נלוות, ולכן נדרש אבחון ממוקד.',question:'לבקש באילו מצבים הופיעה התופעה, האם התיבה הייתה חמה ומה נדרש לבדיקת המשך.'},
   {id:'gear-slip',terms:['החלקת גיר','החלקה בתיבת הילוכים','החלקת הילוכים','רעש גיר','רעש מתיבת הילוכים'],category:'תיבת הילוכים',tag:'מכני',tone:'safety',meaning:'הבוחן ציין החלקה או רעש הקשורים לתיבת ההילוכים. הביטוי אינו קובע את מקור התקלה או את היקפה.',question:'לבקש תיאור מדויק של התופעה, תנאי הופעתה ובדיקת המשך מתאימה.'},
   {id:'clutch',terms:['מצמד שחוק','בלאי מצמד','קלאץ שחוק','הפרדה לא תקינה של המצמד'],category:'מצמד',tag:'בלאי',tone:'clarify',meaning:'נרשם בלאי או תפקוד חריג של המצמד. דרגת הבלאי לא נקבעת מהביטוי בלבד.',question:'לבקש כיצד נבדק המצמד ומה היו הסימנים בפועל.'},
   {id:'brake-balance',terms:['סטייה בבלימה','הפרש בלימה','כוח בלימה לא מאוזן','בלימה לא מאוזנת'],category:'מערכת בלמים',tag:'בטיחות',tone:'safety',meaning:'נמדד או הורגש הבדל בבלימה בין צדדים. יש לזהות את הגלגלים והרכיבים הקשורים.',question:'לבקש את תוצאות המדידה, הצד שבו נמצא ההפרש ומה נדרש לבדוק במערכת.'},
   {id:'brakes',terms:['רפידות בלם','רפידות שחוקות','דיסקים שחוקים','צלחות בלם','בלמים שחוקים','בלם יד לא תקין'],category:'מערכת בלמים',tag:'בטיחות',tone:'safety',meaning:'נרשם בלאי או תפקוד חריג ברכיב של מערכת הבלמים. היקף הבלאי דורש פירוט ומדידה.',question:'לבקש מהבוחן לציין אילו גלגלים ורכיבים, מה נמדד ומה הסיבה לסיווג.'},
-  {id:'control-arm-bushings',terms:['תותבים למשולשים','תותבים ומשולשים','תותבי משולשים','תותבים משולשים','בלאי תותבים למשולשים','רעש יתר תותבים ומשולשים','תותבים למשולשים קד פגומים','תותבים למשולשים קדמיים פגומים'],category:'מערכת מתלה קדמי',tag:'משמעות נמוכה',tone:'clarify',classification:'actual_finding',reportSeverity:'low',suppresses:['suspension'],meaning:'התותבים מחברים ומבודדים את זרועות המתלה. בלאי או חופש בהם עלולים לגרום לנקישות, חוסר דיוק בהיגוי ושחיקת צמיגים לא אחידה.',decision:'נמצא ליקוי בתותבים או במשולשים במתלה הקדמי. יש להביא בחשבון את הצורך בטיפול ואת העלות.'},
+  {id:'control-arm-bushings',terms:['תותבים למשולשים','תותבים ומשולשים','תותבי משולשים','תותבים משולשים','בלאי תותבים למשולשים','רעש יתר תותבים ומשולשים','תותבים למשולשים קד פגומים','תותבים למשולשים קדמיים פגומים','תותבים לזרועות מתלה פגומים','תותבים לזרועות המתלה פגומים'],category:'מערכת מתלה קדמי',tag:'משמעות נמוכה',tone:'clarify',classification:'actual_finding',reportSeverity:'low',suppresses:['suspension'],meaning:'התותבים מחברים ומבודדים את זרועות המתלה. בלאי או חופש בהם עלולים לגרום לנקישות, חוסר דיוק בהיגוי ושחיקת צמיגים לא אחידה.',decision:'נמצא ליקוי בתותבים או במשולשים במתלה הקדמי. יש להביא בחשבון את הצורך בטיפול ואת העלות.'},
   {id:'front-suspension-noise-report',terms:['רעש ממתלה קדמי','רעש יתר ממתלה קדמי'],patterns:[/רעש.*ממתלה\s*קדמי/],category:'מערכת מתלה קדמי',tag:'משמעות נמוכה',tone:'clarify',classification:'context_dependent',reportSeverity:'low',meaning:'נרשם רעש מהמתלה הקדמי. הניסוח מצביע על רעש שנשמע בבדיקה, אך אינו מזהה לבדו את הרכיב שגורם לו.',decision:'יש לאתר את מקור הרעש ולהביא בחשבון את עלות הטיפול.'},
-  {id:'steering-alignment-report',terms:['זוויות היגוי כיוון','זויות היגוי כיוון','ויות היגוי כיוון'],category:'מערכת ההיגוי',tag:'משמעות בינונית',tone:'clarify',classification:'actual_finding',reportSeverity:'medium',meaning:'נרשם צורך בכיוון זוויות ההיגוי.',decision:'זהו ממצא במשקל בינוני שמחייב כיוון פרונט ובדיקה אם קיימת שחיקת צמיגים או סטייה נוספת.'},
+  {id:'steering-alignment-report',terms:['זוויות היגוי כיוון','זויות היגוי כיוון','ויות היגוי כיוון','לתקן זוויות היגוי','לתקן זויות היגוי','זוויות היגוי'],category:'מערכת ההיגוי',tag:'משמעות בינונית',tone:'clarify',classification:'actual_finding',reportSeverity:'medium',meaning:'נרשם צורך בכיוון זוויות ההיגוי.',decision:'זהו ממצא במשקל בינוני שמחייב כיוון פרונט ובדיקה אם קיימת שחיקת צמיגים או סטייה נוספת.'},
   {id:'steering-play',terms:['חופש בהגה','חופש במערכת ההיגוי','מסרק הגה','נקישות בהגה','הגה לא חוזר'],category:'היגוי',tag:'בטיחות',tone:'safety',meaning:'נרשם חופש, רעש או תפקוד חריג במערכת ההיגוי. יש חשיבות לזיהוי הרכיב המדויק.',question:'לבקש מהבוחן להראות את מקור החופש או הרעש ולציין את בדיקת ההמשך.'},
   {id:'steering-knock',terms:['נקישה בהגה','נקישות בהגה','נקישה בתיבת הגה','נקישות בתיבת הגה','חופש ונקישה בתיבת הגה'],category:'מערכת ההיגוי',tag:'ליקוי בטיחותי',tone:'safety',classification:'actual_finding',suppresses:['steering-play'],meaning:'נקישה בהגה מצביעה על חופש או שחיקה באחד מרכיבי ההיגוי, כגון תיבת ההגה, מסרק, מפרק או חיבור. כשהיא מופיעה יחד עם חופש, הדיוק והיציבות עלולים להיפגע.',decision:'זהו ממצא בעל משקל בטיחותי ואינו בלאי קוסמטי. יש להתייחס אליו כתיקון נדרש לפני שימוש רגיל ולשקלל את חומרתו בהערכת מצב הרכב והעלויות.'},
   {id:'suspension',terms:['חופש במתלה','חופשים במתלים','נקישות במתלים','בולמי זעזועים','בולם זעזועים','תפוח הגה','תפוח פרונט','זרוע מתלה','תותבי מתלה'],category:'מתלים והיגוי',tag:'בטיחות',tone:'safety',meaning:'נרשם בלאי, חופש או תפקוד חריג באחד מרכיבי המתלה או ההיגוי.',question:'לבקש את שם הרכיב, הצד שבו נמצא הממצא וכיצד נקבע החופש או הבלאי.'},
@@ -1916,6 +2298,14 @@ function applyExpertCalibration(rule,formula){
     sourceText,
     expertDecision:decision
   };
+  if(decision.id==='oil_burning'&&/לבדוק (?:תצרוכת|צריכת) שמן/.test(normalizeFindingText(sourceText))){
+    calibrated.tag='הסתייגות כללית';
+    calibrated.tone='clarify';
+    calibrated.classification='limitation_or_disclaimer';
+    calibrated.reportSeverity=null;
+    calibrated.meaning='הנוסח ממליץ לבדוק תצרוכת שמן בנסיעה. הוא אינו קובע לבדו שהמנוע שורף שמן.';
+    calibrated.decision='אין לספור את המשפט כליקוי עצמאי. יש לייחס משקל רק לממצא ממשי נוסף, אם נרשם לצד ההמלצה.';
+  }
   const specific=specificFindingInterpretation(calibrated);
   if(specific){
     calibrated.meaning=specific.meaning;
@@ -1931,6 +2321,7 @@ function reportKmForEngineWarranty(text){
   const number='([0-9]{4,7}|[0-9]{1,3}(?:\\s+[0-9]{3}){1,2})';
   const unit='(?:קמ|קילומטראז|קילומטרים?)';
   const patterns=[
+    new RegExp('קמ\\s*(?:או\\s*מייל)?\\s*'+number,'gi'),
     new RegExp('(?:מונה\\s+)?'+unit+'\\s*(?:מונה\\s*)?'+number,'gi'),
     new RegExp(number+'\\s*(?:מונה\\s*)?'+unit,'gi'),
     new RegExp('מונה\\s+'+number,'gi')
@@ -2002,6 +2393,15 @@ function normalizeFindingText(value){
     .replace(/[\u05f3\u05f4'"׳״]/g,'')
     .replace(/[–—]/g,'-')
     .replace(/צירייה/g,'ציריה')
+    .replace(/חנייה/g,'חניה')
+    .replace(/(^|\s)תקלוה(?=\s|$)/g,'$1תקלה')
+    .replace(/(^|\s)אוויו(?=\s|$)/g,'$1אוויר')
+    .replace(/(^|\s)לחקן(?=\s|$)/g,'$1לתקן')
+    .replace(/(^|\s)חצרוכת(?=\s|$)/g,'$1תצרוכת')
+    .replace(/(^|\s)צועה\s+פגומה/g,'$1רצועה פגומה')
+    .replace(/אחירי/g,'אחורי')
+    .replace(/אפורי/g,'אחורי')
+    .replace(/צ\s*קת\s+שחוקות/g,'צלחות שחוקות')
     .replace(/הגוי/g,'היגוי')
     .replace(/[()[\]{}:;,./\\-]+/g,' ')
     .replace(/\s+/g,' ')
@@ -2435,6 +2835,7 @@ function findKnowledgeRules(line,categoryHint=''){
   const n=normalizeFindingText(line);
   const matches=[];
   findingKnowledgeBase.forEach(rule=>{
+    if(rule.categoryHints?.length&&!rule.categoryHints.includes(categoryHint)) return;
     let longest='';
     rule.terms.forEach(term=>{
       const normalizedTerm=normalizeFindingText(term);
@@ -2520,6 +2921,11 @@ function reportCategoryFromLine(line){
   const n=normalizeFindingText(line).replace(/^\d+\s+/,'').trim();
   const compact=n.replace(/\s/g,'');
   if(compact.includes('הערותכלליות')) return 'הערות כלליות';
+  if(/שלדה\s*ומ?רכ[בג]/.test(n)) return 'שלדת מרכב';
+  if(/העברת\s*הכוח/.test(n)) return 'תיבת העברת הכוח';
+  if(/סרן\s*קדמי.*היגוי/.test(n)) return 'מערכת ההיגוי';
+  if(/^מערכת\s*קירור$/.test(n)) return 'מערכת הקירור';
+  if(/^צמיגים$/.test(n)) return 'צמיגים וחישוקים';
   const matches=formulaCategoryDefinitions.filter(category=>{
     const categoryText=normalizeFindingText(category.name);
     if(!categoryText) return false;
@@ -2541,7 +2947,8 @@ function stripReportScaffolding(line,category,severity){
   let cleaned=normalizeFindingText(String(line||'').replace(/[✓✔☑×✕]/g,' '));
   if(category){
     const categoryText=normalizeFindingText(category);
-    if(cleaned===categoryText) cleaned='';
+    const withoutArticle=value=>value.replace(/^מערכת\s+ה/,'מערכת ');
+    if(cleaned===categoryText||withoutArticle(cleaned)===withoutArticle(categoryText)||/שלדה\s*ומ?רכ[בג]/.test(cleaned)&&category==='שלדת מרכב') cleaned='';
   }
   if(severity) cleaned=cleaned.replace(/משמעות\s*(?:גבוהה|נמוכה)|ליקויים?\s+שוליים?|ליקוי\s+שולי/g,' ');
   return cleaned.replace(/^\s*\d+\s*/,' ').replace(/\s+/g,' ').trim();
@@ -2622,8 +3029,40 @@ function finalizeReportFinding(item){
   return applyManagerFormulaOverride(cleaned);
 }
 
+function reportConclusionOrder(category){
+  const value=normalizeFindingText(category);
+  if(/מנוע|גידוש/.test(value)) return 10;
+  if(/קירור/.test(value)) return 20;
+  if(/דלק/.test(value)) return 30;
+  if(/הצתה/.test(value)) return 40;
+  if(/פליטה|זיהום/.test(value)) return 50;
+  if(/התנעה|מצבר|טעינה/.test(value)) return 60;
+  if(/מצמד/.test(value)) return 70;
+  if(/תיבת|הילוכ|העברת הכוח/.test(value)) return 80;
+  if(/צירי|גל הינע|הנעה/.test(value)) return 90;
+  if(/מתלה קדמי|קפיצים קדמי/.test(value)) return 100;
+  if(/מתלה אחורי|קפיצים אחורי/.test(value)) return 110;
+  if(/מתל.*היגוי|היגוי.*מתל/.test(value)) return 120;
+  if(/מתל|קפיצ/.test(value)) return 115;
+  if(/היגוי/.test(value)) return 120;
+  if(/בלמ/.test(value)) return 130;
+  if(/צמיג|חישוק|גלגל/.test(value)) return 140;
+  if(/שלד|מרכב|פח|צבע/.test(value)) return 150;
+  if(/תאורה|פנס/.test(value)) return 160;
+  if(/מחוונ|מחשב|אלקטרונ/.test(value)) return 170;
+  if(/הערות|מגבלת/.test(value)) return 190;
+  return 180;
+}
+
+function orderFindingsLikeReport(findings){
+  return findings.map((item,index)=>({item,index,order:reportConclusionOrder(item.category||'')}))
+    .sort((a,b)=>a.order-b.order||a.index-b.index)
+    .map(entry=>entry.item);
+}
+
 function interpretSummaryText(text){
   const findings=[],unknown=[],seen=new Set();
+  text=diagnosticTableText(text);
   const compactReport=normalizeFindingText(text).replace(/\s/g,'');
   const chassisHint=compactReport.includes('סוגשלדהשלדהנפרדת')?'שלדה נפרדת':compactReport.includes('סוגשלדהשלדתמרכב')?'שלדת מרכב':'';
   const chassisCategories=['שלדת מרכב','שלדה נפרדת'];
@@ -2671,7 +3110,7 @@ function interpretSummaryText(text){
       if(excerpt&&!unknown.includes(excerpt)) unknown.push(excerpt);
     }
   });
-  const finalFindings=findings.map(finalizeReportFinding).filter(Boolean);
+  const finalFindings=orderFindingsLikeReport(findings.map(finalizeReportFinding).filter(Boolean));
   return applyReportMileageContext(applyEngineWarrantyContext({findings:finalFindings,unknown},text),text);
 }
 
@@ -2761,6 +3200,7 @@ function analyseInspectionReport(){
   reportText=[preReportText,afterReportText].filter(Boolean).join('\n\n');
   prepareReportPdf('finalPdfBtn');
   showFeedback();
+  showClarificationOptions();
   box.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
