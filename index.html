@@ -162,7 +162,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 @media(max-width:500px){.quickChoices{grid-template-columns:1fr}.quickChoice{font-size:14px}.guidedSection>summary{font-size:18px}}
 @media(max-width:760px){.mktHero{padding:30px 0 24px}.mktHeroGrid,.mktAbout,.afterGrid{grid-template-columns:1fr}.mktGrid3{grid-template-columns:1fr}.mktOutcome{grid-template-columns:1fr 1fr}.mktHeroCard{padding:18px}.mktLead{font-size:18px}.mktCtas{flex-direction:column}.mktBtn{width:100%}main{padding-top:12px}.card{padding:18px;margin:20px 0}.credentials strong{font-size:22px}.credentials span{font-size:15px}.scopeStrip{grid-template-columns:1fr}}
 @media(max-width:460px){.mktOutcome{grid-template-columns:1fr}.priceGrid{grid-template-columns:1fr}.licenseGrid,.grid,.formulaAdminGrid{grid-template-columns:1fr}.formulaAdmin .wide{grid-column:auto}.mktWrap{padding:0 14px}}
-</style><meta name="buytest-build" content="expert-calibration-239-v48-manager-conclusion-overrides">
+</style><meta name="buytest-build" content="expert-calibration-239-v49-report-mileage-context">
 </head><body>
 
 <section id="marketingLanding">
@@ -1925,13 +1925,24 @@ function applyExpertCalibration(rule,formula){
 }
 
 function reportKmForEngineWarranty(text){
-  const values=[];
+  const reportValues=[];
   const known=Number(loadedKm||externalVehicleData.kmHistory?.[0]?.km||0);
-  if(known) values.push(known);
-  const raw=String(text||'');
-  const patterns=[/(?:קמ|קילומטר(?:ים|אז׳)?)\s*[:\-]?\s*([0-9][0-9., ]{3,})/gi,/([0-9][0-9., ]{3,})\s*(?:קמ|קילומטר(?:ים|אז׳)?)/gi];
-  patterns.forEach(pattern=>{for(const match of raw.matchAll(pattern)){const value=Number(String(match[1]).replace(/[^0-9]/g,''));if(value) values.push(value);}});
-  return values.length?Math.max(...values):0;
+  const raw=normalizeFindingText(text);
+  const number='([0-9]{4,7}|[0-9]{1,3}(?:\\s+[0-9]{3}){1,2})';
+  const unit='(?:קמ|קילומטראז|קילומטרים?)';
+  const patterns=[
+    new RegExp('(?:מונה\\s+)?'+unit+'\\s*(?:מונה\\s*)?'+number,'gi'),
+    new RegExp(number+'\\s*(?:מונה\\s*)?'+unit,'gi'),
+    new RegExp('מונה\\s+'+number,'gi')
+  ];
+  patterns.forEach(pattern=>{
+    for(const match of raw.matchAll(pattern)){
+      const value=Number(String(match[1]).replace(/[^0-9]/g,''));
+      if(value>=1000&&value<=2000000) reportValues.push(value);
+    }
+  });
+  if(reportValues.length) return Math.max(...reportValues);
+  return known>=1000&&known<=2000000?known:0;
 }
 
 function applyEngineWarrantyContext(result,text){
@@ -1959,6 +1970,27 @@ function applyEngineWarrantyContext(result,text){
   warranty.reportSeverity='high';
   warranty.meaning='הנוסח „אין אחריות על המנוע” מופיע לצד '+uniqueReasons.join(', ')+'.';
   warranty.decision='בצירוף הנתונים האלה ההסתייגות משמעותית. יש לבחון אותה יחד עם ממצאי המנוע ולהעריך את היקף הטיפול והעלות; אין להסיק סיבה אחרת שלא מופיעה בבדיקה.';
+  return result;
+}
+
+function applyReportMileageContext(result,text){
+  const km=reportKmForEngineWarranty(text);
+  result.reportKm=km||0;
+  if(!km) return result;
+  const wearIds=new Set([
+    'expert-internal_wear','expert-engine_vapor_blowby','expert-internal_knocks',
+    'expert-compression_leakdown','expert-oil_burning','expert-engine_output'
+  ]);
+  result.findings=result.findings.map(item=>{
+    const source=normalizeFindingText(item.sourceText||item.matchedTerm||item.meaning||'');
+    const explicitWear=wearIds.has(item.id)||/בלאי פנימי|לחץ עוקה|נקיש|דליפות לחץ|לחץ דחיסה|מנוע שורף שמן|שריפת שמן|הספק מנוע ירוד|סחיבה חלשה/.test(source);
+    if(!explicitWear||item.classification==='limitation_or_disclaimer'||item.classification==='recommendation') return item;
+    const mileageText=`בדוח נקרא קילומטראז׳ של ${fmtNum(km)} ק״מ. `+(km>=200000
+      ? 'זהו קילומטראז׳ גבוה שנותן הקשר לבלאי שנרשם ומחזק את הצורך בבירור ממוקד של מצב המנוע והעלות הצפויה. הוא אינו מבטל את הממצא ואינו מוכיח לבדו צורך בשיפוץ.'
+      : 'הקילומטראז׳ משמש הקשר לבלאי שנרשם, אך אינו משנה לבדו את האבחנה ואינו מוכיח צורך בשיפוץ.');
+    const existing=String(item.contextNote||'').trim();
+    return {...item,reportKm:km,contextNote:existing?existing+' '+mileageText:mileageText};
+  });
   return result;
 }
 
@@ -2640,7 +2672,7 @@ function interpretSummaryText(text){
     }
   });
   const finalFindings=findings.map(finalizeReportFinding).filter(Boolean);
-  return applyEngineWarrantyContext({findings:finalFindings,unknown},text);
+  return applyReportMileageContext(applyEngineWarrantyContext({findings:finalFindings,unknown},text),text);
 }
 
 function interpretComputerText(text){
@@ -2677,6 +2709,7 @@ function meaningCardHtml(item){
 
 function analysisTextBlock(title,result){
   let text=title+'\n';
+  if(result.reportKm) text+=`קילומטראז׳ שנקרא מהדוח: ${fmtNum(result.reportKm)} ק״מ. הנתון משמש כהקשר לממצאים ואינו אבחנה בפני עצמו.\n`;
   const findings=result.findings.map(finalizeReportFinding).filter(Boolean);
   if(findings.length){
     text+=findings.map(item=>`• ${item.category} [${item.tag||formulaClassificationLabels[item.classification]||'סיווג מקצועי'}] — ${item.meaning} מסקנה: ${item.decision||professionalDecision(item)}${item.contextNote?' התאמה לרכב: '+item.contextNote:''}`).join('\n')+'\n';
@@ -2704,6 +2737,9 @@ function analyseInspectionReport(){
   const totalFindings=summaryResult.findings.length+computerResult.findings.length;
   let html='<h3>מסקנות מקצועיות מסיכום הבדיקה</h3>';
   html+='<p>הפלט אינו העתק של דוח המכון ואינו כולל את הקובץ, הלוגו או שם המכון.</p>';
+  if(summaryResult.reportKm){
+    html+=`<div class="info"><b>קילומטראז׳ שנקרא מהדוח:</b> ${fmtNum(summaryResult.reportKm)} ק״מ. הנתון משמש כהקשר לממצאים, ובמיוחד לבלאי במנוע; הוא אינו אבחנה בפני עצמו.</div>`;
+  }
   if(summaryResult.findings.length){
     html+='<h4>סיכום הבוחן</h4>'+summaryResult.findings.map(meaningCardHtml).join('');
   }
