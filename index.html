@@ -367,7 +367,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 <div class="caseLabel">שלב 2 מתוך 2 · אחרי המכון</div>
 <h2>6 · הסבר סיכום הבוחן</h2>
 <p class="sub"><b>מעלים את דף סיכום הבוחן</b>, ובמידת הצורך גם את דף הבדיקה הממוחשבת. המערכת עוברת על כל סעיפי האבחון - מהמנוע ועד התאורה - ומדלגת לחלוטין על „הערות כלליות”.</p>
-<div class="privacyStrip"><b>פרטיות וזהות:</b> קובצי המקור מעובדים בדפדפן ואינם מצורפים ל־PDF של BuyTest. הפלט אינו מעתיק את הטופס, את הלוגו או את שם המכון.</div>
+<div class="privacyStrip"><b>פרטיות וזהות:</b> לצורך זיהוי הטקסט, עמודי סיכום הבוחן והבדיקה הממוחשבת נשלחים לעיבוד בשירות Google Cloud Vision. קובצי המקור אינם מצורפים ל־PDF של BuyTest, והפלט אינו מעתיק את הטופס, את הלוגו או את שם המכון.</div>
 
 <div class="field"><label for="inspectionOwnerName"><b>שם מזמין/ת בדיקת המכון</b></label><input id="inspectionOwnerName" autocomplete="name" placeholder="השם שמופיע בהזמנת הבדיקה"></div>
 <label class="ownershipBox"><input type="checkbox" id="inspectionOwnership"><span>אני מאשר/ת שהבדיקה הוזמנה על שמי, או שקיבלתי מבעל/ת הבדיקה הרשאה להעלות אותה ולעבד את הסיכום לצורך השירות.</span></label>
@@ -487,7 +487,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
     </div>
     <div id="privacyText" class="legalPage" style="display:none">
       <h2>מדיניות פרטיות</h2>
-      <p>מספר הרכב שנבדק נשלח למאגרי המידע הציבוריים הדרושים להצגת הנתונים. בגרסה זו תמונות הרכב, סיכום הבוחן והבדיקה הממוחשבת מעובדים בדפדפן ואינם נשלחים לשרת של BuyTest. קובצי דוח המכון אינם מצורפים ל־PDF המופק.</p>
+      <p>מספר הרכב שנבדק נשלח למאגרי המידע הציבוריים הדרושים להצגת הנתונים. לצורך זיהוי טקסט, עמודי סיכום הבוחן והבדיקה הממוחשבת נשלחים ישירות מהדפדפן לעיבוד בשירות Google Cloud Vision. הם אינם נשלחים לשרת של BuyTest ואינם מצורפים ל־PDF המופק. תמונות רכב אחרות נשארות בדפדפן.</p>
       <p>שם מזמין הבדיקה והטקסט שזוהה בקובץ משמשים רק לביצוע התהליך במכשיר. אין לצלם מספר זהות, חתימה, כתובת, טלפון, לוגו או מידע אישי שאינו נחוץ. עם חיבור שרת או שירות זיהוי חיצוני, מדיניות זו תעודכן מראש ותפרט את מטרות העיבוד, הגורמים המקבלים ותקופות השמירה.</p>
       <p>נתוני תשלום, לאחר חיבור השירות, יעובדו אצל ספק הסליקה המאובטח ובהתאם למדיניות שלו. יש להשלים לפני ההשקה פרטי בעל השליטה במידע ודרך יצירת קשר למימוש זכויות עיון ותיקון.</p>
     </div>
@@ -505,6 +505,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@7.0.0/dist/tesseract.min.js" crossorigin="anonymous"></script>
 <script>
+const GOOGLE_VISION_API_KEY='AIzaSyC7sYeRG_sFdCHB6DweZ2L8tFY98c7V21I';
+const GOOGLE_VISION_ENDPOINT='https://vision.googleapis.com/v1/images:annotate';
 const VEHICLE_ID='56063a99-8a3e-4ff4-912e-5966c0279bad';
 const OWNERS_ID='bb2355dc-9ec7-4f06-9c3f-3344672171da';
 const ACTIVE_ID='053cea08-09bc-40ec-8f7a-156f0677aff3';
@@ -1173,6 +1175,37 @@ function computerReadQuality(text){
   return {ok,score,findings:analysis.findings.length,categories:0,unknown:analysis.unknown.length};
 }
 
+function googleVisionImageContent(source){
+  const value=String(source||'');
+  const comma=value.indexOf(',');
+  return comma>=0?value.slice(comma+1):value;
+}
+
+async function recognizeDocumentWithGoogleVision(sources,state){
+  if(!GOOGLE_VISION_API_KEY) throw new Error('VISION_KEY_MISSING');
+  const texts=[];
+  for(let index=0;index<sources.length;index++){
+    state.textContent=`קורא את דוח הבדיקה באמצעות Google Vision... עמוד ${index+1} מתוך ${sources.length}`;
+    const response=await fetch(GOOGLE_VISION_ENDPOINT+'?key='+encodeURIComponent(GOOGLE_VISION_API_KEY),{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({requests:[{
+        image:{content:googleVisionImageContent(sources[index])},
+        features:[{type:'DOCUMENT_TEXT_DETECTION'}],
+        imageContext:{languageHints:['iw','en']}
+      }]})
+    });
+    let payload=null;
+    try{payload=await response.json();}catch(_){/* handled below */}
+    if(!response.ok) throw new Error('VISION_HTTP_'+response.status+':'+String(payload?.error?.message||''));
+    const result=payload?.responses?.[0];
+    if(result?.error) throw new Error('VISION_API:'+String(result.error.message||result.error.code||'unknown'));
+    const text=cleanOcrText(result?.fullTextAnnotation?.text||result?.textAnnotations?.[0]?.description||'');
+    if(text) texts.push(text);
+  }
+  return diagnosticTableText(texts.join('\n'));
+}
+
 async function recognizeDocumentSources(worker,sources,state,setPass,qualityFunction){
   const candidates=[];
   for(const psm of ['3','6','11']){
@@ -1261,23 +1294,38 @@ async function handleInspectionFile(input,kind){
       : {text:'',sources:await imageForDocumentOcr(file)};
     let recognized=diagnosticTableText(prepared.text);
     let quality=recognized?qualityFunction(recognized):null;
-    if(!recognized){
-      if(!window.Tesseract) throw new Error('OCR_UNAVAILABLE');
+    let engine=recognized?'טקסט מובנה ב־PDF':'';
+    if(!recognized&&prepared.sources.length){
+      try{
+        const cloudText=await recognizeDocumentWithGoogleVision(prepared.sources,state);
+        if(cloudText){
+          recognized=diagnosticTableText(cloudText);
+          quality=qualityFunction(recognized);
+          engine='Google Cloud Vision';
+        }
+      }catch(visionError){
+        console.warn('BuyTest Google Vision unavailable:',visionError);
+      }
+    }
+    if(!quality?.ok&&prepared.sources.length&&window.Tesseract){
       let currentPass='6';
       worker=await Tesseract.createWorker('heb+eng',1,{
         logger:m=>{
-      if(m.status==='recognizing text') state.textContent=`מזהה את דוח הבדיקה... מעבר ${currentPass==='3'?'ראשון':currentPass==='6'?'שני':'נוסף'} ${Math.round((m.progress||0)*100)}%`;
+          if(m.status==='recognizing text') state.textContent=`משפר את הקריאה במנוע הגיבוי... מעבר ${currentPass==='3'?'ראשון':currentPass==='6'?'שני':'נוסף'} ${Math.round((m.progress||0)*100)}%`;
         }
       });
-      const best=await recognizeDocumentSources(worker,prepared.sources,state,value=>{currentPass=value;},qualityFunction);
-      recognized=diagnosticTableText(best.text);
-      quality=best.quality;
+      const local=await recognizeDocumentSources(worker,prepared.sources,state,value=>{currentPass=value;},qualityFunction);
+      if(!quality||local.quality.score>quality.score){
+        recognized=diagnosticTableText(local.text);
+        quality=local.quality;
+        engine='מנוע הקריאה המקומי';
+      }
     }
     if(!recognized) throw new Error('TEXT_NOT_FOUND');
     if(!quality?.ok) throw new Error('OCR_LOW_QUALITY');
     textArea.value=recognized;
-    inspectionOcrMeta[kind]=quality;
-    state.textContent=`✓ הדוח נקרא. זוהו ${quality.findings} ממצאים לפענוח מקצועי.`;
+    inspectionOcrMeta[kind]={...quality,engine};
+    state.textContent=`✓ הדוח נקרא באמצעות ${engine}. זוהו ${quality.findings} ממצאים לפענוח מקצועי.`;
     if(review) review.style.display='block';
   }catch(error){
     console.warn('BuyTest document OCR unavailable:',error);
