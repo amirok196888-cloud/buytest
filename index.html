@@ -505,8 +505,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@7.0.0/dist/tesseract.min.js" crossorigin="anonymous"></script>
 <script>
-const GOOGLE_VISION_API_KEY='AIzaSyC7sYeRG_sFdCHB6DweZ2L8tFY98c7V21I';
-const GOOGLE_VISION_ENDPOINT='https://vision.googleapis.com/v1/images:annotate';
+const GOOGLE_VISION_PROXY_ENDPOINT='https://tjxjxavxrmvbofvtnsaj.supabase.co/functions/v1/vision-ocr';
+const BUYTEST_SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqeGp4YXZ4cm12Ym9mdnRuc2FqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzMjk3NjMsImV4cCI6MjEwMzkwNTc2M30.AWPEga4E1CQQ9QqqMyw1gTJn__aqV_fCx_raQhGjMck';
 const VEHICLE_ID='56063a99-8a3e-4ff4-912e-5966c0279bad';
 const OWNERS_ID='bb2355dc-9ec7-4f06-9c3f-3344672171da';
 const ACTIVE_ID='053cea08-09bc-40ec-8f7a-156f0677aff3';
@@ -1182,13 +1182,17 @@ function googleVisionImageContent(source){
 }
 
 async function recognizeDocumentWithGoogleVision(sources,state){
-  if(!GOOGLE_VISION_API_KEY) throw new Error('VISION_KEY_MISSING');
+  if(!BUYTEST_SUPABASE_ANON_KEY) throw new Error('VISION_PROXY_KEY_MISSING');
   const texts=[];
   for(let index=0;index<sources.length;index++){
     state.textContent=`קורא את דוח הבדיקה באמצעות Google Vision... עמוד ${index+1} מתוך ${sources.length}`;
-    const response=await fetch(GOOGLE_VISION_ENDPOINT+'?key='+encodeURIComponent(GOOGLE_VISION_API_KEY),{
+    const response=await fetch(GOOGLE_VISION_PROXY_ENDPOINT,{
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:{
+        'Content-Type':'application/json',
+        'apikey':BUYTEST_SUPABASE_ANON_KEY,
+        'Authorization':'Bearer '+BUYTEST_SUPABASE_ANON_KEY
+      },
       body:JSON.stringify({requests:[{
         image:{content:googleVisionImageContent(sources[index])},
         features:[{type:'DOCUMENT_TEXT_DETECTION'}],
@@ -1197,7 +1201,7 @@ async function recognizeDocumentWithGoogleVision(sources,state){
     });
     let payload=null;
     try{payload=await response.json();}catch(_){/* handled below */}
-    if(!response.ok) throw new Error('VISION_HTTP_'+response.status+':'+String(payload?.error?.message||''));
+    if(!response.ok) throw new Error('VISION_PROXY_HTTP_'+response.status+':'+String(payload?.error?.message||payload?.message||''));
     const result=payload?.responses?.[0];
     if(result?.error) throw new Error('VISION_API:'+String(result.error.message||result.error.code||'unknown'));
     const text=cleanOcrText(result?.fullTextAnnotation?.text||result?.textAnnotations?.[0]?.description||'');
