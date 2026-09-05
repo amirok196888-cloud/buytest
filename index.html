@@ -174,7 +174,7 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
 @media(max-width:760px){.mktHero{padding:30px 0 24px}.mktHeroGrid,.mktAbout,.afterGrid,.clarificationChoices{grid-template-columns:1fr}.mktGrid3{grid-template-columns:1fr}.mktOutcome{grid-template-columns:1fr 1fr}.mktHeroCard{padding:18px}.mktLead{font-size:18px}.mktCtas{flex-direction:column}.mktBtn{width:100%}main{padding-top:12px}.card{padding:18px;margin:20px 0}.credentials strong{font-size:22px}.credentials span{font-size:15px}.scopeStrip{grid-template-columns:1fr}}
 @media(max-width:460px){.mktOutcome{grid-template-columns:1fr}.priceGrid{grid-template-columns:1fr}.licenseGrid,.grid,.formulaAdminGrid,.inspectionIdentityGrid,.inspectionHeaderGrid{grid-template-columns:1fr}.formulaAdmin .wide{grid-column:auto}.mktWrap{padding:0 14px}.replyTable,.replyTable tbody,.replyTable tr,.replyTable th,.replyTable td{display:block;width:100%}.replyTable th{padding:9px 0 5px}.inspectionIdentityValue{font-size:19px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
-</style><meta name="buytest-build" content="expert-calibration-242-v57-visible-inspection-details">
+</style><meta name="buytest-build" content="expert-calibration-243-v58-vision-full-read">
 </head><body>
 
 <section id="marketingLanding">
@@ -556,30 +556,37 @@ async function googleVisionRecognize(sources,state,featureType='DOCUMENT_TEXT_DE
   const usable=(sources||[]).filter(Boolean);
   if(!usable.length) return '';
   const texts=[];
+  let failedParts=0;
   for(let offset=0;offset<usable.length;offset+=1){
     const batch=usable.slice(offset,offset+1);
     if(state) state.textContent=`קורא את הדוח באמצעות Google Vision... חלק ${offset+1}–${offset+batch.length} מתוך ${usable.length}`;
-    const response=await fetch(GOOGLE_VISION_PROXY_ENDPOINT,{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'apikey':BUYTEST_SUPABASE_ANON_KEY,
-        'Authorization':'Bearer '+BUYTEST_SUPABASE_ANON_KEY
-      },
-      body:JSON.stringify({requests:batch.map(source=>({
-        image:{content:googleVisionImageContent(source)},
-        features:[{type:featureType,maxResults:1}],
-        imageContext:{languageHints:['he','en']}
-      }))})
-    });
-    const payload=await response.json().catch(()=>({}));
-    if(!response.ok||payload?.error) throw new Error('GOOGLE_VISION_PROXY_FAILED');
-    (payload.responses||[]).forEach(item=>{
-      if(item?.error) throw new Error('GOOGLE_VISION_FAILED');
-      const value=item?.fullTextAnnotation?.text||item?.textAnnotations?.[0]?.description||'';
-      if(value) texts.push(cleanOcrText(value));
-    });
+    try{
+      const response=await fetch(GOOGLE_VISION_PROXY_ENDPOINT,{
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'apikey':BUYTEST_SUPABASE_ANON_KEY,
+          'Authorization':'Bearer '+BUYTEST_SUPABASE_ANON_KEY
+        },
+        body:JSON.stringify({requests:batch.map(source=>({
+          image:{content:googleVisionImageContent(source)},
+          features:[{type:featureType,maxResults:1}],
+          imageContext:{languageHints:['he','en']}
+        }))})
+      });
+      const payload=await response.json().catch(()=>({}));
+      if(!response.ok||payload?.error) throw new Error('GOOGLE_VISION_PROXY_FAILED_'+response.status);
+      (payload.responses||[]).forEach(item=>{
+        if(item?.error){failedParts++;return;}
+        const value=item?.fullTextAnnotation?.text||item?.textAnnotations?.[0]?.description||'';
+        if(value) texts.push(cleanOcrText(value));
+      });
+    }catch(error){
+      failedParts++;
+      console.warn('Google Vision skipped one document part:',error);
+    }
   }
+  if(!texts.length) throw new Error('GOOGLE_VISION_ALL_PARTS_FAILED_'+failedParts);
   return cleanOcrText(texts.join('\n'));
 }
 function setExternalVehicleData(data={}){
@@ -1170,8 +1177,8 @@ function detectDocumentBounds(image){
 }
 
 function renderDocumentOcrTile(image,tile){
-  const targetWidth=tile.width<1100?2000:Math.min(2800,Math.max(1800,tile.width));
-  const scale=Math.min(5,targetWidth/Math.max(1,tile.width),3600/Math.max(1,tile.height));
+  const targetWidth=tile.width<1100?1900:Math.min(2400,Math.max(1700,tile.width));
+  const scale=Math.min(4,targetWidth/Math.max(1,tile.width),3200/Math.max(1,tile.height));
   const canvas=document.createElement('canvas');
   canvas.width=Math.max(1,Math.round(tile.width*scale));
   canvas.height=Math.max(1,Math.round(tile.height*scale));
@@ -1180,14 +1187,20 @@ function renderDocumentOcrTile(image,tile){
   ctx.imageSmoothingQuality='high';
   ctx.fillStyle='#fff';
   ctx.fillRect(0,0,canvas.width,canvas.height);
-  ctx.filter='grayscale(1) contrast(1.38) brightness(1.06)';
+  ctx.filter='grayscale(1) contrast(1.18) brightness(1.03)';
   ctx.drawImage(image,tile.x,tile.y,tile.width,tile.height,0,0,canvas.width,canvas.height);
-  return canvas.toDataURL('image/png');
+  // JPEG keeps the inline JSON safely below Google Vision's request-size limit.
+  let quality=0.92;
+  let source=canvas.toDataURL('image/jpeg',quality);
+  while(source.length>7.5*1024*1024&&quality>0.68){quality-=0.08;source=canvas.toDataURL('image/jpeg',quality);}
+  return source;
 }
 
 async function imageForDocumentOcr(file){
   const image=await loadImageFile(file);
-  const bounds=detectDocumentBounds(image);
+  // Do not auto-crop report photos: the previous brightness heuristic could
+  // remove rows at the top or bottom of coloured inspection forms.
+  const bounds={x:0,y:0,width:image.naturalWidth,height:image.naturalHeight};
   return documentOcrTilePlan(bounds.width,bounds.height)
     .map(tile=>renderDocumentOcrTile(image,{x:bounds.x+tile.x,y:bounds.y+tile.y,width:tile.width,height:tile.height}));
 }
@@ -1229,7 +1242,7 @@ async function pdfForDocumentOcr(file,qualityFunction){
     canvas.height=Math.round(viewport.height);
     const ctx=canvas.getContext('2d');
     await page.render({canvasContext:ctx,viewport}).promise;
-    sources.push(canvas.toDataURL('image/png'));
+    sources.push(canvas.toDataURL('image/jpeg',0.92));
   }
   return {text:'',sources};
 }
