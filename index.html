@@ -170,7 +170,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 @media(max-width:500px){.quickChoices{grid-template-columns:1fr}.quickChoice{font-size:14px}.guidedSection>summary{font-size:18px}}
 @media(max-width:760px){.mktHero{padding:30px 0 24px}.mktHeroGrid,.mktAbout,.afterGrid,.clarificationChoices{grid-template-columns:1fr}.mktGrid3{grid-template-columns:1fr}.mktOutcome{grid-template-columns:1fr 1fr}.mktHeroCard{padding:18px}.mktLead{font-size:18px}.mktCtas{flex-direction:column}.mktBtn{width:100%}main{padding-top:12px}.card{padding:18px;margin:20px 0}.credentials strong{font-size:22px}.credentials span{font-size:15px}.scopeStrip{grid-template-columns:1fr}}
 @media(max-width:460px){.mktOutcome{grid-template-columns:1fr}.priceGrid{grid-template-columns:1fr}.licenseGrid,.grid,.formulaAdminGrid{grid-template-columns:1fr}.formulaAdmin .wide{grid-column:auto}.mktWrap{padding:0 14px}.replyTable,.replyTable tbody,.replyTable tr,.replyTable th,.replyTable td{display:block;width:100%}.replyTable th{padding:9px 0 5px}}
-</style><meta name="buytest-build" content="expert-calibration-239-v53-admin-customer-replies">
+</style><meta name="buytest-build" content="expert-calibration-239-v54-table-status-and-gearbox-mount-fix">
 </head><body>
 
 <section id="marketingLanding">
@@ -1250,6 +1250,7 @@ const findingKnowledgeBase=[
   {id:'front-lamps-damaged-report',terms:['פנס חזית פגומים','פנסי חזית פגומים','פנס חזית פגום','מיחקת פגומים'],patterns:[/פנס[י]?\s*חזית.*פגומ/,/מיחקת\s*פגומ/],category:'מערכת תאורה',tag:'משמעות נמוכה',tone:'clarify',classification:'actual_finding',reportSeverity:'low',meaning:'נרשם נזק בפנסי החזית.',decision:'יש לבדוק את פעולת הפנסים, התושבות והאטימה ולהביא בחשבון תיקון או החלפה.'},
   {id:'transmission-disc-wear-report',terms:['נקישות בלאי דיסקיות בתיבת הילוכים','בלאי דיסקיות בתיבת הילוכים'],patterns:[/(?:נקיש[א-ת]*\s*)?בלאי\s*דיסק[א-ת]*.*הילוכים/],category:'תיבת העברת הכוח',tag:'משמעות בינונית',tone:'clarify',classification:'actual_finding',reportSeverity:'medium',meaning:'נרשמו נקישות ובלאי בדיסקיות תיבת ההילוכים.',decision:'יש לבצע בדיקת תיבה ממוקדת ולהביא בחשבון תיקון אפשרי ועלות במערכת ההילוכים.'},
   {id:'engine-gear-mounts-report',terms:['לבדוק תושבות מנוע וגיר','תושבות מנוע וגיר'],patterns:[/תושבות.*מנוע.*גיר/,/לבדוק\s*תושבות.*גיר/],category:'תיבת העברת הכוח',tag:'משמעות נמוכה',tone:'clarify',classification:'actual_finding',reportSeverity:'low',meaning:'נרשמה דרישה לבדוק את תושבות המנוע והגיר, לצד סימון של תושבת פגומה.',decision:'יש לזהות איזו תושבת פגומה ולהביא בחשבון החלפה.'},
+  {id:'gearbox-mount-report',terms:['תושבת תיבת הילוכים פגומה','תושבת תיבת ההילוכים פגומה','תושבת גיר פגומה'],patterns:[/תושבת\s+(?:תיבת\s+ה?ילוכים|גיר)\s+פגומ/],category:'תיבת הילוכים',tag:'ליקוי נקודתי',tone:'clarify',classification:'actual_finding',reportSeverity:'low',suppresses:['gear-shift'],meaning:'נרשמה תושבת פגומה של תיבת ההילוכים. התושבת מחברת את התיבה למרכב ומבודדת תנועה ורעידות; הממצא אינו קובע שתיבת ההילוכים עצמה פגומה.',decision:'יש לבדוק ולהחליף את התושבת לפי הצורך ולהביא בחשבון את עלות הטיפול. אין לסווג את תיבת ההילוכים כלא תקינה על סמך ממצא זה בלבד.'},
   {id:'gearbox-software-update-report',terms:['לבדוק עידכון גירסה לגיר','לבדוק עדכון גרסה לגיר'],patterns:[/לבדוק.*(?:עידכון|עדכון).*גירס?ה.*גיר/],category:'תיבת העברת הכוח',tag:'בדיקת המשך',tone:'clarify',classification:'recommendation',meaning:'הדוח ממליץ לבדוק אם נדרש עדכון תוכנה לתיבת ההילוכים.',decision:'אין לספור זאת לבדה כתקלה מכנית; יש לבדוק במוסך לפי מספר השלדה אם קיים עדכון רלוונטי.'},
   {id:'clutch-condition-check-report',terms:['בדיקת תקינות מצמדים','לבדוק תקינות מצמדים'],patterns:[/בדיקת\s*תקינות\s*מצמדים/],category:'תיבת העברת הכוח',tag:'בדיקת המשך',tone:'clarify',classification:'recommendation',meaning:'נרשמה דרישה לבדוק את תקינות המצמדים.',decision:'אין לקבוע מהמשפט בלבד שהמצמדים פגומים; יש לבצע בדיקה ממוקדת ולהעריך עלות רק אם תימצא תקלה.'},
   {id:'expert-internal_wear',terms:['בלאי פנימי','בלאי פנימץ','בלאי פנימצ','בלאי פנימ'],patterns:[/בלאי\s*פנימ[א-ת]*/],category:'מנוע',tag:'משמעות גבוהה',tone:'safety',classification:'actual_finding',reportSeverity:'high',contextPolicy:'no_effect',meaning:'נרשם בדוח בלאי פנימי במנוע. זהו ממצא ממשי הנוגע למצבו המכני של המנוע.',decision:'זהו ממצא בעל משמעות גבוהה. יש לברר את מצב המנוע והיקף הטיפול האפשרי ולהביא בחשבון את הסיכון והעלות.'},
@@ -2091,7 +2092,8 @@ const expertCalibrationDecisions=[{"id":"engine_block_damage","category":"מנו
 {"id":"gearbox_noise","category":"תיבת הילוכים","title":"רעש מתיבת ההילוכים","phrases":["רעש מתיבת הילוכים","רעש יתר בתאוצה"],"formulaIds":["technotest-95","technotest-504"],"aliasIds":[],"classification":"actual","severity":"high","agePolicy":"no_effect","note":"","updatedAt":"2026-09-04T12:04:23.972Z"},
 {"id":"gear_linkage","category":"תיבת הילוכים","title":"חופשים במנגנון ההילוכים","phrases":["חופשים במנגנוני הילוכים"],"formulaIds":["technotest-96"],"aliasIds":[],"classification":"actual","severity":"low","agePolicy":"no_effect","note":"","updatedAt":"2026-09-04T12:04:36.825Z"},
 {"id":"gear_selection","category":"תיבת הילוכים","title":"שילוב קשה, חריקות או הילוך קופץ","phrases":["חריקות בשילוב הילוכים","שילוב הילוכים קשה","הילוך קופץ"],"formulaIds":["technotest-97","technotest-98","technotest-99"],"aliasIds":[],"classification":"actual","severity":"high","agePolicy":"no_effect","note":"","updatedAt":"2026-09-04T12:04:45.815Z"},
-{"id":"gearbox_fault","category":"תיבת הילוכים","title":"תיבת הילוכים פגומה","phrases":["תיבת הילוכים פגומה","תושבת תיבת הילוכים פגומה"],"formulaIds":["technotest-100","technotest-101"],"aliasIds":[],"classification":"actual","severity":"high","agePolicy":"no_effect","note":"","updatedAt":"2026-09-04T12:04:54.497Z"},
+{"id":"gearbox_fault","category":"תיבת הילוכים","title":"תיבת הילוכים פגומה","phrases":["תיבת הילוכים פגומה"],"formulaIds":["technotest-100"],"aliasIds":[],"classification":"actual","severity":"high","agePolicy":"no_effect","note":"","updatedAt":"2026-09-05T04:40:00.000Z"},
+{"id":"gearbox_mount","category":"תיבת הילוכים","title":"תושבת תיבת הילוכים פגומה","phrases":["תושבת תיבת הילוכים פגומה","תושבת תיבת ההילוכים פגומה","תושבת גיר פגומה"],"formulaIds":["technotest-101"],"aliasIds":[],"classification":"actual","severity":"low","agePolicy":"no_effect","note":"התושבת היא רכיב תמיכה נפרד; אין להסיק מתקלה בתושבת שתיבת ההילוכים עצמה אינה תקינה.","updatedAt":"2026-09-05T04:40:00.000Z"},
 {"id":"gearbox_behavior","category":"תיבת הילוכים","title":"נקישה, השהיה ורעידות","phrases":["נקישה בשילוב הילוכים","רעידות בתחילת נסיעה","השהיה בשילוב הילוכים","רעידות יתר"],"formulaIds":["technotest-500","technotest-501","technotest-502","technotest-551"],"aliasIds":[],"classification":"actual","severity":"medium","agePolicy":"no_effect","note":"","updatedAt":"2026-09-04T12:05:06.158Z"},
 {"id":"gearbox_history","category":"תיבת הילוכים","title":"סימני פירוק התיבה","phrases":["סימני פירוק תיבת הילוכים"],"formulaIds":["technotest-503"],"aliasIds":[],"classification":"history","severity":"none","agePolicy":"economic_only","note":"","updatedAt":"2026-09-04T12:05:29.983Z"},
 {"id":"gearbox_wear","category":"תיבת הילוכים","title":"בלאי סביר","phrases":["בלאי סביר"],"formulaIds":["technotest-550"],"aliasIds":["sample-013"],"classification":"disclaimer","severity":"none","agePolicy":"economic_only","note":"רק בשביל לרשום משהו ברובחעקת תיבת ההילוכים","updatedAt":"2026-09-04T12:06:15.623Z"},
@@ -2305,6 +2307,13 @@ function applyExpertCalibration(rule,formula){
     calibrated.reportSeverity=null;
     calibrated.meaning='הנוסח ממליץ לבדוק תצרוכת שמן בנסיעה. הוא אינו קובע לבדו שהמנוע שורף שמן.';
     calibrated.decision='אין לספור את המשפט כליקוי עצמאי. יש לייחס משקל רק לממצא ממשי נוסף, אם נרשם לצד ההמלצה.';
+  }
+  if(decision.id==='gearbox_mount'){
+    calibrated.tag='ליקוי נקודתי';
+    calibrated.tone='clarify';
+    calibrated.reportSeverity='low';
+    calibrated.meaning='נרשמה תושבת פגומה של תיבת ההילוכים. התושבת מחברת את התיבה למרכב ומבודדת תנועה ורעידות; הממצא אינו קובע שתיבת ההילוכים עצמה פגומה.';
+    calibrated.decision='יש לבדוק ולהחליף את התושבת לפי הצורך ולהביא בחשבון את עלות הטיפול. אין לסווג את תיבת ההילוכים כלא תקינה על סמך ממצא זה בלבד.';
   }
   const specific=specificFindingInterpretation(calibrated);
   if(specific){
@@ -2949,13 +2958,27 @@ function stripReportScaffolding(line,category,severity){
     const categoryText=normalizeFindingText(category);
     const withoutArticle=value=>value.replace(/^מערכת\s+ה/,'מערכת ');
     if(cleaned===categoryText||withoutArticle(cleaned)===withoutArticle(categoryText)||/שלדה\s*ומ?רכ[בג]/.test(cleaned)&&category==='שלדת מרכב') cleaned='';
+    else if(cleaned.startsWith(categoryText+' ')) cleaned=cleaned.slice(categoryText.length).trim();
   }
   if(severity) cleaned=cleaned.replace(/משמעות\s*(?:גבוהה|נמוכה)|ליקויים?\s+שוליים?|ליקוי\s+שולי/g,' ');
   return cleaned.replace(/^\s*\d+\s*/,' ').replace(/\s+/g,' ').trim();
 }
 
+function isReportStatusScaffolding(value){
+  const cleaned=normalizeFindingText(value)
+    .replace(/(?:^|\s)(?:סטטוס|אבחנה|מכלול|הבדיקה|תקין|לא תקין|לא תקינה|כן|לא)(?=\s|$)/g,' ')
+    .replace(/(?:^|\s)[0-9xv]+(?=\s|$)/g,' ')
+    .replace(/\s+/g,' ')
+    .trim();
+  return !cleaned;
+}
+
 function specificFindingInterpretation(item){
   const source=normalizeFindingText(item?.sourceText||item?.matchedTerm||'');
+  if(/תושבת\s+(?:תיבת\s+ה?ילוכים|גיר)\s+פגומ/.test(source)) return {
+    meaning:'נרשמה תושבת פגומה של תיבת ההילוכים. התושבת מחברת את התיבה למרכב ומבודדת תנועה ורעידות; הממצא אינו קובע שתיבת ההילוכים עצמה פגומה.',
+    decision:'יש לבדוק ולהחליף את התושבת לפי הצורך ולהביא בחשבון את עלות הטיפול. אין לסווג את תיבת ההילוכים כלא תקינה על סמך ממצא זה בלבד.'
+  };
   if(/תיקוני פח(?:חות)? וצבע|בוצעו תיקוני פח וצבע/.test(source)) return {
     meaning:'נמצאו סימנים לעבודות פחחות וצבע בחלקים החיצוניים של הרכב. הנוסח אינו מצביע לבדו על החלפת חלק או על פגיעה מבנית.',
     decision:'יש לבדוק את איכות הצבע והפחחות ולהביא בחשבון תיקון קוסמטי אם נדרש.'
@@ -3082,7 +3105,7 @@ function interpretSummaryText(text){
       if(chassisHint) currentCategory=chassisHint;
     }
     const contentLine=stripReportScaffolding(line,lineCategory,lineSeverity);
-    if(!contentLine||isExplicitlyNormal(contentLine)) return;
+    if(!contentLine||isReportStatusScaffolding(contentLine)||isExplicitlyNormal(contentLine)) return;
     const candidateLines=[contentLine];
     if(lines[index+1]) candidateLines.push(contentLine+' '+stripReportScaffolding(lines[index+1],reportCategoryFromLine(lines[index+1]),reportSeverityFromLine(lines[index+1])));
     if(lines[index+1]&&lines[index+2]) candidateLines.push(contentLine+' '+stripReportScaffolding(lines[index+1],reportCategoryFromLine(lines[index+1]),reportSeverityFromLine(lines[index+1]))+' '+stripReportScaffolding(lines[index+2],reportCategoryFromLine(lines[index+2]),reportSeverityFromLine(lines[index+2])));
