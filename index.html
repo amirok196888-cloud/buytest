@@ -113,13 +113,13 @@ body.paid-open .paidOnly{display:block!important}
 /* BuyTest V20 – light commercial landing + improved value-first flow */
 :root{--bg:#f5f7f8;--card:#ffffff;--card2:#f8fafb;--line:#d9e2e6;--txt:#17242b;--muted:#60717a;--a:#0fa87e;--warn:#9b6b00;--bad:#bd3030}
 html{scroll-behavior:smooth}
-body{background:#f5f7f8;color:var(--txt);line-height:1.55}
+body{background:#f5f7f8;color:var(--txt);line-height:1.55;-webkit-font-smoothing:antialiased}
 main{max-width:840px;padding:34px 16px 90px}
 .hero{padding:22px 12px 26px}.hero h1{font-size:clamp(30px,7vw,44px);color:#10242c}.hero p{color:var(--muted);font-size:16px}
 .promise{background:#eaf8f3;border-color:#b7e4d5;color:#143e33;padding:18px;margin:18px 0 24px}
 .expert{background:#fff;border-color:var(--line);color:var(--txt);padding:16px;margin-bottom:28px;box-shadow:0 6px 22px #17242b0c}.expert span{color:var(--muted)}
 .card{background:#fff;border-color:var(--line);box-shadow:0 8px 28px #17242b0b;padding:22px;margin:24px 0;border-radius:20px}
-h2{font-size:22px;color:#14262d}.sub,.label,.field label{color:var(--muted)}
+h2{font-size:22px;color:#14262d}.sub{color:var(--muted);font-size:15px}.label{color:var(--muted);font-size:13px}.field label{color:var(--muted);font-size:14px}
 .plate input,.field input,.field select,textarea{background:#fff;color:#17242b;border-color:#cbd8dd}.plate input{box-shadow:inset 0 0 0 1px #eef3f5}.primary{background:#0fa87e;color:#fff}.secondary,.devBtn{background:#eef4f6;color:#17323c;border-color:#cbd8dd}
 .status,.box,.check,.info,.priceCard,.paywall,.legalConsent,.feedbackBox{background:#f8fafb;border-color:#d9e2e6;color:#17242b}
 .value{color:#10242c}.badge{background:#e8f6f1;color:#176c56}.owner{border-bottom-color:#e1e8eb}
@@ -154,23 +154,27 @@ footer{position:static;background:#edf2f4;border-top:1px solid #d9e2e6;color:#60
 #vehicleLookup{scroll-margin-top:14px}
 .scanStatus{display:none;margin-top:10px;padding:12px 14px;border-radius:12px;background:#eef4f6;color:#28444e;font-weight:700}
 .scanStatus.show{display:block}.scanStatus.error{background:#fff0f0;color:#8f2525}
+.ocrStatusTitle{display:block;font-size:16px;color:#075e48}.ocrStatusDetails{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}.ocrEngineBadge{display:inline-flex;align-items:center;gap:5px;padding:5px 9px;border-radius:999px;background:#d7f2e9;color:#075e48;font-size:13px;font-weight:900}.ocrFindingCount{font-size:13px;color:#35515c}
 .checkrow{display:flex;gap:10px;align-items:flex-start;padding:12px;border:1px solid #d9e2e6;border-radius:12px;background:#f8fafb;line-height:1.55}
 .checkrow input{width:22px;height:22px;flex:0 0 auto;margin-top:2px;accent-color:#0fa87e}
 .licenseGuideImage{cursor:zoom-in;transition:transform .18s ease}.licenseGuideImage:hover{transform:translateY(-2px)}
 .imageModal{display:none;position:fixed;inset:0;z-index:10050;background:rgba(0,0,0,.9);padding:18px;overflow:auto;align-items:center;justify-content:center}
 .imageModal.open{display:flex}.imageModal img{display:block;max-width:100%;max-height:88vh;border-radius:12px;background:#fff}.imageModal button{position:fixed;top:16px;left:16px;background:#fff;color:#17242b;z-index:1}
 .returnBtn{margin-top:10px}.paymentNote{line-height:1.6}
-button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #ffbd18;outline-offset:3px}
+button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity:.58}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid #ffbd18;outline-offset:3px}
 .paywall{margin:30px 0;padding:24px}.paywall h3{font-size:24px}.paywall p{font-size:15px}
 .afterGrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}.uploadPanel{border:1px solid #d9e2e6;border-radius:16px;padding:16px;background:#f8fafb}.uploadPanel.required{border-color:#0fa87e}.uploadPanel h3{margin:0 0 6px;font-size:18px}.uploadState{display:none;margin-top:10px;padding:10px 12px;border-radius:10px;background:#e8f7f2;color:#075e48;font-weight:700;line-height:1.5}.uploadState.show{display:block}.reportInput{min-height:150px;margin-top:10px;background:#fff}.ownershipBox{display:flex;gap:10px;align-items:flex-start;padding:14px;border:1px solid #f0cf8a;border-radius:12px;background:#fff7e8;line-height:1.55}.ownershipBox input{width:22px;height:22px;flex:0 0 auto;margin-top:2px;accent-color:#0fa87e}.interpretation{display:none;margin-top:18px}.interpretation.show{display:block}.meaningCard{border:1px solid #d9e2e6;border-right:5px solid #0fa87e;border-radius:14px;padding:14px;margin:10px 0;background:#fff}.meaningCard.safety{border-right-color:#c9362b;background:#fff8f7}.meaningCard.clarify{border-right-color:#e3a400;background:#fffdf5}.meaningCard h4{margin:0 0 6px}.meaningCard p{margin:5px 0;line-height:1.6}.meaningTag{display:inline-block;padding:4px 9px;border-radius:999px;background:#e8f7f2;color:#075e48;font-size:12px;font-weight:800}.unknownList{background:#fff7e8;border:1px solid #f0cf8a;border-radius:12px;padding:14px;margin-top:14px}.privacyStrip{margin:12px 0;padding:12px;border-radius:12px;background:#eef7fb;color:#183c4d;line-height:1.6}.scopeStrip{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:12px 0}.scopeStrip span{padding:10px;border-radius:10px;background:#edf8f4;text-align:center;font-weight:800;color:#075e48}.caseLabel{display:inline-flex;gap:7px;align-items:center;padding:7px 11px;border-radius:999px;background:#17352d;color:#fff;font-weight:800;font-size:13px}
+.inspectionIdentity{margin:0 0 18px;padding:18px;border:2px solid #0fa87e;border-radius:16px;background:linear-gradient(135deg,#f3fbf8,#fff);box-shadow:0 8px 24px rgba(15,168,126,.10)}.inspectionIdentityTitle{margin:0 0 12px;font-size:15px;color:#35515c}.inspectionIdentityGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.inspectionIdentityItem{padding:12px 14px;border:1px solid #cce7de;border-radius:12px;background:#fff}.inspectionIdentityLabel{display:block;margin-bottom:3px;color:#60717a;font-size:12px;font-weight:800}.inspectionIdentityValue{display:block;color:#10242c;font-size:21px;font-weight:950;line-height:1.3;overflow-wrap:anywhere}.interpretation>h3{font-size:24px;margin:0 0 8px}.interpretation>p{color:#60717a}
+.inspectionHeaderGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}.inspectionOwnerField,.inspectionKmField{padding:15px;border:2px solid #b9ddd2;border-radius:15px;background:#f6fcfa}.inspectionOwnerField label,.inspectionKmLabel{display:block!important;margin:0 0 7px!important;color:#17352d!important;font-size:17px!important;font-weight:950!important}.inspectionOwnerField input{font-size:19px;font-weight:900;border-width:2px}.inspectionKmField{display:flex;flex-direction:column;justify-content:center}.inspectionKmValue{display:block;color:#10242c;font-size:24px;font-weight:950;line-height:1.25}.inspectionKmSource{display:block;margin-top:4px;color:#60717a;font-size:13px;font-weight:700}
 .ocrReview{display:none;margin-top:12px;padding-top:12px;border-top:1px solid #d9e2e6}.ocrReview .secondary{margin-top:8px}
 .formulaAdmin{display:none;border:2px solid #285f7a;background:#f2f8fb}.formulaAdminGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.formulaAdmin .wide{grid-column:1/-1}.formulaAdmin input,.formulaAdmin select,.formulaAdmin textarea{width:100%;background:#fff}.formulaAdmin textarea{min-height:80px}.formulaAdminStats{padding:11px 13px;border-radius:12px;background:#e7f3f8;color:#173f52;font-weight:800;margin:10px 0}.formulaAdminList{max-height:270px;overflow:auto;border:1px solid #d9e2e6;border-radius:12px;background:#fff;margin-top:12px}.formulaAdminItem{padding:10px 12px;border-bottom:1px solid #e6edef}.formulaAdminItem:last-child{border-bottom:0}.formulaAdminItem small{display:block;color:#60717a;margin-top:3px}.formulaAdminActions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}.formulaAdminActions button{flex:1;min-width:150px}.contextNote{margin-top:8px;padding:9px 11px;border-radius:10px;background:#eef4f6;color:#35515c}.matchSource{font-size:12px;color:#60717a;margin-top:7px}
 .customerReplyAdmin{display:none;margin-top:20px;padding:18px;border:2px solid #285f7a;border-radius:16px;background:#f2f8fb}.customerReplyAdmin h2{margin-bottom:6px}.replyTable{width:100%;border-collapse:separate;border-spacing:0 9px}.replyTable th{width:160px;text-align:right;vertical-align:top;padding:12px 0 0 10px;color:#35515c}.replyTable td{padding:0}.replyTable input,.replyTable textarea{width:100%;box-sizing:border-box;background:#fff}.replyTable textarea{min-height:92px}.replyTable textarea.replyAnswer{min-height:170px}.replyActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.replyActions button{flex:1;min-width:150px}.replyDrafts{margin-top:16px;border-top:1px solid #cbd8dd;padding-top:14px}.replyDraftItem{background:#fff;border:1px solid #d9e2e6;border-radius:12px;padding:12px;margin:9px 0}.replyDraftItem small{display:block;color:#60717a;margin:4px 0 8px}.replyDraftItem .miniActions{display:flex;gap:7px;flex-wrap:wrap}.replyDraftItem .miniActions button{padding:8px 11px;font-size:13px}.replySafetyNote{margin:10px 0;padding:11px 13px;border-radius:12px;background:#fff7e8;border:1px solid #f0cf8a;color:#694d13;line-height:1.55}
 .guidedSection{padding:0!important;overflow:hidden}.guidedSection>summary{list-style:none;cursor:pointer;padding:18px;display:flex;align-items:center;gap:12px;font-size:20px;font-weight:900}.guidedSection>summary::-webkit-details-marker{display:none}.guidedSection>summary:after{content:'פתיחה';margin-right:auto;font-size:12px;color:#0b7f67;background:#e8f7f2;border-radius:999px;padding:6px 10px}.guidedSection[open]>summary:after{content:'סגירה'}.guidedSection>.stepContent{padding:0 18px 18px}.questionCount{color:#60717a;font-size:13px;font-weight:800;margin-bottom:9px}.guidedChecks .check{display:none}.guidedChecks .check.active{display:block}.checkTitle{display:block;font-size:18px;line-height:1.55;margin-bottom:14px}.quickChoices{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.quickChoice{background:#eef4f6;color:#17323c;border:1px solid #cbd8dd;padding:11px 7px;font-size:13px}.quickChoice.selected{background:#0fa87e;color:#fff;border-color:#0b8d6b}.quickChoice.issue.selected{background:#d97b24;border-color:#bd671b}.quickChoice.skip.selected{background:#71818a;border-color:#5f6e76}.guidedNav{display:flex;align-items:center;gap:10px;margin-top:12px}.guidedNav button{flex:1;background:#eaf2f5;color:#17323c;border:1px solid #cbd8dd}.guidedProgress{font-size:13px;font-weight:800;color:#60717a;white-space:nowrap}.licenseDetails{margin:12px 0;border:1px solid #d9e2e6;border-radius:12px;background:#f8fafb}.licenseDetails>summary{padding:13px;font-weight:900;cursor:pointer}.licenseDetails>div{padding:0 13px 13px}.legalCompact{margin:12px 0 0!important;padding:12px!important}.legalCompact p{margin:0 0 9px;color:#50666f}.legalCompact a,.legalCompact button{color:#0b7f67;background:none;border:0;text-decoration:underline;padding:0;font:inherit;font-weight:800}.simpleFinding textarea{background:#fff;color:#17242b}.managerOnly{display:none}
 @media(max-width:500px){.quickChoices{grid-template-columns:1fr}.quickChoice{font-size:14px}.guidedSection>summary{font-size:18px}}
 @media(max-width:760px){.mktHero{padding:30px 0 24px}.mktHeroGrid,.mktAbout,.afterGrid,.clarificationChoices{grid-template-columns:1fr}.mktGrid3{grid-template-columns:1fr}.mktOutcome{grid-template-columns:1fr 1fr}.mktHeroCard{padding:18px}.mktLead{font-size:18px}.mktCtas{flex-direction:column}.mktBtn{width:100%}main{padding-top:12px}.card{padding:18px;margin:20px 0}.credentials strong{font-size:22px}.credentials span{font-size:15px}.scopeStrip{grid-template-columns:1fr}}
-@media(max-width:460px){.mktOutcome{grid-template-columns:1fr}.priceGrid{grid-template-columns:1fr}.licenseGrid,.grid,.formulaAdminGrid{grid-template-columns:1fr}.formulaAdmin .wide{grid-column:auto}.mktWrap{padding:0 14px}.replyTable,.replyTable tbody,.replyTable tr,.replyTable th,.replyTable td{display:block;width:100%}.replyTable th{padding:9px 0 5px}}
-</style><meta name="buytest-build" content="expert-calibration-240-v55-short-question-and-reply-panel">
+@media(max-width:460px){.mktOutcome{grid-template-columns:1fr}.priceGrid{grid-template-columns:1fr}.licenseGrid,.grid,.formulaAdminGrid,.inspectionIdentityGrid,.inspectionHeaderGrid{grid-template-columns:1fr}.formulaAdmin .wide{grid-column:auto}.mktWrap{padding:0 14px}.replyTable,.replyTable tbody,.replyTable tr,.replyTable th,.replyTable td{display:block;width:100%}.replyTable th{padding:9px 0 5px}.inspectionIdentityValue{font-size:19px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+</style><meta name="buytest-build" content="expert-calibration-242-v57-visible-inspection-details">
 </head><body>
 
 <section id="marketingLanding">
@@ -203,7 +207,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 <div class="mktTitle"><h2>מה BuyTest בעצם עושה?</h2><p>לא מחליף מכון בדיקה ולא מחליט עבורך. הוא מרכז את מה שכדאי לבדוק מראש ומסביר בשפה פשוטה את המשמעות של סיכום הבוחן לאחר הבדיקה.</p></div>
 <div class="mktGrid3">
 <div class="mktInfoCard"><div class="ico">🔎</div><h3>מרכז מידע</h3><p>מושך נתונים זמינים על הרכב ומציג אותם במקום אחד, בצורה ברורה ופשוטה.</p></div>
-<div class="mktInfoCard"><div class="ico">🧭</div><h3>מוביל אותך שלב־שלב</h3><p>לאחר התשלום נפתחים שאלות, בדיקות פרקטיות ותיעוד מסודר שגם מי שאינו איש מקצוע יכול לבצע ולהבין.</p></div>
+<div class="mktInfoCard"><div class="ico">🧭</div><h3>מוביל אותך שלב־שלב</h3><p>לאחר התשלום נפתחות שאלות, בדיקות מעשיות ואפשרות לתיעוד מסודר — גם למי שאינו איש מקצוע.</p></div>
 <div class="mktInfoCard"><div class="ico">🧾</div><h3>מסביר את סיכום הבוחן</h3><p>מזהה ניסוחים מוכרים, מסביר את משמעותם ומסמן במפורש כל ניסוח שלא ניתן לפענח בבטחה.</p></div>
 </div>
 </div></div>
@@ -272,7 +276,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 </section>
 <section class="card" id="fullCheckOffer" style="display:none">
 <h2>תיק BuyTest מלא לרכב אחד · 49 ₪</h2>
-<p class="sub"><b>אותו תיק נשאר פתוח לשלב שלפני המכון ולשלב שאחרי המכון.</b><br>כלולים בדיקת רישיון וצ׳קליסט, דגשים לבוחן, העלאת סיכום הבוחן, בדיקה ממוחשבת אופציונלית, הסבר משולב ב־PDF והבהרה קצרה אחת במייל.</p>
+<p class="sub"><b>אותו תיק נשאר פתוח לשלב שלפני המכון ולשלב שאחרי המכון.</b><br>התיק כולל בדיקת רישיון ורשימת בדיקה, דגשים לבוחן, העלאת סיכום הבוחן, בדיקה ממוחשבת אופציונלית, הסבר משולב ב־PDF והבהרה קצרה אחת במייל.</p>
 <div class="scopeStrip"><span>לפני המכון</span><span>דגשים לבוחן</span><span>אחרי המכון</span></div>
 <button class="primary full" type="button" onclick="startPayment()">פתח תיק בדיקה – 49 ₪</button>
 <div class="devMsg" id="paymentMsg" role="status" aria-live="polite"></div>
@@ -366,10 +370,13 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 <section class="card paidOnly" id="afterInspectionSection" style="display:none">
 <div class="caseLabel">שלב 2 מתוך 2 · אחרי המכון</div>
 <h2>6 · הסבר סיכום הבוחן</h2>
-<p class="sub"><b>מעלים את דף סיכום הבוחן</b>, ובמידת הצורך גם את דף הבדיקה הממוחשבת. המערכת עוברת על כל סעיפי האבחון - מהמנוע ועד התאורה - ומדלגת לחלוטין על „הערות כלליות”.</p>
-<div class="privacyStrip"><b>פרטיות וזהות:</b> קובצי המקור מעובדים בדפדפן ואינם מצורפים ל־PDF של BuyTest. הפלט אינו מעתיק את הטופס, את הלוגו או את שם המכון.</div>
+<p class="sub"><b>מעלים את דף סיכום הבוחן</b>, ובמידת הצורך גם את דף הבדיקה הממוחשבת. המערכת עוברת על סעיפי האבחון — מהמנוע ועד התאורה — ומדלגת על „הערות כלליות”.</p>
+<div class="privacyStrip"><b>פרטיות וזהות:</b> לצורך זיהוי הטקסט, עמודי הדוח עשויים להישלח ישירות מהדפדפן אל Google Cloud Vision. אם השירות אינו זמין, נעשה ניסיון גיבוי מקומי באמצעות Tesseract. קובצי המקור אינם מצורפים ל־PDF של BuyTest, והפלט אינו מעתיק את הטופס, הלוגו או שם המכון.</div>
 
-<div class="field"><label for="inspectionOwnerName"><b>שם מזמין/ת בדיקת המכון</b></label><input id="inspectionOwnerName" autocomplete="name" placeholder="השם שמופיע בהזמנת הבדיקה"></div>
+<div class="inspectionHeaderGrid">
+  <div class="field inspectionOwnerField"><label for="inspectionOwnerName">שם מזמין/ת בדיקת המכון</label><input id="inspectionOwnerName" autocomplete="name" placeholder="השם שמופיע בהזמנת הבדיקה"></div>
+  <div class="inspectionKmField" aria-live="polite"><span class="inspectionKmLabel">קילומטראז׳ הרכב</span><strong class="inspectionKmValue" id="inspectionKmValue">טרם זוהה</strong><span class="inspectionKmSource" id="inspectionKmSource">יתעדכן מנתוני הרכב או מסיכום הבוחן</span></div>
+</div>
 <label class="ownershipBox"><input type="checkbox" id="inspectionOwnership"><span>אני מאשר/ת שהבדיקה הוזמנה על שמי, או שקיבלתי מבעל/ת הבדיקה הרשאה להעלות אותה ולעבד את הסיכום לצורך השירות.</span></label>
 
 <div class="afterGrid">
@@ -483,12 +490,12 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
       <p>בהעלאת דוח המשתמש מצהיר שהבדיקה הוזמנה על שמו או שיש לו הרשאה מתאימה מבעל הבדיקה לעשות שימוש בקובץ לצורך השירות. BuyTest אינו טוען לבעלות בדוח המכון ואינו מפרסם או מצרף את טופס המקור לפלט. המשתמש מתבקש להעלות רק את אזור סיכום הבוחן, ללא לוגו ופרטים אישיים שאינם דרושים.</p>
       <p>BuyTest אינו קשור למכון הבדיקה ואינו מדבר בשמו. ההסבר נגזר מן הטקסט שזוהה בדוח וממאגר הסיווג המקצועי של המערכת.</p>
       <p>התשלום לתיק BuyTest כולל הבהרה קצרה אחת במייל על מסקנה שמופיעה בסיכום. הבהרה אישית ומפורטת היא שירות נפרד בתשלום. שני סוגי המענה מבוססים על הדוח שהמשתמש העלה בלבד ואינם בדיקה פיזית, שמאות, התחייבות לעלות תיקון או המלצה לקנות או לא לקנות את הרכב.</p>
-      <p>כל הזכויות באתר, בתוכן, במבנה הבדיקה, בצ׳קליסטים, בעיצוב ובסימני BuyTest שמורות ל־BuyTest. אין להעתיק, להפיץ או לעשות בהם שימוש מסחרי ללא אישור מראש ובכתב.</p>
+      <p>כל הזכויות באתר, בתוכן, במבנה הבדיקה, ברשימות הבדיקה, בעיצוב ובסימני BuyTest שמורות ל־BuyTest. אין להעתיק, להפיץ או לעשות בהם שימוש מסחרי ללא אישור מראש ובכתב.</p>
     </div>
     <div id="privacyText" class="legalPage" style="display:none">
       <h2>מדיניות פרטיות</h2>
-      <p>מספר הרכב שנבדק נשלח למאגרי המידע הציבוריים הדרושים להצגת הנתונים. בגרסה זו תמונות הרכב, סיכום הבוחן והבדיקה הממוחשבת מעובדים בדפדפן ואינם נשלחים לשרת של BuyTest. קובצי דוח המכון אינם מצורפים ל־PDF המופק.</p>
-      <p>שם מזמין הבדיקה והטקסט שזוהה בקובץ משמשים רק לביצוע התהליך במכשיר. אין לצלם מספר זהות, חתימה, כתובת, טלפון, לוגו או מידע אישי שאינו נחוץ. עם חיבור שרת או שירות זיהוי חיצוני, מדיניות זו תעודכן מראש ותפרט את מטרות העיבוד, הגורמים המקבלים ותקופות השמירה.</p>
+      <p>מספר הרכב שנבדק נשלח למאגרי המידע הציבוריים הדרושים להצגת הנתונים. לצורך זיהוי הטקסט, תמונות או עמודי PDF מסיכום הבוחן ומהבדיקה הממוחשבת עשויים להישלח ישירות מדפדפן המשתמש אל Google Cloud Vision. אם השירות אינו זמין, נעשה ניסיון גיבוי מקומי בדפדפן באמצעות Tesseract. בגרסה זו BuyTest אינו שומר את קובצי הדוח בשרת שלו, והם אינם מצורפים ל־PDF המופק.</p>
+      <p>שם מזמין/ת הבדיקה והטקסט שזוהה בקובץ משמשים רק לביצוע התהליך ולהפקת הסיכום. אין לצלם מספר זהות, חתימה, כתובת, טלפון, לוגו או מידע אישי שאינו נחוץ. השימוש בשירותי הזיהוי כפוף גם לתנאי השירות ולמדיניות הפרטיות של ספק השירות.</p>
       <p>נתוני תשלום, לאחר חיבור השירות, יעובדו אצל ספק הסליקה המאובטח ובהתאם למדיניות שלו. יש להשלים לפני ההשקה פרטי בעל השליטה במידע ודרך יצירת קשר למימוש זכויות עיון ותיקון.</p>
     </div>
     <div id="cancelText" class="legalPage" style="display:none">
@@ -508,14 +515,34 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 const VEHICLE_ID='56063a99-8a3e-4ff4-912e-5966c0279bad';
 const OWNERS_ID='bb2355dc-9ec7-4f06-9c3f-3344672171da';
 const ACTIVE_ID='053cea08-09bc-40ec-8f7a-156f0677aff3';
-let loadedKm=null, reportText='', preReportText='', afterReportText='';
+let loadedKm=null, reportText='', preReportText='', afterReportText='', interpretedReportKm=null;
 let externalVehicleData={kmHistory:[]};
 const inspectionFiles={summary:null,computer:null};
 const inspectionOcrMeta={summary:null,computer:null};
 // Google Cloud Vision key. Keep the surrounding quotes and replace only the text below.
-const GOOGLE_VISION_API_KEY='PASTE_GOOGLE_VISION_API_KEY_HERE';
+const GOOGLE_VISION_API_KEY='AIzaSyDWVjQ9a3Q9iqEWWzuQmqFgUKJGKRlewT0';
 function googleVisionReady(){
   return /^AIza[\w-]{20,}$/.test(String(GOOGLE_VISION_API_KEY||'').trim());
+}
+function ocrEngineLabel(engine){
+  return ({
+    'google-vision':'Google Vision',
+    'tesseract':'Tesseract (גיבוי מקומי)',
+    'pdf-text':'טקסט מקורי מתוך PDF'
+  })[engine]||'לא זוהה';
+}
+function ocrSuccessHtml(engine,findings){
+  const count=Number(findings)||0;
+  return `<span class="ocrStatusTitle">✓ הדוח נקרא בהצלחה</span><span class="ocrStatusDetails"><span class="ocrEngineBadge">מנוע פענוח: ${escapeHtml(ocrEngineLabel(engine))}</span><span class="ocrFindingCount">זוהו ${count} ממצאים לפענוח מקצועי</span></span>`;
+}
+function refreshInspectionHeader(reportKm=0){
+  const value=document.getElementById('inspectionKmValue');
+  const source=document.getElementById('inspectionKmSource');
+  if(!value||!source) return;
+  const fromReport=Number(reportKm)>0;
+  const known=Number(reportKm||loadedKm||externalVehicleData.kmHistory?.[0]?.km||0);
+  value.textContent=known?fmtNum(known)+' ק״מ':'טרם זוהה';
+  source.textContent=fromReport?'נקרא מסיכום הבוחן':known?'ממאגר הרישוי':'יתעדכן מנתוני הרכב או מסיכום הבוחן';
 }
 function googleVisionImageContent(source){
   const comma=String(source||'').indexOf(',');
@@ -555,6 +582,7 @@ function setExternalVehicleData(data={}){
   kh.innerHTML=externalVehicleData.kmHistory.length
     ? (()=>{const x=externalVehicleData.kmHistory[0];return '<div class="owner"><span>קילומטראז׳ מדווח'+(x.date?' · '+fmtDate(x.date):'')+'</span><span class="badge">'+fmtNum(x.km)+' ק״מ'+(x.source?' · '+escapeHtml(x.source):'')+'</span></div>'})()
     : 'אין נתון זמין במאגר';
+  refreshInspectionHeader();
 }
 function plate(){return document.getElementById('plate').value.replace(/\D/g,'')}
 function apiUrl(resource,p){return'https://data.gov.il/api/3/action/datastore_search?resource_id='+resource+'&filters='+encodeURIComponent(JSON.stringify({mispar_rechev:Number(p)}))+'&limit=20'}
@@ -1016,10 +1044,13 @@ async function scanPlatePhoto(input){
   let worker=null;
   try{
     const source=await imageForPlateOcr(file);
-    let detectedText='';
+    let detectedText='',selectedEngine='';
     if(googleVisionReady()){
       status.textContent='מזהה את מספר הרכב באמצעות Google Vision...';
-      try{detectedText=await googleVisionRecognize([source],null,'TEXT_DETECTION');}catch(error){console.warn('Google Vision plate OCR fallback:',error);}
+      try{
+        detectedText=await googleVisionRecognize([source],null,'TEXT_DETECTION');
+        if(detectedText) selectedEngine='google-vision';
+      }catch(error){console.warn('Google Vision plate OCR fallback:',error);}
     }
     if(!detectedText){
       if(!window.Tesseract) throw new Error('OCR_UNAVAILABLE');
@@ -1031,6 +1062,7 @@ async function scanPlatePhoto(input){
       await worker.setParameters({tessedit_char_whitelist:'0123456789- ',preserve_interword_spaces:'0',tessedit_pageseg_mode:'7'});
       const result=await worker.recognize(source);
       detectedText=result?.data?.text||'';
+      if(detectedText) selectedEngine='tesseract';
     }
     const candidates=(detectedText.match(/[0-9][0-9\s\-–—]{5,16}[0-9]/g)||[])
       .map(value=>value.replace(/\D/g,''))
@@ -1038,7 +1070,7 @@ async function scanPlatePhoto(input){
     const recognized=candidates[0]||'';
     if(!recognized) throw new Error('PLATE_NOT_FOUND');
     document.getElementById('plate').value=recognized;
-    status.textContent='✓ זוהה מספר רכב '+recognized+'. טוען נתונים...';
+    status.textContent=`✓ זוהה מספר רכב ${recognized} באמצעות ${ocrEngineLabel(selectedEngine)}. טוען נתונים...`;
     await loadVehicle();
   }catch(error){
     console.warn('BuyTest plate scan detail '+JSON.stringify({name:error?.name||'',message:error?.message||'',type:error?.type||'',file:error?.filename||'',line:error?.lineno||'',nested:error?.error?.message||'',url:error?.target?.responseURL||'',status:error?.target?.status||0}));
@@ -1267,6 +1299,7 @@ function clearInspectionFile(kind){
   if(textArea) textArea.value='';
   if(state){state.textContent='';state.classList.remove('show');}
   if(review) review.style.display='none';
+  if(isSummary) refreshInspectionHeader();
 }
 
 async function handleInspectionFile(input,kind){
@@ -1304,18 +1337,22 @@ async function handleInspectionFile(input,kind){
       ? await pdfForDocumentOcr(file,qualityFunction)
       : {text:'',sources:await imageForDocumentOcr(file)};
     let recognized=diagnosticTableText(prepared.text);
+    let selectedEngine=recognized?'pdf-text':'';
+    let visionAttempted=false,tesseractAttempted=false;
     let quality=recognized?qualityFunction(recognized):{ok:false,score:0,findings:0,categories:0,unknown:0};
     if(!quality.ok&&prepared.sources?.length&&googleVisionReady()){
+      visionAttempted=true;
       try{
         const visionText=diagnosticTableText(await googleVisionRecognize(prepared.sources,state));
         const visionQuality=qualityFunction(visionText);
-        if(visionQuality.score>quality.score){recognized=visionText;quality=visionQuality;}
+        if(visionQuality.score>quality.score){recognized=visionText;quality=visionQuality;selectedEngine='google-vision';}
       }catch(error){
         console.warn('Google Vision document OCR fallback:',error);
       }
     }
     if(!quality.ok){
       if(!window.Tesseract) throw new Error('OCR_UNAVAILABLE');
+      tesseractAttempted=true;
       let currentPass='6';
       worker=await Tesseract.createWorker('heb+eng',1,{
         logger:m=>{
@@ -1323,13 +1360,14 @@ async function handleInspectionFile(input,kind){
         }
       });
       const best=await recognizeDocumentSources(worker,prepared.sources,state,value=>{currentPass=value;},qualityFunction);
-      if(best.quality.score>quality.score){recognized=diagnosticTableText(best.text);quality=best.quality;}
+      if(best.quality.score>quality.score){recognized=diagnosticTableText(best.text);quality=best.quality;selectedEngine='tesseract';}
     }
     if(!recognized) throw new Error('TEXT_NOT_FOUND');
     if(!quality?.ok) throw new Error('OCR_LOW_QUALITY');
     textArea.value=recognized;
-    inspectionOcrMeta[kind]=quality;
-    state.textContent=`✓ הדוח נקרא. זוהו ${quality.findings} ממצאים לפענוח מקצועי.`;
+    inspectionOcrMeta[kind]={...quality,engine:selectedEngine,visionAttempted,tesseractAttempted};
+    state.innerHTML=ocrSuccessHtml(selectedEngine,quality.findings);
+    if(isSummary) refreshInspectionHeader(reportKmForEngineWarranty(recognized));
     if(review) review.style.display='block';
   }catch(error){
     console.warn('BuyTest document OCR unavailable:',error);
@@ -3311,7 +3349,20 @@ function analyseInspectionReport(){
   const summaryResult=interpretSummaryText(summaryText);
   const computerResult=computerText?interpretComputerText(computerText):{findings:[],unknown:[]};
   const totalFindings=summaryResult.findings.length+computerResult.findings.length;
-  let html='<h3>מסקנות מקצועיות מסיכום הבדיקה</h3>';
+  interpretedReportKm=summaryResult.reportKm||null;
+  const displayedKm=summaryResult.reportKm||Number(loadedKm||externalVehicleData.kmHistory?.[0]?.km||0);
+  const kmSource=summaryResult.reportKm?'נקרא מסיכום הבוחן':'ממאגר הרישוי';
+  const engineItems=[
+    inspectionOcrMeta.summary?.engine?`סיכום הבוחן: ${ocrEngineLabel(inspectionOcrMeta.summary.engine)}`:'',
+    inspectionOcrMeta.computer?.engine?`בדיקה ממוחשבת: ${ocrEngineLabel(inspectionOcrMeta.computer.engine)}`:''
+  ].filter(Boolean);
+  let html='<div class="inspectionIdentity">';
+  html+='<div class="inspectionIdentityTitle">פרטי הבדיקה</div><div class="inspectionIdentityGrid">';
+  html+=`<div class="inspectionIdentityItem"><span class="inspectionIdentityLabel">שם מזמין/ת הבדיקה</span><strong class="inspectionIdentityValue">${escapeHtml(ownerName)}</strong></div>`;
+  html+=`<div class="inspectionIdentityItem"><span class="inspectionIdentityLabel">קילומטראז׳ ${displayedKm?'('+kmSource+')':''}</span><strong class="inspectionIdentityValue">${displayedKm?fmtNum(displayedKm)+' ק״מ':'לא זמין'}</strong></div>`;
+  html+='</div>';
+  if(engineItems.length) html+=`<div class="ocrStatusDetails" style="margin-top:12px"><span class="ocrEngineBadge">מנוע הפענוח: ${escapeHtml(engineItems.join(' · '))}</span></div>`;
+  html+='</div><h3>מסקנות מקצועיות מסיכום הבדיקה</h3>';
   html+='<p>הפלט אינו העתק של דוח המכון ואינו כולל את הקובץ, הלוגו או שם המכון.</p>';
   if(summaryResult.reportKm){
     html+=`<div class="info"><b>קילומטראז׳ שנקרא מהדוח:</b> ${fmtNum(summaryResult.reportKm)} ק״מ. הנתון משמש כהקשר לממצאים, ובמיוחד לבלאי במנוע; הוא אינו אבחנה בפני עצמו.</div>`;
@@ -3337,7 +3388,7 @@ function analyseInspectionReport(){
 
   const pre=collectPreInspection();
   preReportText=pre.text;
-  afterReportText='אחרי הבדיקה במכון\n'+analysisTextBlock('מסקנות מסיכום הבוחן',summaryResult)+(computerText?'\n'+analysisTextBlock('מסקנות מהבדיקה הממוחשבת',computerResult):'')+'\nהבהרה: המערכת מדרגת את משקל הממצאים; ההחלטה הסופית והמחיר נשארים בידי המשתמש.';
+  afterReportText='אחרי הבדיקה במכון\n'+`שם מזמין/ת הבדיקה: ${ownerName}\n`+`קילומטראז׳: ${displayedKm?fmtNum(displayedKm)+' ק״מ':'לא זמין'}${displayedKm?' ('+kmSource+')':''}\n`+`מנוע הפענוח: ${engineItems.join(' · ')||'לא זוהה'}\n`+analysisTextBlock('מסקנות מסיכום הבוחן',summaryResult)+(computerText?'\n'+analysisTextBlock('מסקנות מהבדיקה הממוחשבת',computerResult):'')+'\nהבהרה: המערכת מדרגת את משקל הממצאים; ההחלטה הסופית והמחיר נשארים בידי המשתמש.';
   reportText=[preReportText,afterReportText].filter(Boolean).join('\n\n');
   prepareReportPdf('finalPdfBtn');
   showFeedback();
@@ -3521,11 +3572,12 @@ async function btBuildPdfBlob(){
 
   const details=[
     `מספר רכב: ${document.getElementById('vPlate')?.textContent||plate()||'לא צוין'}`,
+    `שם מזמין/ת הבדיקה: ${document.getElementById('inspectionOwnerName')?.value.trim()||'לא צוין'}`,
     `יצרן: ${document.getElementById('vMaker')?.textContent||'לא צוין'}`,
     `דגם: ${document.getElementById('vModel')?.textContent||'לא צוין'}`,
     `שנה: ${document.getElementById('vYear')?.textContent||'לא צוין'}`,
     `צבע: ${document.getElementById('vColor')?.textContent||'לא צוין'}`,
-    `קילומטראז׳: ${loadedKm!=null?fmtNum(loadedKm)+' ק"מ':'לא צוין'}`
+    `קילומטראז׳: ${interpretedReportKm!=null?fmtNum(interpretedReportKm)+' ק"מ (נקרא מסיכום הבוחן)':loadedKm!=null?fmtNum(loadedKm)+' ק"מ (ממאגר הרישוי)':'לא צוין'}`
   ];
   details.forEach(x=>textBlock(x,30,false,5));
   y+=15; rule();
