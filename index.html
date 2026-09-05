@@ -1189,7 +1189,7 @@ function detectDocumentBounds(image){
   return result;
 }
 
-function renderDocumentOcrTile(image,tile){
+function renderDocumentOcrTile(image,tile,mode='grayscale'){
   const targetWidth=tile.width<1100?1900:Math.min(2400,Math.max(1700,tile.width));
   const scale=Math.min(4,targetWidth/Math.max(1,tile.width),3200/Math.max(1,tile.height));
   const canvas=document.createElement('canvas');
@@ -1200,8 +1200,20 @@ function renderDocumentOcrTile(image,tile){
   ctx.imageSmoothingQuality='high';
   ctx.fillStyle='#fff';
   ctx.fillRect(0,0,canvas.width,canvas.height);
-  ctx.filter='grayscale(1) contrast(1.18) brightness(1.03)';
+  ctx.filter=mode==='color'?'contrast(1.08) saturate(1.08) brightness(1.02)':mode==='threshold'?'none':'grayscale(1) contrast(1.18) brightness(1.03)';
   ctx.drawImage(image,tile.x,tile.y,tile.width,tile.height,0,0,canvas.width,canvas.height);
+  if(mode==='threshold'){
+    try{
+      const imageData=ctx.getImageData(0,0,canvas.width,canvas.height);
+      const pixels=imageData.data;
+      for(let index=0;index<pixels.length;index+=4){
+        const gray=(pixels[index]*0.299)+(pixels[index+1]*0.587)+(pixels[index+2]*0.114);
+        const value=gray<160?0:255;
+        pixels[index]=value;pixels[index+1]=value;pixels[index+2]=value;pixels[index+3]=255;
+      }
+      ctx.putImageData(imageData,0,0);
+    }catch(error){console.warn('BuyTest threshold OCR variant unavailable:',error);}
+  }
   // JPEG keeps the inline JSON safely below Google Vision's request-size limit.
   let quality=0.92;
   let source=canvas.toDataURL('image/jpeg',quality);
@@ -1214,8 +1226,14 @@ async function imageForDocumentOcr(file){
   // Do not auto-crop report photos: the previous brightness heuristic could
   // remove rows at the top or bottom of coloured inspection forms.
   const bounds={x:0,y:0,width:image.naturalWidth,height:image.naturalHeight};
-  return documentOcrTilePlan(bounds.width,bounds.height)
-    .map(tile=>renderDocumentOcrTile(image,{x:bounds.x+tile.x,y:bounds.y+tile.y,width:tile.width,height:tile.height}));
+  const tiles=documentOcrTilePlan(bounds.width,bounds.height);
+  const screenLikeLandscape=bounds.width/bounds.height>=1.15;
+  return tiles.flatMap(tile=>{
+    const positioned={x:bounds.x+tile.x,y:bounds.y+tile.y,width:tile.width,height:tile.height};
+    return screenLikeLandscape
+      ? [renderDocumentOcrTile(image,positioned,'color'),renderDocumentOcrTile(image,positioned,'grayscale'),renderDocumentOcrTile(image,positioned,'threshold')]
+      : [renderDocumentOcrTile(image,positioned,'grayscale')];
+  });
 }
 
 function pdfPageText(textContent){
@@ -3484,6 +3502,7 @@ const dtcKnowledgeBase=[
   {match:/^P04(?:00|01|02|03|04|05|06|07|08|09)$/,system:'מנוע / זיהום אוויר',title:'חריגה במערכת מחזור גזי הפליטה EGR',severity:'medium',direction:'מחשב המנוע זיהה זרימה, מיקום או מעגל חשמלי חריג במערכת EGR.',checks:['פקודה מול מיקום בפועל','מעברים וסתימות פיח','שסתום ומפעיל','חיישן מיקום או לחץ','חיווט ומחברים','השפעה על זרימת האוויר']},
   {match:/^P04(?:20|30)$/,system:'זיהום אוויר',title:'יעילות ממיר קטליטי נמוכה',severity:'medium',direction:'השוואת החיישנים לפני ואחרי הממיר מצביעה על יעילות נמוכה מהסף. הקוד אינו מוכיח לבדו שהממיר פגום.',checks:['החטאות הצתה ותערובת לפני בדיקת הממיר','דליפות פליטה','פעולת חיישני חמצן','טמפרטורת הממיר','צריכת שמן או נוזל קירור','תוצאות בדיקת גזים']},
   {match:/^P04[4-5][0-9]$/,system:'זיהום אוויר / אדי דלק',title:'חריגה במערכת אדי הדלק EVAP',severity:'low',direction:'מערכת בקרת אדי הדלק זיהתה דליפה, זרימה או תקלה חשמלית.',checks:['פקק ומערכת מילוי דלק','בדיקת עשן','שסתומי טיהור ואוורור','צנרת ומכל פחם','חיישן לחץ מיכל','חיווט ומחברים']},
+  {match:/^P2196$/,system:'מנוע / תערובת וזיהום אוויר',title:'אות חיישן חמצן תקוע על תערובת עשירה — בנק 1 חיישן 1',severity:'medium',direction:'מחשב המנוע זיהה שאות חיישן החמצן או הלמבדה הקדמי בבנק 1 נשאר בצד העשיר. הקוד אינו מוכיח לבדו שהחיישן פגום; ייתכן שהמנוע אכן עובד בתערובת עשירה או שקיימת תקלה בחיישן, במעגל או בתנאי המדידה.',checks:['מצב הקוד ונתוני Freeze Frame','STFT ו־LTFT בסרק ובעומס','תגובת חיישן החמצן או הלמבדה הקדמי','לחץ דלק ודליפת מזרקים','שסתום טיהור אדי דלק EVAP','חיווט, מחבר והזנת החיישן','מחיקה רק לאחר תיעוד ובדיקה אם הקוד חוזר']},
   {match:/^P200[23]$/,system:'זיהום אוויר / מסנן חלקיקים',title:'יעילות מסנן החלקיקים נמוכה',severity:'high',direction:'מערכת הפליטה אינה משיגה את יעילות הסינון הצפויה במסנן החלקיקים.',checks:['עומס פיח ואפר','לחץ דיפרנציאלי בסרק ובעומס','טמפרטורות פליטה','היסטוריית רגנרציה','דליפות פליטה','תקינות חיישנים לפני קביעה לגבי המסנן']},
   {match:/^P245[23]$/,system:'זיהום אוויר / מסנן חלקיקים',title:'חריגה בחיישן לחץ מסנן החלקיקים',severity:'high',direction:'האות ממעגל הלחץ הדיפרנציאלי של מסנן החלקיקים אינו תקין או אינו סביר.',checks:['צינורות החיישן לסתימה או נזק','לחץ דיפרנציאלי כשהמנוע כבוי ופועל','חיישן ומחבר','חיווט','עומס פיח אמיתי','דליפות במערכת הפליטה']},
   {match:/^P2463$/,system:'זיהום אוויר / מסנן חלקיקים',title:'הצטברות פיח גבוהה במסנן החלקיקים',severity:'high',direction:'מחשב המנוע מעריך שעומס הפיח במסנן גבוה ודורש בירור לפני ביצוע רגנרציה או החלפה.',checks:['עומס פיח ואפר מחושב','לחץ דיפרנציאלי','טמפרטורות פליטה','סיבות שמנעו רגנרציה','מצב שמן מנוע','האם תנאי היצרן מאפשרים רגנרציה בטוחה']},
@@ -3510,14 +3529,24 @@ const dtcKnowledgeBase=[
   {match:/^U0293$/,system:'תקשורת / מערכת היברידית',title:'אובדן תקשורת עם בקר ההנעה ההיברידית',severity:'high',direction:'נרשם אובדן תקשורת עם אחד מבקרי מערכת ההנעה ההיברידית.',checks:['מצבר 12 וולט וטעינה','הזנות והארקות','רשת CAN','מחברי בקר ההנעה','קודי מתח גבוה נלווים','בדיקה לפי הוראות היצרן']}
 ];
 
-function extractDtcCodes(text){
+function extractDtcCodeDetails(text){
   const found=[];
   const source=String(text||'').toUpperCase();
-  for(const match of source.matchAll(/\b([PCBU])[\s\-:.]*([0-9A-FOIL])[\s\-:.]*([0-9A-FOIL])[\s\-:.]*([0-9A-FOIL])[\s\-:.]*([0-9A-FOIL])\b/g)){
+  for(const match of source.matchAll(/\b([PCBU])[\s\-:.]*([0-9A-FOIL])[\s\-:.]*([0-9A-FOIL])[\s\-:.]*([0-9A-FOIL])[\s\-:.]*([0-9A-FOIL])(?:[\s\-:.]*([0-9A-FOIL])[\s\-:.]*([0-9A-FOIL]))?\b/g)){
     const code=match.slice(1,6).join('').replace(/[O]/g,'0').replace(/[IL]/g,'1');
-    if(!found.includes(code)) found.push(code);
+    const extension=match[6]&&match[7]?(match[6]+match[7]).replace(/[O]/g,'0').replace(/[IL]/g,'1'):'';
+    const displayCode=extension?`${code}-${extension}`:code;
+    const existing=found.find(item=>item.code===code);
+    if(!existing) found.push({code,displayCode,raw:match[0]});
+    else if(extension&&!existing.displayCode.includes('-')) Object.assign(existing,{displayCode,raw:match[0]});
   }
   return found;
+}
+
+function extractDtcCodes(text){return extractDtcCodeDetails(text).map(item=>item.code)}
+
+function dtcDisplayCode(text,code){
+  return extractDtcCodeDetails(text).find(item=>item.code===code)?.displayCode||code;
 }
 
 function dtcContextForCode(text,code){
@@ -3582,12 +3611,14 @@ function dtcKnowledgeFor(code){
 
 function dtcFinding(code,text){
   const knowledge=dtcKnowledgeFor(code);
+  const displayCode=dtcDisplayCode(text,code);
   const statusKey=detectDtcStatus(dtcContextForCode(text,code));
   const status=dtcStatusDefinitions[statusKey];
   const highImpact=['safety','high'].includes(knowledge.severity)&&statusKey!=='historical';
   return {
     id:'dtc-'+code,
     code,
+    displayCode,
     dtcStatusKey:statusKey,
     dtcSeverity:knowledge.severity,
     category:knowledge.system,
@@ -3595,7 +3626,7 @@ function dtcFinding(code,text){
     tone:highImpact?'safety':'clarify',
     classification:'computer_diagnostic_code',
     reportSeverity:knowledge.severity,
-    meaning:`קוד ${code} — ${knowledge.title}. כיוון כללי: ${knowledge.direction}`,
+    meaning:`קוד ${displayCode} — ${knowledge.title}. כיוון כללי: ${knowledge.direction}`,
     decision:knowledge.checks.join(', ')+'. אין להחליף רכיב על סמך הקוד בלבד.',
     contextNote:status.explanation,
     sourceText:code
@@ -3643,7 +3674,7 @@ function usefulVehicleValue(value){
 function extractComputerVehicleIdentity(text){
   const raw=cleanOcrText(text);
   const lines=raw.split('\n').map(line=>line.trim()).filter(Boolean);
-  let vin='',plate='',maker='',model='';
+  let vin='',plate='',maker='',model='',year='';
 
   for(const line of lines){
     if(!vin){
@@ -3679,11 +3710,21 @@ function extractComputerVehicleIdentity(text){
     }
   }
 
+  if(!maker||!model||!year){
+    const vehicleLine=lines.find(line=>/\b(?:19|20)\d{2}\b/.test(line)&&/^[A-Za-z][A-Za-z .()\-]+\s+(?:19|20)\d{2}\s*$/.test(line)&&!/(system|function|report|diagnostic|version|automatically)/i.test(line));
+    const match=vehicleLine?.match(/^([A-Za-z][A-Za-z.\-]{1,20})\s+(.+?)\s+((?:19|20)\d{2})\s*$/);
+    if(match){
+      if(!maker) maker=usefulVehicleValue(match[1]);
+      if(!model) model=usefulVehicleValue(match[2]);
+      if(!year) year=match[3];
+    }
+  }
+
   if(!vin){
     const candidates=raw.toUpperCase().match(/\b[A-HJ-NPR-Z0-9]{17}\b/g)||[];
     vin=candidates.map(validVin).find(Boolean)||'';
   }
-  return {vin,plate,maker,model};
+  return {vin,plate,maker,model,year};
 }
 
 function currentVehicleIdentity(){
@@ -3692,7 +3733,8 @@ function currentVehicleIdentity(){
     plate:/^\d{7,8}$/.test(displayedPlate)?displayedPlate:'',
     vin:validVin(document.getElementById('vVin')?.textContent||''),
     maker:usefulVehicleValue(document.getElementById('vMaker')?.textContent||''),
-    model:usefulVehicleValue(document.getElementById('vModel')?.textContent||'')
+    model:usefulVehicleValue(document.getElementById('vModel')?.textContent||''),
+    year:String(document.getElementById('vYear')?.textContent||'').match(/\b(?:19|20)\d{2}\b/)?.[0]||''
   };
 }
 
@@ -3707,6 +3749,7 @@ function assessComputerVehicleIdentity(extracted){
   if(extracted.plate) evidence.push(`מספר רכב שנקרא מהדוח: ${extracted.plate}`);
   if(extracted.maker) evidence.push(`יצרן שנקרא מהדוח: ${extracted.maker}`);
   if(extracted.model) evidence.push(`דגם שנקרא מהדוח: ${extracted.model}`);
+  if(extracted.year) evidence.push(`שנת ייצור שנקראה מהדוח: ${extracted.year}`);
 
   const vinComparable=Boolean(extracted.vin&&expected.vin);
   const plateComparable=Boolean(extracted.plate&&expected.plate);
@@ -3749,10 +3792,42 @@ function computerIdentityText(identity){
   return ['אימות שיוך הבדיקה לרכב',identity.title,identity.message,...(identity.evidence||[])].filter(Boolean).join('\n');
 }
 
+const computerDescriptionKnowledgeBase=[
+  {id:'computer-text-o2-rich',pattern:/\b(?:o2|02|oxygen)\s*sensor\s*signal\s*stuck\s*rich\b/i,system:'מנוע / תערובת וזיהום אוויר',title:'אות חיישן חמצן תקוע על תערובת עשירה',severity:'medium',direction:'המלל מצביע על אות חיישן חמצן או למבדה שנשאר בצד העשיר. ייתכן שמדובר בתערובת עשירה בפועל, בחיישן או במעגל שלו.',checks:['מצב התקלה ו־Freeze Frame','תיקוני דלק','תגובת החיישן','לחץ דלק ומזרקים','שסתום EVAP','חיווט ומחבר']},
+  {id:'computer-text-o2-lean',pattern:/\b(?:o2|02|oxygen)\s*sensor\s*signal\s*stuck\s*lean\b/i,system:'מנוע / תערובת וזיהום אוויר',title:'אות חיישן חמצן תקוע על תערובת ענייה',severity:'medium',direction:'המלל מצביע על אות חיישן חמצן או למבדה שנשאר בצד העני. ייתכן שמדובר בתערובת ענייה בפועל, בדליפת אוויר, בחיישן או במעגל שלו.',checks:['מצב התקלה ו־Freeze Frame','תיקוני דלק','דליפות יניקה','לחץ דלק','תגובת החיישן','חיווט ומחבר']},
+  {id:'computer-text-misfire',pattern:/\b(?:random|multiple|cylinder\s*\d+)?\s*misfire\s*(?:detected)?\b/i,system:'מנוע / הצתה ובעירה',title:'זוהתה החטאת הצתה',severity:'high',direction:'המלל מצביע על בעירה לא תקינה בצילינדר אחד או יותר, אך אינו קובע אם המקור הוא הצתה, דלק או מצב מכני.',checks:['מוני החטאה','מצתים וסלילים','הזרקה ולחץ דלק','דליפות אוויר','דחיסה ותזמון']},
+  {id:'computer-text-catalyst',pattern:/\bcatalyst\s+(?:system\s+)?efficiency\s+below\s+threshold\b/i,system:'זיהום אוויר',title:'יעילות הממיר הקטליטי מתחת לסף',severity:'medium',direction:'המלל מצביע על יעילות נמוכה לפי השוואת חיישני הפליטה. אין להסיק ממנו לבדו שהממיר פגום.',checks:['החטאות ותערובת','דליפות פליטה','חיישני חמצן','טמפרטורת הממיר','בדיקת גזים']},
+  {id:'computer-text-mixture',pattern:/\bsystem\s+too\s+(?:lean|rich)\b/i,system:'מנוע / תערובת דלק',title:'תערובת דלק ענייה או עשירה',severity:'medium',direction:'המלל מצביע על תיקוני דלק שהגיעו לגבול. חיישן החמצן הוא רק אחד הגורמים האפשריים.',checks:['STFT ו־LTFT','דליפות יניקה או פליטה','לחץ דלק ומזרקים','מד זרימת אוויר','חיישני חמצן']},
+  {id:'computer-text-communication',pattern:/\b(?:lost|no)\s+communication\s+with\b/i,system:'תקשורת בין מחשבים',title:'אובדן תקשורת עם מחשב ברכב',severity:'high',direction:'המלל מצביע על תקשורת חסרה עם יחידת בקרה, אך ייתכן שהמקור הוא מתח, הזנה, הארקה, חיווט או רשת התקשורת.',checks:['מצבר וטעינה','הזנות והארקות','רשת CAN','מחברים וחיווט','סריקה מלאה של כל המחשבים']},
+  {id:'computer-text-gear-ratio',pattern:/\b(?:incorrect|implausible)\s+(?:gear\s+)?ratio\b/i,system:'תיבת הילוכים',title:'יחס העברה לא תקין',severity:'high',direction:'המלל מצביע על פער בין יחס ההעברה המבוקש ליחס שנמדד. ייתכן קשר להחלקה, לחץ, פיקוד או חיישן.',checks:['מהירויות כניסה ויציאה','החלקה בנסיעה','לחץ ושמן גיר','סולנואידים וגוף שסתומים','חיישנים וחיווט']}
+];
+
+function computerDescriptionFindings(text){
+  const findings=[],seen=new Set();
+  reportLines(text).forEach(line=>{
+    if(extractDtcCodes(line).length||/\bnormal\b/i.test(line)) return;
+    const rule=computerDescriptionKnowledgeBase.find(item=>item.pattern.test(line));
+    if(!rule||seen.has(rule.id)) return;
+    seen.add(rule.id);
+    const statusKey=detectDtcStatus(line);
+    const status=dtcStatusDefinitions[statusKey]||dtcStatusDefinitions.unknown;
+    findings.push({
+      id:rule.id,computerDescription:true,dtcStatusKey:statusKey,dtcSeverity:rule.severity,
+      category:rule.system,tag:`${status.label} · ${dtcSeverityLabels[rule.severity]}`,
+      tone:['safety','high'].includes(rule.severity)&&statusKey!=='historical'?'safety':'clarify',
+      classification:'computer_diagnostic_description',reportSeverity:rule.severity,
+      meaning:`${rule.title}. כיוון כללי: ${rule.direction}`,
+      decision:rule.checks.join(', ')+'. אין להחליף רכיב על סמך המלל בלבד.',
+      contextNote:status.explanation,sourceText:line
+    });
+  });
+  return findings;
+}
+
 function interpretComputerText(text){
   const unknown=[];
   const codes=extractDtcCodes(text);
-  const findings=[...dtcClusterFindings(codes),...codes.map(code=>dtcFinding(code,text))];
+  const findings=[...dtcClusterFindings(codes),...codes.map(code=>dtcFinding(code,text)),...computerDescriptionFindings(text)];
   let genericAbnormalAdded=false;
   reportLines(text).forEach(line=>{
     if(isMetadataLine(line)||extractDtcCodes(line).length) return;
@@ -3793,12 +3868,12 @@ function computerFindingsHtml(result){
 function meaningCardHtml(item){
   item=finalizeReportFinding(item);
   if(!item) return '';
-  const contextLabel=item.code?'מצב הקוד:':'בהתאם לרכב:';
+  const contextLabel=item.code||item.computerDescription?'מצב הקוד:':'בהתאם לרכב:';
   const context=item.contextNote?`<div class="contextNote"><b>${contextLabel}</b> ${escapeHtml(item.contextNote)}</div>`:'';
   const source=item.sourceText?`<div class="matchSource">הנוסח שזוהה: ${escapeHtml(item.sourceText)}</div>`:'';
   const decision=item.decision||professionalDecision(item);
-  const heading=item.code?`<span class="dtcCode">${escapeHtml(item.code)}</span> · ${escapeHtml(item.category)}`:escapeHtml(item.category);
-  const decisionLabel=item.code?'מה צריך לבדוק:':'המסקנה:';
+  const heading=item.code?`<span class="dtcCode">${escapeHtml(item.displayCode||item.code)}</span> · ${escapeHtml(item.category)}`:escapeHtml(item.category);
+  const decisionLabel=item.code||item.computerDescription?'מה צריך לבדוק:':'המסקנה:';
   return `<div class="meaningCard ${item.tone||''}"><span class="meaningTag">${escapeHtml(item.tag||formulaClassificationLabels[item.classification]||'סיווג מקצועי')}</span><h4>${heading}</h4><p><b>מה זה אומר:</b> ${escapeHtml(item.meaning)}</p><p><b>${decisionLabel}</b> ${escapeHtml(decision)}</p>${context}${source}</div>`;
 }
 
