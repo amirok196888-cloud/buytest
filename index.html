@@ -536,12 +536,14 @@ function ocrEngineLabel(engine){
     'pdf-text':'טקסט מקורי מתוך PDF'
   })[engine]||'לא זוהה';
 }
-function ocrSuccessHtml(engine,findings,verification=null){
+function ocrSuccessHtml(engine,findings,verification=null,options={}){
   const count=Number(findings)||0;
   const verified=verification?.completed
     ? `<span class="ocrFindingCount">אימות צולב הושלם${verification.added?` · נוספו ${verification.added} שורות ליקוי שנמצאו בבדיקה המקומית`:''}</span>`
     : '';
-  return `<span class="ocrStatusTitle">✓ הדוח נקרא בהצלחה</span><span class="ocrStatusDetails"><span class="ocrEngineBadge">מנוע פענוח: ${escapeHtml(ocrEngineLabel(engine))}</span>${verified}<span class="ocrFindingCount">זוהו ${count} ממצאים לפענוח מקצועי</span></span>`;
+  const title=options.limited?'✓ הדוח נקרא, אך נדרש אימות של חלק מהטקסט':'✓ הדוח נקרא בהצלחה';
+  const resultText=count?`זוהו ${count} ממצאים לפענוח מקצועי`:options.isComputer?'לא זוהה קוד תקלה ברור; פרטי הרכב והטקסט הקריא נשמרו':'לא זוהה ממצא ברור';
+  return `<span class="ocrStatusTitle">${title}</span><span class="ocrStatusDetails"><span class="ocrEngineBadge">מנוע פענוח: ${escapeHtml(ocrEngineLabel(engine))}</span>${verified}<span class="ocrFindingCount">${resultText}</span></span>`;
 }
 function refreshInspectionHeader(reportKm=0){
   const value=document.getElementById('inspectionKmValue');
@@ -1272,13 +1274,28 @@ function reportReadQuality(text){
   return {ok,score,findings:analysis.findings.length,categories:categoryCount,unknown:analysis.unknown.length};
 }
 
+function computerOcrTextUsable(text){
+  const cleaned=cleanOcrText(text);
+  if(!cleaned) return false;
+  const codes=extractDtcCodes(cleaned);
+  const identity=extractComputerVehicleIdentity(cleaned);
+  const hebrewWords=(cleaned.match(/[א-ת]{2,}/g)||[]).length;
+  const latinWords=(cleaned.match(/[A-Za-z]{2,}/g)||[]).length;
+  const values=(cleaned.match(/\d+(?:[.,]\d+)?/g)||[]).length;
+  const diagnosticSignal=/(?:\bDTC\b|fault|trouble\s*code|diagnostic|current|active|pending|permanent|history|historical|stored|ECU|PCM|TCM|ABS|SRS|engine|transmission|תקלה|תקלות|קוד|קודים|פעיל|היסטורי|ממתין|מנוע|תיבת\s*הילוכים)/i.test(cleaned);
+  const noFaultSignal=/(?:no\s+(?:fault|trouble|dtc)(?:\s+codes?)?|אין\s+(?:קודי?\s*)?תקלות?|לא\s+נמצאו\s+(?:קודי?\s*)?תקלות?)/i.test(cleaned);
+  return codes.length>0||Boolean(identity.vin||identity.plate)||noFaultSignal||(cleaned.length>=25&&diagnosticSignal&&(hebrewWords>=3||latinWords>=3)&&values>=1);
+}
+
 function computerReadQuality(text){
   const cleaned=cleanOcrText(text);
   const analysis=interpretComputerText(cleaned);
   const hebrewWords=(cleaned.match(/[א-ת]{2,}/g)||[]).length;
+  const latinWords=(cleaned.match(/[A-Za-z]{2,}/g)||[]).length;
   const values=(cleaned.match(/\d+(?:[.,]\d+)?/g)||[]).length;
-  const score=(analysis.findings.length*100)+Math.min(hebrewWords,80)+Math.min(values*3,80)+Math.min(analysis.unknown.length*3,45);
-  const ok=analysis.findings.length>=1||(hebrewWords>=10&&values>=3);
+  const identity=analysis.vehicleIdentity?.extracted||{};
+  const score=(analysis.findings.length*100)+Math.min(hebrewWords,80)+Math.min(latinWords,60)+Math.min(values*3,80)+Math.min(analysis.unknown.length*3,45)+(identity.vin||identity.plate?60:0);
+  const ok=computerOcrTextUsable(cleaned);
   return {ok,score,findings:analysis.findings.length,categories:0,unknown:analysis.unknown.length};
 }
 
@@ -1445,7 +1462,7 @@ async function handleInspectionFile(input,kind){
         const visionQuality=qualityFunction(visionText);
         const visionHebrewWords=(visionText.match(/[א-ת]{2,}/g)||[]).length;
         const visionValues=(visionText.match(/\d+(?:[.,]\d+)?/g)||[]).length;
-        visionUsable=visionQuality.ok||(isSummary?visionHebrewWords>=12:(visionHebrewWords>=8&&visionValues>=2));
+        visionUsable=visionQuality.ok||(isSummary?visionHebrewWords>=12:computerOcrTextUsable(visionText));
         if(visionUsable){recognized=visionText;quality={...visionQuality,ok:true};selectedEngine='google-vision';}
       }catch(error){
         console.warn('Google Vision document OCR fallback:',error);
@@ -1488,10 +1505,11 @@ async function handleInspectionFile(input,kind){
       }
     }
     if(!recognized) throw new Error('TEXT_NOT_FOUND');
+    if(!isSummary&&!quality?.ok&&computerOcrTextUsable(recognized)) quality={...quality,ok:true,limited:true};
     if(!quality?.ok) throw new Error('OCR_LOW_QUALITY');
     textArea.value=recognized;
     inspectionOcrMeta[kind]={...quality,engine:selectedEngine,visionAttempted,tesseractAttempted,verification};
-    state.innerHTML=ocrSuccessHtml(selectedEngine,quality.findings+quality.unknown,verification);
+    state.innerHTML=ocrSuccessHtml(selectedEngine,quality.findings+quality.unknown,verification,{limited:Boolean(quality.limited),isComputer:!isSummary});
     if(isSummary) refreshInspectionHeader(reportKmForEngineWarranty(recognized));
     if(review) review.style.display='block';
   }catch(error){
@@ -3495,8 +3513,8 @@ const dtcKnowledgeBase=[
 function extractDtcCodes(text){
   const found=[];
   const source=String(text||'').toUpperCase();
-  for(const match of source.matchAll(/\b([PCBU])[\s\-:.]*([0-9A-F])[\s\-:.]*([0-9A-F])[\s\-:.]*([0-9A-F])[\s\-:.]*([0-9A-F])\b/g)){
-    const code=match.slice(1,6).join('');
+  for(const match of source.matchAll(/\b([PCBU])[\s\-:.]*([0-9A-FOIL])[\s\-:.]*([0-9A-FOIL])[\s\-:.]*([0-9A-FOIL])[\s\-:.]*([0-9A-FOIL])\b/g)){
+    const code=match.slice(1,6).join('').replace(/[O]/g,'0').replace(/[IL]/g,'1');
     if(!found.includes(code)) found.push(code);
   }
   return found;
