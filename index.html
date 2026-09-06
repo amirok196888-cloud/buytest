@@ -1138,7 +1138,7 @@ async function submitBuyTestPayment(event){
     const response=await fetch('https://hook.eu1.make.com/dmfkcvdgy97jfz8qxoev3m956fgfjq7f',{
       method:'POST',
       headers:{'Content-Type':'application/json','Accept':'text/plain, application/json'},
-      body:JSON.stringify({planKey,planName:plan.name,fullName,phone})
+      body:JSON.stringify({planKey,planName:plan.name,price:plan.price,fullName,phone})
     });
     const raw=(await response.text()).trim();
     let paymentUrl='';
@@ -4629,5 +4629,5 @@ document.addEventListener('keydown',event=>{
   </section>
 </div>
 
-<!-- payment-fetch-response-v5 -->
+<!-- payment-dynamic-plan-v6 -->
 </body></html>
