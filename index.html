@@ -1097,6 +1097,7 @@ function startPayment(planKey='bundle'){
   document.getElementById('paymentStatus').textContent='';
   document.getElementById('paymentStatus').className='paymentStatus';
   document.getElementById('paymentCustomerForm').reset();
+  document.getElementById('paymentSubmitButton').disabled=false;
   document.getElementById('paymentPlanKey').value=selectedKey;
   const overlay=document.getElementById('paymentOverlay');
   overlay.hidden=false;
@@ -4593,6 +4594,10 @@ window.addEventListener('DOMContentLoaded',()=>{
   if(purchaseBox) purchaseBox.style.display='none';
   const feedbackBox=document.getElementById('feedbackBox');
   if(feedbackBox) feedbackBox.style.display='none';
+});
+window.addEventListener('pageshow',()=>{
+  const paymentButton=document.getElementById('paymentSubmitButton');
+  if(paymentButton) paymentButton.disabled=false;
 });
 document.addEventListener('keydown',event=>{
   if(event.key!=='Escape') return;
