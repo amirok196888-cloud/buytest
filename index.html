@@ -1217,7 +1217,9 @@ async function submitBuyTestPayment(event){
   }catch(error){
     console.error('BuyTest payment handoff failed:',error);
     status.className='paymentStatus error';
-    status.textContent='לא הצלחנו לפתוח את התשלום. לא בוצע חיוב. נסה שוב בעוד רגע.';
+    status.textContent=error.message==='payment_link_failed'
+      ?'מערכת התשלום נעצרה כי הסכום בקישור לא תאם למסלול. לא בוצע חיוב.'
+      :'לא הצלחנו לפתוח את התשלום. לא בוצע חיוב. נסה שוב בעוד רגע.';
     button.disabled=false;
   }
 }
