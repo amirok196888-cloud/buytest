@@ -108,7 +108,7 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#07131aef;border-top:1p
 .paidOnly{display:none!important}
 body.plan-premium .premiumFeature,body.plan-report .reportFeature,body.plan-bundle .paidOnly,body.manager-mode.manager-all .paidOnly{display:block!important}
 .clarificationBox.show{display:none}
-body.plan-report .clarificationBox.show,body.plan-consultation .clarificationBox.show,body.plan-bundle .clarificationBox.show,body.manager-mode .clarificationBox.show{display:block}
+body.plan-report .clarificationBox.show,body.plan-consultation .clarificationBox.show,body.plan-bundle .clarificationBox.show,body.manager-mode.manager-all .clarificationBox.show{display:block}
 .managerPlanControls{margin-top:12px;padding-top:12px;border-top:1px solid #9dd9c7}.managerPlanControls b{display:block;margin-bottom:8px}.managerPlanButtons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.managerPlanButtons button{margin:0;background:#fff;color:#075e48;border:1px solid #7fcab3}.managerPlanStatus{margin-top:8px;font-size:13px;font-weight:800}
 .photoPreview{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
 .photoPreview img{width:100%;height:120px;object-fit:cover;border-radius:10px}
@@ -141,6 +141,7 @@ footer{position:static;background:#edf2f4;border-top:1px solid #d9e2e6;color:#60
 .mktWrap{max-width:1080px;margin:auto;padding:0 18px}
 .mktHero{padding:54px 0 44px;background:linear-gradient(180deg,#f7fbfa,#fff)}
 .mktHeroGrid{display:grid;grid-template-columns:1fr;gap:24px;align-items:center;max-width:860px}
+.mktBrandLogo{display:block;width:min(300px,72vw);height:auto;margin:0 0 18px auto}
 .mktEyebrow{display:inline-block;background:#e8f7f2;color:#14765f;border-radius:999px;padding:7px 12px;font-weight:800;font-size:13px}
 .mktHero h1{font-size:clamp(38px,6vw,64px);line-height:1.03;margin:16px 0 14px;color:#10242c;letter-spacing:-1px}.mktHero h1 span{color:#0fa87e}
 .mktLead{font-size:20px;line-height:1.6;color:#50666f;max-width:700px;margin:0 0 24px}.mktCtas{display:flex;gap:12px;flex-wrap:wrap}.mktBtn{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:0 22px;border-radius:14px;font-weight:900;text-decoration:none}.mktBtnPrimary{background:#0fa87e;color:#fff}.mktBtnGhost{border:1px solid #cbd8dd;color:#17323c;background:#fff}
@@ -178,14 +179,14 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
 @media(max-width:760px){.mktHero{padding:30px 0 24px}.mktHeroGrid,.mktAbout,.afterGrid,.clarificationChoices{grid-template-columns:1fr}.mktGrid3{grid-template-columns:1fr}.mktOutcome{grid-template-columns:1fr 1fr}.mktHeroCard{padding:18px}.mktLead{font-size:18px}.mktCtas{flex-direction:column}.mktBtn{width:100%}main{padding-top:12px}.card{padding:18px;margin:20px 0}.credentials strong{font-size:22px}.credentials span{font-size:15px}.scopeStrip{grid-template-columns:1fr}}
 @media(max-width:460px){.mktOutcome{grid-template-columns:1fr}.priceGrid{grid-template-columns:1fr}.licenseGrid,.grid,.formulaAdminGrid,.inspectionIdentityGrid,.inspectionHeaderGrid{grid-template-columns:1fr}.formulaAdmin .wide{grid-column:auto}.mktWrap{padding:0 14px}.replyTable,.replyTable tbody,.replyTable tr,.replyTable th,.replyTable td{display:block;width:100%}.replyTable th{padding:9px 0 5px}.inspectionIdentityValue{font-size:19px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
-</style><meta name="buytest-build" content="expert-calibration-246-v61-dtc-diagnostics">
+</style><meta name="buytest-build" content="buytest-v67-full-qa-fixes">
 </head><body>
 
 <section id="marketingLanding">
-<div class="mktWrap" style="padding-top:24px"><a class="mktAdLink" href="#vehicleLookup" aria-label="מעבר להזנת מספר הרכב"><img src="buytest-ad.png" alt="BuyTest — בדיקת רכב חכמה לפני קנייה" width="1250" height="1250"></a><div class="mktAdHint">לחץ על התמונה כדי לעבור לנתוני הרכב</div></div>
 <div class="mktHero">
 <div class="mktWrap mktHeroGrid">
 <div>
+<img class="mktBrandLogo" src="buytest-logo-compact.png" alt="BuyTest">
 <span class="mktEyebrow">BuyTest · לפני המכון ואחרי המכון</span>
 <h1>בדיקה אחת שמלווה אותך — <span>לפני ואחרי המכון</span></h1>
 <p class="mktLead">BuyTest מרכז תהליך אחד לרכב אחד: בדיקה מודרכת לפני המכון, דגשים למסירה לבוחן, ולאחר הבדיקה — הסבר פשוט לסיכום הבוחן ולבדיקה הממוחשבת, אם צורפה.</p>
@@ -343,7 +344,7 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
     <div class="field"><label for="formulaSeverity"><b>רמת משמעות</b></label><select id="formulaSeverity"><option value="high">משמעות גבוהה</option><option value="medium">משמעות בינונית</option><option value="low">משמעות נמוכה</option><option value="none">ללא משקל עצמאי</option></select></div>
     <div class="field wide"><label for="formulaText"><b>הנוסח כפי שהוא עשוי להופיע בדוח</b></label><input id="formulaText" placeholder="לדוגמה: רעש באביזרי מנוע"></div>
     <div class="field wide"><label for="formulaMeaning"><b>הסבר ללקוח</b></label><textarea id="formulaMeaning" placeholder="מה ניתן לומר בבטחה על הנוסח"></textarea></div>
-    <div class="field wide"><label for="formulaDecision"><b>מה כדאי לברר</b></label><textarea id="formulaDecision" placeholder="כתוב הכוונה לבדיקה בלבד, ללא המלצת קנייה, הערכת מחיר או ביקורת על המכון"></textarea></div>
+    <div class="field wide"><label for="formulaDecision"><b>הנחיית המשך ללקוח</b></label><textarea id="formulaDecision" placeholder="כתוב הכוונה לבדיקה בלבד, ללא המלצת קנייה, הערכת מחיר או ביקורת על המכון"></textarea></div>
     <div class="field wide"><label for="formulaQuestion"><b>מה כדאי לברר</b></label><textarea id="formulaQuestion" placeholder="איזו שאלה או בדיקת המשך נדרשת"></textarea></div>
     <div class="field wide"><label for="formulaSearch"><b>חיפוש במאגר</b></label><input id="formulaSearch" oninput="renderFormulaAdminList()" placeholder="חפש לפי מילה או נוסח"></div>
   </div>
@@ -1059,7 +1060,7 @@ function previewPlanAsManager(planKey='all'){
 }
 function startPayment(planKey='bundle'){
   const plan=buytestPlans[planKey]||buytestPlans.bundle;
-  sessionStorage.setItem('buytestPendingPlan',planKey in buytestPlans?planKey:'bundle');
+  sessionStorage.setItem('buytestPendingPlan',Object.prototype.hasOwnProperty.call(buytestPlans,planKey)?planKey:'bundle');
   const m=document.getElementById('paymentMsg');
   m.classList.add('show');
   m.textContent=`נבחר: ${plan.name} · ${plan.price} ₪. ${plan.scope}. החיבור המאובטח ל־Grow יופעל לאחר קבלת פרטי ה־API; כרגע לא נגבה תשלום והשירות אינו נפתח ללקוח.`;
@@ -3809,8 +3810,11 @@ function extractComputerVehicleIdentity(text){
   }
 
   if(!maker||!model||!year){
-    const vehicleLine=lines.find(line=>/\b(?:19|20)\d{2}\b/.test(line)&&/^[A-Za-z][A-Za-z .()\-]+\s+(?:19|20)\d{2}\s*$/.test(line)&&!/(system|function|report|diagnostic|version|automatically)/i.test(line));
-    const match=vehicleLine?.match(/^([A-Za-z][A-Za-z.\-]{1,20})\s+(.+?)\s+((?:19|20)\d{2})\s*$/);
+    let match=null;
+    for(const line of lines){
+      const candidate=line.match(/^([A-Za-z][A-Za-z.\-]{1,20})\s+([A-Za-z0-9][A-Za-z0-9 .()/_\-]{1,35}?)\s+((?:19|20)\d{2})(?:\s|$)/);
+      if(candidate&&!/(system|function|report|diagnostic|version|automatically)/i.test(candidate[1]+' '+candidate[2])){match=candidate;break;}
+    }
     if(match){
       if(!maker) maker=usefulVehicleValue(match[1]);
       if(!model) model=usefulVehicleValue(match[2]);
@@ -3837,7 +3841,7 @@ function currentVehicleIdentity(){
 }
 
 function comparableVehicleText(value){
-  return normalizeFindingText(String(value||'')).replace(/[^a-z0-9א-ת]/g,'');
+  return normalizeFindingText(String(value||'')).replace(/0/g,'o').replace(/[^a-z0-9א-ת]/g,'');
 }
 
 function assessComputerVehicleIdentity(extracted){
