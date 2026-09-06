@@ -592,6 +592,7 @@ const GOOGLE_VISION_PROXY_ENDPOINT='https://tjxjxavxrmvbofvtnsaj.supabase.co/fun
 const BUYTEST_SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqeGp4YXZ4cm12Ym9mdnRuc2FqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzMjk3NjMsImV4cCI6MjEwMzkwNTc2M30.AWPEga4E1CQQ9QqqMyw1gTJn__aqV_fCx_raQhGjMck';
 const BUYTEST_PAYMENT_ENDPOINT='https://tjxjxavxrmvbofvtnsaj.supabase.co/functions/v1/buytest-payment';
 const BUYTEST_PAYMENT_STORAGE_KEY='buytestPaymentAccessV1';
+const BUYTEST_PAYMENT_RETURN_KEY='buytestPaymentReturnPendingV1';
 function googleVisionReady(){
   return /^https:\/\/.+\/functions\/v1\/vision-ocr$/.test(GOOGLE_VISION_PROXY_ENDPOINT)
     && String(BUYTEST_SUPABASE_ANON_KEY||'').length>40;
@@ -1072,8 +1073,8 @@ function applyPlanAccess(planKey,{scroll=false}={}){
   }
   return true;
 }
-function activatePurchasedPlan(planKey){
-  if(!applyPlanAccess(planKey,{scroll:true})) return false;
+function activatePurchasedPlan(planKey,{scroll=true}={}){
+  if(!applyPlanAccess(planKey,{scroll})) return false;
   const offer=document.getElementById('fullCheckOffer');
   if(offer) offer.style.display='none';
   sessionStorage.removeItem('buytestPendingPlan');
@@ -1114,7 +1115,7 @@ async function callBuyTestPaymentService(body){
   if(!response.ok||!data.ok) throw new Error(data.error||('HTTP '+response.status));
   return data;
 }
-async function restoreBuyTestAccess({requiredPlate='',onReturn=false}={}){
+async function restoreBuyTestAccess({requiredPlate='',onReturn=false,scroll=true}={}){
   const saved=storedBuyTestPayment();
   if(!saved?.orderId||!saved?.clientSecret) return false;
   const normalizedRequired=String(requiredPlate||'').replace(/\D/g,'');
@@ -1126,7 +1127,7 @@ async function restoreBuyTestAccess({requiredPlate='',onReturn=false}={}){
       saveBuyTestPayment({...saved,plate:data.plate,plan:data.plan,expiresAt,accessToken:data.accessToken});
       const input=document.getElementById('plate');
       if(input&&!input.value) input.value=data.plate;
-      activatePurchasedPlan(data.plan);
+      activatePurchasedPlan(data.plan,{scroll});
       const expiry=expiresAt?new Date(expiresAt).toLocaleString('he-IL'):'בעוד 48 שעות';
       showBuyTestAccessNotice('✓ התשלום אושר. הגישה לרכב '+data.plate+' פתוחה עד '+expiry+'.');
       return true;
@@ -1140,6 +1141,20 @@ async function restoreBuyTestAccess({requiredPlate='',onReturn=false}={}){
     if(onReturn) showBuyTestAccessNotice('התשלום התקבל, אך האישור עדיין מתעדכן. המתן רגע ורענן את הדף.',true);
   }
   return false;
+}
+async function resumePaidVehicleFlow(plateNumber){
+  const paidPlate=String(plateNumber||'').replace(/\D/g,'');
+  if(!/^\d{7,8}$/.test(paidPlate)) return false;
+  const input=document.getElementById('plate');
+  if(!input) return false;
+  input.value=paidPlate;
+  const legalAccept=document.getElementById('entryLegalAccept');
+  if(legalAccept) legalAccept.checked=true;
+  const shownPlate=String(document.getElementById('vPlate')?.textContent||'').replace(/\D/g,'');
+  const vehicleData=document.getElementById('vehicleData');
+  if(shownPlate===paidPlate&&vehicleData?.style.display!=='none') return true;
+  await loadVehicle();
+  return true;
 }
 async function initializeBuyTestAccess(){
   const params=new URLSearchParams(location.search);
@@ -1167,15 +1182,24 @@ async function initializeBuyTestAccess(){
       return;
     }
   }
-  const returned=manualAccess||params.get('buytest_payment')==='return'||params.get('response')==='success'||params.get('reponse')==='success';
+  const returnMarker=sessionStorage.getItem(BUYTEST_PAYMENT_RETURN_KEY)==='1';
+  const returned=manualAccess||returnMarker||params.get('buytest_payment')==='return'||params.get('response')==='success'||params.get('reponse')==='success';
   const saved=storedBuyTestPayment();
   if(!saved) return;
   const returnedOrder=params.get('order');
   if(returnedOrder&&returnedOrder!==saved.orderId) return;
-  if(!returned){await restoreBuyTestAccess();return}
+  if(!returned){
+    if(await restoreBuyTestAccess({scroll:false})) await resumePaidVehicleFlow(saved.plate);
+    return;
+  }
   if(!manualAccess) showBuyTestAccessNotice('התשלום הסתיים. מאמת את האישור ופותח את האתר...');
-  for(let attempt=0;attempt<20;attempt++){
-    if(await restoreBuyTestAccess({onReturn:attempt===19})){history.replaceState({},document.title,location.pathname);return}
+  for(let attempt=0;attempt<40;attempt++){
+    if(await restoreBuyTestAccess({onReturn:attempt===39,scroll:false})){
+      sessionStorage.removeItem(BUYTEST_PAYMENT_RETURN_KEY);
+      history.replaceState({},document.title,location.pathname);
+      await resumePaidVehicleFlow(saved.plate);
+      return;
+    }
     await new Promise(resolve=>setTimeout(resolve,1500));
   }
 }
@@ -1237,8 +1261,10 @@ async function submitBuyTestPayment(event){
     const data=await callBuyTestPaymentService({action:'create',plan:planKey,plate:vehiclePlate,fullName,phone});
     saveBuyTestPayment({orderId:data.orderId,clientSecret:data.clientSecret,plate:vehiclePlate,plan:planKey,createdAt:new Date().toISOString()});
     sessionStorage.setItem('buytestPendingPlan',planKey);
+    sessionStorage.setItem(BUYTEST_PAYMENT_RETURN_KEY,'1');
     window.location.assign(data.paymentUrl);
   }catch(error){
+    sessionStorage.removeItem(BUYTEST_PAYMENT_RETURN_KEY);
     console.error('BuyTest payment handoff failed:',error);
     status.className='paymentStatus error';
     status.textContent=error.message==='payment_link_failed'
@@ -4685,9 +4711,10 @@ window.addEventListener('DOMContentLoaded',async()=>{
   if(feedbackBox) feedbackBox.style.display='none';
   await initializeBuyTestAccess();
 });
-window.addEventListener('pageshow',()=>{
+window.addEventListener('pageshow',async event=>{
   const paymentButton=document.getElementById('paymentSubmitButton');
   if(paymentButton) paymentButton.disabled=false;
+  if(event.persisted&&sessionStorage.getItem(BUYTEST_PAYMENT_RETURN_KEY)==='1') await initializeBuyTestAccess();
 });
 document.addEventListener('keydown',event=>{
   if(event.key!=='Escape') return;
