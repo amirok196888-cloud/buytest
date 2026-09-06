@@ -46,6 +46,7 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#07131aef;border-top:1p
 .priceGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
 .priceCard{background:#0d2029;border:1px solid #2a4652;border-radius:16px;padding:15px}
 .price{font-size:28px;font-weight:900;margin:8px 0}.price small{font-size:13px;color:var(--muted)}
+.priceCard h3{margin:0 0 6px}.priceCard p{margin:0;color:var(--muted);font-size:14px;line-height:1.55}.priceCard.featured{grid-column:1/-1;border:2px solid var(--a);background:linear-gradient(135deg,#103a34,#102a35);position:relative}.priceCard.featured .price{color:#7de8c7}.bundleBadge{display:inline-block;margin-bottom:9px;padding:5px 10px;border-radius:999px;background:var(--a);color:#062019;font-size:13px;font-weight:900}.oldPrice{font-size:15px;color:var(--muted);text-decoration:line-through;margin-inline-start:7px}.saving{display:block;margin-top:4px;color:#9cebd4;font-size:13px;font-weight:800}.planBoundary{margin-top:12px;padding:11px 12px;border:1px solid #31505c;border-radius:12px;background:#0b1e27;color:#c8d5da;font-size:13px;line-height:1.55}
 .locked{filter:blur(2px);opacity:.35;pointer-events:none;user-select:none}
 .paywall{background:#102832;border:1px solid #31505c;border-radius:17px;padding:16px;margin:14px 0;text-align:center}
 .paywall h3{margin:0 0 7px}.paywall p{color:var(--muted);font-size:13px}
@@ -67,7 +68,7 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#07131aef;border-top:1p
 .feedbackBox h3{margin:0 0 8px}.feedbackBox textarea{width:100%;min-height:110px;box-sizing:border-box;border-radius:12px;padding:12px;font:inherit}
 .clarificationBox{display:none;margin-top:18px;padding:18px;border:2px solid #0fa87e;border-radius:18px;background:#f4fbf9}
 .clarificationBox.show{display:block}.clarificationBox h3{margin:0 0 7px;font-size:22px}.clarificationBox>.sub{margin-bottom:14px}
-.clarificationChoices{display:grid;grid-template-columns:1fr 1fr;gap:12px}.clarificationChoice{border:1px solid #cbd8dd;border-radius:15px;padding:15px;background:#fff;display:flex;flex-direction:column;align-items:stretch}
+.clarificationChoices{display:grid;grid-template-columns:1fr;gap:12px}.clarificationChoice{border:1px solid #cbd8dd;border-radius:15px;padding:15px;background:#fff;display:flex;flex-direction:column;align-items:stretch}
 .clarificationChoice.paid{border-color:#e3a400;background:#fffdf5}.clarificationChoice h4{margin:0 0 7px;font-size:18px}.clarificationChoice p{margin:0 0 12px;line-height:1.55;color:#50666f}.clarificationChoice button{margin-top:auto}
 .clarificationPrice{display:inline-block;align-self:flex-start;margin-bottom:9px;padding:5px 9px;border-radius:999px;background:#e8f7f2;color:#075e48;font-size:13px;font-weight:900}
 .clarificationChoice.paid .clarificationPrice{background:#fff0c8;color:#7a5700}.clarificationForm{display:none;margin-top:14px;padding-top:14px;border-top:1px solid #d9e2e6}.clarificationForm.show{display:block}
@@ -105,7 +106,10 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#07131aef;border-top:1p
 #landing .landingCard{width:100%!important;max-width:760px!important;margin:0 auto!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
 
 .paidOnly{display:none!important}
-body.paid-open .paidOnly{display:block!important}
+body.plan-premium .premiumFeature,body.plan-report .reportFeature,body.plan-bundle .paidOnly,body.manager-mode.manager-all .paidOnly{display:block!important}
+.clarificationBox.show{display:none}
+body.plan-report .clarificationBox.show,body.plan-consultation .clarificationBox.show,body.plan-bundle .clarificationBox.show,body.manager-mode .clarificationBox.show{display:block}
+.managerPlanControls{margin-top:12px;padding-top:12px;border-top:1px solid #9dd9c7}.managerPlanControls b{display:block;margin-bottom:8px}.managerPlanButtons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.managerPlanButtons button{margin:0;background:#fff;color:#075e48;border:1px solid #7fcab3}.managerPlanStatus{margin-top:8px;font-size:13px;font-weight:800}
 .photoPreview{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
 .photoPreview img{width:100%;height:120px;object-fit:cover;border-radius:10px}
 .photoPreview button{width:100%;margin-top:4px}.photoBox{margin-top:18px}
@@ -198,7 +202,7 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
 <div class="mktSteps">
 <div class="mktStep"><div class="mktNum">1</div><div><b>מזינים או סורקים מספר רכב</b><br/><span>ומקבלים את נתוני הרכב הזמינים ממאגרים ציבוריים.</span></div></div>
 <div class="mktStep"><div class="mktNum">2</div><div><b>רואים את נתוני הרכב</b><br/><span>המידע הזמין מוצג בצורה ברורה לפני שמחליטים אם להמשיך.</span></div></div>
-<div class="mktStep"><div class="mktNum">3</div><div><b>פותחים תיק בדיקה אחד</b><br/><span>ב־49 ₪ מקבלים את שלבי “לפני” ו“אחרי”, תיעוד וסיכום PDF משולב.</span></div></div>
+<div class="mktStep"><div class="mktNum">3</div><div><b>בוחרים שירות או חבילה מלאה</b><br/><span>אפשר לרכוש כל שירות בנפרד, או את שלושת השירותים יחד ב־120 ₪ במקום 137 ₪.</span></div></div>
 </div>
 </div>
 </div>
@@ -233,7 +237,7 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
 <div class="mktFaq">
 <details><summary>האם BuyTest מחליף בדיקה במכון?</summary><p>לא. השלב הראשון מארגן בדיקות בסיסיות ודגשים למכון; השלב השני מסביר את סיכום הבוחן. השירות אינו בודק את הרכב פיזית ואינו מאשר תקינות.</p></details>
 <details><summary>מה מקבלים לפני התשלום?</summary><p>מזינים או סורקים מספר רכב ומקבלים את נתוני הרכב הזמינים ממאגרים ציבוריים. הבדיקה המקצועית המודרכת נפתחת לאחר התשלום.</p></details>
-<details><summary>מה כלול בתשלום?</summary><p>בדיקת BuyTest אחת ב־49 ₪ לרכב אחד: התאמת רישיון, שאלות ובדיקות לפני המכון, דגשים לבוחן, העלאת סיכום הבוחן, העלאה אופציונלית של הבדיקה הממוחשבת, הסבר ממצאים, PDF משולב והבהרה קצרה אחת במייל. מעבר אישי ומפורט על הדוח הוא שירות נפרד בתוספת 39 ₪.</p></details>
+<details><summary>אילו מסלולים אפשר לרכוש?</summary><p>אפשר לרכוש בנפרד את מסלול הפרימיום ב־49 ₪, פענוח דוח ב־39 ₪ או התייעצות אישית ב־49 ₪. החבילה המלאה כוללת את שלושתם לרכב אחד במחיר 120 ₪ במקום 137 ₪.</p></details>
 <details><summary>מה קורה אם חסר מידע על הרכב?</summary><p>מאגרים ציבוריים אינם תמיד מלאים. כאשר נתון אינו זמין, BuyTest מציגה זאת במקום להמציא מידע, וממליצה לאמת פרטים מהותיים מול מסמכי הרכב והגורמים המתאימים.</p></details>
 <details><summary>האם BuyTest אומר אם לקנות את הרכב?</summary><p>לא. אין המלצת קנייה או אי־קנייה, אין הערכת שווי או עלות תיקון ואין קביעה לגבי ירידת ערך. BuyTest משקף משמעויות ושאלות לבירור בלבד; ההחלטה היא של המשתמש.</p></details>
 </div>
@@ -275,33 +279,71 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
 </div></div><div id="rawlink" style="display:none"></div></div>
 </section>
 <section class="card" id="fullCheckOffer" style="display:none">
-<h2>תיק BuyTest מלא לרכב אחד · 49 ₪</h2>
-<p class="sub"><b>אותו תיק נשאר פתוח לשלב שלפני המכון ולשלב שאחרי המכון.</b><br>התיק כולל בדיקת רישיון ורשימת בדיקה, דגשים לבוחן, העלאת סיכום הבוחן, בדיקה ממוחשבת אופציונלית, הסבר משולב ב־PDF והבהרה קצרה אחת במייל.</p>
-<div class="scopeStrip"><span>לפני המכון</span><span>דגשים לבוחן</span><span>אחרי המכון</span></div>
-<button class="primary full" type="button" onclick="startPayment()">פתח תיק בדיקה – 49 ₪</button>
+<h2>בחר את השירות שמתאים לך</h2>
+<p class="sub">כל מסלול מיועד לרכב אחד ולמקרה בדיקה אחד. אפשר לבחור שירות בודד או לרכוש את החבילה המלאה במחיר אחד.</p>
+<div class="priceGrid" aria-label="מסלולי BuyTest">
+  <article class="priceCard">
+    <h3>מסלול פרימיום</h3>
+    <div class="price">49 ₪</div>
+    <p>בדיקת רישיון, רשימת בדיקה מודרכת ודגשים מסודרים למסירה לבוחן לפני הבדיקה במכון.</p>
+    <button class="secondary planBtn" type="button" onclick="startPayment('premium')">בחירת פרימיום</button>
+  </article>
+  <article class="priceCard">
+    <h3>פענוח דוח</h3>
+    <div class="price">39 ₪</div>
+    <p>העלאת סיכום הבוחן והבדיקה הממוחשבת, אם צורפה, וקבלת הסבר מתוך מאגר BuyTest וסיכום PDF.</p>
+    <button class="secondary planBtn" type="button" onclick="startPayment('report')">בחירת פענוח דוח</button>
+  </article>
+  <article class="priceCard">
+    <h3>התייעצות אישית</h3>
+    <div class="price">49 ₪</div>
+    <p>מעבר אישי של עמוס רוקח על הדוח ומתן הסבר מקצועי על הממצאים והבירורים הנדרשים.</p>
+    <button class="secondary planBtn" type="button" onclick="startPayment('consultation')">בחירת התייעצות אישית</button>
+  </article>
+  <article class="priceCard featured">
+    <span class="bundleBadge">החבילה המשתלמת</span>
+    <h3>חבילת BuyTest המלאה</h3>
+    <div class="price">120 ₪ <span class="oldPrice">137 ₪</span><span class="saving">חיסכון של 17 ₪</span></div>
+    <p>מסלול הפרימיום, פענוח הדוח והתייעצות אישית — הכול בתיק אחד לרכב אחד.</p>
+    <button class="primary planBtn" type="button" onclick="startPayment('bundle')">בחירת החבילה המלאה</button>
+  </article>
+</div>
+<div class="planBoundary"><b>גבולות השירות:</b> BuyTest מסביר את המידע שנמסר ואת משמעות הממצאים. השירות אינו קובע אם לקנות את הרכב, אינו מעריך מחירי תיקון או ירידת ערך ואינו מדרג את עבודת מכון הבדיקה.</div>
 <div class="devMsg" id="paymentMsg" role="status" aria-live="polite"></div>
 </section>
 
-<section class="card managerOnly" id="managerPreviewBox" style="padding:14px">
+<section class="card managerOnly" id="managerPreviewBox" style="display:none;padding:14px">
   <button class="devBtn" type="button" onclick="openManagerPreview()">🔐 כניסת מנהל לבדיקה</button>
 </section>
 
 
 <section class="card" id="managerActiveNotice" style="display:none;border:2px solid #0ea67b;background:#e8f7f2;color:#075e48">
-  <b>מצב מנהל פעיל.</b> כל חלקי הבדיקה פתוחים ללא תשלום לצורך בדיקה וניהול.
-  <div style="margin-top:12px"><button class="primary" type="button" onclick="openCustomerReplyPanel()">פתיחת טופס מענה ללקוח</button></div>
+  <b>מצב מנהל פעיל.</b> אפשר להציג את כל המערכת או לדמות בנפרד את המסך שיקבל כל מסלול.
+  <div class="managerPlanControls">
+    <b>בדיקת תצוגת מסלולים:</b>
+    <div class="managerPlanButtons">
+      <button type="button" onclick="previewPlanAsManager('premium')">פרימיום</button>
+      <button type="button" onclick="previewPlanAsManager('report')">פענוח דוח</button>
+      <button type="button" onclick="previewPlanAsManager('consultation')">התייעצות</button>
+      <button type="button" onclick="previewPlanAsManager('bundle')">חבילה מלאה</button>
+      <button type="button" onclick="previewPlanAsManager('all')">הצג הכול</button>
+      <button type="button" onclick="openCustomerReplyPanel()">טופס מענה ללקוח</button>
+    </div>
+    <div class="managerPlanStatus" id="managerPlanStatus">מוצגת כרגע החבילה המלאה.</div>
+  </div>
 </section>
 
 <section class="card formulaAdmin" id="managerFormulaPanel">
   <h2 style="margin-bottom:6px">ניהול מאגר נוסחי הבדיקות</h2>
-  <p class="sub">חפש כל נוסח קיים וערוך את ההסבר והמסקנה שיוצגו ללקוח. התיקונים נשמרים במכשיר, נכנסים מיד לפענוח ומשמשים גם בבדיקות הבאות.</p>
+  <p class="sub">חפש כל נוסח קיים וערוך את רמת המשמעות, ההסבר ומה כדאי לברר. התיקונים נשמרים במכשיר, נכנסים מיד לפענוח ומשמשים גם בבדיקות הבאות.</p>
   <div class="formulaAdminStats" id="formulaAdminStats">טוען את המאגר...</div>
   <div class="formulaAdminGrid">
     <div class="field"><label for="formulaCategory"><b>קבוצה</b></label><select id="formulaCategory" onchange="renderFormulaAdminList()"></select></div>
-    <div class="field"><label for="formulaType"><b>סוג הממצא</b></label><select id="formulaType"><option value="actual_finding">ליקוי או ממצא ממשי</option><option value="context_dependent">תלוי הקשר</option><option value="limitation_or_disclaimer">הסתייגות כללית</option><option value="recommendation">המלצה לבדיקה נוספת</option><option value="maintenance_recommendation">תחזוקה / כיוון</option><option value="repair_history_or_evidence">סימן לתיקון או החלפה</option><option value="information">מידע בלבד</option></select></div>
+    <div class="field"><label for="formulaType"><b>סוג הממצא</b></label><select id="formulaType"><option value="actual_finding">ממצא מסוים שנרשם</option><option value="context_dependent">תלוי הקשר</option><option value="limitation_or_disclaimer">הסתייגות כללית</option><option value="recommendation">המלצה לבדיקה נוספת</option><option value="maintenance_recommendation">תחזוקה / כיוון</option><option value="repair_history_or_evidence">סימן לתיקון או החלפה</option><option value="information">מידע בלבד</option></select></div>
+    <div class="field"><label for="formulaSeverity"><b>רמת משמעות</b></label><select id="formulaSeverity"><option value="high">משמעות גבוהה</option><option value="medium">משמעות בינונית</option><option value="low">משמעות נמוכה</option><option value="none">ללא משקל עצמאי</option></select></div>
     <div class="field wide"><label for="formulaText"><b>הנוסח כפי שהוא עשוי להופיע בדוח</b></label><input id="formulaText" placeholder="לדוגמה: רעש באביזרי מנוע"></div>
     <div class="field wide"><label for="formulaMeaning"><b>הסבר ללקוח</b></label><textarea id="formulaMeaning" placeholder="מה ניתן לומר בבטחה על הנוסח"></textarea></div>
-    <div class="field wide"><label for="formulaDecision"><b>המסקנה שתוצג ללקוח</b></label><textarea id="formulaDecision" placeholder="כתוב כאן את המסקנה המקצועית המדויקת"></textarea></div>
+    <div class="field wide"><label for="formulaDecision"><b>מה כדאי לברר</b></label><textarea id="formulaDecision" placeholder="כתוב הכוונה לבדיקה בלבד, ללא המלצת קנייה, הערכת מחיר או ביקורת על המכון"></textarea></div>
     <div class="field wide"><label for="formulaQuestion"><b>מה כדאי לברר</b></label><textarea id="formulaQuestion" placeholder="איזו שאלה או בדיקת המשך נדרשת"></textarea></div>
     <div class="field wide"><label for="formulaSearch"><b>חיפוש במאגר</b></label><input id="formulaSearch" oninput="renderFormulaAdminList()" placeholder="חפש לפי מילה או נוסח"></div>
   </div>
@@ -310,7 +352,7 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
   <div class="formulaAdminList" id="formulaAdminList"></div>
 </section>
 
-<details class="card paidOnly guidedSection" id="licenseMatchSection" style="display:none;border:2px solid #0ea67b;" open>
+<details class="card paidOnly premiumFeature guidedSection" id="licenseMatchSection" style="display:none;border:2px solid #0ea67b;" open>
   <summary>א. התאמת רישיון הרכב לרכב ולמוכר</summary>
   <div class="stepContent">
   <p class="sub" style="font-weight:700;color:#17352d;">
@@ -348,26 +390,26 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
   </div>
 </details>
 
-<details class="card paidOnly guidedSection" style="display:none"><summary>2 · שאלות למוכר</summary><div class="stepContent"><p class="sub">שאלה אחת בכל פעם. בחר תשובה פשוטה; רק במקרה שצריך בירור ייפתח מקום לפירוט.</p>
+<details class="card paidOnly premiumFeature guidedSection" style="display:none"><summary>2 · שאלות למוכר</summary><div class="stepContent"><p class="sub">שאלה אחת בכל פעם. בחר תשובה פשוטה; רק במקרה שצריך בירור ייפתח מקום לפירוט.</p>
 <div id="sellerChecks"></div></div></details>
 <div id="purchaseBox" style="display:none"></div>
-<details class="card paidOnly guidedSection" style="display:none"><summary>3 · בדיקה חיצונית</summary><div class="stepContent"><p class="sub">בדיקה אחת בכל פעם. אין צורך בידע מקצועי — סמן רק את מה שראית.</p>
+<details class="card paidOnly premiumFeature guidedSection" style="display:none"><summary>3 · בדיקה חיצונית</summary><div class="stepContent"><p class="sub">בדיקה אחת בכל פעם. אין צורך בידע מקצועי — סמן רק את מה שראית.</p>
 <div id="externalChecks"></div></div></details>
-<details class="card paidOnly guidedSection" style="display:none"><summary>4 · בדיקה עצמית ונסיעה קצרה</summary><div class="stepContent"><p class="sub">התקדם שאלה־שאלה. אם אינך יכול לבדוק סעיף, בחר „לא בדקתי”.</p>
+<details class="card paidOnly premiumFeature guidedSection" style="display:none"><summary>4 · בדיקה עצמית ונסיעה קצרה</summary><div class="stepContent"><p class="sub">התקדם שאלה־שאלה. אם אינך יכול לבדוק סעיף, בחר „לא בדקתי”.</p>
 <div id="selfChecks"></div>
 <div class="photoBox"><h3>תיעוד תמונות</h3>
 <p class="sub">אפשר לצרף עד ארבע תמונות של הרכב או של ממצאים שתרצה לתעד. הן יוצגו בעמוד השני של הסיכום.</p>
 <button class="secondary full" type="button" onclick="document.getElementById('vehiclePhotos').click()">📷 הוסף עד 4 תמונות לבדיקה</button>
 <input id="vehiclePhotos" type="file" accept="image/*" capture="environment" multiple style="display:none" onchange="addVehiclePhotos(this)">
 <div id="photoPreview" class="photoPreview"></div></div></div></details>
-<section class="card paidOnly" style="display:none"><h2>5 · סיכום לפני המכון ודגשים לבוחן</h2><p class="sub">הסיכום מרכז רק את הנקודות שהזנת ומכין רשימת דגשים למסירה לבוחן. הוא אינו קובע אם להיכנס לבדיקה ואינו מחליף שיחה עם הבוחן.</p>
+<section class="card paidOnly premiumFeature" style="display:none"><h2>5 · סיכום לפני המכון ודגשים לבוחן</h2><p class="sub">הסיכום מרכז רק את הנקודות שהזנת ומכין רשימת דגשים למסירה לבוחן. הוא אינו קובע אם להיכנס לבדיקה ואינו מחליף שיחה עם הבוחן.</p>
 <button class="primary full" onclick="buildReport()">הפק סיכום ודגשים לבוחן</button>
 <div class="report" id="report"></div>
 <button class="primary full" id="pdfBtn" onclick="shareReportPdf('pdfBtn')" style="display:none">שיתוף כ־PDF</button>
 <div class="info"><b>חשוב:</b> BuyTest אינו קובע שהרכב תקין, בטוח או כדאי לרכישה. כל החלטה נשארת בידי המשתמש.</div>
 </section>
 
-<section class="card paidOnly" id="afterInspectionSection" style="display:none">
+<section class="card paidOnly reportFeature" id="afterInspectionSection" style="display:none">
 <div class="caseLabel">שלב 2 מתוך 2 · אחרי המכון</div>
 <h2>6 · הסבר סיכום הבוחן</h2>
 <p class="sub"><b>מעלים את דף סיכום הבוחן</b>, ובמידת הצורך גם את דף הבדיקה הממוחשבת. המערכת עוברת על סעיפי האבחון — מהמנוע ועד התאורה — ומדלגת על „הערות כלליות”.</p>
@@ -405,32 +447,28 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
 </div>
 
 <div class="info"><b>פענוח אוטומטי:</b> המערכת קוראת את סיכום הבוחן ומפרשת קודי תקלה מהבדיקה הממוחשבת לפי המערכת, מצב הקוד ודגשי האבחון. ההסבר נותן כיוון לבדיקה ואינו קובע שרכיב מסוים פגום. קטע שלא נקרא בוודאות לא ייכלל במסקנות.</div>
+<div class="info"><b>רמות המשמעות בפענוח:</b><br>• <b>משמעות גבוהה</b> — ממצא המחייב בירור מקצועי והשלמת בדיקות לפי הצורך.<br>• <b>משמעות בינונית</b> — ממצא הדורש התייחסות, כשמשמעותו עשויה להיות תלויה בחומרה ובהקשר.<br>• <b>משמעות נמוכה</b> — ממצא נקודתי או תחזוקתי שאינו מכריע לבדו.<br>• <b>הסתייגות כללית / מגבלת בדיקה</b> — ניסוח שאינו קובע לבדו שקיימת תקלה ואינו מביע עמדה על עבודת המכון.</div>
 <button class="primary full" type="button" onclick="analyseInspectionReport()">הצג את משמעות הממצאים</button>
 <p class="sub" style="text-align:center;margin-top:8px">ההסבר יוצג מיד על המסך. לאחר מכן ניתן לשתף PDF בן שלושה עמודים: פענוח דוח הבדיקה, עד ארבע תמונות והבהרות משפטיות, ופענוח נפרד של הבדיקה הממוחשבת.</p>
 <div class="interpretation" id="afterInterpretation"></div>
 <button class="primary full" id="finalPdfBtn" onclick="shareReportPdf('finalPdfBtn')" style="display:none">שיתוף סיכום מלא בן 3 עמודים כ־PDF</button>
-<section class="clarificationBox" id="clarificationBox" aria-labelledby="clarificationTitle">
-  <h3 id="clarificationTitle">יש לך שאלה על הסיכום?</h3>
-  <p class="sub">בחר את סוג המענה המתאים. הפנייה מתבצעת במייל בלבד, ללא חשיפת מספר טלפון פרטי.</p>
+<button class="secondary full returnBtn" type="button" onclick="returnToVehicle()">חזרה לנתוני הרכב</button>
+</section>
+<section class="clarificationBox consultationFeature" id="clarificationBox" aria-labelledby="clarificationTitle">
+  <h3 id="clarificationTitle">התייעצות אישית עם בוחן רכב</h3>
+  <p class="sub">אפשר להעביר את הדוח לעמוס רוקח לקבלת הסבר אישי על הממצאים ועל הבירורים שכדאי לבצע מול המכון, המוסך או השמאי.</p>
   <div class="clarificationChoices">
-    <article class="clarificationChoice">
-      <span class="clarificationPrice">כלול במחיר</span>
-      <h4>הבהרה קצרה אחת</h4>
-      <p>בחר ממצא אחד וכתוב שאלה קצרה אחת, עד 50 תווים.</p>
-      <button class="secondary" type="button" onclick="selectClarification('included')">שליחת שאלה קצרה</button>
-    </article>
     <article class="clarificationChoice paid">
-      <span class="clarificationPrice">תוספת 39 ₪</span>
-      <h4>הבהרה אישית מקצועית</h4>
-      <p>מעבר אישי ומענה מפורט לעד שלוש שאלות. מומלץ לצרף את דוח הבדיקה המלא. המענה ניתן בשעות העבודה המקובלות.</p>
-      <button class="primary" type="button" onclick="selectClarification('paid')">בקשת הבהרה אישית</button>
+      <span class="clarificationPrice">49 ₪ · כלול בחבילה המלאה</span>
+      <h4>מענה אישי על דוח אחד ורכב אחד</h4>
+      <p>ההתייעצות מפרשת את הממצאים ומכוונת לבדיקות המשך. היא אינה כוללת החלטת קנייה, הערכת מחיר תיקון, שמאות או קביעה לגבי מקצועיות המכון.</p>
+      <button class="primary" type="button" onclick="selectClarification()">בקשת התייעצות אישית</button>
     </article>
   </div>
   <div class="clarificationForm" id="clarificationForm">
-    <div class="field" id="clarificationFindingField"><label for="clarificationFinding"><b>על איזה ממצא השאלה?</b></label><select id="clarificationFinding"><option value="">בחר ממצא מתוך הסיכום</option></select></div>
-    <div class="field"><label for="clarificationQuestion"><b id="clarificationQuestionLabel">השאלה שלך</b></label><textarea id="clarificationQuestion" maxlength="50" oninput="updateClarificationCounter()" placeholder="כתוב שאלה קצרה עד 50 תווים"></textarea><div class="clarificationCounter" id="clarificationCounter"><span>שאלה אחת בלבד</span><span id="clarificationCharacterCount">0 מתוך 50</span></div></div>
-    <p class="formNote" id="clarificationFormNote">לאחר הלחיצה תיפתח אפליקציית המייל. מומלץ לצרף להודעה את קובץ ה־PDF של BuyTest.</p>
-    <button class="primary full" type="button" onclick="sendClarificationEmail()">פתיחת הודעת מייל</button>
+    <div class="field"><label for="clarificationQuestion"><b id="clarificationQuestionLabel">מה חשוב לך שאבדוק בדוח?</b></label><textarea id="clarificationQuestion" maxlength="1500" oninput="updateClarificationCounter()" placeholder="אפשר לכתוב בקצרה מה תרצה לברר ולצרף את דוח הבדיקה למייל"></textarea><div class="clarificationCounter" id="clarificationCounter"><span>תיאור קצר של הבירור</span><span id="clarificationCharacterCount">0 מתוך 1500</span></div></div>
+    <p class="formNote" id="clarificationFormNote">לאחר הלחיצה תיפתח אפליקציית המייל. יש לצרף את דוח הבדיקה המלא. פרטי התשלום בסך 49 ₪ יישלחו לפני תחילת ההתייעצות, אלא אם נרכשה החבילה המלאה.</p>
+    <button class="primary full" type="button" onclick="sendClarificationEmail()">פתיחת בקשת התייעצות במייל</button>
   </div>
   <section class="customerReplyAdmin" id="customerReplyAdmin">
     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
@@ -444,7 +482,7 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
       <tr><th><label for="replyCustomerQuestion">שאלת הלקוח</label></th><td><textarea id="replyCustomerQuestion" placeholder="הדבק כאן את השאלה שהתקבלה"></textarea></td></tr>
       <tr><th><label for="replyProfessionalAnswer">ההסבר שלך</label></th><td><textarea class="replyAnswer" id="replyProfessionalAnswer" placeholder="כתוב כאן את ההסבר המקצועי שיישלח ללקוח"></textarea></td></tr>
     </tbody></table>
-    <div class="replySafetyNote"><b>הבהרה משפטית שתצורף אוטומטית:</b> המענה מבוסס על דוח הבדיקה והמידע שנמסר בלבד. הוא אינו בדיקה פיזית, שמאות, אומדן מחייב לעלות תיקון או המלצה לקנות או לא לקנות את הרכב.</div>
+    <div class="replySafetyNote"><b>הבהרה משפטית שתצורף אוטומטית:</b> המענה מבוסס על דוח הבדיקה והמידע שנמסר בלבד. הוא אינו בדיקה פיזית, שמאות, הערכת עלויות או המלצה לקנות או לא לקנות את הרכב, ואינו קובע שמכון הבדיקה טעה או פעל שלא כשורה.</div>
     <div class="replyActions">
       <button class="secondary" type="button" onclick="saveCustomerReplyDraft()">שמור טיוטה</button>
       <button class="secondary" type="button" onclick="downloadCustomerReplyPdf()">הורד תשובה עם לוגו כ־PDF</button>
@@ -456,8 +494,6 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
   </section>
 </section>
 <div class="clarificationAdminPending" id="clarificationAdminPending"><b>הגדרת מנהל:</b> אזור הפניות מוכן, והוא יוצג ללקוחות לאחר הכנסת כתובת המייל העסקית.</div>
-<button class="secondary full returnBtn" type="button" onclick="returnToVehicle()">חזרה לנתוני הרכב</button>
-</section>
 </main>
 <section class="feedbackBox" id="feedbackBox">
 <h3>איך הייתה הבדיקה?</h3>
@@ -485,11 +521,11 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
       <h2 id="legalTitle">תנאי שימוש</h2>
       <p>BuyTest הוא כלי להכנה מודרכת לפני בדיקת רכב ולהסבר של סיכום הבוחן לאחריה. השירות אינו בודק את הרכב פיזית, אינו מהווה חוות דעת מקצועית או שמאות, אינו מאשר תקינות או בטיחות ואינו מחליף בדיקה במכון מוסמך.</p>
       <p>נתוני הרכב מתקבלים ממאגרים חיצוניים, ובהם מאגרי משרד התחבורה. המידע עלול להיות חלקי, חסר, שגוי או לא מעודכן. המשתמש אחראי לאמת כל פרט מהותי מול רישיון הרכב, המוכר והגורמים המוסמכים.</p>
-      <p>BuyTest אינו נותן הערכת שווי, אומדן עלות תיקון, קביעת ירידת ערך או המלצה לקנות או לא לקנות. כל הסבר הוא מידע כללי המבוסס על הטקסט שהמשתמש אישר, וכל החלטה כספית, משפטית או בטיחותית היא באחריות המשתמש בלבד.</p>
+      <p>BuyTest אינו נותן הערכת שווי, אומדן עלות תיקון, קביעת ירידת ערך או המלצה לקנות או לא לקנות. כל הסבר מבוסס על הטקסט שהמשתמש העלה ועל כללי המאגר, וההחלטה כיצד לפעול נשארת בידי המשתמש לאחר בירור עם בעלי המקצוע המתאימים.</p>
       <p>זיהוי טקסט מתמונה עלול לשגות. המערכת מנתחת אוטומטית רק קטעים שנקראו ברמת ודאות מספקת; קטע שלא נקרא או שלא נמצא לו פירוש מקצועי לא ייכלל במסקנות. נתון ממוחשב ללא טווח ייחוס או סימון מפורש לא יקבל קביעה שאינה נתמכת בדף.</p>
       <p>בהעלאת דוח המשתמש מצהיר שהבדיקה הוזמנה על שמו או שיש לו הרשאה מתאימה מבעל הבדיקה לעשות שימוש בקובץ לצורך השירות. BuyTest אינו טוען לבעלות בדוח המכון ואינו מפרסם או מצרף את טופס המקור לפלט. המשתמש מתבקש להעלות רק את אזור סיכום הבוחן, ללא לוגו ופרטים אישיים שאינם דרושים.</p>
-      <p>BuyTest אינו קשור למכון הבדיקה ואינו מדבר בשמו. ההסבר נגזר מן הטקסט שזוהה בדוח וממאגר הסיווג המקצועי של המערכת.</p>
-      <p>התשלום לתיק BuyTest כולל הבהרה קצרה אחת במייל על מסקנה שמופיעה בסיכום. הבהרה אישית ומפורטת היא שירות נפרד בתשלום. שני סוגי המענה מבוססים על הדוח שהמשתמש העלה בלבד ואינם בדיקה פיזית, שמאות, התחייבות לעלות תיקון או המלצה לקנות או לא לקנות את הרכב.</p>
+      <p>BuyTest אינו קשור למכון הבדיקה ואינו מדבר בשמו. ההסבר נגזר מן הטקסט שזוהה בדוח וממאגר הסיווג המקצועי של המערכת. הסיווג אינו ביקורת, דירוג או קביעה לגבי מקצועיות המכון, דיוק עבודתו או התנהלותו. ניסוח שמסווג כ„הסתייגות כללית” או „מגבלת בדיקה” מתאר את סוג המשפט בלבד ואינו מייחס למכון כוונה פסולה.</p>
+      <p>אפשר לרכוש בנפרד מסלול פרימיום, פענוח דוח או התייעצות אישית, וכן חבילה מלאה הכוללת את שלושתם לרכב אחד. ההתייעצות האישית מבוססת על הדוח והמידע שהמשתמש מסר בלבד ואינה בדיקה פיזית, שמאות, הערכת עלויות, המלצה לקנות או לא לקנות או קביעה לגבי מכון הבדיקה.</p>
       <p>כל הזכויות באתר, בתוכן, במבנה הבדיקה, ברשימות הבדיקה, בעיצוב ובסימני BuyTest שמורות ל־BuyTest. אין להעתיק, להפיץ או לעשות בהם שימוש מסחרי ללא אישור מראש ובכתב.</p>
     </div>
     <div id="privacyText" class="legalPage" style="display:none">
@@ -500,7 +536,7 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
     </div>
     <div id="cancelText" class="legalPage" style="display:none">
       <h2>ביטול עסקה והחזרים</h2>
-      <p>מערכת התשלום עדיין אינה פעילה ולכן לא נגבה כעת תשלום. לפני הפעלת הגבייה יוצגו פרטי העסק, דרך יצירת קשר, אופן מסירת הודעת ביטול ותנאי הביטול וההחזר בהתאם לדין ולמועד שבו החל השירות בפועל. מחיר היעד לתיק בדיקה אחד לרכב אחד הוא 49 ₪.</p>
+      <p>מערכת התשלום עדיין אינה פעילה ולכן לא נגבה כעת תשלום. לפני הפעלת הגבייה יוצגו פרטי העסק, דרך יצירת קשר, אופן מסירת הודעת ביטול ותנאי הביטול וההחזר בהתאם לדין ולמועד שבו החל השירות בפועל. מחירי היעד לרכב אחד ולמקרה בדיקה אחד הם: מסלול פרימיום 49 ₪, פענוח דוח 39 ₪, התייעצות אישית 49 ₪, או חבילה מלאה ב־120 ₪ במקום 137 ₪ ברכישה נפרדת.</p>
     </div>
   </div>
 </div>
@@ -707,7 +743,6 @@ document.querySelectorAll('.guidedChecks').forEach(renderGuided);
 // כתובת המייל העסקית תוזן כאן לאחר פתיחתה. כל עוד השדה ריק,
 // אזור הפניות אינו מוצג ללקוחות ואינו יוצר כפתור שאינו עובד.
 const BUYTEST_CONTACT_EMAIL='buytest2026@gmail.com';
-let clarificationType='included';
 let clarificationFindingOptions=[];
 function setClarificationFindingOptions(items){
   const select=document.getElementById('clarificationFinding');
@@ -744,8 +779,7 @@ function updateClarificationCounter(){
   const count=document.getElementById('clarificationCharacterCount');
   const counter=document.getElementById('clarificationCounter');
   if(!question||!count||!counter) return;
-  if(clarificationType==='included'&&/[\r\n]/.test(question.value)) question.value=question.value.replace(/[\r\n]+/g,' ');
-  const limit=question.maxLength>0?question.maxLength:50;
+  const limit=question.maxLength>0?question.maxLength:1500;
   count.textContent=`${question.value.length} מתוך ${limit}`;
   counter.classList.toggle('limit',question.value.length>=limit);
 }
@@ -756,30 +790,9 @@ function showClarificationOptions(){
   if(box) box.classList.toggle('show',hasEmail);
   if(pending) pending.style.display=!hasEmail&&document.body.classList.contains('manager-mode')?'block':'none';
 }
-function selectClarification(type){
-  clarificationType=type==='paid'?'paid':'included';
+function selectClarification(){
   const form=document.getElementById('clarificationForm');
   const question=document.getElementById('clarificationQuestion');
-  const label=document.getElementById('clarificationQuestionLabel');
-  const note=document.getElementById('clarificationFormNote');
-  const findingField=document.getElementById('clarificationFindingField');
-  const counter=document.getElementById('clarificationCounter');
-  if(clarificationType==='paid'){
-    question.maxLength=1500;
-    question.placeholder='כתוב עד שלוש שאלות שתרצה שאבדוק באופן אישי';
-    label.textContent='השאלות שלך לבדיקה אישית';
-    note.textContent='לאחר הלחיצה תיפתח אפליקציית המייל עם בקשת ההזמנה. מומלץ לצרף את דוח הבדיקה המלא כדי לאפשר מענה מקצועי ומדויק ככל האפשר. פרטי התשלום בסך 39 ₪ יישלחו לפני תחילת המענה.';
-    if(findingField) findingField.style.display='none';
-    if(counter) counter.firstElementChild.textContent='עד שלוש שאלות';
-  }else{
-    question.maxLength=50;
-    if(question.value.length>50) question.value=question.value.slice(0,50);
-    question.placeholder='כתוב שאלה קצרה עד 50 תווים';
-    label.textContent='השאלה הקצרה שלך';
-    note.textContent='לאחר הלחיצה תיפתח אפליקציית המייל. מומלץ לצרף להודעה את קובץ ה־PDF של BuyTest.';
-    if(findingField) findingField.style.display='block';
-    if(counter) counter.firstElementChild.textContent='שאלה אחת בלבד';
-  }
   updateClarificationCounter();
   form.classList.add('show');
   form.scrollIntoView({behavior:'smooth',block:'nearest'});
@@ -794,19 +807,15 @@ function sendClarificationEmail(){
   if(question.length<5){alert('יש לכתוב את השאלה לפני פתיחת הודעת המייל.');return;}
   const vehiclePlate=plate()||'לא הוזן';
   const owner=document.getElementById('inspectionOwnerName')?.value.trim()||'לא הוזן';
-  const paid=clarificationType==='paid';
-  const selectedFinding=document.getElementById('clarificationFinding')?.value||'';
-  if(!paid&&!selectedFinding){alert('יש לבחור ממצא אחד מתוך הסיכום.');return;}
-  const subject=paid?`בקשה להבהרה אישית בתשלום · רכב ${vehiclePlate}`:`הבהרה קצרה על סיכום BuyTest · רכב ${vehiclePlate}`;
+  const subject=`בקשת התייעצות אישית · רכב ${vehiclePlate}`;
   const body=[
-    paid?'סוג הפנייה: הבהרה אישית מקצועית בתוספת 39 ₪':'סוג הפנייה: הבהרה קצרה אחת הכלולה במחיר',
+    'סוג הפנייה: התייעצות אישית עם בוחן רכב · 49 ₪ (או כחלק מהחבילה המלאה)',
     `מספר רכב: ${vehiclePlate}`,
     `שם מזמין הבדיקה: ${owner}`,
     '',
-    !paid?`הממצא שנבחר: ${selectedFinding}`:'',
-    !paid?'':'מומלץ לצרף את דוח הבדיקה המלא כדי לאפשר מענה מקצועי ומדויק ככל האפשר.',
+    'יש לצרף את דוח הבדיקה המלא כדי לאפשר מענה מקצועי ומדויק ככל האפשר.',
     '',
-    'השאלה:',
+    'מה חשוב לבדוק בדוח:',
     question,
     '',
     'מומלץ לצרף להודעה את קובץ ה־PDF של BuyTest.'
@@ -816,13 +825,14 @@ function sendClarificationEmail(){
 
 function openCustomerReplyPanel(){
   if(!document.body.classList.contains('manager-mode')) return;
+  previewPlanAsManager('consultation');
   showClarificationOptions();
   const panel=document.getElementById('customerReplyAdmin');
   if(panel){panel.style.display='block';panel.scrollIntoView({behavior:'smooth',block:'start'});}
 }
 
 const CUSTOMER_REPLY_STORAGE_KEY='buytestCustomerReplyDraftsV1';
-const CUSTOMER_REPLY_LEGAL='המענה מבוסס על דוח הבדיקה והמידע שנמסר בלבד. הוא אינו בדיקה פיזית, שמאות, אומדן מחייב לעלות תיקון או המלצה לקנות או לא לקנות את הרכב.';
+const CUSTOMER_REPLY_LEGAL='המענה מבוסס על דוח הבדיקה והמידע שנמסר בלבד. הוא אינו בדיקה פיזית, שמאות, הערכת עלויות או המלצה לקנות או לא לקנות את הרכב, ואינו קובע שמכון הבדיקה טעה או פעל שלא כשורה.';
 function customerReplyData(){
   return {
     email:document.getElementById('replyCustomerEmail')?.value.trim()||'',
@@ -1007,7 +1017,53 @@ function openLegal(which){
 }
 function closeLegal(){document.getElementById('legalModal').classList.remove('open')}
 function unlockFreeSections(){document.querySelectorAll('.freeAfterLookup').forEach(x=>x.style.display='block');}
-function startPayment(){const m=document.getElementById('paymentMsg');m.classList.add('show');m.textContent='תיק הבדיקה המלא יעלה 49 ₪ ויכלול את שלבי “לפני” ו“אחרי” לאותו רכב. החיבור המאובטח ל־Grow יופעל לאחר קבלת פרטי ה־API; כרגע לא נגבה תשלום והבדיקה אינה נפתחת ללקוח.';}
+const buytestPlans={
+  premium:{name:'מסלול פרימיום',price:49,scope:'בדיקת רישיון, רשימת בדיקה מודרכת ודגשים לבוחן'},
+  report:{name:'פענוח דוח',price:39,scope:'פענוח סיכום הבוחן והבדיקה הממוחשבת, אם צורפה, מתוך מאגר BuyTest'},
+  consultation:{name:'התייעצות אישית',price:49,scope:'מעבר אישי על דוח אחד ורכב אחד ומתן הסבר מקצועי'},
+  bundle:{name:'חבילת BuyTest המלאה',price:120,scope:'מסלול פרימיום, פענוח דוח והתייעצות אישית לרכב אחד'}
+};
+const buytestPlanClasses=['plan-premium','plan-report','plan-consultation','plan-bundle'];
+function applyPlanAccess(planKey,{scroll=false}={}){
+  const valid=Object.prototype.hasOwnProperty.call(buytestPlans,planKey);
+  if(!valid) return false;
+  document.body.classList.remove(...buytestPlanClasses,'manager-all');
+  document.body.classList.add('plan-'+planKey);
+  document.querySelectorAll('.paidOnly').forEach(section=>section.style.removeProperty('display'));
+  showClarificationOptions();
+  if(scroll){
+    const target=planKey==='premium'?document.getElementById('licenseMatchSection'):planKey==='report'?document.getElementById('afterInspectionSection'):planKey==='consultation'?document.getElementById('clarificationBox'):document.getElementById('licenseMatchSection');
+    target?.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  return true;
+}
+function activatePurchasedPlan(planKey){
+  if(!applyPlanAccess(planKey,{scroll:true})) return false;
+  const offer=document.getElementById('fullCheckOffer');
+  if(offer) offer.style.display='none';
+  sessionStorage.removeItem('buytestPendingPlan');
+  return true;
+}
+function previewPlanAsManager(planKey='all'){
+  if(!document.body.classList.contains('manager-mode')) return;
+  const status=document.getElementById('managerPlanStatus');
+  if(planKey==='all'){
+    document.body.classList.remove(...buytestPlanClasses);
+    document.body.classList.add('manager-all');
+    showClarificationOptions();
+    if(status) status.textContent='מוצגים כרגע כל חלקי המערכת.';
+    return;
+  }
+  if(!applyPlanAccess(planKey)) return;
+  if(status) status.textContent='תצוגת בדיקה: '+buytestPlans[planKey].name+' בלבד.';
+}
+function startPayment(planKey='bundle'){
+  const plan=buytestPlans[planKey]||buytestPlans.bundle;
+  sessionStorage.setItem('buytestPendingPlan',planKey in buytestPlans?planKey:'bundle');
+  const m=document.getElementById('paymentMsg');
+  m.classList.add('show');
+  m.textContent=`נבחר: ${plan.name} · ${plan.price} ₪. ${plan.scope}. החיבור המאובטח ל־Grow יופעל לאחר קבלת פרטי ה־API; כרגע לא נגבה תשלום והשירות אינו נפתח ללקוח.`;
+}
 async function managerCodeDigest(value){
   const bytes=new TextEncoder().encode(String(value||'').trim());
   const digest=await crypto.subtle.digest('SHA-256',bytes);
@@ -1021,8 +1077,8 @@ async function openManagerPreview(){
     alert('קוד מנהל שגוי');
     return;
   }
-  document.body.classList.add('paid-open','manager-mode');
-  document.querySelectorAll('.paidOnly').forEach(section=>section.style.display='block');
+  document.body.classList.add('manager-mode','manager-all');
+  document.querySelectorAll('.paidOnly').forEach(section=>section.style.removeProperty('display'));
   const purchaseBox=document.getElementById('purchaseBox');
   if(purchaseBox) purchaseBox.style.display='none';
   const managerBox=document.getElementById('managerPreviewBox');
@@ -1643,7 +1699,7 @@ const ruleClassification={
   'inspection-limited':'limitation_or_disclaimer','frame-edge':'actual_finding','frame':'actual_finding','body-repair':'repair_history_or_evidence','paint':'repair_history_or_evidence','engine-noise':'context_dependent','oil-sweat':'context_dependent','oil-leak':'actual_finding','crankcase-pressure':'context_dependent','coolant-leak':'actual_finding','cooling-system':'context_dependent','gear-shift':'actual_finding','gear-slip':'actual_finding','clutch':'actual_finding','brake-balance':'actual_finding','brakes':'actual_finding','steering-play':'actual_finding','suspension':'actual_finding','driveline':'context_dependent','tires':'actual_finding','tire-size':'actual_finding','warning-light':'actual_finding','airbag':'actual_finding','abs-esp':'actual_finding','battery':'actual_finding','aircon':'actual_finding','computer-fault':'context_dependent','faults-cleared':'context_dependent','emissions':'context_dependent'
 };
 
-const formulaClassificationLabels={actual_finding:'ליקוי או ממצא ממשי',limitation_or_disclaimer:'הסתייגות כללית',recommendation:'המלצה לבדיקה נוספת',maintenance_recommendation:'תחזוקה / כיוון',repair_history_or_evidence:'סימן לתיקון או החלפה',information:'מידע בלבד',context_dependent:'תלוי הקשר'};
+const formulaClassificationLabels={actual_finding:'ממצא מסוים שנרשם',limitation_or_disclaimer:'הסתייגות כללית',recommendation:'המלצה לבדיקה נוספת',maintenance_recommendation:'תחזוקה / כיוון',repair_history_or_evidence:'סימן לתיקון או החלפה',information:'מידע בלבד',context_dependent:'תלוי הקשר'};
 
 const rawFormulaDatabase=[{"id":"technotest-31","source_code":31,"category_id":"fuel_system","category":"מערכת דלק","subgroup":null,"text":"קורוזיה בטרמוסטט","procedure_127":false,"classification":{"type":"actual_finding","severity":"review","basis":"explicit_condition_wording","context_policy":null},"source":"technotest_wording_catalog","active":true,"editable":false},
 {"id":"technotest-32","source_code":32,"category_id":"fuel_system","category":"מערכת דלק","subgroup":null,"text":"מאייד לא תקין","procedure_127":true,"classification":{"type":"actual_finding","severity":"review","basis":"explicit_condition_wording","context_policy":null},"source":"technotest_wording_catalog","active":true,"editable":false},
@@ -2545,7 +2601,7 @@ const expertCalibrationDecisions=[{"id":"engine_block_damage","category":"מנו
 {"id":"lighting_ac","category":"מערכת תאורה","title":"מזגן בסעיף התאורה","phrases":["מזגן אוויר אינו פועל"],"formulaIds":["technotest-674"],"aliasIds":[],"classification":"actual","severity":"medium","agePolicy":"no_effect","note":"","updatedAt":"2026-09-04T13:18:02.953Z"},
 {"id":"fog_lamp","category":"מערכת תאורה","title":"פנס ערפל","phrases":["פנס ערפל קדמי שבור"],"formulaIds":[],"aliasIds":["sample-028"],"classification":"actual","severity":"low","agePolicy":"no_effect","note":"","updatedAt":"2026-09-04T13:18:42.880Z"}];
 const expertClassificationMap={actual:'actual_finding',context:'context_dependent',disclaimer:'limitation_or_disclaimer',history:'repair_history_or_evidence',wear:'context_dependent',split:'actual_finding'};
-const expertSeverityLabels={safety:'ליקוי בטיחותי',high:'משמעות גבוהה',medium:'משמעות בינונית',low:'משמעות נמוכה',none:'ללא משקל עצמאי'};
+const expertSeverityLabels={safety:'דגש בטיחותי',high:'משמעות גבוהה',medium:'משמעות בינונית',low:'משמעות נמוכה',none:'ללא משקל עצמאי'};
 const expertDecisionByFormulaId=new Map();
 const expertDecisionByAliasId=new Map();
 const expertDecisionByPhrase=new Map();
@@ -2576,17 +2632,17 @@ function expertSeverityFor(decision,formula){
 
 function expertConclusion(decision,severity){
   if(decision.id==='engine_warranty') return 'ללא ממצא תומך, הנוסח „אין אחריות על המנוע” הוא הסתייגות כללית ואינו מקבל משקל עצמאי.';
-  if(decision.id==='control_arm_bushings') return 'נמצא ליקוי בתותבים או במשולשים במתלה הקדמי. יש להביא בחשבון את הצורך בטיפול ואת העלות.';
-  if((decision.id==='body_paint_repairs'||decision.id==='frame_cosmetic') && severity==='high') return 'ניסוח מפורש של מצב פחחות וצבע ירוד הוא ממצא בעל משמעות גבוהה, ויש לברר את היקף התיקונים והעלות.';
+  if(decision.id==='control_arm_bushings') return 'נרשם ממצא בתותבים או במשולשים במתלה הקדמי. יש לבדוק את חומרתו ואת הטיפול הנדרש במוסך.';
+  if((decision.id==='body_paint_repairs'||decision.id==='frame_cosmetic') && severity==='high') return 'ניסוח מפורש של מצב פחחות וצבע ירוד הוא ממצא בעל משמעות גבוהה, ויש לברר את היקף התיקונים אצל בעל מקצוע מתאים.';
   let base='';
-  if(decision.classification==='disclaimer') base='זהו ניסוח הסתייגות או מגבלת בדיקה, ואין לספור אותו לבדו כליקוי ברכב.';
+  if(decision.classification==='disclaimer') base='זהו ניסוח של הסתייגות כללית או מגבלת בדיקה. הוא אינו קובע לבדו שקיימת תקלה ברכב ואינו מביע עמדה על עבודת המכון.';
   else if(decision.classification==='history') base='זהו מידע על תיקון, פירוק או החלפה קודמים; אין להסיק ממנו לבדו שקיימת תקלה פעילה.';
   else if(decision.classification==='context') base=severity==='high'?'זוהי אזהרה משמעותית, אך יש לפרש אותה לפי הנוסח והממצאים הנלווים בדוח.':'המשמעות תלויה בנוסח המדויק ובממצאים הנלווים, ואין להחמיר או להקל מעבר למה שנכתב.';
   else if(decision.classification==='wear') base='זהו ממצא של בלאי; יש להביא אותו בחשבון לפי חומרתו בלי להציגו אוטומטית ככשל חמור.';
   else if(severity==='safety') base='זהו ליקוי ממשי בעל השלכה בטיחותית שדורש טיפול או בירור מקצועי.';
-  else if(severity==='high') base='זהו ממצא ממשי ומשמעותי שדורש בירור מקצועי והתייחסות להיקף הטיפול והעלות.';
-  else if(severity==='medium') base='זהו ממצא ממשי במשקל בינוני; יש להביא בחשבון את הצורך בטיפול ואת העלות.';
-  else if(severity==='low') base='יש לבדוק את מצב החלק ולהביא בחשבון את הצורך בטיפול ואת העלות.';
+  else if(severity==='high') base='זהו ממצא בעל משמעות גבוהה שדורש בירור מקצועי והשלמת בדיקות לפי הצורך.';
+  else if(severity==='medium') base='זהו ממצא בעל משמעות בינונית; יש לברר את חומרתו ואת הטיפול הנדרש.';
+  else if(severity==='low') base='זהו ממצא בעל משמעות נמוכה; יש לבדוק את מצב החלק ואת הטיפול הנדרש.';
   else base='לממצא אין משקל עצמאי ללא ממצא נוסף שמחזק אותו.';
   const note=severity==='low'&&/גבוה/.test(decision.note||'')?'':decision.note;
   return note?base+' '+note:base;
@@ -2626,7 +2682,7 @@ function applyExpertCalibration(rule,formula){
     calibrated.tone='clarify';
     calibrated.reportSeverity='low';
     calibrated.meaning='נרשמה תושבת פגומה של תיבת ההילוכים. התושבת מחברת את התיבה למרכב ומבודדת תנועה ורעידות; הממצא אינו קובע שתיבת ההילוכים עצמה פגומה.';
-    calibrated.decision='יש לבדוק ולהחליף את התושבת לפי הצורך ולהביא בחשבון את עלות הטיפול. אין לסווג את תיבת ההילוכים כלא תקינה על סמך ממצא זה בלבד.';
+    calibrated.decision='יש לבדוק את התושבת במוסך ולטפל בה לפי הצורך. אין לסווג את תיבת ההילוכים כלא תקינה על סמך ממצא זה בלבד.';
   }
   const specific=specificFindingInterpretation(calibrated);
   if(specific){
@@ -2682,7 +2738,7 @@ function applyEngineWarrantyContext(result,text){
   warranty.tone='safety';
   warranty.reportSeverity='high';
   warranty.meaning='הנוסח „אין אחריות על המנוע” מופיע לצד '+uniqueReasons.join(', ')+'.';
-  warranty.decision='בצירוף הנתונים האלה ההסתייגות משמעותית. יש לבחון אותה יחד עם ממצאי המנוע ולהעריך את היקף הטיפול והעלות; אין להסיק סיבה אחרת שלא מופיעה בבדיקה.';
+  warranty.decision='בצירוף הנתונים האלה ההסתייגות מקבלת משמעות גבוהה יותר. יש לבחון אותה יחד עם ממצאי המנוע ולבצע בירור מקצועי; אין להסיק סיבה אחרת שלא מופיעה בבדיקה.';
   return result;
 }
 
@@ -2699,7 +2755,7 @@ function applyReportMileageContext(result,text){
     const explicitWear=wearIds.has(item.id)||/בלאי פנימי|לחץ עוקה|נקיש|דליפות לחץ|לחץ דחיסה|מנוע שורף שמן|שריפת שמן|הספק מנוע ירוד|סחיבה חלשה/.test(source);
     if(!explicitWear||item.classification==='limitation_or_disclaimer'||item.classification==='recommendation') return item;
     const mileageText=`בדוח נקרא קילומטראז׳ של ${fmtNum(km)} ק״מ. `+(km>=200000
-      ? 'זהו קילומטראז׳ גבוה שנותן הקשר לבלאי שנרשם ומחזק את הצורך בבירור ממוקד של מצב המנוע והעלות הצפויה. הוא אינו מבטל את הממצא ואינו מוכיח לבדו צורך בשיפוץ.'
+      ? 'זהו קילומטראז׳ גבוה שנותן הקשר לבלאי שנרשם ומחזק את הצורך בבירור ממוקד של מצב המנוע. הוא אינו מבטל את הממצא ואינו מוכיח לבדו צורך בשיפוץ.'
       : 'הקילומטראז׳ משמש הקשר לבלאי שנרשם, אך אינו משנה לבדו את האבחנה ואינו מוכיח צורך בשיפוץ.');
     const existing=String(item.contextNote||'').trim();
     return {...item,reportKm:km,contextNote:existing?existing+' '+mileageText:mileageText};
@@ -2815,9 +2871,12 @@ function applyManagerFormulaOverride(item){
   const managerMeaning=item.managerMeaning||override?.meaning||'';
   const managerDecision=item.managerDecision||override?.decision||'';
   if(!override&&!managerMeaning&&!managerDecision) return item;
+  const overrideSeverity=override?.report_severity||item.reportSeverity;
   return {
     ...item,
     classification:override?.classification_type||item.classification,
+    reportSeverity:overrideSeverity==='none'?null:overrideSeverity,
+    tag:override?.report_severity?(expertSeverityLabels[override.report_severity]||item.tag):item.tag,
     meaning:managerMeaning||item.meaning,
     decision:managerDecision||item.decision,
     managerEdited:true
@@ -2855,9 +2914,9 @@ function initFormulaAdmin(){
 }
 
 function formulaAdminRows(){
-  const base=rawFormulaDatabase.filter(isOperationalFormula).map(item=>({kind:'base',id:item.id,text:item.text,category:item.category,type:item.classification?.type||'context_dependent',meaning:item.meaning||'',decision:item.decision||'',question:item.question||'',procedure127:Boolean(item.procedure_127)}));
-  const observed=observedFormulaAliases.filter(isOperationalFormula).map(item=>({kind:'observed',id:item.id,text:item.text,category:item.category,type:item.classification_type||'context_dependent',meaning:item.meaning||'',decision:item.decision||'',question:item.question||''}));
-  const custom=loadCustomFormulas().filter(isOperationalFormula).map(item=>({kind:'custom',id:item.id,text:item.text,category:item.category,type:item.classification_type||'context_dependent',meaning:item.meaning||'',decision:item.decision||'',question:item.question||''}));
+  const base=rawFormulaDatabase.filter(isOperationalFormula).map(item=>({kind:'base',id:item.id,text:item.text,category:item.category,type:item.classification?.type||'context_dependent',severity:item.classification?.severity==='review'?'medium':(item.classification?.severity||'none'),meaning:item.meaning||'',decision:item.decision||'',question:item.question||'',procedure127:Boolean(item.procedure_127)}));
+  const observed=observedFormulaAliases.filter(isOperationalFormula).map(item=>({kind:'observed',id:item.id,text:item.text,category:item.category,type:item.classification_type||'context_dependent',severity:item.report_severity||'none',meaning:item.meaning||'',decision:item.decision||'',question:item.question||''}));
+  const custom=loadCustomFormulas().filter(isOperationalFormula).map(item=>({kind:'custom',id:item.id,text:item.text,category:item.category,type:item.classification_type||'context_dependent',severity:item.report_severity||'none',meaning:item.meaning||'',decision:item.decision||'',question:item.question||''}));
   return [...custom,...observed,...base].map(item=>({...item,override:formulaOverrideFor(item.category,item.text)}));
 }
 
@@ -2885,7 +2944,8 @@ function renderFormulaAdminList(){
     const reset=item.override?`<button class="secondary" type="button" onclick="deleteFormulaOverride('${item.override.id}')">איפוס התיקון</button>`:'';
     const remove=item.kind==='custom'?`<button class="secondary" type="button" onclick="deleteCustomFormula('${item.id}')">מחיקה</button>`:'';
     const controls=`<div style="margin-top:7px;display:flex;gap:6px;flex-wrap:wrap"><button class="secondary" type="button" onclick="editFormulaEntry('${item.kind}','${item.id}')">עריכת הסבר ומסקנה</button>${reset}${remove}</div>`;
-    return `<div class="formulaAdminItem"><b>${escapeHtml(item.text)}</b><small>${escapeHtml(formulaClassificationLabels[item.type]||'תלוי הקשר')} · ${source}${procedure}${edited}</small>${controls}</div>`;
+    const severity=item.override?.report_severity||item.severity||'none';
+    return `<div class="formulaAdminItem"><b>${escapeHtml(item.text)}</b><small>${escapeHtml(formulaClassificationLabels[item.type]||'תלוי הקשר')} · ${escapeHtml(expertSeverityLabels[severity]||'ללא משקל עצמאי')} · ${source}${procedure}${edited}</small>${controls}</div>`;
   }).join(''):'<div class="formulaAdminItem">לא נמצאו נוסחים התואמים לחיפוש בקבוצה זו.</div>';
   if(rows.length>visible.length) list.insertAdjacentHTML('beforeend',`<div class="formulaAdminItem"><small>מוצגים ${visible.length} מתוך ${rows.length} תוצאות. אפשר לצמצם באמצעות החיפוש.</small></div>`);
 }
@@ -2896,8 +2956,10 @@ function resetFormulaEditor(){
   ['formulaText','formulaMeaning','formulaDecision','formulaQuestion'].forEach(id=>{const field=document.getElementById(id);if(field){field.value='';field.readOnly=false;field.disabled=false;}});
   const category=document.getElementById('formulaCategory');
   const type=document.getElementById('formulaType');
+  const severity=document.getElementById('formulaSeverity');
   if(category) category.disabled=false;
   if(type) type.disabled=false;
+  if(severity){severity.disabled=false;severity.value='medium';}
   const saveButton=document.getElementById('formulaSaveButton');
   const cancelButton=document.getElementById('formulaCancelEdit');
   if(saveButton) saveButton.textContent='הוסף נוסח למאגר';
@@ -2907,6 +2969,7 @@ function resetFormulaEditor(){
 function saveCustomFormula(){
   const category=document.getElementById('formulaCategory')?.value||'';
   const type=document.getElementById('formulaType')?.value||'context_dependent';
+  const severity=document.getElementById('formulaSeverity')?.value||'none';
   const textValue=document.getElementById('formulaText')?.value.trim()||'';
   const meaningValue=document.getElementById('formulaMeaning')?.value.trim()||'';
   const decisionValue=document.getElementById('formulaDecision')?.value.trim()||'';
@@ -2924,6 +2987,7 @@ function saveCustomFormula(){
       category:editingFormulaTarget.category,
       text:editingFormulaTarget.text,
       classification_type:type,
+      report_severity:severity,
       meaning:meaningValue||template.meaning,
       decision:decisionValue||professionalDecision({category,type,classification:type,meaning:meaningValue||template.meaning}),
       question:questionValue,
@@ -2946,6 +3010,7 @@ function saveCustomFormula(){
     category,
     text:textValue,
     classification_type:type,
+    report_severity:severity,
     meaning:meaningValue||template.meaning,
     decision:decisionValue,
     question:questionValue||template.question,
@@ -2981,6 +3046,7 @@ function editFormulaEntry(kind,id){
   const override=item.override;
   document.getElementById('formulaCategory').value=item.category;
   document.getElementById('formulaType').value=override?.classification_type||item.type||'context_dependent';
+  document.getElementById('formulaSeverity').value=override?.report_severity||preview.reportSeverity||item.severity||'none';
   document.getElementById('formulaText').value=item.text||'';
   document.getElementById('formulaMeaning').value=override?.meaning||item.meaning||preview.meaning||'';
   document.getElementById('formulaDecision').value=override?.decision||item.decision||preview.decision||professionalDecision(preview);
@@ -3041,7 +3107,7 @@ function exportFormulaDatabase(){
   formulaAdminMessage('המאגר המעודכן יוצא לקובץ JSON.');
 }
 
-const reportSeverityLabels={safety:'ליקוי בטיחותי',high:'משמעות גבוהה',medium:'משמעות בינונית',low:'משמעות נמוכה',minor:'ליקוי שולי',none:'ללא משקל עצמאי'};
+const reportSeverityLabels={safety:'דגש בטיחותי',high:'משמעות גבוהה',medium:'משמעות בינונית',low:'משמעות נמוכה',minor:'משמעות נמוכה',none:'ללא משקל עצמאי'};
 
 function isOperationalFormula(item){
   return Boolean(item)&&item.active!==false&&item.category!=='הערות כלליות';
@@ -3050,8 +3116,8 @@ function isOperationalFormula(item){
 function classificationTemplate(type,category,text){
   const label=formulaClassificationLabels[type]||formulaClassificationLabels.context_dependent;
   const templates={
-    actual_finding:`„${text}” הוא ליקוי שנרשם בפועל בסעיף ${category}. זה אינו משפט כיסוי או הערה כללית.`,
-    limitation_or_disclaimer:`„${text}” הוא סייג להיקף הבדיקה או לאחריות המכון, ולא הוכחה לתקלה ברכב.`,
+    actual_finding:`„${text}” הוא ממצא מסוים שנרשם בסעיף ${category}. ההסבר משקף את נוסח הדוח ואינו חוות דעת על מכון הבדיקה.`,
+    limitation_or_disclaimer:`„${text}” הוא ניסוח של הסתייגות כללית או מגבלת בדיקה. הוא אינו הוכחה לתקלה ברכב ואינו מייחס למכון כוונה כלשהי.`,
     recommendation:`„${text}” הוא ניסוח של המלצה או בדיקת המשך. אין לספור אותו כליקוי שנמצא בפועל.`,
     maintenance_recommendation:`„${text}” מתאר צורך בתחזוקה או בכיוון, ולא בהכרח תקלה ברכיב.`,
     repair_history_or_evidence:`„${text}” מציין סימן לפירוק, תיקון, החלפה או עבודה קודמת. יש לפרש אותו לפי החלק ולפי קבוצת המשמעות שבה הוא מופיע בדוח; הוא אינו מוכיח לבדו תקלה פעילה.`,
@@ -3063,25 +3129,26 @@ function classificationTemplate(type,category,text){
 
 function professionalDecision(item){
   if(item.decision) return item.decision;
-  if(item.reportSeverity==='high') return 'ממצא מהותי בהערכת מצב הרכב והעלויות. הוא אינו מוכיח לבדו נזק מבני, אך יש לייחס לו משקל גבוה בסיכון, בסחירות ובשווי הרכב.';
-  if(item.reportSeverity==='low') return 'יש להביא בחשבון את מצב החלק ואת עלות הטיפול הצפויה. הממצא אינו מכריע לבדו.';
-  if(item.reportSeverity==='minor') return 'ליקוי שולי או קוסמטי. בדרך כלל השפעתו נמוכה כל עוד אינו מצטרף לממצאים מהותיים יותר.';
-  if(item.classification==='limitation_or_disclaimer') return 'אין לספור את הנוסח כליקוי. הוא רק מצמצם את ודאות הבדיקה באותו רכיב.';
-  if(item.classification==='recommendation') return 'אין לספור את הנוסח כתקלה שנמצאה. הוא מציין פעולה מומלצת בלבד.';
-  if(item.classification==='maintenance_recommendation') return 'זהו צורך תחזוקתי צפוי ולא בהכרח כשל. משקלו בקנייה הוא בעיקר הוצאה קרובה.';
+  if(item.reportSeverity==='high') return 'זהו ממצא בעל משמעות גבוהה. יש לברר את היקפו ולהשלים בדיקה מקצועית מתאימה.';
+  if(item.reportSeverity==='medium') return 'זהו ממצא בעל משמעות בינונית. יש לברר את חומרתו ואת הטיפול הנדרש.';
+  if(item.reportSeverity==='low') return 'זהו ממצא בעל משמעות נמוכה. יש לבדוק את מצב החלק ואת הטיפול הנדרש.';
+  if(item.reportSeverity==='minor') return 'זהו ממצא נקודתי או קוסמטי בעל משמעות נמוכה, כל עוד לא נרשם ממצא מהותי נוסף באותה מערכת.';
+  if(item.classification==='limitation_or_disclaimer') return 'זהו ניסוח של מגבלת בדיקה או הסתייגות כללית. הוא אינו קובע לבדו שקיימת תקלה ואינו מביע עמדה על עבודת המכון.';
+  if(item.classification==='recommendation') return 'הנוסח מציין בדיקת המשך מומלצת ואינו קובע שנמצאה תקלה.';
+  if(item.classification==='maintenance_recommendation') return 'הנוסח מצביע על צורך בתחזוקה או בכיוון. יש לברר את הפעולה הנדרשת אצל בעל מקצוע מתאים.';
   if(item.classification==='repair_history_or_evidence') return 'הנוסח מתאר סימן לפירוק, תיקון או החלפה קודמים. יש לפרש אותו לפי החלק ולפי קבוצת המשמעות שבה הוא מופיע בדוח, בלי להסיק השפעה שלא נכתבה.';
   if(item.classification==='information') return 'אין למידע הזה משקל של ליקוי בפני עצמו.';
-  if(item.classification==='context_dependent') return item.contextNote||'זהו ממצא תלוי גיל וקילומטראז׳; לבדו הוא אינו מצדיק פסילה, אך הוא מעלה את הסיכון להוצאה קרובה.';
+  if(item.classification==='context_dependent') return item.contextNote||'זהו ממצא תלוי הקשר. יש לפרש אותו לפי גיל הרכב, הקילומטראז׳ והממצאים הנלווים, בלי להסיק מעבר לנוסח הדוח.';
   const safetyCategories=['מערכת הבלמים (ללא פירוק גלגלים)','מערכת ההיגוי','מערכת מתלה קדמי','מערכת מתלה אחורי','צמיגים וחישוקים','שלדת מרכב','שלדה נפרדת'];
-  if(safetyCategories.includes(item.category)||/בלמ|היגוי|מתלה|צמיג/.test(item.category||'')) return 'זהו ליקוי ממשי במערכת המשפיעה על בטיחות או יציבות. יש לשקלל תיקון קרוב ואת חומרת הממצאים הנוספים בהערכת מצב הרכב והעלויות.';
-  if(/מנוע|הילוכים|הנעה|גידוש|קירור/.test(item.category||'')) return 'זהו ליקוי מכני ממשי שעלול לגרור הוצאה קרובה. משקלו בהערכת מצב הרכב והעלויות בינוני עד גבוה בהתאם לחומרת שאר ממצאי המערכת.';
+  if(safetyCategories.includes(item.category)||/בלמ|היגוי|מתלה|צמיג/.test(item.category||'')) return 'נרשם ממצא במערכת שעשויה להשפיע על בטיחות או יציבות. יש לבצע בירור מקצועי ולטפל בהתאם לממצא המאומת.';
+  if(/מנוע|הילוכים|הנעה|גידוש|קירור/.test(item.category||'')) return 'נרשם ממצא מכני שדורש בירור ממוקד במוסך ואימות של מקורו וחומרתו.';
   if(/תאורה/.test(item.category||'')) return 'זהו ליקוי תפקודי שנדרש לתקן. בדרך כלל הוא נקודתי, אלא אם הוא חלק מתקלה חשמלית רחבה יותר.';
-  return 'זהו ליקוי ממשי שיש להביא בחשבון במחיר ובהערכת מצב הרכב והעלויות.';
+  return 'נרשם ממצא שדורש בדיקה והבהרה אצל בעל המקצוע המתאים.';
 }
 
 function contextNoteFor(item){
   if(item.expertDecision){
-    if(item.contextPolicy==='economic_only') return 'גיל הרכב והקילומטראז׳ משפיעים על הכדאיות הכלכלית בלבד, ולא מבטלים את עצם הממצא.';
+    if(item.contextPolicy==='economic_only') return 'גיל הרכב והקילומטראז׳ נותנים הקשר לממצא, אך אינם מבטלים את עצם קיומו בדוח.';
     if(item.contextPolicy==='expected_wear'&&item.classification!=='limitation_or_disclaimer') return 'ייתכן שמדובר בבלאי צפוי, אך הסיווג המקצועי וחומרת הממצא נשארים כפי שנקבעו.';
     return '';
   }
@@ -3093,7 +3160,7 @@ function contextNoteFor(item){
   const young=age!==null&&age<=5,lowKm=Boolean(km&&km<=80000),old=age!==null&&age>=10,highKm=Boolean(km&&km>=150000);
   if(young||lowKm){
     const profile=young&&lowKm?'ברכב צעיר ובעל קילומטראז׳ נמוך':young?'ברכב צעיר':'ברכב בעל קילומטראז׳ נמוך';
-    return `${profile}, ממצא כזה פחות צפוי ולכן משקלו בהערכת מצב הרכב והעלויות בינוני עד גבוה.`;
+    return `${profile}, ממצא כזה פחות צפוי ולכן הוא מחייב בירור מקצועי ממוקד.`;
   }
   if(old||highKm){
     const profile=old&&highKm?'ברכב ותיק ובעל קילומטראז׳ גבוה':old?'ברכב ותיק':'ברכב בעל קילומטראז׳ גבוה';
@@ -3102,9 +3169,40 @@ function contextNoteFor(item){
   return 'בגיל ובקילומטראז׳ האלה משקל הממצא בינוני; ממצאים נוספים באותה מערכת יכולים להעלות אותו.';
 }
 
+const customerRestrictedWording=/(?:עלות|מחיר|שווי|סחירות|ירידת\s*ערך|הוצאה|כלכל|כספי|כדאי|כדאיות|לקנות|קניית|אי[־-]?קנייה|פסיל|לברוח|כיסוי\s*תחת|משפט\s*כיסוי|מקצועיות\s*המכון|המכון\s*(?:טעה|התרשל|הטעה|לא\s*מקצועי))/i;
+
+function neutralCustomerDirection(item){
+  if(item?.classification==='limitation_or_disclaimer') return 'זהו ניסוח של הסתייגות כללית או מגבלת בדיקה. הוא אינו קובע לבדו שקיימת תקלה ואינו מביע עמדה על עבודת המכון.';
+  if(item?.classification==='recommendation') return 'הנוסח מציין צורך בבדיקת המשך ואינו קובע שנמצאה תקלה.';
+  if(item?.classification==='maintenance_recommendation') return 'הנוסח מצביע על צורך בתחזוקה או בכיוון. יש לברר את הפעולה הנדרשת אצל בעל מקצוע מתאים.';
+  if(item?.classification==='repair_history_or_evidence') return 'הנוסח מתאר סימן לפירוק, תיקון או החלפה קודמים. יש לבדוק את החלק ואת משמעות הממצא בלי להסיק מעבר למה שנכתב.';
+  if(item?.classification==='information') return 'זהו מידע תיאורי בלבד ואינו קובע שקיימת תקלה.';
+  if(item?.code||item?.computerDescription) return 'קוד התקלה מספק כיוון לאבחון בלבד. יש לבדוק את מצב הקוד, את הנתונים הנלווים ואת המערכת המתאימה באמצעות ציוד אבחון מקצועי.';
+  if(item?.reportSeverity==='safety') return 'נרשם ממצא בעל היבט בטיחותי. יש לבצע בדיקה מקצועית ולטפל בהתאם לממצא המאומת.';
+  if(item?.reportSeverity==='high') return 'זהו ממצא בעל משמעות גבוהה. יש לברר את היקפו ולהשלים בדיקה מקצועית מתאימה.';
+  if(item?.reportSeverity==='medium') return 'זהו ממצא בעל משמעות בינונית. יש לברר את חומרתו ואת הטיפול הנדרש.';
+  if(item?.reportSeverity==='low'||item?.reportSeverity==='minor') return 'זהו ממצא בעל משמעות נמוכה. יש לבדוק את מצב החלק ואת הטיפול הנדרש.';
+  return 'יש לברר את משמעות הממצא אצל בעל המקצוע המתאים, בלי להסיק מעבר לנוסח הדוח.';
+}
+
+function customerSafeText(value,item,fallback='direction'){
+  const sentences=String(value||'').split(/(?<=[.!?])/u).map(part=>part.trim()).filter(Boolean);
+  const safe=sentences.filter(sentence=>!customerRestrictedWording.test(sentence)).join(' ').trim();
+  if(safe) return safe;
+  if(fallback==='meaning'){
+    const source=String(item?.sourceText||item?.matchedTerm||'').trim();
+    return source?`בדוח זוהה הנוסח „${source}”. הסיווג מבוסס על ההתאמה למאגר BuyTest.`:'הממצא סווג לפי הטקסט שנקרא מהדוח וההתאמה למאגר BuyTest.';
+  }
+  return neutralCustomerDirection(item);
+}
+
+function customerFacingDecision(item){
+  return customerSafeText(item?.decision||professionalDecision({...item,decision:''}),item,'direction');
+}
+
 function rawFormulaToRule(formula,sourceLabel='מאגר הנוסחים'){
   const type=formula.classification?.type||formula.classification_type||'context_dependent';
-  const formulaSeverity=['high','low','minor'].includes(formula.classification?.severity)?formula.classification.severity:null;
+  const formulaSeverity=['safety','high','medium','low','minor'].includes(formula.classification?.severity)?formula.classification.severity:null;
   const template=classificationTemplate(type,formula.category,formula.text);
   const safetyCategories=['מערכת הבלמים (ללא פירוק גלגלים)','מערכת ההיגוי','מערכת מתלה קדמי','מערכת מתלה אחורי','צמיגים וחישוקים','שלדת מרכב','שלדה נפרדת'];
   const rule={
@@ -3131,7 +3229,7 @@ function customFormulaToRule(formula){
   const rule=rawFormulaToRule({
     ...formula,
     id:'custom-'+formula.id,
-    classification:{type:formula.classification_type||'context_dependent',context_policy:formula.classification_type==='context_dependent'?'vehicle_age_and_mileage':null}
+    classification:{type:formula.classification_type||'context_dependent',severity:formula.report_severity==='none'?null:formula.report_severity,context_policy:formula.classification_type==='context_dependent'?'vehicle_age_and_mileage':null}
   },'נוסח שהוסף בניהול');
   rule.managerMeaning=formula.meaning||'';
   rule.managerDecision=formula.decision||'';
@@ -3869,12 +3967,14 @@ function meaningCardHtml(item){
   item=finalizeReportFinding(item);
   if(!item) return '';
   const contextLabel=item.code||item.computerDescription?'מצב הקוד:':'בהתאם לרכב:';
-  const context=item.contextNote?`<div class="contextNote"><b>${contextLabel}</b> ${escapeHtml(item.contextNote)}</div>`:'';
+  const safeContext=item.contextNote?customerSafeText(item.contextNote,item,'direction'):'';
+  const context=safeContext?`<div class="contextNote"><b>${contextLabel}</b> ${escapeHtml(safeContext)}</div>`:'';
   const source=item.sourceText?`<div class="matchSource">הנוסח שזוהה: ${escapeHtml(item.sourceText)}</div>`:'';
-  const decision=item.decision||professionalDecision(item);
+  const meaning=customerSafeText(item.meaning,item,'meaning');
+  const decision=customerFacingDecision(item);
   const heading=item.code?`<span class="dtcCode">${escapeHtml(item.displayCode||item.code)}</span> · ${escapeHtml(item.category)}`:escapeHtml(item.category);
-  const decisionLabel=item.code||item.computerDescription?'מה צריך לבדוק:':'המסקנה:';
-  return `<div class="meaningCard ${item.tone||''}"><span class="meaningTag">${escapeHtml(item.tag||formulaClassificationLabels[item.classification]||'סיווג מקצועי')}</span><h4>${heading}</h4><p><b>מה זה אומר:</b> ${escapeHtml(item.meaning)}</p><p><b>${decisionLabel}</b> ${escapeHtml(decision)}</p>${context}${source}</div>`;
+  const decisionLabel=item.code||item.computerDescription?'מה צריך לבדוק:':'מה כדאי לברר:';
+  return `<div class="meaningCard ${item.tone||''}"><span class="meaningTag">${escapeHtml(item.tag||formulaClassificationLabels[item.classification]||'סיווג מקצועי')}</span><h4>${heading}</h4><p><b>מה זה אומר:</b> ${escapeHtml(meaning)}</p><p><b>${decisionLabel}</b> ${escapeHtml(decision)}</p>${context}${source}</div>`;
 }
 
 function analysisTextBlock(title,result){
@@ -3882,7 +3982,7 @@ function analysisTextBlock(title,result){
   if(result.reportKm) text+=`קילומטראז׳ שנקרא מהדוח: ${fmtNum(result.reportKm)} ק״מ. הנתון משמש כהקשר לממצאים ואינו אבחנה בפני עצמו.\n`;
   const findings=result.findings.map(finalizeReportFinding).filter(Boolean);
   if(findings.length){
-    const lineFor=item=>`• ${item.category} [${item.tag||formulaClassificationLabels[item.classification]||'סיווג מקצועי'}] — ${item.meaning} ${item.code?'מה צריך לבדוק:':'מסקנה:'} ${item.decision||professionalDecision(item)}${item.contextNote?(item.code?' מצב הקוד: ':' התאמה לרכב: ')+item.contextNote:''}`;
+    const lineFor=item=>`• ${item.category} [${item.tag||formulaClassificationLabels[item.classification]||'סיווג מקצועי'}] — ${customerSafeText(item.meaning,item,'meaning')} ${item.code?'מה צריך לבדוק:':'מה כדאי לברר:'} ${customerFacingDecision(item)}${item.contextNote?(item.code?' מצב הקוד: ':' התאמה לרכב: ')+customerSafeText(item.contextNote,item,'direction'):''}`;
     if(result.codes){
       const groups=new Map();
       findings.forEach(item=>{
@@ -3909,7 +4009,7 @@ function analysisTextBlock(title,result){
 function unknownFindingsHtml(items){
   const rows=(items||[]).filter(Boolean);
   if(!rows.length) return '';
-  return '<div class="unknownList"><b>ניסוחים שנראים כליקוי אך עדיין אינם מזוהים במאגר:</b><ul>'
+  return '<div class="unknownList"><b>ניסוחים שדורשים בירור ואינם מזוהים עדיין במאגר:</b><ul>'
     +rows.map(item=>`<li>${escapeHtml(item)}</li>`).join('')+'</ul></div>';
 }
 
@@ -3946,7 +4046,7 @@ function analyseInspectionReport(){
   html+=`<div class="inspectionIdentityItem"><span class="inspectionIdentityLabel">קילומטראז׳ ${displayedKm?'('+kmSource+')':''}</span><strong class="inspectionIdentityValue">${displayedKm?fmtNum(displayedKm)+' ק״מ':'לא זמין'}</strong></div>`;
   html+='</div>';
   if(engineItems.length) html+=`<div class="ocrStatusDetails" style="margin-top:12px"><span class="ocrEngineBadge">מנוע הפענוח: ${escapeHtml(engineItems.join(' · '))}</span></div>`;
-  html+='</div><h3>מסקנות מקצועיות מסיכום הבדיקה</h3>';
+  html+='</div><h3>פענוח הממצאים מסיכום הבדיקה</h3>';
   html+='<p>הפלט אינו העתק של דוח המכון ואינו כולל את הקובץ, הלוגו או שם המכון.</p>';
   if(summaryResult.reportKm){
     html+=`<div class="info"><b>קילומטראז׳ שנקרא מהדוח:</b> ${fmtNum(summaryResult.reportKm)} ק״מ. הנתון משמש כהקשר לממצאים, ובמיוחד לבלאי במנוע; הוא אינו אבחנה בפני עצמו.</div>`;
@@ -3960,9 +4060,9 @@ function analyseInspectionReport(){
     html+=unknownFindingsHtml(computerResult.unknown);
   }
   if(!totalFindings&&!totalUnknown){
-    html+='<div class="unknownList"><b>לא זוהו בדוח ניסוחים של ליקוי מתוך המאגר המקצועי.</b></div>';
+    html+='<div class="unknownList"><b>לא זוהו בדוח ממצאים שניתן להתאים בבטחה למאגר המקצועי.</b></div>';
   }
-  html+='<div class="info"><b>איך להשתמש במסקנות:</b> לכל ממצא מוצגים סוג הממצא, חומרתו והמשקל שלו בהערכת מצב הרכב והעלויות. ההחלטה הסופית והמחיר נשארים בידי המשתמש.</div>';
+  html+='<div class="info"><b>איך להשתמש בפענוח:</b> לכל ממצא מוצגים סוג הממצא, רמת המשמעות ומה כדאי לברר. אין כאן המלצה לקנות או לא לקנות, הערכת מחיר או חוות דעת על מכון הבדיקה.</div>';
 
   const box=document.getElementById('afterInterpretation');
   box.innerHTML=html;
@@ -3974,7 +4074,7 @@ function analyseInspectionReport(){
 
   const pre=collectPreInspection();
   preReportText=pre.text;
-  afterReportText='אחרי הבדיקה במכון\n'+`שם מזמין/ת הבדיקה: ${ownerName}\n`+`קילומטראז׳: ${displayedKm?fmtNum(displayedKm)+' ק״מ':'לא זמין'}${displayedKm?' ('+kmSource+')':''}\n`+`מנוע הפענוח: ${engineItems.join(' · ')||'לא זוהה'}\n`+analysisTextBlock('מסקנות מסיכום הבוחן',summaryResult)+(computerText?'\n'+computerIdentityText(computerResult.vehicleIdentity)+'\n'+analysisTextBlock('מסקנות מהבדיקה הממוחשבת',computerResult):'')+'\nהבהרה: המערכת מדרגת את משקל הממצאים; ההחלטה הסופית והמחיר נשארים בידי המשתמש.';
+  afterReportText='אחרי הבדיקה במכון\n'+`שם מזמין/ת הבדיקה: ${ownerName}\n`+`קילומטראז׳: ${displayedKm?fmtNum(displayedKm)+' ק״מ':'לא זמין'}${displayedKm?' ('+kmSource+')':''}\n`+`מנוע הפענוח: ${engineItems.join(' · ')||'לא זוהה'}\n`+analysisTextBlock('פענוח סיכום הבוחן',summaryResult)+(computerText?'\n'+computerIdentityText(computerResult.vehicleIdentity)+'\n'+analysisTextBlock('פענוח הבדיקה הממוחשבת',computerResult):'')+'\nהבהרה: BuyTest מסביר את הממצאים ומה כדאי לברר. אין בפלט המלצת קנייה, הערכת מחיר או קביעה לגבי מכון הבדיקה.';
   reportText=[preReportText,afterReportText].filter(Boolean).join('\n\n');
   prepareReportPdf('finalPdfBtn');
   showFeedback();
@@ -4211,7 +4311,7 @@ async function btBuildThreePageAfterReportPdf(){
   let y=btDrawPdfEntries(page1.ctx,identityEntries,page1.y,H-165,contentWidth,margin)+14;
   page1.ctx.fillStyle='#cce7de';page1.ctx.fillRect(margin,y,contentWidth,2);y+=20;
   btDrawPdfEntries(page1.ctx,mechanicalEntries,y,H-165,contentWidth,margin);
-  drawFooter(page1.ctx,'הסיכום מבוסס על הטקסט שזוהה בדוח המכון ואינו מחליף בדיקה פיזית, אבחון מוסך או חוות דעת שמאית.');
+  drawFooter(page1.ctx,'הפענוח מבוסס על הטקסט שזוהה בדוח ואינו מחליף בדיקה פיזית, אבחון מוסך או חוות דעת שמאית. הוא אינו המלצת קנייה או חוות דעת על המכון.');
   canvases.push(page1.canvas);
 
   const page2=makePage('תמונות והבהרות משפטיות',2);
@@ -4240,10 +4340,11 @@ async function btBuildThreePageAfterReportPdf(){
     {text:'• BuyTest מספק הסבר מידע בלבד; הוא אינו בודק את הרכב פיזית ואינו מהווה חוות דעת מקצועית, שמאות, אישור תקינות או תחליף לבדיקה במכון מוסמך.',heading:false},
     {text:'• BuyTest אינו נותן הערכת שווי, אומדן עלות תיקון, ירידת ערך או המלצה לקנות או לא לקנות.',heading:false},
     {text:'• הפענוח מבוסס על הטקסט שזוהה בקבצים. זיהוי אופטי עלול לשגות, ולכן יש לאמת כל פרט מהותי מול דוח המקור ורישיון הרכב.',heading:false},
-    {text:'• המידע ממאגרים חיצוניים עלול להיות חלקי או לא מעודכן. האחריות לבירור הממצאים ולקבלת החלטה כספית, משפטית או בטיחותית היא של המשתמש.',heading:false}
+    {text:'• המידע ממאגרים חיצוניים עלול להיות חלקי או לא מעודכן. יש לאמת כל ממצא מול בעלי המקצוע המתאימים.',heading:false},
+    {text:'• הסיווג אינו ביקורת או דירוג של מכון הבדיקה ואינו קובע שהמכון טעה, התרשל או פעל שלא כשורה.',heading:false}
   ];
   btDrawPdfEntries(page2.ctx,legalEntries,legalTop,H-165,contentWidth,margin);
-  drawFooter(page2.ctx,'קובץ דוח המכון, הלוגו ושם המכון אינם נכללים בפלט. BuyTest אינו קשור למכון הבדיקה ואינו מדבר בשמו.');
+  drawFooter(page2.ctx,'קובץ דוח המכון, הלוגו ושם המכון אינם נכללים בפלט. BuyTest אינו קשור למכון הבדיקה, אינו מדבר בשמו ואינו מייחס לו כוונה כלשהי.');
   canvases.push(page2.canvas);
 
   const page3=makePage('בדיקה ממוחשבת וקודי תקלות',3);
@@ -4342,7 +4443,7 @@ async function btBuildPdfBlob(){
   textBlock('BuyTest מספק הכנה מודרכת לפני המכון והסבר מידע לאחריו. הוא אינו בודק את הרכב פיזית ואינו מהווה חוות דעת מקצועית, שמאות, אישור לתקינות או תחליף לבדיקה במכון מוסמך.',22,true,8);
   textBlock('BuyTest אינו נותן הערכת שווי, עלות תיקון, ירידת ערך או המלצה לקנות או לא לקנות. כל החלטה היא של המשתמש בלבד.',21,true,8);
   textBlock('ההסבר מבוסס רק על הטקסט שהמשתמש אישר. ניסוח לא מוכר או נתון ללא טווח ייחוס או סימון מפורש אינו מפורש בדרך של ניחוש ויש לבררו מול הבוחן.',21,false,8);
-  textBlock('קובץ דוח המכון, הלוגו ושם המכון אינם כלולים בפלט. BuyTest אינו קשור למכון הבדיקה ואינו מדבר בשמו.',21,false,8);
+  textBlock('קובץ דוח המכון, הלוגו ושם המכון אינם כלולים בפלט. BuyTest אינו קשור למכון הבדיקה, אינו מדבר בשמו ואינו קובע שהמכון טעה או פעל שלא כשורה.',21,false,8);
   textBlock('המידע על הרכב מתקבל ממאגרים חיצוניים, ובהם מאגרי משרד התחבורה, ועלול להיות חלקי, חסר, שגוי או לא מעודכן.',21,false,8);
   textBlock('האחריות לאימות הנתונים, לבירור הממצאים מול הבוחן ולקבלת כל החלטה כספית, משפטית או בטיחותית היא של המשתמש בלבד.',21,false,8);
   textBlock('השימוש ב-BuyTest כפוף לתנאי השימוש ולמדיניות הפרטיות המלאים המופיעים באתר.',20,false,0);
