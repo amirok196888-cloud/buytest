@@ -1143,13 +1143,37 @@ async function restoreBuyTestAccess({requiredPlate='',onReturn=false}={}){
 }
 async function initializeBuyTestAccess(){
   const params=new URLSearchParams(location.search);
-  const returned=params.get('buytest_payment')==='return'||params.get('response')==='success'||params.get('reponse')==='success';
+  const hashParams=new URLSearchParams(location.hash.replace(/^#/,''));
+  const redemptionCode=String(hashParams.get('redeem')||'');
+  const redemptionPlate=String(hashParams.get('plate')||'').replace(/\D/g,'');
+  let manualAccess=false;
+  if(redemptionCode&&/^\d{7,8}$/.test(redemptionPlate)){
+    manualAccess=true;
+    history.replaceState({},document.title,location.pathname);
+    showBuyTestAccessNotice('מפעיל את הגישה ששולמה לרכב '+redemptionPlate+'...');
+    try{
+      const access=await callBuyTestPaymentService({action:'redeem',code:redemptionCode,plate:redemptionPlate});
+      saveBuyTestPayment({
+        orderId:access.orderId,
+        clientSecret:access.clientSecret,
+        plate:access.plate,
+        plan:access.plan,
+        expiresAt:access.expiresAt,
+        createdAt:new Date().toISOString()
+      });
+    }catch(error){
+      console.error('BuyTest redemption failed:',error);
+      showBuyTestAccessNotice('קישור ההפעלה אינו תקף או שכבר הופעל. לא בוצע חיוב נוסף.',true);
+      return;
+    }
+  }
+  const returned=manualAccess||params.get('buytest_payment')==='return'||params.get('response')==='success'||params.get('reponse')==='success';
   const saved=storedBuyTestPayment();
   if(!saved) return;
   const returnedOrder=params.get('order');
   if(returnedOrder&&returnedOrder!==saved.orderId) return;
   if(!returned){await restoreBuyTestAccess();return}
-  showBuyTestAccessNotice('התשלום הסתיים. מאמת את האישור ופותח את האתר...');
+  if(!manualAccess) showBuyTestAccessNotice('התשלום הסתיים. מאמת את האישור ופותח את האתר...');
   for(let attempt=0;attempt<20;attempt++){
     if(await restoreBuyTestAccess({onReturn:attempt===19})){history.replaceState({},document.title,location.pathname);return}
     await new Promise(resolve=>setTimeout(resolve,1500));
