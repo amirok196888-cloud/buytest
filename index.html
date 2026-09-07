@@ -114,19 +114,13 @@ body.plan-report .clarificationBox.show,body.plan-consultation .clarificationBox
 .photoPreview img{width:100%;height:120px;object-fit:cover;border-radius:10px}
 .photoPreview button{width:100%;margin-top:4px}.photoBox{margin-top:18px}
 
-/* BuyTest secure payment handoff */
+/* BuyTest payment provider transition */
 .paymentOverlay[hidden]{display:none!important}
 .paymentOverlay{position:fixed;inset:0;z-index:99999;background:rgba(8,28,34,.64);display:grid;place-items:center;padding:18px}
 .paymentDialog{width:min(100%,440px);max-height:92vh;overflow:auto;background:#fff;border-radius:22px;padding:22px;box-shadow:0 24px 70px rgba(0,0,0,.28);color:#17242b}
 .paymentDialog h2{margin:0 0 6px}.paymentDialog p{margin:0 0 16px;color:#60717a}
-.paymentDialog label{display:block;font-weight:800;margin:12px 0 5px}
-.paymentDialog input[type="text"],.paymentDialog input[type="tel"]{width:100%;box-sizing:border-box;border:1px solid #cbd8dd;border-radius:12px;padding:13px 14px;font:inherit;background:#fff;color:#17242b}
-.paymentConsent{display:flex!important;align-items:flex-start;gap:9px;font-weight:500!important;font-size:13px;color:#51636b;margin-top:15px!important}
-.paymentConsent input{margin-top:4px;flex:0 0 auto}
-.paymentActions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:16px}
+.paymentActions{display:grid;grid-template-columns:1fr;gap:9px;margin-top:16px}
 .paymentActions button{margin:0}
-.paymentStatus{min-height:22px;margin-top:12px!important;font-size:14px;font-weight:700}
-.paymentStatus.error{color:#b42318}.paymentStatus.waiting{color:#176c56}
 
 </style><style>#appShell{display:block!important}
 /* BuyTest V20 – light commercial landing + improved value-first flow */
@@ -1244,59 +1238,14 @@ function previewPlanAsManager(planKey='all'){
 function startPayment(planKey='bundle'){
   const selectedKey=Object.prototype.hasOwnProperty.call(buytestPlans,planKey)?planKey:'bundle';
   const plan=buytestPlans[selectedKey];
-  sessionStorage.setItem('buytestPendingPlan',selectedKey);
-  document.getElementById('paymentPlanKey').value=selectedKey;
   document.getElementById('paymentPlanSummary').textContent=plan.name+' · '+plan.price+' ₪';
-  document.getElementById('paymentStatus').textContent='';
-  document.getElementById('paymentStatus').className='paymentStatus';
-  document.getElementById('paymentCustomerForm').reset();
-  document.getElementById('paymentSubmitButton').disabled=false;
-  document.getElementById('paymentPlanKey').value=selectedKey;
   const overlay=document.getElementById('paymentOverlay');
   overlay.hidden=false;
   document.body.style.overflow='hidden';
-  setTimeout(()=>document.getElementById('paymentFullName').focus(),50);
 }
 function closeBuyTestPayment(){
   document.getElementById('paymentOverlay').hidden=true;
   document.body.style.overflow='';
-}
-function normalizeIsraeliMobile(value){
-  let phone=String(value||'').replace(/[^0-9+]/g,'');
-  if(phone.startsWith('+972')) phone='0'+phone.slice(4);
-  else if(phone.startsWith('972')) phone='0'+phone.slice(3);
-  return phone;
-}
-async function submitBuyTestPayment(event){
-  event.preventDefault();
-  const status=document.getElementById('paymentStatus');
-  const button=document.getElementById('paymentSubmitButton');
-  const planKey=document.getElementById('paymentPlanKey').value;
-  const fullName=document.getElementById('paymentFullName').value.trim().replace(/\s+/g,' ');
-  const phone=normalizeIsraeliMobile(document.getElementById('paymentPhone').value);
-  const vehiclePlate=plate();
-  const nameParts=fullName.split(' ').filter(Boolean);
-  if(!/^\d{7,8}$/.test(vehiclePlate)){status.className='paymentStatus error';status.textContent='יש להזין תחילה מספר רכב בן 7 או 8 ספרות.';return}
-  if(nameParts.length<2||nameParts.some(part=>part.length<2)){status.className='paymentStatus error';status.textContent='יש לרשום שם פרטי ושם משפחה.';return}
-  if(!/^05\d{8}$/.test(phone)){status.className='paymentStatus error';status.textContent='יש לרשום מספר נייד ישראלי תקין.';return}
-  status.className='paymentStatus waiting';
-  status.textContent='יוצר קישור מאובטח לתשלום...';
-  button.disabled=true;
-  try{
-    const data=await callBuyTestPaymentService({action:'create',plan:planKey,plate:vehiclePlate,fullName,phone});
-    saveBuyTestPayment({orderId:data.orderId,clientSecret:data.clientSecret,plate:vehiclePlate,plan:planKey,createdAt:new Date().toISOString()});
-    sessionStorage.setItem('buytestPendingPlan',planKey);
-    sessionStorage.setItem(BUYTEST_PAYMENT_RETURN_KEY,'1');
-    window.location.assign(data.paymentUrl);
-  }catch(error){
-    sessionStorage.removeItem(BUYTEST_PAYMENT_RETURN_KEY);
-    console.error('BuyTest payment handoff failed:',error);
-    status.className='paymentStatus error';
-    status.textContent=error.message==='payment_link_failed'
-      ?'מערכת התשלום נעצרה כי הסכום בקישור לא תאם למסלול. לא בוצע חיוב.'
-      :'לא הצלחנו לפתוח את התשלום. לא בוצע חיוב. נסה שוב בעוד רגע.';
-    button.disabled=false;
-  }
 }
 
 async function managerCodeDigest(value){
@@ -4737,8 +4686,6 @@ window.addEventListener('DOMContentLoaded',async()=>{
   await runBuyTestAccessInitialization();
 });
 window.addEventListener('pageshow',async event=>{
-  const paymentButton=document.getElementById('paymentSubmitButton');
-  if(paymentButton) paymentButton.disabled=false;
   if(event.persisted&&sessionStorage.getItem(BUYTEST_PAYMENT_RETURN_KEY)==='1') await runBuyTestAccessInitialization();
 });
 document.addEventListener('visibilitychange',async()=>{
@@ -4755,24 +4702,12 @@ document.addEventListener('keydown',event=>{
 
 <div class="paymentOverlay" id="paymentOverlay" hidden>
   <section class="paymentDialog" role="dialog" aria-modal="true" aria-labelledby="paymentDialogTitle">
-    <h2 id="paymentDialogTitle">מעבר לתשלום מאובטח</h2>
+    <h2 id="paymentDialogTitle">מערכת התשלום מתעדכנת</h2>
     <p id="paymentPlanSummary"></p>
-    <form id="paymentCustomerForm" onsubmit="submitBuyTestPayment(event)">
-      <input type="hidden" id="paymentPlanKey">
-      <label for="paymentFullName">שם מלא</label>
-      <input id="paymentFullName" type="text" autocomplete="name" required placeholder="שם פרטי ושם משפחה">
-      <label for="paymentPhone">טלפון נייד</label>
-      <input id="paymentPhone" type="tel" inputmode="tel" autocomplete="tel" required placeholder="05XXXXXXXX">
-      <label class="paymentConsent">
-        <input id="paymentConsent" type="checkbox" required>
-        <span>אני מאשר/ת שהשם, הטלפון והמסלול שנבחר יישלחו ל־Make ול־Grow לצורך יצירת קישור התשלום.</span>
-      </label>
-      <div class="paymentActions">
-        <button class="primary" id="paymentSubmitButton" type="submit">המשך לתשלום</button>
-        <button class="secondary" type="button" onclick="closeBuyTestPayment()">ביטול</button>
-      </div>
-      <p class="paymentStatus" id="paymentStatus" role="status" aria-live="polite"></p>
-    </form>
+    <p>החיבור המאובטח ל־Morning נמצא בהכנה. כרגע לא ניתן לבצע תשלום חדש ולא יבוצע חיוב.</p>
+    <div class="paymentActions">
+      <button class="primary" type="button" onclick="closeBuyTestPayment()">הבנתי</button>
+    </div>
   </section>
 </div>
 
