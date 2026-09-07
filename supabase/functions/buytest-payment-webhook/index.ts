@@ -57,10 +57,11 @@ async function cardcomResult(terminalNumber: number, apiName: string, lowProfile
     return data;
   } finally { clearTimeout(timeout); }
 }
-function compactProviderPayload(result: Record<string, unknown>) {
+function compactProviderPayload(result: Record<string, unknown>, existing: unknown = {}) {
   const transaction = result.TranzactionInfo && typeof result.TranzactionInfo === "object" ? result.TranzactionInfo as Record<string, unknown> : {};
   const documentInfo = result.DocumentInfo && typeof result.DocumentInfo === "object" ? result.DocumentInfo as Record<string, unknown> : {};
   return {
+    ...(existing && typeof existing === "object" && !Array.isArray(existing) ? existing as Record<string, unknown> : {}),
     provider: "cardcom",
     lowProfileId: String(result.LowProfileId || ""),
     transactionId: String(result.TranzactionId || ""),
@@ -106,7 +107,7 @@ Deno.serve(async (req: Request) => {
       status: "paid",
       paid_at: new Date().toISOString(),
       expires_at: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
-      provider_payload: compactProviderPayload(result),
+      provider_payload: compactProviderPayload(result, order.provider_payload),
     });
     return json({ ok: true });
   } catch (error) {

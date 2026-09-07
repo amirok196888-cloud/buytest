@@ -8,12 +8,13 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 const PLANS = {
   premium: { amountAgorot: 4900, title: "בדיקה עצמית לפני המכון", scopes: ["premium"] },
-  report: { amountAgorot: 3900, title: "פענוח אחרי המכון", scopes: ["report"] },
-  consultation: { amountAgorot: 4900, title: "התייעצות אישית", scopes: ["consultation"] },
+  report: { amountAgorot: 3900, title: "פענוח אחרי המכון", scopes: ["premium", "report"] },
+  consultation: { amountAgorot: 4900, title: "התייעצות אישית", scopes: ["premium", "report", "consultation"] },
   bundle: { amountAgorot: 12000, title: "חבילת BuyTest המלאה", scopes: ["premium", "report", "consultation"] },
 } as const;
 type PlanKey = keyof typeof PLANS;
 type CardcomConfig = { terminalNumber: number; apiName: string; enabled: boolean };
+type StageProgress = { preInspectionCompleted: boolean; reportCompleted: boolean };
 
 function responseHeaders(origin: string | null) {
   return {
@@ -43,6 +44,19 @@ function cleanEmail(value: unknown) { return cleanText(value, 50).toLowerCase();
 function validEmail(value: string) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value); }
 function isPlan(value: unknown): value is PlanKey {
   return Object.prototype.hasOwnProperty.call(PLANS, String(value));
+}
+function recordValue(value: unknown): Record<string, unknown> {
+  return value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {};
+}
+function stageProgress(value: unknown): StageProgress {
+  const progress = recordValue(recordValue(value).progress);
+  return {
+    preInspectionCompleted: progress.preInspectionCompleted === true,
+    reportCompleted: progress.reportCompleted === true,
+  };
+}
+function progressPayload(existing: unknown, progress: StageProgress, values: Record<string, unknown> = {}) {
+  return { ...recordValue(existing), ...values, progress };
 }
 function base64Url(data: Uint8Array) {
   let binary = "";
@@ -140,12 +154,13 @@ function safePaymentUrl(value: unknown) {
     return url.toString();
   } catch { return ""; }
 }
-function compactProviderPayload(result: Record<string, unknown>) {
+function compactProviderPayload(result: Record<string, unknown>, existing: unknown = {}) {
   const transaction = result.TranzactionInfo && typeof result.TranzactionInfo === "object"
     ? result.TranzactionInfo as Record<string, unknown> : {};
   const documentInfo = result.DocumentInfo && typeof result.DocumentInfo === "object"
     ? result.DocumentInfo as Record<string, unknown> : {};
   return {
+    ...recordValue(existing),
     provider: "cardcom",
     lowProfileId: String(result.LowProfileId || ""),
     transactionId: String(result.TranzactionId || ""),
@@ -182,15 +197,19 @@ async function refreshCardcomOrder(order: Record<string, unknown>, config: Cardc
     status: "paid",
     paid_at: new Date().toISOString(),
     expires_at: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
-    provider_payload: compactProviderPayload(result),
+    provider_payload: compactProviderPayload(result, order.provider_payload),
   }) || order;
 }
 async function signedEntitlement(order: Record<string, unknown>) {
   const signingKey = await privateConfig("buytest_entitlement_hmac_secret");
   if (!signingKey) throw new Error("entitlement_signing_unavailable");
   const plan = String(order.plan) as PlanKey;
+  const progress = stageProgress(order.provider_payload);
+  const scopes = plan === "bundle"
+    ? ["premium", ...(progress.preInspectionCompleted ? ["report"] : []), ...(progress.reportCompleted ? ["consultation"] : [])]
+    : [...PLANS[plan].scopes];
   const payload = base64Url(new TextEncoder().encode(JSON.stringify({
-    v: 1, oid: order.id, plate: order.plate, plan, scopes: PLANS[plan].scopes,
+    v: 1, oid: order.id, plate: order.plate, plan, scopes,
     exp: Math.floor(new Date(String(order.expires_at)).getTime() / 1000),
   })));
   const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(signingKey), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
@@ -198,10 +217,19 @@ async function signedEntitlement(order: Record<string, unknown>) {
   return `${payload}.${base64Url(new Uint8Array(signature))}`;
 }
 
+async function verifiedPriorOrder(body: Record<string, unknown>, plate: string) {
+  const orderId = String(body.priorOrderId || "");
+  const clientToken = String(body.priorClientSecret || "");
+  if (!/^[0-9a-f-]{36}$/i.test(orderId) || clientToken.length < 30) return null;
+  const order = await orderById(orderId);
+  if (!order || !(await hashesMatch(String(order.client_secret_hash || ""), await sha256(clientToken)))) return null;
+  const expiresAt = new Date(String(order.expires_at)).getTime();
+  if (String(order.status) !== "paid" || String(order.plate) !== plate || !Number.isFinite(expiresAt) || expiresAt <= Date.now()) return null;
+  return order;
+}
+
 async function createPayment(origin: string | null, body: Record<string, unknown>) {
   if (origin !== ALLOWED_ORIGIN) return json(origin, { ok: false, error: "origin_not_allowed" }, 403);
-  const config = await cardcomConfig();
-  if (!config.enabled) return json(origin, { ok: false, error: "payment_provider_transition", provider: "cardcom_pending" }, 503);
   const planKey = String(body.plan || "");
   const plate = cleanPlate(body.plate);
   const customerName = cleanText(body.customerName, 50);
@@ -211,6 +239,22 @@ async function createPayment(origin: string | null, body: Record<string, unknown
     return json(origin, { ok: false, error: "invalid_payment_request" }, 400);
   }
   const plan = PLANS[planKey];
+  let inheritedProgress: StageProgress = { preInspectionCompleted: false, reportCompleted: false };
+  let priorOrderId = "";
+  if (planKey === "report" || planKey === "consultation") {
+    const priorOrder = await verifiedPriorOrder(body, plate);
+    if (!priorOrder || !isPlan(priorOrder.plan)) return json(origin, { ok: false, error: "previous_stage_required" }, 409);
+    const priorProgress = stageProgress(priorOrder.provider_payload);
+    const priorScopes: readonly string[] = PLANS[priorOrder.plan as PlanKey].scopes;
+    const allowed = planKey === "report"
+      ? priorScopes.includes("premium") && priorProgress.preInspectionCompleted
+      : priorScopes.includes("report") && priorProgress.reportCompleted;
+    if (!allowed) return json(origin, { ok: false, error: "previous_stage_required" }, 409);
+    inheritedProgress = priorProgress;
+    priorOrderId = String(priorOrder.id);
+  }
+  const config = await cardcomConfig();
+  if (!config.enabled) return json(origin, { ok: false, error: "payment_provider_transition", provider: "cardcom_pending" }, 503);
   const orderId = crypto.randomUUID();
   const clientSecret = randomToken();
   const order = await insertOrder({
@@ -221,7 +265,7 @@ async function createPayment(origin: string | null, body: Record<string, unknown
     amount_agorot: plan.amountAgorot,
     status: "pending",
     expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
-    provider_payload: { provider: "cardcom", stage: "creating" },
+    provider_payload: { provider: "cardcom", stage: "creating", progress: inheritedProgress, priorOrderId: priorOrderId || null },
   });
   if (!order) throw new Error("order_creation_failed");
   const returnBase = `${SITE_URL}?buytest_payment=return&order=${encodeURIComponent(orderId)}`;
@@ -259,7 +303,7 @@ async function createPayment(origin: string | null, body: Record<string, unknown
       },
     });
   } catch (error) {
-    await updateOrder(orderId, { status: "failed", provider_payload: { provider: "cardcom", stage: "create_failed" } });
+    await updateOrder(orderId, { status: "failed", provider_payload: progressPayload(order.provider_payload, inheritedProgress, { provider: "cardcom", stage: "create_failed" }) });
     throw error;
   }
   const responseCode = Number(cardcomResult.ResponseCode);
@@ -268,7 +312,7 @@ async function createPayment(origin: string | null, body: Record<string, unknown
   if (responseCode !== 0 || !/^[0-9a-f-]{36}$/i.test(lowProfileId) || !paymentUrl) {
     await updateOrder(orderId, {
       status: "failed",
-      provider_payload: { provider: "cardcom", stage: "create_rejected", responseCode, description: cleanText(cardcomResult.Description, 250) },
+      provider_payload: progressPayload(order.provider_payload, inheritedProgress, { provider: "cardcom", stage: "create_rejected", responseCode, description: cleanText(cardcomResult.Description, 250) }),
     });
     return json(origin, { ok: false, error: "cardcom_create_failed" }, 502);
   }
@@ -276,9 +320,9 @@ async function createPayment(origin: string | null, body: Record<string, unknown
     status: "payment_ready",
     payment_url: paymentUrl,
     provider_transaction_id: lowProfileId,
-    provider_payload: { provider: "cardcom", stage: "payment_ready", responseCode: 0, lowProfileId },
+    provider_payload: progressPayload(order.provider_payload, inheritedProgress, { provider: "cardcom", stage: "payment_ready", responseCode: 0, lowProfileId }),
   });
-  return json(origin, { ok: true, orderId, clientSecret, plate, plan: planKey, paymentUrl });
+  return json(origin, { ok: true, orderId, clientSecret, plate, plan: planKey, progress: inheritedProgress, paymentUrl });
 }
 
 async function paymentStatus(origin: string | null, body: Record<string, unknown>) {
@@ -298,9 +342,38 @@ async function paymentStatus(origin: string | null, body: Record<string, unknown
   const expired = Number.isFinite(expiresAt) && expiresAt <= Date.now();
   if (expired && !["paid", "expired"].includes(String(order.status))) order = await updateOrder(orderId, { status: "expired" }) || order;
   if (order.status === "paid" && !expired) {
-    return json(origin, { ok: true, status: "paid", plan: order.plan, plate: order.plate, expiresAt: order.expires_at, accessToken: await signedEntitlement(order) });
+    return json(origin, { ok: true, status: "paid", plan: order.plan, plate: order.plate, expiresAt: order.expires_at, progress: stageProgress(order.provider_payload), accessToken: await signedEntitlement(order) });
   }
   return json(origin, { ok: true, status: expired ? "expired" : order.status, paymentUrl: expired ? null : order.payment_url });
+}
+
+async function completeStage(origin: string | null, body: Record<string, unknown>) {
+  if (origin !== ALLOWED_ORIGIN) return json(origin, { ok: false, error: "origin_not_allowed" }, 403);
+  const orderId = String(body.orderId || "");
+  const clientToken = String(body.clientSecret || "");
+  const stage = String(body.stage || "");
+  if (!/^[0-9a-f-]{36}$/i.test(orderId) || clientToken.length < 30 || !["premium", "report"].includes(stage)) {
+    return json(origin, { ok: false, error: "invalid_stage_request" }, 400);
+  }
+  const order = await orderById(orderId);
+  if (!order || !(await hashesMatch(String(order.client_secret_hash || ""), await sha256(clientToken)))) return json(origin, { ok: false, error: "order_not_found" }, 404);
+  const expiresAt = new Date(String(order.expires_at)).getTime();
+  if (String(order.status) !== "paid" || !Number.isFinite(expiresAt) || expiresAt <= Date.now() || !isPlan(order.plan)) {
+    return json(origin, { ok: false, error: "paid_access_required" }, 403);
+  }
+  const plan = String(order.plan) as PlanKey;
+  const scopes: readonly string[] = PLANS[plan].scopes;
+  if (!scopes.includes(stage)) return json(origin, { ok: false, error: "stage_not_purchased" }, 403);
+  const progress = stageProgress(order.provider_payload);
+  if (stage === "report" && !progress.preInspectionCompleted && plan !== "report") {
+    return json(origin, { ok: false, error: "previous_stage_required" }, 409);
+  }
+  const nextProgress: StageProgress = stage === "premium"
+    ? { ...progress, preInspectionCompleted: true }
+    : { preInspectionCompleted: true, reportCompleted: true };
+  const updated = await updateOrder(orderId, { provider_payload: progressPayload(order.provider_payload, nextProgress) });
+  if (!updated) throw new Error("stage_update_failed");
+  return json(origin, { ok: true, progress: nextProgress, accessToken: await signedEntitlement(updated) });
 }
 
 async function redeemPaidAccess(origin: string | null, body: Record<string, unknown>) {
@@ -335,6 +408,7 @@ Deno.serve(async (req: Request) => {
     }
     if (action === "create") return await createPayment(origin, body);
     if (action === "status") return await paymentStatus(origin, body);
+    if (action === "complete") return await completeStage(origin, body);
     if (action === "redeem") return await redeemPaidAccess(origin, body);
     return json(origin, { ok: false, error: "unknown_action" }, 400);
   } catch (error) {
