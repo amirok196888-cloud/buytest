@@ -593,6 +593,9 @@ const BUYTEST_SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOi
 const BUYTEST_PAYMENT_ENDPOINT='https://tjxjxavxrmvbofvtnsaj.supabase.co/functions/v1/buytest-payment';
 const BUYTEST_PAYMENT_STORAGE_KEY='buytestPaymentAccessV1';
 const BUYTEST_PAYMENT_RETURN_KEY='buytestPaymentReturnPendingV1';
+const BUYTEST_RECENT_PAYMENT_WINDOW_MS=30*60*1000;
+let buyTestLastPaymentStatus='';
+let buyTestAccessCheckPromise=null;
 function googleVisionReady(){
   return /^https:\/\/.+\/functions\/v1\/vision-ocr$/.test(GOOGLE_VISION_PROXY_ENDPOINT)
     && String(BUYTEST_SUPABASE_ANON_KEY||'').length>40;
@@ -1122,6 +1125,7 @@ async function restoreBuyTestAccess({requiredPlate='',onReturn=false,scroll=true
   if(normalizedRequired&&normalizedRequired!==String(saved.plate||'')){lockPurchasedPlan();return false}
   try{
     const data=await callBuyTestPaymentService({action:'status',orderId:saved.orderId,clientSecret:saved.clientSecret});
+    buyTestLastPaymentStatus=String(data.status||'');
     if(data.status==='paid'){
       const expiresAt=String(data.expiresAt||saved.expiresAt||'');
       saveBuyTestPayment({...saved,plate:data.plate,plan:data.plan,expiresAt,accessToken:data.accessToken});
@@ -1137,6 +1141,7 @@ async function restoreBuyTestAccess({requiredPlate='',onReturn=false,scroll=true
       if(onReturn) showBuyTestAccessNotice('לא נמצאה הרשאת תשלום פעילה. לא בוצע חיוב נוסף.',true);
     }
   }catch(error){
+    buyTestLastPaymentStatus='';
     console.warn('BuyTest access check failed:',error);
     if(onReturn) showBuyTestAccessNotice('התשלום התקבל, אך האישור עדיין מתעדכן. המתן רגע ורענן את הדף.',true);
   }
@@ -1197,10 +1202,16 @@ async function initializeBuyTestAccess(){
   const returnedOrder=params.get('order');
   if(returnedOrder&&returnedOrder!==saved.orderId) return;
   if(!returned){
-    if(await restoreBuyTestAccessWithRetry({scroll:false})) await resumePaidVehicleFlow(saved.plate);
-    return;
+    if(await restoreBuyTestAccessWithRetry({scroll:false})){
+      await resumePaidVehicleFlow(saved.plate);
+      return;
+    }
+    const createdAt=Date.parse(String(saved.createdAt||''));
+    const recentPayment=Number.isFinite(createdAt)&&Date.now()-createdAt>=0&&Date.now()-createdAt<BUYTEST_RECENT_PAYMENT_WINDOW_MS;
+    if(!recentPayment||!['','pending','payment_ready'].includes(buyTestLastPaymentStatus)) return;
+    showBuyTestAccessNotice('בודק את אישור התשלום ופותח את האתר...');
   }
-  if(!manualAccess) showBuyTestAccessNotice('התשלום הסתיים. מאמת את האישור ופותח את האתר...');
+  else if(!manualAccess) showBuyTestAccessNotice('התשלום הסתיים. מאמת את האישור ופותח את האתר...');
   for(let attempt=0;attempt<40;attempt++){
     if(await restoreBuyTestAccess({onReturn:attempt===39,scroll:false})){
       sessionStorage.removeItem(BUYTEST_PAYMENT_RETURN_KEY);
@@ -1210,6 +1221,12 @@ async function initializeBuyTestAccess(){
     }
     await new Promise(resolve=>setTimeout(resolve,1500));
   }
+  showBuyTestAccessNotice('אישור התשלום עדיין לא התקבל. אם חויבת, אל תשלם שוב — אפשר לסגור את הדף ולחזור אליו מאותו מכשיר; הגישה תיפתח אוטומטית לאחר האישור.',true);
+}
+function runBuyTestAccessInitialization(){
+  if(buyTestAccessCheckPromise) return buyTestAccessCheckPromise;
+  buyTestAccessCheckPromise=initializeBuyTestAccess().finally(()=>{buyTestAccessCheckPromise=null});
+  return buyTestAccessCheckPromise;
 }
 function previewPlanAsManager(planKey='all'){
   if(!document.body.classList.contains('manager-mode')) return;
@@ -4717,12 +4734,15 @@ window.addEventListener('DOMContentLoaded',async()=>{
   if(purchaseBox) purchaseBox.style.display='none';
   const feedbackBox=document.getElementById('feedbackBox');
   if(feedbackBox) feedbackBox.style.display='none';
-  await initializeBuyTestAccess();
+  await runBuyTestAccessInitialization();
 });
 window.addEventListener('pageshow',async event=>{
   const paymentButton=document.getElementById('paymentSubmitButton');
   if(paymentButton) paymentButton.disabled=false;
-  if(event.persisted&&sessionStorage.getItem(BUYTEST_PAYMENT_RETURN_KEY)==='1') await initializeBuyTestAccess();
+  if(event.persisted&&sessionStorage.getItem(BUYTEST_PAYMENT_RETURN_KEY)==='1') await runBuyTestAccessInitialization();
+});
+document.addEventListener('visibilitychange',async()=>{
+  if(document.visibilityState==='visible'&&sessionStorage.getItem(BUYTEST_PAYMENT_RETURN_KEY)==='1') await runBuyTestAccessInitialization();
 });
 document.addEventListener('keydown',event=>{
   if(event.key!=='Escape') return;
