@@ -2,6 +2,7 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+const SETUP_ORIGIN = "https://amirok196888-cloud.github.io";
 
 function base64Url(data: Uint8Array) {
   let binary = "";
@@ -59,6 +60,20 @@ function securityHeaders(contentType: string) {
     "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; img-src 'none'; font-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
   };
 }
+function corsHeaders(req: Request, contentType = "application/json; charset=utf-8") {
+  const headers = securityHeaders(contentType);
+  const origin = req.headers.get("Origin") || "";
+  if (origin === SETUP_ORIGIN) {
+    return {
+      ...headers,
+      "Access-Control-Allow-Origin": SETUP_ORIGIN,
+      "Access-Control-Allow-Headers": "content-type",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Vary": "Origin",
+    };
+  }
+  return headers;
+}
 function page() {
   return `<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>הגדרת Cardcom ל־BuyTest</title><style>
   *{box-sizing:border-box}body{margin:0;background:#f3f7f8;color:#13272e;font-family:Arial,sans-serif;padding:18px}.card{max-width:520px;margin:26px auto;background:#fff;border:1px solid #d8e4e7;border-radius:22px;padding:24px;box-shadow:0 12px 38px #17333d17}h1{font-size:27px;margin:0 0 8px}p{color:#557079;line-height:1.6;margin:0 0 18px}.field{margin:13px 0}.field label{display:block;font-weight:800;margin-bottom:6px}.field input{width:100%;border:1px solid #bdcdd2;border-radius:12px;padding:13px;font-size:17px;background:#fff;color:#13272e}.ltr{direction:ltr;text-align:left}button{width:100%;border:0;border-radius:13px;padding:14px;background:#0fa87e;color:#fff;font-size:18px;font-weight:900;margin-top:12px}button:disabled{opacity:.6}.note{padding:12px;border-radius:12px;background:#edf8f4;color:#075e48;font-weight:700}.status{min-height:24px;font-weight:800;margin-top:14px}.error{color:#a32727}.success{color:#087356}small{display:block;color:#60717a;line-height:1.5;margin-top:12px}
@@ -68,11 +83,17 @@ function page() {
 }
 
 Deno.serve(async (req: Request) => {
+  const origin = req.headers.get("Origin") || "";
+  if (req.method === "OPTIONS") {
+    if (origin !== SETUP_ORIGIN) return new Response(null, { status: 403, headers: securityHeaders("text/plain; charset=utf-8") });
+    return new Response(null, { status: 204, headers: corsHeaders(req, "text/plain; charset=utf-8") });
+  }
   if (req.method === "GET") return new Response(page(), { status: 200, headers: securityHeaders("text/html; charset=utf-8") });
-  if (req.method !== "POST") return new Response(JSON.stringify({ ok: false, error: "method_not_allowed" }), { status: 405, headers: securityHeaders("application/json; charset=utf-8") });
+  if (req.method !== "POST") return new Response(JSON.stringify({ ok: false, error: "method_not_allowed" }), { status: 405, headers: corsHeaders(req) });
+  if (origin && origin !== SETUP_ORIGIN) return new Response(JSON.stringify({ ok: false, error: "origin_not_allowed" }), { status: 403, headers: corsHeaders(req) });
   try {
     const contentLength = Number(req.headers.get("content-length") || 0);
-    if (contentLength > 4096) return new Response(JSON.stringify({ ok: false, error: "request_too_large" }), { status: 413, headers: securityHeaders("application/json; charset=utf-8") });
+    if (contentLength > 4096) return new Response(JSON.stringify({ ok: false, error: "request_too_large" }), { status: 413, headers: corsHeaders(req) });
     const body = await req.json() as Record<string, unknown>;
     const setupToken = String(body.setupToken || "");
     const terminalNumber = String(body.terminalNumber || "").replace(/\D/g, "");
@@ -80,18 +101,18 @@ Deno.serve(async (req: Request) => {
     const apiPassword = String(body.apiPassword || "").trim();
     const expectedHash = await privateConfig("buytest_cardcom_setup_token_hash");
     if (setupToken.length < 40 || !expectedHash || !hashesMatch(await sha256(setupToken), expectedHash)) {
-      return new Response(JSON.stringify({ ok: false, error: "invalid_setup_link" }), { status: 403, headers: securityHeaders("application/json; charset=utf-8") });
+      return new Response(JSON.stringify({ ok: false, error: "invalid_setup_link" }), { status: 403, headers: corsHeaders(req) });
     }
     if (!/^\d{3,12}$/.test(terminalNumber) || apiName.length < 5 || apiName.length > 200 || apiPassword.length < 8 || apiPassword.length > 500) {
-      return new Response(JSON.stringify({ ok: false, error: "invalid_configuration" }), { status: 400, headers: securityHeaders("application/json; charset=utf-8") });
+      return new Response(JSON.stringify({ ok: false, error: "invalid_configuration" }), { status: 400, headers: corsHeaders(req) });
     }
     await setPrivateConfig("cardcom_terminal_number", terminalNumber);
     await setPrivateConfig("cardcom_api_name", apiName);
     await setPrivateConfig("cardcom_api_password", apiPassword);
     await setPrivateConfig("cardcom_payments_enabled", "false");
     await setPrivateConfig("buytest_cardcom_setup_token_hash", await sha256(randomToken()));
-    return new Response(JSON.stringify({ ok: true }), { status: 200, headers: securityHeaders("application/json; charset=utf-8") });
+    return new Response(JSON.stringify({ ok: true }), { status: 200, headers: corsHeaders(req) });
   } catch {
-    return new Response(JSON.stringify({ ok: false, error: "setup_failed" }), { status: 500, headers: securityHeaders("application/json; charset=utf-8") });
+    return new Response(JSON.stringify({ ok: false, error: "setup_failed" }), { status: 500, headers: corsHeaders(req) });
   }
 });
