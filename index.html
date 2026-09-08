@@ -1452,9 +1452,10 @@ async function openManagerPreview(){
   const offer=document.getElementById('fullCheckOffer');
   if(offer) offer.style.display='none';
   const notice=document.getElementById('managerActiveNotice');
-  if(notice){notice.style.display='block';notice.scrollIntoView({behavior:'smooth',block:'start'});}
+  const formulasOnly=new URLSearchParams(location.search).get('manager')==='formulas';
+  if(notice){notice.style.display='block';if(!formulasOnly) notice.scrollIntoView({behavior:'smooth',block:'start'});}
   const formulaPanel=document.getElementById('managerFormulaPanel');
-  if(formulaPanel) formulaPanel.style.display='block';
+  if(formulaPanel){formulaPanel.style.display='block';if(formulasOnly) formulaPanel.scrollIntoView({behavior:'smooth',block:'start'});}
   const replyPanel=document.getElementById('customerReplyAdmin');
   if(replyPanel) replyPanel.style.display='block';
   initFormulaAdmin();
@@ -5369,7 +5370,11 @@ window.addEventListener('DOMContentLoaded',async()=>{
   if(flowProgress&&licenseMatchSection) flowProgress.insertAdjacentElement('afterend',licenseMatchSection);
   document.querySelectorAll('.paidOnly').forEach(x=>x.style.display='none');
   const managerBox=document.getElementById('managerPreviewBox');
-  if(managerBox&&new URLSearchParams(location.search).get('manager')==='1') managerBox.style.display='block';
+  const managerEntry=new URLSearchParams(location.search).get('manager');
+  if(managerBox&&(managerEntry==='1'||managerEntry==='formulas')){
+    managerBox.style.display='block';
+    if(managerEntry==='formulas') setTimeout(()=>managerBox.scrollIntoView({behavior:'smooth',block:'center'}),120);
+  }
   const purchaseBox=document.getElementById('purchaseBox');
   if(purchaseBox) purchaseBox.style.display='none';
   const feedbackBox=document.getElementById('feedbackBox');
