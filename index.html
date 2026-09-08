@@ -104,12 +104,12 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#07131aef;border-top:1p
 
 .paidOnly{display:none!important}
 body.plan-premium .premiumFeature,
-body.plan-report .premiumFeature,body.plan-report .reportFeature,
-body.plan-consultation .premiumFeature,body.plan-consultation .reportFeature,body.plan-consultation .consultationFeature,
+body.plan-report .reportFeature,
+body.plan-consultation .consultationFeature,
 body.plan-bundle .premiumFeature,body.plan-bundle.stage-report-open .reportFeature,body.plan-bundle.stage-consultation-open .consultationFeature,
 body.manager-mode.manager-all .paidOnly{display:block!important}
 .clarificationBox.show{display:none}
-body.plan-consultation .clarificationBox.show,body.plan-bundle.stage-consultation-open .clarificationBox.show,body.manager-mode.manager-all .clarificationBox.show{display:block}
+body.report-complete .clarificationBox.show,body.plan-consultation .clarificationBox.show,body.plan-bundle.stage-consultation-open .clarificationBox.show,body.manager-mode.manager-all .clarificationBox.show{display:block}
 .managerPlanControls{margin-top:12px;padding-top:12px;border-top:1px solid #9dd9c7}.managerPlanControls b{display:block;margin-bottom:8px}.managerPlanButtons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.managerPlanButtons button{margin:0;background:#fff;color:#075e48;border:1px solid #7fcab3}.managerPlanStatus{margin-top:8px;font-size:13px;font-weight:800}
 .photoPreview{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
 .photoPreview img{width:100%;height:120px;object-fit:cover;border-radius:10px}
@@ -127,6 +127,8 @@ body.plan-consultation .clarificationBox.show,body.plan-bundle.stage-consultatio
 .paymentActions{display:grid;grid-template-columns:1fr;gap:9px;margin-top:16px}
 .paymentActions button{margin:0}
 .priceCard{position:relative;transition:border-color .2s ease,opacity .2s ease,transform .2s ease}.priceCard.locked{opacity:.7;border-style:dashed}.priceCard.current{border-color:#0fa87e;box-shadow:0 0 0 2px rgba(15,168,126,.14),0 7px 20px rgba(16,45,53,.06)}.priceCard.completed{border-color:#72c7ae;background:#f3fbf8}.stageState{display:block;margin:9px 0 11px;padding:7px 10px;border-radius:9px;background:#edf5f7;color:#405c66;font-size:13px;font-weight:850}.priceCard.current .stageState{background:#e1f7ef;color:#075e48}.priceCard.completed .stageState{background:#dff5e9;color:#17643c}.priceCard.locked .stageState{background:#f1f3f4;color:#5f6b70}.priceCard button:disabled{cursor:not-allowed;opacity:.75}.sequenceNotice{margin:12px 0 15px;padding:13px 14px;border-radius:13px;background:#eef8f5;border:1px solid #b9e1d5;color:#244c42;font-weight:800;line-height:1.55}
+.routeCards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}.routeCard{border:2px solid #d9e2e6;border-radius:19px;padding:18px;background:#fff;box-shadow:0 8px 24px rgba(16,45,53,.06)}.routeCard.free{border-color:#78ceb4;background:#f3fbf8}.routeCard.paid{border-color:#b8cdd5}.routeCard h3{margin:7px 0 6px;font-size:21px}.routeCard p{margin:0 0 14px;color:#50666f;line-height:1.55}.routePrice{display:inline-flex;padding:5px 10px;border-radius:999px;background:#e8f7f2;color:#075e48;font-weight:950}.routeChoice{display:flex;gap:8px;margin:0 0 12px}.routeChoice button{flex:1;border:1px solid #cbd8dd;background:#f5f8f9;color:#28444e}.routeChoice button.active{background:#102d35;color:#fff;border-color:#102d35}.legalBeforePlate{margin:0 0 12px!important}.legalBeforePlate p{font-size:13px}.vehicleHint{margin:0 0 12px;padding:10px 12px;border-radius:11px;background:#eef7fb;color:#28444e;font-size:14px;font-weight:800}.preFlowProgress{display:none;margin:22px 0 10px;padding:15px 17px;border:1px solid #c8ded7;border-radius:16px;background:#f3fbf8}.preFlowProgress.show{display:block}.preFlowProgress strong{display:block;margin-bottom:8px}.preFlowTrack{height:8px;border-radius:999px;background:#dfeae7;overflow:hidden}.preFlowTrack span{display:block;height:100%;width:20%;background:#0fa87e;transition:width .2s ease}.preFlowScreen{display:none!important}.preFlowScreen.active{display:block!important}.preFlowNav{display:flex;gap:9px;margin-top:16px}.preFlowNav button{flex:1}.consultationLocked,.consultationUnlocked{display:none}.report-complete .clarificationBox.show .consultationLocked{display:block}.plan-consultation .clarificationBox.show .consultationLocked,.plan-bundle.stage-consultation-open .clarificationBox.show .consultationLocked,.manager-mode.manager-all .clarificationBox.show .consultationLocked{display:none}.plan-consultation .clarificationBox.show .consultationUnlocked,.plan-bundle.stage-consultation-open .clarificationBox.show .consultationUnlocked,.manager-mode.manager-all .clarificationBox.show .consultationUnlocked{display:block}.singlePlan{max-width:560px;margin:14px auto 0}.uploadPanel{transition:border-color .2s ease,background .2s ease}.uploadPanel:has(.uploadState.show){border-color:#0fa87e;background:#f3fbf8}
+@media(max-width:700px){.routeCards{grid-template-columns:1fr}.routeChoice{flex-direction:column}.preFlowNav{flex-direction:column-reverse}}
 
 </style><style>#appShell{display:block!important}
 /* BuyTest V20 – light commercial landing + improved value-first flow */
@@ -195,7 +197,7 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
 @media(max-width:760px){.mktHero{padding:30px 0 24px}.mktHeroGrid,.mktAbout,.afterGrid,.clarificationChoices{grid-template-columns:1fr}.mktGrid3{grid-template-columns:1fr}.mktOutcome{grid-template-columns:1fr 1fr}.mktHeroCard{padding:18px}.mktLead{font-size:18px}.mktCtas{flex-direction:column}.mktBtn{width:100%}main{padding-top:12px}.card{padding:18px;margin:20px 0}.credentials strong{font-size:25px}.credentials span{font-size:16px}.scopeStrip{grid-template-columns:1fr}.mktStep{grid-template-columns:38px 1fr}.mktNum{width:38px;height:38px}.mktStepPrice{grid-column:2;text-align:right}.mktBundle{align-items:flex-start;flex-direction:column}.guidedSection>summary{align-items:flex-start;flex-wrap:wrap}.guidedSection>summary:after{margin-right:0;margin-inline-start:auto}.includedTag{order:3;margin-inline-start:0}}
 @media(max-width:460px){.mktOutcome{grid-template-columns:1fr}.priceGrid{grid-template-columns:1fr}.licenseGrid,.grid,.formulaAdminGrid,.inspectionIdentityGrid,.inspectionHeaderGrid{grid-template-columns:1fr}.formulaAdmin .wide{grid-column:auto}.mktWrap{padding:0 14px}.replyTable,.replyTable tbody,.replyTable tr,.replyTable th,.replyTable td{display:block;width:100%}.replyTable th{padding:9px 0 5px}.inspectionIdentityValue{font-size:19px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
-</style><meta name="buytest-build" content="buytest-v72-grounded-findings-core-summary">
+</style><meta name="buytest-build" content="buytest-v73-two-path-flow-free-precheck">
 </head><body>
 
 <section id="marketingLanding">
@@ -205,25 +207,33 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
 <img class="mktBrandLogo" src="buytest-logo-compact.png" alt="BuyTest">
 <span class="mktEyebrow">BuyTest · לפני המכון ואחרי המכון</span>
 <h1>מידע לפני המכון — <span>פענוח הדוח אחריו</span></h1>
-<p class="mktLead">מתחילים בחינם עם נתוני הרכב והתאמת הרישיון. לאחר מכן מתקדמים בשלושה שלבים לפי הסדר: בדיקה עצמית לפני המכון, פענוח הדוח אחרי המכון, ואם רוצים — התייעצות אישית עם בוחן רכב.</p>
+<p class="mktLead">בחרו את מה שאתם צריכים עכשיו: בדיקה עצמית מודרכת לפני המכון — בחינם, או פענוח מקצועי של דוח שכבר קיבלתם מהמכון — ב־49 ₪.</p>
 <div class="credentials">
 <strong>עמוס רוקח</strong>
 <span>הנדסאי רכב · מנהל מוסך מוסמך · בוחן רישוי מלא · שמאי נזקי רכוש ורכב</span>
 <span><b>מעל 15 שנות ניסיון בבדיקות רכב לפני קנייה</b></span>
 </div>
-<div class="mktCtas">
-<a class="mktBtn mktBtnPrimary" href="#vehicleLookup">התחלת הבדיקה בחינם</a>
+<div class="routeCards" aria-label="בחירת מסלול BuyTest">
+  <article class="routeCard free">
+    <span class="routePrice">חינם</span>
+    <h3>לפני שנכנסים למכון</h3>
+    <p>נתוני רכב, התאמת רישיון, שאלות למוכר, בדיקה חיצונית ופנימית, נסיעה קצרה וסיכום PDF.</p>
+    <button class="mktBtn mktBtnPrimary" type="button" onclick="chooseCustomerRoute('free')">התחלת הבדיקה החינמית</button>
+  </article>
+  <article class="routeCard paid">
+    <span class="routePrice">49 ₪</span>
+    <h3>כבר יש לך דוח מהמכון?</h3>
+    <p>מעלים את סיכום הבוחן ואת הבדיקה הממוחשבת, אם קיימת, ומקבלים פענוח מסודר לפי מערכות ומשמעות.</p>
+    <button class="mktBtn mktBtnGhost" type="button" onclick="chooseCustomerRoute('report')">לפענוח דוח המכון</button>
+  </article>
 </div>
 </div>
 <div class="mktHeroCard">
-<h3>שלב מקדים בחינם ואחריו שלושה שלבים בתשלום</h3>
+<h3>שני מסלולים פשוטים</h3>
 <div class="mktSteps">
-<div class="mktStep"><div class="mktNum">✓</div><div><b>שלב מקדים · נתוני הרכב והתאמת הרישיון</b><br/><span>מידע ממשרד התחבורה והתאמה לרכב ולמוכר.</span></div><div class="mktStepPrice">חינם</div></div>
-<div class="mktStep"><div class="mktNum">1</div><div><b>בדיקה עצמית לפני המכון</b><br/><span>זה השלב הראשון במסלול: בדיקות, תמונות וסיכום PDF.</span></div><div class="mktStepPrice">49 ₪</div></div>
-<div class="mktStep"><div class="mktNum">2</div><div><b>פענוח אחרי המכון</b><br/><span>נפתח רק לאחר השלמת שלב 1.</span></div><div class="mktStepPrice">39 ₪</div></div>
-<div class="mktStep"><div class="mktNum">3</div><div><b>התייעצות אישית עם בוחן רכב</b><br/><span>נפתחת רק לאחר השלמת שלב 2.</span></div><div class="mktStepPrice">49 ₪</div></div>
+<div class="mktStep"><div class="mktNum">1</div><div><b>בדיקה עצמית לפני המכון</b><br/><span>תהליך מודרך מלא וסיכום PDF.</span></div><div class="mktStepPrice">חינם</div></div>
+<div class="mktStep"><div class="mktNum">2</div><div><b>פענוח דוח אחרי המכון</b><br/><span>שירות נפרד למי שכבר קיבל דוח.</span></div><div class="mktStepPrice">49 ₪</div></div>
 </div>
-<div class="mktBundle"><b>חבילת BuyTest המלאה — רוכשים מראש ומתקדמים לפי הסדר</b><strong>120 ₪ <del>137 ₪</del></strong></div>
 </div>
 </div>
 </div>
@@ -256,8 +266,8 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
 <div class="mktTitle"><h2>שאלות נפוצות</h2></div>
 <div class="mktFaq">
 <details><summary>האם BuyTest מחליף בדיקה במכון?</summary><p>לא. השלב הראשון מארגן בדיקות בסיסיות ודגשים למכון; השלב השני מסביר את סיכום הבוחן. השירות אינו בודק את הרכב פיזית ואינו מאשר תקינות.</p></details>
-<details><summary>מה מקבלים בחינם?</summary><p>מזינים או סורקים מספר רכב, מקבלים את הנתונים הזמינים ממאגרי משרד התחבורה ובודקים את התאמת רישיון הרכב לרכב ולמוכר.</p></details>
-<details><summary>אילו שירותים אפשר לרכוש?</summary><p>מתחילים בשלב 1 — בדיקה עצמית לפני המכון ב־49 ₪. לאחר השלמתו אפשר לפתוח את שלב 2 — פענוח אחרי המכון ב־39 ₪; לאחר השלמת הפענוח אפשר לפתוח את שלב 3 — התייעצות אישית ב־49 ₪. אפשר גם לרכוש מראש את החבילה המלאה ב־120 ₪ במקום 137 ₪, אך גם בה השלבים נפתחים לפי הסדר.</p></details>
+<details><summary>מה מקבלים בחינם?</summary><p>מזינים מספר רכב, מקבלים את הנתונים הזמינים ממאגרי משרד התחבורה וממשיכים לבדיקה עצמית מודרכת: התאמת רישיון, שאלות למוכר, בדיקות ברכב, נסיעה קצרה וסיכום PDF.</p></details>
+<details><summary>מה כולל השירות בתשלום?</summary><p>פענוח דוח המכון עולה 49 ₪ לרכב אחד: העלאת סיכום הבוחן, העלאה אופציונלית של הבדיקה הממוחשבת, הסבר הממצאים וסיכום PDF. לאחר השלמת הפענוח בלבד תוצע התייעצות אישית נפרדת ב־49 ₪.</p></details>
 <details><summary>מה קורה אם חסר מידע על הרכב?</summary><p>מאגרים ציבוריים אינם תמיד מלאים. כאשר נתון אינו זמין, BuyTest מציגה זאת במקום להמציא מידע, וממליצה לאמת פרטים מהותיים מול מסמכי הרכב והגורמים המתאימים.</p></details>
 <details><summary>האם BuyTest אומר אם לקנות את הרכב?</summary><p>לא. אין המלצת קנייה או אי־קנייה, אין הערכת שווי או עלות תיקון ואין קביעה לגבי ירידת ערך. BuyTest משקף משמעויות ושאלות לבירור בלבד; ההחלטה היא של המשתמש.</p></details>
 </div>
@@ -271,19 +281,20 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
 
 
 
-<section class="card" id="vehicleLookup"><h2 class="stageTitle"><span>שלב מקדים · נתוני הרכב והתאמת הרישיון</span><span class="stagePriceTag free">חינם</span></h2><p class="sub">הקלד מספר רכב או צלם את לוחית הרישוי. לאחר קבלת הנתונים ממשרד התחבורה תוכל לבדוק בחינם את התאמת הרישיון לרכב ולמוכר.</p>
-<div class="field" style="margin-bottom:10px"></div>
-<div class="plate"><input id="plate" inputmode="numeric" maxlength="8" placeholder="מספר רכב"/><button class="primary" onclick="loadVehicle()">הצג נתוני רכב</button>
-<button class="secondary" type="button" onclick="document.getElementById('plateCamera').click()">📷 סריקת מספר רכב</button>
-<input id="plateCamera" type="file" accept="image/*" capture="environment" style="display:none" onchange="scanPlatePhoto(this)"></div>
-<div class="legalConsent legalCompact">
+<section class="card" id="vehicleLookup"><h2 class="stageTitle"><span>נתוני הרכב</span><span class="stagePriceTag free" id="vehicleRoutePrice">חינם</span></h2><p class="sub">בחרו מסלול, אשרו את התנאים והקלידו את מספר הרכב ידנית. יוצגו הנתונים הזמינים ממאגרי משרד התחבורה לפני שממשיכים.</p>
+<div class="routeChoice" aria-label="בחירת מסלול">
+  <button type="button" id="freeRouteButton" class="active" onclick="setCustomerRoute('free')">בדיקה לפני המכון · חינם</button>
+  <button type="button" id="reportRouteButton" onclick="setCustomerRoute('report')">פענוח דוח מכון · 49 ₪</button>
+</div>
+<div class="vehicleHint" id="vehicleRouteHint">לאחר הצגת נתוני הרכב תיפתח הבדיקה העצמית החינמית, שלב אחר שלב.</div>
+<div class="legalConsent legalCompact legalBeforePlate">
   <p>BuyTest מציג מידע ומסביר ממצאים, אך אינו מחליף בדיקה במכון ואינו ממליץ אם לקנות את הרכב.</p>
   <label>
-    <input type="checkbox" id="entryLegalAccept">
+    <input type="checkbox" id="entryLegalAccept" onchange="syncVehicleLookupButton()">
     <span>קראתי ואני מסכים/ה ל<button type="button" onclick="openLegal('terms')">תנאי השימוש</button> ול<button type="button" onclick="openLegal('privacy')">מדיניות הפרטיות</button>.</span>
   </label>
 </div>
-<div class="scanStatus" id="scanStatus" role="status" aria-live="polite"></div>
+<div class="plate"><input id="plate" inputmode="numeric" maxlength="8" autocomplete="off" aria-label="מספר רכב" placeholder="מספר רכב" oninput="sanitizePlateInput(this);syncVehicleLookupButton()"/><button class="primary" id="vehicleLookupButton" onclick="loadVehicle()" disabled>הצג נתוני רכב</button></div>
 <div class="status" id="status"><div id="statusMsg">טוען...</div><div id="vehicleData" style="display:none"><div class="grid">
 <div class="box"><div class="label">מספר רכב</div><div class="value" id="vPlate">—</div></div>
 <div class="box"><div class="label">יצרן</div><div class="value" id="vMaker">—</div></div>
@@ -298,42 +309,18 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
 
 </div></div><div id="rawlink" style="display:none"></div></div>
 </section>
+<div class="preFlowProgress freeAfterLookup" id="preFlowProgress" aria-live="polite"><strong id="preFlowProgressText">שלב 1 מתוך 5 · התאמת רישיון</strong><div class="preFlowTrack" aria-hidden="true"><span id="preFlowProgressBar"></span></div></div>
 <section class="card" id="fullCheckOffer" style="display:none">
-<h2>מסלול BuyTest לרכב הזה</h2>
-<p class="sub">כל שלושת השלבים מוצגים כאן מראש. מתקדמים לפי הסדר, וכל שלב נפתח רק לאחר השלמת השלב שלפניו.</p>
-<div class="sequenceNotice">מתחילים בשלב 1 ב־49 ₪. אפשר לשלם על כל שלב כאשר מגיעים אליו, או לרכוש מראש את כל המסלול ב־120 ₪ — בלי לדלג על סדר העבודה.</div>
-<div class="priceGrid" aria-label="מסלולי BuyTest">
-  <article class="priceCard current" id="premiumPlanCard">
-    <span class="bundleBadge">שלב 1 · לפני המכון</span>
-    <h3>בדיקה עצמית לפני המכון</h3>
-    <div class="price">49 ₪</div>
-    <p>שאלות למוכר, בדיקות חיצוניות ופנימיות, נסיעה קצרה, עד ארבע תמונות וסיכום PDF.</p>
-    <span class="stageState" id="premiumPlanState">השלב הראשון — מתחילים כאן</span>
-    <button class="secondary planBtn" id="premiumPlanButton" type="button" onclick="startPayment('premium')">פתיחת שלב 1 – 49 ₪</button>
-  </article>
-  <article class="priceCard locked" id="reportPlanCard">
-    <span class="bundleBadge">שלב 2 · אחרי המכון</span>
+<h2>פענוח דוח המכון</h2>
+<p class="sub">התשלום פותח לרכב הזה את העלאת סיכום הבוחן, הבדיקה הממוחשבת והפקת סיכום PDF. הבדיקה העצמית החינמית אינה תנאי לרכישה.</p>
+<div class="priceGrid singlePlan" aria-label="פענוח דוח BuyTest">
+  <article class="priceCard current" id="reportPlanCard">
+    <span class="bundleBadge">אחרי המכון</span>
     <h3>פענוח דוח המכון והבדיקה הממוחשבת</h3>
-    <div class="price">39 ₪</div>
-    <p>העלאת סיכום הבוחן והבדיקה הממוחשבת, פענוח הממצאים וקבלת סיכום PDF.</p>
-    <span class="stageState" id="reportPlanState">נפתח לאחר השלמת שלב 1</span>
-    <button class="secondary planBtn" id="reportPlanButton" type="button" onclick="startPayment('report')" disabled>שלב 2 נעול עד להשלמת שלב 1</button>
-  </article>
-  <article class="priceCard locked" id="consultationPlanCard">
-    <span class="bundleBadge">שלב 3 · הסבר אישי</span>
-    <h3>התייעצות אישית עם בוחן רכב</h3>
     <div class="price">49 ₪</div>
-    <p>מעבר אישי של עמוס רוקח על הדוח ומתן הסבר מקצועי על הממצאים והבירורים הנדרשים.</p>
-    <span class="stageState" id="consultationPlanState">נפתח לאחר השלמת שלב 2</span>
-    <button class="secondary planBtn" id="consultationPlanButton" type="button" onclick="startPayment('consultation')" disabled>שלב 3 נעול עד להשלמת שלב 2</button>
-  </article>
-  <article class="priceCard featured" id="bundlePlanCard">
-    <span class="bundleBadge">החבילה המשתלמת</span>
-    <h3>חבילת BuyTest המלאה</h3>
-    <div class="price">120 ₪ <span class="oldPrice">137 ₪</span><span class="saving">חיסכון של 17 ₪</span></div>
-    <p>בדיקה עצמית, פענוח דוח והתייעצות אישית לרכב אחד. רוכשים פעם אחת, והשלבים נפתחים לפי הסדר.</p>
-    <span class="stageState" id="bundlePlanState">כל המסלול מראש — ללא דילוג על שלבים</span>
-    <button class="primary planBtn" id="bundlePlanButton" type="button" onclick="startPayment('bundle')">רכישת כל המסלול – 120 ₪</button>
+    <p>העלאת סיכום הבוחן והבדיקה הממוחשבת, פענוח הממצאים וקבלת סיכום PDF.</p>
+    <span class="stageState" id="reportPlanState">מוכן לפתיחה לרכב שנבחר</span>
+    <button class="primary planBtn" id="reportPlanButton" type="button" onclick="startPayment('report')">פתיחת הפענוח – 49 ₪</button>
   </article>
 </div>
 <div class="planBoundary"><b>גבולות השירות:</b> BuyTest מסביר את המידע שנמסר ואת משמעות הממצאים. השירות אינו קובע אם לקנות את הרכב, אינו מעריך מחירי תיקון או ירידת ערך ואינו מדרג את עבודת מכון הבדיקה.</div>
@@ -380,7 +367,7 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
   <div class="formulaAdminList" id="formulaAdminList"></div>
 </section>
 
-<details class="card freeAfterLookup guidedSection" id="licenseMatchSection" style="display:none;border:2px solid #0ea67b;" open>
+<details class="card freeAfterLookup preFlowScreen guidedSection" id="licenseMatchSection" data-pre-step="0" style="display:none;border:2px solid #0ea67b;" open>
   <summary><span>התאמת רישיון הרכב לרכב ולמוכר</span><span class="stagePriceTag free">חינם</span></summary>
   <div class="stepContent">
   <p class="sub" style="font-weight:700;color:#17352d;">
@@ -415,37 +402,33 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
     <div class="quickChoices"><button class="quickChoice" type="button" onclick="setCheckState(this,'ok')">הכול תואם</button><button class="quickChoice issue" type="button" onclick="setCheckState(this,'issue')">מצאתי אי־התאמה</button><button class="quickChoice skip" type="button" onclick="setCheckState(this,'skip')">לא בדקתי</button></div>
     <div class="finding simpleFinding"><textarea placeholder="תאר בקצרה את אי־ההתאמה"></textarea></div>
   </div>
+  <div class="preFlowNav"><button class="primary" type="button" onclick="showPreFlowStep(1)">המשך לשאלות למוכר</button></div>
   </div>
 </details>
 
-<section class="card paidOnly premiumFeature serviceIntro" id="selfCheckIntro" style="display:none">
-  <div class="caseLabel">שלב 1 מתוך 3 · לפני המכון</div>
-  <h2 class="stageTitle"><span>בדיקה עצמית לפני המכון</span><span class="stagePriceTag">49 ₪</span></h2>
-  <p class="sub">בדיקות פשוטות וברורות שאפשר לבצע לבד, עם אפשרות לצרף תמונות ולהפיק סיכום PDF.</p>
-  <ul class="serviceIntroList"><li>שאלות למוכר</li><li>בדיקות חיצוניות ופנימיות</li><li>נסיעה קצרה ותיעוד עד ארבע תמונות</li><li>סיכום מסודר לשמירה או לשליחה</li></ul>
-</section>
-<details class="card paidOnly premiumFeature guidedSection" style="display:none"><summary><span>א · שאלות למוכר</span><span class="includedTag">כלול בשלב 1</span></summary><div class="stepContent"><p class="sub">שאלה אחת בכל פעם. בחר תשובה פשוטה; רק במקרה שצריך בירור ייפתח מקום לפירוט.</p>
-<div id="sellerChecks"></div></div></details>
+<details class="card freeAfterLookup preFlowScreen guidedSection" id="sellerSection" data-pre-step="1" style="display:none"><summary><span>שאלות למוכר</span><span class="includedTag">חינם</span></summary><div class="stepContent"><p class="sub">שאלה אחת בכל פעם. בחר תשובה פשוטה; רק במקרה שצריך בירור ייפתח מקום לפירוט.</p>
+<div id="sellerChecks"></div><div class="preFlowNav"><button class="secondary" type="button" onclick="showPreFlowStep(0)">חזרה</button><button class="primary" type="button" onclick="showPreFlowStep(2)">המשך לבדיקה החיצונית</button></div></div></details>
 <div id="purchaseBox" style="display:none"></div>
-<details class="card paidOnly premiumFeature guidedSection" style="display:none"><summary><span>ב · בדיקה חיצונית</span><span class="includedTag">כלול בשלב 1</span></summary><div class="stepContent"><p class="sub">בדיקה אחת בכל פעם. אין צורך בידע מקצועי — סמן רק את מה שראית.</p>
-<div id="externalChecks"></div></div></details>
-<details class="card paidOnly premiumFeature guidedSection" style="display:none"><summary><span>ג · בדיקה פנימית ונסיעה קצרה</span><span class="includedTag">כלול בשלב 1</span></summary><div class="stepContent"><p class="sub">התקדם שאלה־שאלה. אם אינך יכול לבדוק סעיף, בחר „לא בדקתי”.</p>
+<details class="card freeAfterLookup preFlowScreen guidedSection" id="externalSection" data-pre-step="2" style="display:none"><summary><span>בדיקה חיצונית</span><span class="includedTag">חינם</span></summary><div class="stepContent"><p class="sub">בדיקה אחת בכל פעם. אין צורך בידע מקצועי — סמן רק את מה שראית.</p>
+<div id="externalChecks"></div><div class="preFlowNav"><button class="secondary" type="button" onclick="showPreFlowStep(1)">חזרה</button><button class="primary" type="button" onclick="showPreFlowStep(3)">המשך לבדיקה הפנימית ולנסיעה</button></div></div></details>
+<details class="card freeAfterLookup preFlowScreen guidedSection" id="selfSection" data-pre-step="3" style="display:none"><summary><span>בדיקה פנימית ונסיעה קצרה</span><span class="includedTag">חינם</span></summary><div class="stepContent"><p class="sub">התקדם שאלה־שאלה. אם אינך יכול לבדוק סעיף, בחר „לא בדקתי”.</p>
 <div id="selfChecks"></div>
 <div class="photoBox"><h3>תיעוד תמונות</h3>
 <p class="sub">אפשר לצרף עד ארבע תמונות של הרכב או של ממצאים שתרצה לתעד. הן יוצגו בעמוד השני של הסיכום.</p>
 <button class="secondary full" type="button" onclick="document.getElementById('vehiclePhotos').click()">📷 הוסף עד 4 תמונות לבדיקה</button>
 <input id="vehiclePhotos" type="file" accept="image/*" capture="environment" multiple style="display:none" onchange="addVehiclePhotos(this)">
-<div id="photoPreview" class="photoPreview"></div></div></div></details>
-<section class="card paidOnly premiumFeature" style="display:none"><h2 class="stageTitle"><span>ד · סיכום הבדיקה העצמית</span><span class="includedTag">כלול בשלב 1</span></h2><p class="sub">הסיכום מרכז את הבדיקות והתמונות שהזנת ומכין קובץ מסודר לשמירה או לשליחה. השלמת הסיכום פותחת את שלב 2. הוא אינו קובע אם להיכנס לבדיקה ואינו מחליף בדיקה במכון.</p>
+<div id="photoPreview" class="photoPreview"></div></div><div class="preFlowNav"><button class="secondary" type="button" onclick="showPreFlowStep(2)">חזרה</button><button class="primary" type="button" onclick="showPreFlowStep(4)">המשך לסיכום</button></div></div></details>
+<section class="card freeAfterLookup preFlowScreen" id="preSummarySection" data-pre-step="4" style="display:none"><h2 class="stageTitle"><span>סיכום הבדיקה העצמית</span><span class="includedTag">חינם</span></h2><p class="sub">הסיכום מרכז את הבדיקות והתמונות שהזנת ומכין קובץ מסודר לשמירה או לשליחה. הוא אינו קובע אם להיכנס לבדיקה ואינו מחליף בדיקה במכון.</p>
 <button class="primary full" onclick="buildReport()">הפקת סיכום הבדיקה העצמית</button>
 <div class="report" id="report"></div>
 <button class="primary full" id="pdfBtn" onclick="shareReportPdf('pdfBtn')" style="display:none">שיתוף כ־PDF</button>
 <div class="info"><b>חשוב:</b> BuyTest אינו קובע שהרכב תקין, בטוח או כדאי לרכישה. כל החלטה נשארת בידי המשתמש.</div>
+<div class="preFlowNav"><button class="secondary" type="button" onclick="showPreFlowStep(3)">חזרה</button><button class="secondary" type="button" onclick="setCustomerRoute('report');document.getElementById('fullCheckOffer').style.display='block';document.getElementById('fullCheckOffer').scrollIntoView({behavior:'smooth',block:'start'})">יש לי דוח מכון לפענוח</button></div>
 </section>
 
 <section class="card paidOnly reportFeature" id="afterInspectionSection" style="display:none">
-<div class="caseLabel">שלב 2 מתוך 3 · אחרי המכון</div>
-<h2 class="stageTitle"><span>פענוח דוח המכון והבדיקה הממוחשבת</span><span class="stagePriceTag">39 ₪</span></h2>
+<div class="caseLabel">אחרי המכון</div>
+<h2 class="stageTitle"><span>פענוח דוח המכון והבדיקה הממוחשבת</span><span class="stagePriceTag">49 ₪</span></h2>
 <p class="sub"><b>מעלים את דף סיכום הבוחן</b>, ובמידת הצורך גם עמוד אחד או יותר של הבדיקה הממוחשבת. המערכת מרכזת את כל הממצאים לפי מערכת ורמת משמעות, בלי לאבד פרטי חלק, צד, החלפה או פגיעה, ומציגה מסקנה מקצועית קצרה לכל קבוצה.</p>
 <div class="privacyStrip"><b>פרטיות וזהות:</b> לצורך זיהוי הטקסט, עמודי הדוח עשויים להישלח אל Google Cloud Vision דרך שירות מאובטח של BuyTest. לאחר הפענוח מתבצעת בדיקת אימות מקומית בדפדפן באמצעות Tesseract; אם Vision אינו זמין, המנוע המקומי עשוי לשמש כגיבוי. קובצי המקור אינם מצורפים ל־PDF של BuyTest, והפלט אינו מעתיק את הטופס, הלוגו או שם המכון.</div>
 
@@ -489,23 +472,25 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
 <button class="primary full" id="finalPdfBtn" onclick="shareReportPdf('finalPdfBtn')" style="display:none">שיתוף סיכום מלא כ־PDF</button>
 <button class="secondary full returnBtn" type="button" onclick="returnToVehicle()">חזרה לנתוני הרכב</button>
 </section>
-<section class="clarificationBox consultationFeature" id="clarificationBox" aria-labelledby="clarificationTitle">
-  <div class="caseLabel">שלב 3 מתוך 3 · התייעצות אישית</div>
+<section class="clarificationBox" id="clarificationBox" aria-labelledby="clarificationTitle">
+  <div class="caseLabel">אפשרות נוספת לאחר הפענוח</div>
   <h3 id="clarificationTitle" class="stageTitle"><span>התייעצות אישית עם בוחן רכב</span><span class="stagePriceTag">49 ₪</span></h3>
   <p class="sub">אפשר להעביר את הדוח לעמוס רוקח לקבלת הסבר אישי על הממצאים ועל הבירורים שכדאי לבצע מול המכון, המוסך או השמאי.</p>
-  <div class="clarificationChoices">
+  <div class="consultationLocked">
     <article class="clarificationChoice paid">
-      <span class="clarificationPrice">כלול בחבילה המלאה</span>
+      <span class="clarificationPrice">שירות נפרד · 49 ₪</span>
       <h4>מענה אישי על דוח אחד ורכב אחד</h4>
       <p>ההתייעצות מפרשת את הממצאים ומכוונת לבדיקות המשך. היא אינה כוללת החלטת קנייה, הערכת מחיר תיקון, שמאות או קביעה לגבי מקצועיות המכון.</p>
-      <button class="primary" type="button" onclick="selectClarification()">בקשת התייעצות אישית</button>
+      <button class="primary full" id="consultationPlanButton" type="button" onclick="startPayment('consultation')">פתיחת התייעצות אישית – 49 ₪</button>
     </article>
   </div>
-  <div class="clarificationForm" id="clarificationForm">
+  <div class="consultationUnlocked">
+  <div class="clarificationForm show" id="clarificationForm">
     <div class="field"><label for="clarificationQuestion"><b id="clarificationQuestionLabel">מה חשוב לך שאבדוק בדוח?</b></label><textarea id="clarificationQuestion" maxlength="1500" oninput="updateClarificationCounter()" placeholder="אפשר לכתוב בקצרה מה תרצה לברר ולצרף את דוח הבדיקה למייל"></textarea><div class="clarificationCounter" id="clarificationCounter"><span>תיאור קצר של הבירור</span><span id="clarificationCharacterCount">0 מתוך 1500</span></div></div>
-    <p class="formNote" id="clarificationFormNote">לאחר הלחיצה תיפתח אפליקציית המייל. יש לצרף את דוח הבדיקה המלא. שלב ההתייעצות נפתח רק לאחר השלמת הפענוח ואישור התשלום, או כחלק מהחבילה המלאה.</p>
+    <p class="formNote" id="clarificationFormNote">לאחר הלחיצה תיפתח אפליקציית המייל. יש לצרף את דוח הבדיקה המלא כדי לאפשר מענה מדויק ככל האפשר.</p>
     <div class="info"><b>זמן המענה:</b> תשובות יינתנו בשעות העבודה המקובלות.</div>
     <button class="primary full" type="button" onclick="sendClarificationEmail()">פתיחת בקשת התייעצות במייל</button>
+  </div>
   </div>
   <section class="customerReplyAdmin" id="customerReplyAdmin">
     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
@@ -563,7 +548,7 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
       <p><b>טל״ח:</b> בפענוח אוטומטי עלולות להתרחש טעויות זיהוי, תמלול, שיוך או פרשנות. במקרה של אי־התאמה, דוח המקור גובר. אין להסתמך על ממצא שאינו מופיע בדוח המקורי, ויש לאמת כל ממצא מהותי מול הדוח ובעל מקצוע מתאים. הבהרה זו אינה גורעת מזכויות המשתמש לפי דין.</p>
       <p>בהעלאת דוח המשתמש מצהיר שהבדיקה הוזמנה על שמו או שיש לו הרשאה מתאימה מבעל הבדיקה לעשות שימוש בקובץ לצורך השירות. BuyTest אינו טוען לבעלות בדוח המכון ואינו מפרסם או מצרף את טופס המקור לפלט. המשתמש מתבקש להעלות רק את אזור סיכום הבוחן, ללא לוגו ופרטים אישיים שאינם דרושים.</p>
       <p>BuyTest אינו קשור למכון הבדיקה ואינו מדבר בשמו. ההסבר נגזר מן הטקסט שזוהה בדוח וממאגר הסיווג המקצועי של המערכת. הסיווג אינו ביקורת, דירוג או קביעה לגבי מקצועיות המכון, דיוק עבודתו או התנהלותו. ניסוח שמסווג כ„הסתייגות כללית” או „מגבלת בדיקה” מתאר את סוג המשפט בלבד ואינו מייחס למכון כוונה פסולה.</p>
-      <p>השירות בנוי משלושה שלבים עוקבים: בדיקה עצמית לפני המכון, פענוח דוח המכון והבדיקה הממוחשבת, ולאחריו התייעצות אישית. אפשר לשלם על כל שלב כאשר מגיעים אליו או לרכוש מראש חבילה מלאה לרכב אחד; בכל מקרה אי אפשר לדלג על שלב. ההתייעצות האישית מבוססת על הדוח והמידע שהמשתמש מסר בלבד ואינה בדיקה פיזית, שמאות, הערכת עלויות, המלצה לקנות או לא לקנות או קביעה לגבי מכון הבדיקה.</p>
+      <p>הבדיקה העצמית לפני המכון ניתנת ללא תשלום. פענוח דוח המכון והבדיקה הממוחשבת הוא שירות נפרד בתשלום לרכב אחד. רק לאחר השלמת הפענוח מוצעת התייעצות אישית נפרדת בתשלום. ההתייעצות מבוססת על הדוח והמידע שהמשתמש מסר בלבד ואינה בדיקה פיזית, שמאות, הערכת עלויות, המלצה לקנות או לא לקנות או קביעה לגבי מכון הבדיקה.</p>
       <p>התשלום מתבצע בדף המאובטח של Cardcom. הרכישה משויכת למספר הרכב שהוזן, והגישה לשירות שנרכש נפתחת לאחר אישור התשלום למשך 48 שעות.</p>
       <p>כל הזכויות באתר, בתוכן, במבנה הבדיקה, ברשימות הבדיקה, בעיצוב ובסימני BuyTest שמורות ל־BuyTest. אין להעתיק, להפיץ או לעשות בהם שימוש מסחרי ללא אישור מראש ובכתב.</p>
     </div>
@@ -576,7 +561,7 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
     <div id="cancelText" class="legalPage" style="display:none">
       <h2>ביטול עסקה והחזרים</h2>
       <p>לבקשת ביטול או לבירור עסקה יש לפנות ל־buytest2026@gmail.com ולציין שם, מספר הרכב ותאריך הרכישה. הבקשה תטופל בהתאם להוראות הדין, לסוג השירות ולשאלה אם השירות הדיגיטלי כבר החל או סופק. החזר שאושר יבוצע לאמצעי התשלום באמצעות Cardcom.</p>
-      <p>המחירים לרכב אחד ולמקרה בדיקה אחד הם: שלב 1 — בדיקה עצמית לפני המכון 49 ₪; שלב 2 — פענוח אחרי המכון 39 ₪, לאחר השלמת שלב 1; שלב 3 — התייעצות אישית 49 ₪, לאחר השלמת שלב 2; או חבילה מלאה ב־120 ₪ במקום 137 ₪ ברכישה נפרדת, כשהשלבים נפתחים לפי הסדר. מפעיל השירות: עמוס רוקח, BuyTest. כתובת קשר: buytest2026@gmail.com.</p>
+      <p>הבדיקה העצמית לפני המכון ניתנת בחינם. פענוח דוח המכון עולה 49 ₪ לרכב אחד. לאחר השלמת הפענוח אפשר לרכוש התייעצות אישית ב־49 ₪ נוספים. מפעיל השירות: עמוס רוקח, BuyTest. כתובת קשר: buytest2026@gmail.com.</p>
     </div>
   </div>
 </div>
@@ -594,6 +579,7 @@ const ACTIVE_ID='053cea08-09bc-40ec-8f7a-156f0677aff3';
 let loadedKm=null, reportText='', preReportText='', afterReportText='', interpretedReportKm=null;
 let latestSummaryResult=null,latestComputerResult=null,latestComputerIdentity=null;
 let externalVehicleData={kmHistory:[]};
+let customerEntryRoute='free';
 const inspectionFiles={summary:null,computer:[]};
 const inspectionOcrMeta={summary:null,computer:null};
 // Google Vision runs through the BuyTest Supabase Edge Function so the private
@@ -689,6 +675,55 @@ function setExternalVehicleData(data={}){
   refreshInspectionHeader();
 }
 function plate(){return document.getElementById('plate').value.replace(/\D/g,'')}
+function sanitizePlateInput(input){input.value=String(input.value||'').replace(/\D/g,'').slice(0,8)}
+function syncVehicleLookupButton(){
+  const button=document.getElementById('vehicleLookupButton');
+  if(!button) return;
+  button.disabled=!(document.getElementById('entryLegalAccept')?.checked&&/^\d{7,8}$/.test(plate()));
+}
+function chooseCustomerRoute(route){
+  setCustomerRoute(route);
+  document.getElementById('vehicleLookup')?.scrollIntoView({behavior:'smooth',block:'start'});
+  setTimeout(()=>document.getElementById('entryLegalAccept')?.focus({preventScroll:true}),450);
+}
+function setCustomerRoute(route){
+  customerEntryRoute=route==='report'?'report':'free';
+  document.getElementById('freeRouteButton')?.classList.toggle('active',customerEntryRoute==='free');
+  document.getElementById('reportRouteButton')?.classList.toggle('active',customerEntryRoute==='report');
+  const hint=document.getElementById('vehicleRouteHint');
+  const tag=document.getElementById('vehicleRoutePrice');
+  if(hint) hint.textContent=customerEntryRoute==='free'
+    ? 'לאחר הצגת נתוני הרכב תיפתח הבדיקה העצמית החינמית, שלב אחר שלב.'
+    : 'לאחר אימות נתוני הרכב אפשר לפתוח את פענוח דוח המכון ב־49 ₪.';
+  if(tag) tag.textContent=customerEntryRoute==='free'?'חינם':'פענוח · 49 ₪';
+  const hasVehicle=document.getElementById('vehicleData')?.style.display==='block';
+  if(customerEntryRoute==='report'){
+    document.getElementById('preFlowProgress')?.classList.remove('show');
+    document.querySelectorAll('.preFlowScreen').forEach(section=>section.classList.remove('active'));
+    if(hasVehicle) document.getElementById('fullCheckOffer').style.display='block';
+  }else if(hasVehicle){
+    const offer=document.getElementById('fullCheckOffer');
+    if(offer) offer.style.display='none';
+    unlockFreeSections();
+    showPreFlowStep(0);
+  }
+}
+const preFlowTitles=['התאמת רישיון','שאלות למוכר','בדיקה חיצונית','בדיקה פנימית ונסיעה','סיכום'];
+function showPreFlowStep(index,{scroll=true}={}){
+  const safe=Math.max(0,Math.min(preFlowTitles.length-1,Number(index)||0));
+  const progress=document.getElementById('preFlowProgress');
+  progress?.classList.add('show');
+  document.querySelectorAll('.preFlowScreen').forEach(section=>{
+    const active=Number(section.dataset.preStep)===safe;
+    section.classList.toggle('active',active);
+    if(section.tagName==='DETAILS') section.open=active;
+  });
+  const text=document.getElementById('preFlowProgressText');
+  const bar=document.getElementById('preFlowProgressBar');
+  if(text) text.textContent=`שלב ${safe+1} מתוך ${preFlowTitles.length} · ${preFlowTitles[safe]}`;
+  if(bar) bar.style.width=`${((safe+1)/preFlowTitles.length)*100}%`;
+  if(scroll) progress?.scrollIntoView({behavior:'smooth',block:'start'});
+}
 function apiUrl(resource,p){return'https://data.gov.il/api/3/action/datastore_search?resource_id='+resource+'&filters='+encodeURIComponent(JSON.stringify({mispar_rechev:Number(p)}))+'&limit=20'}
 function fmtDate(v){if(!v)return'—';let s=String(v);if(/^\d{6}$/.test(s))return s.slice(4,6)+'/'+s.slice(0,4);let d=new Date(s);return isNaN(d)?s:d.toLocaleDateString('he-IL')}
 function fmtNum(v){return(v===null||v===undefined||v==='')?'—':Number(v).toLocaleString('he-IL')}
@@ -752,9 +787,17 @@ async function loadVehicle(){
   statusMsg.textContent='✓ נתוני הרכב נטענו';
   statusMsg.className='green';
   vehicleData.style.display='block';
-  unlockFreeSections();
   const restored=await restoreBuyTestAccessWithRetry({requiredPlate:p,scroll:true});
-  if(offer){offer.style.display='block';if(!restored) offer.scrollIntoView({behavior:'smooth',block:'start'});}
+  if(restored) return;
+  if(customerEntryRoute==='free'){
+    unlockFreeSections();
+    if(offer) offer.style.display='none';
+    showPreFlowStep(0);
+  }else{
+    document.getElementById('preFlowProgress')?.classList.remove('show');
+    document.querySelectorAll('.preFlowScreen').forEach(section=>section.classList.remove('active'));
+    if(offer){offer.style.display='block';offer.scrollIntoView({behavior:'smooth',block:'start'});}
+  }
 }
 const seller=['כמה זמן הרכב אצל המוכר?','האם היו תאונות או תיקונים משמעותיים?','האם המוכר מתחייב בבדיקה לגבי מנוע, גיר, שלדה ותאונות משמעותיות?'];
 const external=['בדוק אם קיימים הבדלי גוון בצבע בין חלקי המרכב','בדוק אם קיימים סימני פתיחה או פירוק בברגי מכסה המנוע ומכסה תא המטען','בדוק אם קיימים סימני פתיחה או פירוק בברגי הדלתות והכנפיים הקדמיות'];
@@ -857,7 +900,7 @@ function sendClarificationEmail(){
   const owner=document.getElementById('inspectionOwnerName')?.value.trim()||'לא הוזן';
   const subject=`בקשת התייעצות אישית · רכב ${vehiclePlate}`;
   const body=[
-    'סוג הפנייה: התייעצות אישית עם בוחן רכב · 49 ₪ (או כחלק מהחבילה המלאה)',
+    'סוג הפנייה: התייעצות אישית עם בוחן רכב · התשלום אושר',
     `מספר רכב: ${vehiclePlate}`,
     `שם מזמין הבדיקה: ${owner}`,
     '',
@@ -1064,10 +1107,10 @@ function openLegal(which){
   document.getElementById('legalModal').classList.add('open');
 }
 function closeLegal(){document.getElementById('legalModal').classList.remove('open')}
-function unlockFreeSections(){document.querySelectorAll('.freeAfterLookup').forEach(x=>x.style.display='block');}
+function unlockFreeSections(){document.querySelectorAll('.freeAfterLookup').forEach(x=>x.style.removeProperty('display'));}
 const buytestPlans={
   premium:{name:'בדיקה עצמית לפני המכון',price:49,scope:'שאלות למוכר, בדיקות חיצוניות ופנימיות, נסיעה קצרה, תמונות וסיכום PDF'},
-  report:{name:'פענוח אחרי המכון',price:39,scope:'פענוח סיכום הבוחן והבדיקה הממוחשבת, אם צורפה, וסיכום PDF'},
+  report:{name:'פענוח דוח המכון',price:49,scope:'פענוח סיכום הבוחן והבדיקה הממוחשבת, אם צורפה, וסיכום PDF'},
   consultation:{name:'התייעצות אישית',price:49,scope:'מעבר אישי על דוח אחד ורכב אחד ומתן הסבר מקצועי'},
   bundle:{name:'חבילת BuyTest המלאה',price:120,scope:'בדיקה עצמית לפני המכון, פענוח אחרי המכון והתייעצות אישית לרכב אחד'}
 };
@@ -1092,31 +1135,17 @@ function setRoadmapCard(key,state,statusText,buttonText,disabled){
 function updateBuyTestRoadmap(){
   const plan=activeBuyTestPlan();
   const progress=buyTestStageProgress;
-  const hasPremium=['premium','report','consultation','bundle'].includes(plan);
-  const hasReport=['report','consultation'].includes(plan)||(plan==='bundle'&&progress.preInspectionCompleted);
-  const hasConsultation=plan==='consultation'||(plan==='bundle'&&progress.reportCompleted);
   document.body.classList.toggle('stage-report-open',plan==='bundle'&&progress.preInspectionCompleted);
   document.body.classList.toggle('stage-consultation-open',plan==='bundle'&&progress.reportCompleted);
-
-  if(progress.preInspectionCompleted) setRoadmapCard('premium','completed','✓ שלב 1 הושלם','שלב 1 הושלם',true);
-  else if(hasPremium) setRoadmapCard('premium','current','שלב 1 פתוח — יש להשלים אותו כדי להתקדם','המשך לשלב 1',true);
-  else setRoadmapCard('premium','current','השלב הראשון — מתחילים כאן','פתיחת שלב 1 – 49 ₪',false);
-
-  if(progress.reportCompleted) setRoadmapCard('report','completed','✓ שלב 2 הושלם','שלב 2 הושלם',true);
-  else if(hasReport) setRoadmapCard('report','current','שלב 2 פתוח כעת','המשך לשלב 2',true);
-  else if(progress.preInspectionCompleted) setRoadmapCard('report','current','שלב 1 הושלם — אפשר לפתוח את שלב 2','פתיחת שלב 2 – 39 ₪',false);
-  else setRoadmapCard('report','locked','נפתח לאחר השלמת שלב 1','שלב 2 נעול עד להשלמת שלב 1',true);
-
-  if(hasConsultation) setRoadmapCard('consultation','current','שלב 3 פתוח כעת','המשך לשלב 3',true);
-  else if(progress.reportCompleted) setRoadmapCard('consultation','current','שלב 2 הושלם — אפשר לפתוח את שלב 3','פתיחת שלב 3 – 49 ₪',false);
-  else setRoadmapCard('consultation','locked','נפתח לאחר השלמת שלב 2','שלב 3 נעול עד להשלמת שלב 2',true);
-
-  if(plan==='bundle') setRoadmapCard('bundle','completed','✓ החבילה המלאה נרכשה — מתקדמים לפי הסדר','החבילה המלאה נרכשה',true);
-  else if(plan) setRoadmapCard('bundle','locked','כבר התחלת מסלול בתשלום לפי שלבים','החבילה המלאה זמינה רק בתחילת המסלול',true);
-  else setRoadmapCard('bundle','current','כל המסלול מראש — ללא דילוג על שלבים','רכישת כל המסלול – 120 ₪',false);
+  if(progress.reportCompleted) setRoadmapCard('report','completed','✓ הפענוח הושלם','הפענוח הושלם',true);
+  else if(plan==='report'||plan==='bundle') setRoadmapCard('report','current','הפענוח פתוח לרכב הזה','המשך להעלאת הדוח',true);
+  else setRoadmapCard('report','current','מוכן לפתיחה לרכב שנבחר','פתיחת הפענוח – 49 ₪',false);
+  const consultationButton=document.getElementById('consultationPlanButton');
+  if(consultationButton) consultationButton.disabled=!progress.reportCompleted||plan==='consultation';
 }
 function setBuyTestStageProgress(value){
   buyTestStageProgress=normalizedStageProgress(value);
+  document.body.classList.toggle('report-complete',buyTestStageProgress.reportCompleted);
   updateBuyTestRoadmap();
 }
 function applyPlanAccess(planKey,{scroll=false,progress=buyTestStageProgress}={}){
@@ -1128,15 +1157,18 @@ function applyPlanAccess(planKey,{scroll=false,progress=buyTestStageProgress}={}
   document.querySelectorAll('.paidOnly').forEach(section=>section.style.removeProperty('display'));
   showClarificationOptions();
   if(scroll){
-    const target=planKey==='bundle'?(buyTestStageProgress.reportCompleted?document.getElementById('clarificationBox'):buyTestStageProgress.preInspectionCompleted?document.getElementById('afterInspectionSection'):document.getElementById('selfCheckIntro')):planKey==='premium'?document.getElementById('selfCheckIntro'):planKey==='report'?document.getElementById('afterInspectionSection'):document.getElementById('clarificationBox');
-    target?.scrollIntoView({behavior:'smooth',block:'start'});
+    if(planKey==='premium'){unlockFreeSections();showPreFlowStep(0);}
+    else{
+      const target=planKey==='bundle'?(buyTestStageProgress.reportCompleted?document.getElementById('clarificationBox'):buyTestStageProgress.preInspectionCompleted?document.getElementById('afterInspectionSection'):document.getElementById('licenseMatchSection')):planKey==='report'?document.getElementById('afterInspectionSection'):document.getElementById('clarificationBox');
+      target?.scrollIntoView({behavior:'smooth',block:'start'});
+    }
   }
   return true;
 }
 function activatePurchasedPlan(planKey,{scroll=true,progress=buyTestStageProgress}={}){
   if(!applyPlanAccess(planKey,{scroll,progress})) return false;
   const offer=document.getElementById('fullCheckOffer');
-  if(offer) offer.style.display='block';
+  if(offer) offer.style.display='none';
   sessionStorage.removeItem('buytestPendingPlan');
   return true;
 }
@@ -1238,6 +1270,7 @@ async function resumePaidVehicleFlow(plateNumber){
   input.value=paidPlate;
   const legalAccept=document.getElementById('entryLegalAccept');
   if(legalAccept) legalAccept.checked=true;
+  syncVehicleLookupButton();
   const shownPlate=String(document.getElementById('vPlate')?.textContent||'').replace(/\D/g,'');
   const vehicleData=document.getElementById('vehicleData');
   if(shownPlate===paidPlate&&vehicleData?.style.display!=='none') return true;
@@ -1274,6 +1307,7 @@ async function initializeBuyTestAccess(){
   const returned=manualAccess||returnMarker||params.get('buytest_payment')==='return'||params.get('response')==='success'||params.get('reponse')==='success';
   const saved=storedBuyTestPayment();
   if(!saved) return;
+  setCustomerRoute(['report','consultation'].includes(String(saved.plan))?'report':'free');
   const returnedOrder=params.get('order');
   if(returnedOrder&&returnedOrder!==saved.orderId) return;
   if(!returned){
@@ -1316,14 +1350,9 @@ function previewPlanAsManager(planKey='all'){
   if(!applyPlanAccess(planKey)) return;
   if(status) status.textContent='תצוגת בדיקה: '+buytestPlans[planKey].name+' בלבד.';
 }
-async function startPayment(planKey='bundle'){
-  const selectedKey=Object.prototype.hasOwnProperty.call(buytestPlans,planKey)?planKey:'bundle';
+async function startPayment(planKey='report'){
+  const selectedKey=Object.prototype.hasOwnProperty.call(buytestPlans,planKey)?planKey:'report';
   const plan=buytestPlans[selectedKey];
-  if(selectedKey==='report'&&!buyTestStageProgress.preInspectionCompleted){
-    showBuyTestAccessNotice('שלב 2 נפתח רק לאחר השלמת שלב 1 והפקת סיכום הבדיקה העצמית.',true);
-    document.getElementById('premiumPlanCard')?.scrollIntoView({behavior:'smooth',block:'center'});
-    return;
-  }
   if(selectedKey==='consultation'&&!buyTestStageProgress.reportCompleted){
     showBuyTestAccessNotice('שלב 3 נפתח רק לאחר השלמת שלב 2 ופענוח דוח המכון.',true);
     document.getElementById('reportPlanCard')?.scrollIntoView({behavior:'smooth',block:'center'});
@@ -1366,8 +1395,8 @@ async function startPayment(planKey='bundle'){
   }
 }
 async function submitBuyTestPayment(){
-  const planKey=sessionStorage.getItem('buytestPendingPlan')||'bundle';
-  const plan=buytestPlans[planKey]||buytestPlans.bundle;
+  const planKey=sessionStorage.getItem('buytestPendingPlan')||'report';
+  const plan=buytestPlans[planKey]||buytestPlans.report;
   const plate=String(document.getElementById('vPlate')?.textContent||document.getElementById('plate')?.value||'').replace(/\D/g,'');
   const customerName=document.getElementById('paymentCustomerName').value.trim();
   const email=document.getElementById('paymentEmail').value.trim();
@@ -1397,6 +1426,7 @@ function closeBuyTestPayment(){
   document.body.style.overflow='';
 }
 async function completeBuyTestStage(stage){
+  if(stage==='premium') return true;
   if(document.body.classList.contains('manager-mode')) return true;
   const saved=storedBuyTestPayment();
   if(!saved?.orderId||!saved?.clientSecret) return false;
@@ -1408,7 +1438,7 @@ async function completeBuyTestStage(stage){
     saveBuyTestPayment({...saved,progress,accessToken:result.accessToken||saved.accessToken});
     setBuyTestStageProgress(progress);
     showClarificationOptions();
-    const label=stage==='premium'?'שלב 1 הושלם. שלב 2 פתוח כעת.':'שלב 2 הושלם. שלב 3 פתוח כעת.';
+    const label='פענוח הדוח הושלם. כעת אפשר לבחור גם התייעצות אישית, אם תרצה.';
     showBuyTestAccessNotice('✓ '+label);
     return true;
   }catch(error){
@@ -1459,67 +1489,6 @@ function addVehiclePhotos(input){
   input.value='';
 }
 function renderVehiclePhotos(){const b=document.getElementById('photoPreview');if(!b)return;b.innerHTML=vehiclePhotoData.map((x,i)=>`<div><img src="${x}"><button type="button" onclick="vehiclePhotoData.splice(${i},1);renderVehiclePhotos()">הסר</button></div>`).join('')}
-async function imageForPlateOcr(file){
-  const dataUrl=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(file)});
-  const image=await new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=reject;img.src=dataUrl});
-  const maxSide=1800;
-  const scale=Math.min(1,maxSide/Math.max(image.naturalWidth,image.naturalHeight));
-  const canvas=document.createElement('canvas');
-  canvas.width=Math.max(1,Math.round(image.naturalWidth*scale));
-  canvas.height=Math.max(1,Math.round(image.naturalHeight*scale));
-  const ctx=canvas.getContext('2d');
-  ctx.filter='grayscale(1) contrast(1.9) brightness(1.12)';
-  ctx.drawImage(image,0,0,canvas.width,canvas.height);
-  return canvas.toDataURL('image/jpeg',0.92);
-}
-async function scanPlatePhoto(input){
-  const file=input.files?.[0];
-  const status=document.getElementById('scanStatus');
-  if(!file) return;
-  status.classList.add('show');
-  status.textContent='מכין את התמונה לזיהוי...';
-  let worker=null;
-  try{
-    const source=await imageForPlateOcr(file);
-    let detectedText='',selectedEngine='';
-    if(googleVisionReady()){
-      status.textContent='מזהה את מספר הרכב באמצעות Google Vision...';
-      try{
-        detectedText=await googleVisionRecognize([source],null,'TEXT_DETECTION');
-        if(detectedText) selectedEngine='google-vision';
-      }catch(error){console.warn('Google Vision plate OCR fallback:',error);}
-    }
-    if(!detectedText){
-      if(!window.Tesseract) throw new Error('OCR_UNAVAILABLE');
-      worker=await Tesseract.createWorker('eng',1,{
-        logger:m=>{
-        if(m.status==='recognizing text') status.textContent='מזהה את מספר הרכב... '+Math.round((m.progress||0)*100)+'%';
-        }
-      });
-      await worker.setParameters({tessedit_char_whitelist:'0123456789- ',preserve_interword_spaces:'0',tessedit_pageseg_mode:'7'});
-      const result=await worker.recognize(source);
-      detectedText=result?.data?.text||'';
-      if(detectedText) selectedEngine='tesseract';
-    }
-    const candidates=(detectedText.match(/[0-9][0-9\s\-–—]{5,16}[0-9]/g)||[])
-      .map(value=>value.replace(/\D/g,''))
-      .filter(value=>/^\d{7,8}$/.test(value));
-    const recognized=candidates[0]||'';
-    if(!recognized) throw new Error('PLATE_NOT_FOUND');
-    document.getElementById('plate').value=recognized;
-    status.textContent=`✓ זוהה מספר רכב ${recognized} באמצעות ${ocrEngineLabel(selectedEngine)}. טוען נתונים...`;
-    await loadVehicle();
-  }catch(error){
-    console.warn('BuyTest plate scan detail '+JSON.stringify({name:error?.name||'',message:error?.message||'',type:error?.type||'',file:error?.filename||'',line:error?.lineno||'',nested:error?.error?.message||'',url:error?.target?.responseURL||'',status:error?.target?.status||0}));
-    status.textContent=error?.message==='PLATE_NOT_FOUND'
-      ? 'לא הצלחנו לזהות מספר בן 7–8 ספרות. אפשר לצלם שוב מקרוב או להקליד את המספר.'
-      : 'זיהוי התמונה אינו זמין כרגע. אפשר להקליד את מספר הרכב ידנית.';
-  }finally{
-    if(worker) await worker.terminate().catch(()=>{});
-    input.value='';
-  }
-}
-
 async function loadImageFile(file){
   const dataUrl=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(file)});
   return new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=reject;img.src=dataUrl});
@@ -4837,7 +4806,7 @@ async function analyseInspectionReport(){
   showFeedback();
   showClarificationOptions();
   box.scrollIntoView({behavior:'smooth',block:'start'});
-  if(status){status.textContent=stageUpdated?'✓ הפענוח הושלם. שלב 3 פתוח כעת.':'✓ הפענוח הושלם. פתיחת שלב 3 תתעדכן לאחר חידוש החיבור.';status.classList.add('show');status.classList.remove('error');}
+  if(status){status.textContent=stageUpdated?'✓ הפענוח הושלם. אפשר לשתף את הסיכום או לבחור בהתייעצות אישית.':'✓ הפענוח הושלם. אפשר לשתף את הסיכום; אפשרות ההתייעצות תתעדכן לאחר חידוש החיבור.';status.classList.add('show');status.classList.remove('error');}
   }catch(error){
     console.error('BuyTest secure analysis error:',error);
     const messages={
@@ -5315,9 +5284,9 @@ async function shareReportPdf(buttonId='pdfBtn'){
 }
 // לאחר אימות תשלום מאובטח נפתח השלב שנרכש; השלבים הבאים נפתחים לפי ההתקדמות.
 window.addEventListener('DOMContentLoaded',async()=>{
-  const vehicleLookup=document.getElementById('vehicleLookup');
   const licenseMatchSection=document.getElementById('licenseMatchSection');
-  if(vehicleLookup&&licenseMatchSection) vehicleLookup.insertAdjacentElement('afterend',licenseMatchSection);
+  const flowProgress=document.getElementById('preFlowProgress');
+  if(flowProgress&&licenseMatchSection) flowProgress.insertAdjacentElement('afterend',licenseMatchSection);
   document.querySelectorAll('.paidOnly').forEach(x=>x.style.display='none');
   const managerBox=document.getElementById('managerPreviewBox');
   if(managerBox&&new URLSearchParams(location.search).get('manager')==='1') managerBox.style.display='block';
@@ -5325,6 +5294,7 @@ window.addEventListener('DOMContentLoaded',async()=>{
   if(purchaseBox) purchaseBox.style.display='none';
   const feedbackBox=document.getElementById('feedbackBox');
   if(feedbackBox) feedbackBox.style.display='none';
+  syncVehicleLookupButton();
   updateBuyTestRoadmap();
   await runBuyTestAccessInitialization();
 });

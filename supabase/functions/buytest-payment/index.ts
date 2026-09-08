@@ -8,8 +8,8 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 const PLANS = {
   premium: { amountAgorot: 4900, title: "בדיקה עצמית לפני המכון", scopes: ["premium"] },
-  report: { amountAgorot: 3900, title: "פענוח אחרי המכון", scopes: ["premium", "report"] },
-  consultation: { amountAgorot: 4900, title: "התייעצות אישית", scopes: ["premium", "report", "consultation"] },
+  report: { amountAgorot: 4900, title: "פענוח דוח המכון", scopes: ["report"] },
+  consultation: { amountAgorot: 4900, title: "התייעצות אישית", scopes: ["consultation"] },
   bundle: { amountAgorot: 12000, title: "חבילת BuyTest המלאה", scopes: ["premium", "report", "consultation"] },
 } as const;
 type PlanKey = keyof typeof PLANS;
@@ -241,14 +241,12 @@ async function createPayment(origin: string | null, body: Record<string, unknown
   const plan = PLANS[planKey];
   let inheritedProgress: StageProgress = { preInspectionCompleted: false, reportCompleted: false };
   let priorOrderId = "";
-  if (planKey === "report" || planKey === "consultation") {
+  if (planKey === "consultation") {
     const priorOrder = await verifiedPriorOrder(body, plate);
     if (!priorOrder || !isPlan(priorOrder.plan)) return json(origin, { ok: false, error: "previous_stage_required" }, 409);
     const priorProgress = stageProgress(priorOrder.provider_payload);
     const priorScopes: readonly string[] = PLANS[priorOrder.plan as PlanKey].scopes;
-    const allowed = planKey === "report"
-      ? priorScopes.includes("premium") && priorProgress.preInspectionCompleted
-      : priorScopes.includes("report") && priorProgress.reportCompleted;
+    const allowed = priorScopes.includes("report") && priorProgress.reportCompleted;
     if (!allowed) return json(origin, { ok: false, error: "previous_stage_required" }, 409);
     inheritedProgress = priorProgress;
     priorOrderId = String(priorOrder.id);
