@@ -197,7 +197,7 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
 @media(max-width:760px){.mktHero{padding:30px 0 24px}.mktHeroGrid,.mktAbout,.afterGrid,.clarificationChoices{grid-template-columns:1fr}.mktGrid3{grid-template-columns:1fr}.mktOutcome{grid-template-columns:1fr 1fr}.mktHeroCard{padding:18px}.mktLead{font-size:18px}.mktCtas{flex-direction:column}.mktBtn{width:100%}main{padding-top:12px}.card{padding:18px;margin:20px 0}.credentials strong{font-size:25px}.credentials span{font-size:16px}.scopeStrip{grid-template-columns:1fr}.mktStep{grid-template-columns:38px 1fr}.mktNum{width:38px;height:38px}.mktStepPrice{grid-column:2;text-align:right}.mktBundle{align-items:flex-start;flex-direction:column}.guidedSection>summary{align-items:flex-start;flex-wrap:wrap}.guidedSection>summary:after{margin-right:0;margin-inline-start:auto}.includedTag{order:3;margin-inline-start:0}}
 @media(max-width:460px){.mktOutcome{grid-template-columns:1fr}.priceGrid{grid-template-columns:1fr}.licenseGrid,.grid,.formulaAdminGrid,.inspectionIdentityGrid,.inspectionHeaderGrid{grid-template-columns:1fr}.formulaAdmin .wide{grid-column:auto}.mktWrap{padding:0 14px}.replyTable,.replyTable tbody,.replyTable tr,.replyTable th,.replyTable td{display:block;width:100%}.replyTable th{padding:9px 0 5px}.inspectionIdentityValue{font-size:19px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
-</style><meta name="buytest-build" content="buytest-v73-two-path-flow-free-precheck">
+</style><meta name="buytest-build" content="buytest-v74-clean-entry-flow">
 </head><body>
 
 <section id="marketingLanding">
@@ -207,7 +207,7 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
 <img class="mktBrandLogo" src="buytest-logo-compact.png" alt="BuyTest">
 <span class="mktEyebrow">BuyTest · לפני המכון ואחרי המכון</span>
 <h1>מידע לפני המכון — <span>פענוח הדוח אחריו</span></h1>
-<p class="mktLead">בחרו את מה שאתם צריכים עכשיו: בדיקה עצמית מודרכת לפני המכון — בחינם, או פענוח מקצועי של דוח שכבר קיבלתם מהמכון — ב־49 ₪.</p>
+<p class="mktLead"><strong>קונים רכב? למכון מגיעים מוכנים — ואם הדוח משאיר סימני שאלה, אני הופך אותם לתשובות ברורות.</strong></p>
 <div class="credentials">
 <strong>עמוס רוקח</strong>
 <span>הנדסאי רכב · מנהל מוסך מוסמך · בוחן רישוי מלא · שמאי נזקי רכוש ורכב</span>
@@ -215,24 +215,15 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
 </div>
 <div class="routeCards" aria-label="בחירת מסלול BuyTest">
   <article class="routeCard free">
-    <span class="routePrice">חינם</span>
     <h3>לפני שנכנסים למכון</h3>
     <p>נתוני רכב, התאמת רישיון, שאלות למוכר, בדיקה חיצונית ופנימית, נסיעה קצרה וסיכום PDF.</p>
-    <button class="mktBtn mktBtnPrimary" type="button" onclick="chooseCustomerRoute('free')">התחלת הבדיקה החינמית</button>
+    <button class="mktBtn mktBtnPrimary" type="button" onclick="chooseCustomerRoute('free')">התחלת הבדיקה לפני המכון – ללא תשלום</button>
   </article>
   <article class="routeCard paid">
-    <span class="routePrice">49 ₪</span>
     <h3>כבר יש לך דוח מהמכון?</h3>
     <p>מעלים את סיכום הבוחן ואת הבדיקה הממוחשבת, אם קיימת, ומקבלים פענוח מסודר לפי מערכות ומשמעות.</p>
-    <button class="mktBtn mktBtnGhost" type="button" onclick="chooseCustomerRoute('report')">לפענוח דוח המכון</button>
+    <button class="mktBtn mktBtnGhost" type="button" onclick="chooseCustomerRoute('report')">פענוח דוח לאחר המכון – 49 ₪</button>
   </article>
-</div>
-</div>
-<div class="mktHeroCard">
-<h3>שני מסלולים פשוטים</h3>
-<div class="mktSteps">
-<div class="mktStep"><div class="mktNum">1</div><div><b>בדיקה עצמית לפני המכון</b><br/><span>תהליך מודרך מלא וסיכום PDF.</span></div><div class="mktStepPrice">חינם</div></div>
-<div class="mktStep"><div class="mktNum">2</div><div><b>פענוח דוח אחרי המכון</b><br/><span>שירות נפרד למי שכבר קיבל דוח.</span></div><div class="mktStepPrice">49 ₪</div></div>
 </div>
 </div>
 </div>
@@ -241,7 +232,7 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
 <div class="mktTitle"><h2>מה BuyTest בעצם עושה?</h2><p>לא מחליף מכון בדיקה ולא מחליט עבורך. הוא מרכז את מה שכדאי לבדוק מראש ומסביר בשפה פשוטה את המשמעות של סיכום הבוחן לאחר הבדיקה.</p></div>
 <div class="mktGrid3">
 <div class="mktInfoCard"><div class="ico">🔎</div><h3>מרכז מידע</h3><p>מושך נתונים זמינים על הרכב ומציג אותם במקום אחד, בצורה ברורה ופשוטה.</p></div>
-<div class="mktInfoCard"><div class="ico">🧭</div><h3>מוביל אותך שלב־שלב</h3><p>לאחר התשלום נפתחות שאלות, בדיקות מעשיות ואפשרות לתיעוד מסודר — גם למי שאינו איש מקצוע.</p></div>
+<div class="mktInfoCard"><div class="ico">🧭</div><h3>מוביל אותך שלב־שלב</h3><p>שאלות קצרות, בדיקות מעשיות ואפשרות לתיעוד מסודר — גם למי שאינו איש מקצוע.</p></div>
 <div class="mktInfoCard"><div class="ico">🧾</div><h3>מסביר את סיכום הבוחן</h3><p>מזהה ניסוחים מוכרים, מסביר את משמעותם ומסמן במפורש כל ניסוח שלא ניתן לפענח בבטחה.</p></div>
 </div>
 </div></div>
@@ -266,8 +257,8 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
 <div class="mktTitle"><h2>שאלות נפוצות</h2></div>
 <div class="mktFaq">
 <details><summary>האם BuyTest מחליף בדיקה במכון?</summary><p>לא. השלב הראשון מארגן בדיקות בסיסיות ודגשים למכון; השלב השני מסביר את סיכום הבוחן. השירות אינו בודק את הרכב פיזית ואינו מאשר תקינות.</p></details>
-<details><summary>מה מקבלים בחינם?</summary><p>מזינים מספר רכב, מקבלים את הנתונים הזמינים ממאגרי משרד התחבורה וממשיכים לבדיקה עצמית מודרכת: התאמת רישיון, שאלות למוכר, בדיקות ברכב, נסיעה קצרה וסיכום PDF.</p></details>
-<details><summary>מה כולל השירות בתשלום?</summary><p>פענוח דוח המכון עולה 49 ₪ לרכב אחד: העלאת סיכום הבוחן, העלאה אופציונלית של הבדיקה הממוחשבת, הסבר הממצאים וסיכום PDF. לאחר השלמת הפענוח בלבד תוצע התייעצות אישית נפרדת ב־49 ₪.</p></details>
+<details><summary>מה כוללת הבדיקה לפני המכון?</summary><p>מזינים מספר רכב, מקבלים את הנתונים הזמינים ממאגרי משרד התחבורה וממשיכים לבדיקה עצמית מודרכת: התאמת רישיון, שאלות למוכר, בדיקות ברכב, נסיעה קצרה וסיכום PDF.</p></details>
+<details><summary>מה כולל פענוח הדוח?</summary><p>מעלים את סיכום הבוחן, ובמידת הצורך גם את הבדיקה הממוחשבת, ומקבלים הסבר מסודר של הממצאים וסיכום PDF. לאחר השלמת הפענוח תוצע אפשרות נפרדת להתייעצות אישית.</p></details>
 <details><summary>מה קורה אם חסר מידע על הרכב?</summary><p>מאגרים ציבוריים אינם תמיד מלאים. כאשר נתון אינו זמין, BuyTest מציגה זאת במקום להמציא מידע, וממליצה לאמת פרטים מהותיים מול מסמכי הרכב והגורמים המתאימים.</p></details>
 <details><summary>האם BuyTest אומר אם לקנות את הרכב?</summary><p>לא. אין המלצת קנייה או אי־קנייה, אין הערכת שווי או עלות תיקון ואין קביעה לגבי ירידת ערך. BuyTest משקף משמעויות ושאלות לבירור בלבד; ההחלטה היא של המשתמש.</p></details>
 </div>
@@ -281,12 +272,7 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
 
 
 
-<section class="card" id="vehicleLookup"><h2 class="stageTitle"><span>נתוני הרכב</span><span class="stagePriceTag free" id="vehicleRoutePrice">חינם</span></h2><p class="sub">בחרו מסלול, אשרו את התנאים והקלידו את מספר הרכב ידנית. יוצגו הנתונים הזמינים ממאגרי משרד התחבורה לפני שממשיכים.</p>
-<div class="routeChoice" aria-label="בחירת מסלול">
-  <button type="button" id="freeRouteButton" class="active" onclick="setCustomerRoute('free')">בדיקה לפני המכון · חינם</button>
-  <button type="button" id="reportRouteButton" onclick="setCustomerRoute('report')">פענוח דוח מכון · 49 ₪</button>
-</div>
-<div class="vehicleHint" id="vehicleRouteHint">לאחר הצגת נתוני הרכב תיפתח הבדיקה העצמית החינמית, שלב אחר שלב.</div>
+<section class="card" id="vehicleLookup"><h2>נתוני הרכב</h2><p class="sub">אשרו את התנאים והקלידו את מספר הרכב ידנית. יוצגו הנתונים הזמינים ממאגרי משרד התחבורה לפני שממשיכים.</p>
 <div class="legalConsent legalCompact legalBeforePlate">
   <p>BuyTest מציג מידע ומסביר ממצאים, אך אינו מחליף בדיקה במכון ואינו ממליץ אם לקנות את הרכב.</p>
   <label>
@@ -312,12 +298,11 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
 <div class="preFlowProgress freeAfterLookup" id="preFlowProgress" aria-live="polite"><strong id="preFlowProgressText">שלב 1 מתוך 5 · התאמת רישיון</strong><div class="preFlowTrack" aria-hidden="true"><span id="preFlowProgressBar"></span></div></div>
 <section class="card" id="fullCheckOffer" style="display:none">
 <h2>פענוח דוח המכון</h2>
-<p class="sub">התשלום פותח לרכב הזה את העלאת סיכום הבוחן, הבדיקה הממוחשבת והפקת סיכום PDF. הבדיקה העצמית החינמית אינה תנאי לרכישה.</p>
+<p class="sub">התשלום פותח לרכב הזה את העלאת סיכום הבוחן, הבדיקה הממוחשבת והפקת סיכום PDF. אפשר להתחיל כאן גם בלי לבצע קודם את הבדיקה שלפני המכון.</p>
 <div class="priceGrid singlePlan" aria-label="פענוח דוח BuyTest">
   <article class="priceCard current" id="reportPlanCard">
     <span class="bundleBadge">אחרי המכון</span>
     <h3>פענוח דוח המכון והבדיקה הממוחשבת</h3>
-    <div class="price">49 ₪</div>
     <p>העלאת סיכום הבוחן והבדיקה הממוחשבת, פענוח הממצאים וקבלת סיכום PDF.</p>
     <span class="stageState" id="reportPlanState">מוכן לפתיחה לרכב שנבחר</span>
     <button class="primary planBtn" id="reportPlanButton" type="button" onclick="startPayment('report')">פתיחת הפענוח – 49 ₪</button>
@@ -368,7 +353,7 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
 </section>
 
 <details class="card freeAfterLookup preFlowScreen guidedSection" id="licenseMatchSection" data-pre-step="0" style="display:none;border:2px solid #0ea67b;" open>
-  <summary><span>התאמת רישיון הרכב לרכב ולמוכר</span><span class="stagePriceTag free">חינם</span></summary>
+  <summary><span>התאמת רישיון הרכב לרכב ולמוכר</span></summary>
   <div class="stepContent">
   <p class="sub" style="font-weight:700;color:#17352d;">
     זהו השלב הראשון והחשוב ביותר בבדיקה: לפני שבודקים את מצב הרכב, מוודאים שהרכב, הרישיון והמוכר תואמים זה לזה.
@@ -406,29 +391,29 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
   </div>
 </details>
 
-<details class="card freeAfterLookup preFlowScreen guidedSection" id="sellerSection" data-pre-step="1" style="display:none"><summary><span>שאלות למוכר</span><span class="includedTag">חינם</span></summary><div class="stepContent"><p class="sub">שאלה אחת בכל פעם. בחר תשובה פשוטה; רק במקרה שצריך בירור ייפתח מקום לפירוט.</p>
+<details class="card freeAfterLookup preFlowScreen guidedSection" id="sellerSection" data-pre-step="1" style="display:none"><summary><span>שאלות למוכר</span></summary><div class="stepContent"><p class="sub">שאלה אחת בכל פעם. בחר תשובה פשוטה; רק במקרה שצריך בירור ייפתח מקום לפירוט.</p>
 <div id="sellerChecks"></div><div class="preFlowNav"><button class="secondary" type="button" onclick="showPreFlowStep(0)">חזרה</button><button class="primary" type="button" onclick="showPreFlowStep(2)">המשך לבדיקה החיצונית</button></div></div></details>
 <div id="purchaseBox" style="display:none"></div>
-<details class="card freeAfterLookup preFlowScreen guidedSection" id="externalSection" data-pre-step="2" style="display:none"><summary><span>בדיקה חיצונית</span><span class="includedTag">חינם</span></summary><div class="stepContent"><p class="sub">בדיקה אחת בכל פעם. אין צורך בידע מקצועי — סמן רק את מה שראית.</p>
+<details class="card freeAfterLookup preFlowScreen guidedSection" id="externalSection" data-pre-step="2" style="display:none"><summary><span>בדיקה חיצונית</span></summary><div class="stepContent"><p class="sub">בדיקה אחת בכל פעם. אין צורך בידע מקצועי — סמן רק את מה שראית.</p>
 <div id="externalChecks"></div><div class="preFlowNav"><button class="secondary" type="button" onclick="showPreFlowStep(1)">חזרה</button><button class="primary" type="button" onclick="showPreFlowStep(3)">המשך לבדיקה הפנימית ולנסיעה</button></div></div></details>
-<details class="card freeAfterLookup preFlowScreen guidedSection" id="selfSection" data-pre-step="3" style="display:none"><summary><span>בדיקה פנימית ונסיעה קצרה</span><span class="includedTag">חינם</span></summary><div class="stepContent"><p class="sub">התקדם שאלה־שאלה. אם אינך יכול לבדוק סעיף, בחר „לא בדקתי”.</p>
+<details class="card freeAfterLookup preFlowScreen guidedSection" id="selfSection" data-pre-step="3" style="display:none"><summary><span>בדיקה פנימית ונסיעה קצרה</span></summary><div class="stepContent"><p class="sub">התקדם שאלה־שאלה. אם אינך יכול לבדוק סעיף, בחר „לא בדקתי”.</p>
 <div id="selfChecks"></div>
 <div class="photoBox"><h3>תיעוד תמונות</h3>
 <p class="sub">אפשר לצרף עד ארבע תמונות של הרכב או של ממצאים שתרצה לתעד. הן יוצגו בעמוד השני של הסיכום.</p>
 <button class="secondary full" type="button" onclick="document.getElementById('vehiclePhotos').click()">📷 הוסף עד 4 תמונות לבדיקה</button>
 <input id="vehiclePhotos" type="file" accept="image/*" capture="environment" multiple style="display:none" onchange="addVehiclePhotos(this)">
 <div id="photoPreview" class="photoPreview"></div></div><div class="preFlowNav"><button class="secondary" type="button" onclick="showPreFlowStep(2)">חזרה</button><button class="primary" type="button" onclick="showPreFlowStep(4)">המשך לסיכום</button></div></div></details>
-<section class="card freeAfterLookup preFlowScreen" id="preSummarySection" data-pre-step="4" style="display:none"><h2 class="stageTitle"><span>סיכום הבדיקה העצמית</span><span class="includedTag">חינם</span></h2><p class="sub">הסיכום מרכז את הבדיקות והתמונות שהזנת ומכין קובץ מסודר לשמירה או לשליחה. הוא אינו קובע אם להיכנס לבדיקה ואינו מחליף בדיקה במכון.</p>
+<section class="card freeAfterLookup preFlowScreen" id="preSummarySection" data-pre-step="4" style="display:none"><h2>סיכום הבדיקה העצמית</h2><p class="sub">הסיכום מרכז את הבדיקות והתמונות שהזנת ומכין קובץ מסודר לשמירה או לשליחה. הוא אינו קובע אם להיכנס לבדיקה ואינו מחליף בדיקה במכון.</p>
 <button class="primary full" onclick="buildReport()">הפקת סיכום הבדיקה העצמית</button>
 <div class="report" id="report"></div>
 <button class="primary full" id="pdfBtn" onclick="shareReportPdf('pdfBtn')" style="display:none">שיתוף כ־PDF</button>
 <div class="info"><b>חשוב:</b> BuyTest אינו קובע שהרכב תקין, בטוח או כדאי לרכישה. כל החלטה נשארת בידי המשתמש.</div>
-<div class="preFlowNav"><button class="secondary" type="button" onclick="showPreFlowStep(3)">חזרה</button><button class="secondary" type="button" onclick="setCustomerRoute('report');document.getElementById('fullCheckOffer').style.display='block';document.getElementById('fullCheckOffer').scrollIntoView({behavior:'smooth',block:'start'})">יש לי דוח מכון לפענוח</button></div>
+<div class="preFlowNav"><button class="secondary" type="button" onclick="showPreFlowStep(3)">חזרה</button><button class="primary" type="button" onclick="setCustomerRoute('report');startPayment('report')">המשך לפענוח דוח המכון – 49 ₪</button></div>
 </section>
 
 <section class="card paidOnly reportFeature" id="afterInspectionSection" style="display:none">
 <div class="caseLabel">אחרי המכון</div>
-<h2 class="stageTitle"><span>פענוח דוח המכון והבדיקה הממוחשבת</span><span class="stagePriceTag">49 ₪</span></h2>
+<h2>פענוח דוח המכון והבדיקה הממוחשבת</h2>
 <p class="sub"><b>מעלים את דף סיכום הבוחן</b>, ובמידת הצורך גם עמוד אחד או יותר של הבדיקה הממוחשבת. המערכת מרכזת את כל הממצאים לפי מערכת ורמת משמעות, בלי לאבד פרטי חלק, צד, החלפה או פגיעה, ומציגה מסקנה מקצועית קצרה לכל קבוצה.</p>
 <div class="privacyStrip"><b>פרטיות וזהות:</b> לצורך זיהוי הטקסט, עמודי הדוח עשויים להישלח אל Google Cloud Vision דרך שירות מאובטח של BuyTest. לאחר הפענוח מתבצעת בדיקת אימות מקומית בדפדפן באמצעות Tesseract; אם Vision אינו זמין, המנוע המקומי עשוי לשמש כגיבוי. קובצי המקור אינם מצורפים ל־PDF של BuyTest, והפלט אינו מעתיק את הטופס, הלוגו או שם המכון.</div>
 
@@ -474,11 +459,10 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
 </section>
 <section class="clarificationBox" id="clarificationBox" aria-labelledby="clarificationTitle">
   <div class="caseLabel">אפשרות נוספת לאחר הפענוח</div>
-  <h3 id="clarificationTitle" class="stageTitle"><span>התייעצות אישית עם בוחן רכב</span><span class="stagePriceTag">49 ₪</span></h3>
+  <h3 id="clarificationTitle">התייעצות אישית עם בוחן רכב</h3>
   <p class="sub">אפשר להעביר את הדוח לעמוס רוקח לקבלת הסבר אישי על הממצאים ועל הבירורים שכדאי לבצע מול המכון, המוסך או השמאי.</p>
   <div class="consultationLocked">
     <article class="clarificationChoice paid">
-      <span class="clarificationPrice">שירות נפרד · 49 ₪</span>
       <h4>מענה אישי על דוח אחד ורכב אחד</h4>
       <p>ההתייעצות מפרשת את הממצאים ומכוונת לבדיקות המשך. היא אינה כוללת החלטת קנייה, הערכת מחיר תיקון, שמאות או קביעה לגבי מקצועיות המכון.</p>
       <button class="primary full" id="consultationPlanButton" type="button" onclick="startPayment('consultation')">פתיחת התייעצות אישית – 49 ₪</button>
@@ -688,14 +672,6 @@ function chooseCustomerRoute(route){
 }
 function setCustomerRoute(route){
   customerEntryRoute=route==='report'?'report':'free';
-  document.getElementById('freeRouteButton')?.classList.toggle('active',customerEntryRoute==='free');
-  document.getElementById('reportRouteButton')?.classList.toggle('active',customerEntryRoute==='report');
-  const hint=document.getElementById('vehicleRouteHint');
-  const tag=document.getElementById('vehicleRoutePrice');
-  if(hint) hint.textContent=customerEntryRoute==='free'
-    ? 'לאחר הצגת נתוני הרכב תיפתח הבדיקה העצמית החינמית, שלב אחר שלב.'
-    : 'לאחר אימות נתוני הרכב אפשר לפתוח את פענוח דוח המכון ב־49 ₪.';
-  if(tag) tag.textContent=customerEntryRoute==='free'?'חינם':'פענוח · 49 ₪';
   const hasVehicle=document.getElementById('vehicleData')?.style.display==='block';
   if(customerEntryRoute==='report'){
     document.getElementById('preFlowProgress')?.classList.remove('show');
