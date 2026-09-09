@@ -197,7 +197,7 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
 @media(max-width:760px){.mktHero{padding:30px 0 24px}.mktHeroGrid,.mktAbout,.afterGrid,.clarificationChoices{grid-template-columns:1fr}.mktGrid3{grid-template-columns:1fr}.mktOutcome{grid-template-columns:1fr 1fr}.mktHeroCard{padding:18px}.mktLead{font-size:18px}.mktCtas{flex-direction:column}.mktBtn{width:100%}main{padding-top:12px}.card{padding:18px;margin:20px 0}.credentials strong{font-size:25px}.credentials span{font-size:16px}.scopeStrip{grid-template-columns:1fr}.mktStep{grid-template-columns:38px 1fr}.mktNum{width:38px;height:38px}.mktStepPrice{grid-column:2;text-align:right}.mktBundle{align-items:flex-start;flex-direction:column}.guidedSection>summary{align-items:flex-start;flex-wrap:wrap}.guidedSection>summary:after{margin-right:0;margin-inline-start:auto}.includedTag{order:3;margin-inline-start:0}}
 @media(max-width:460px){.mktOutcome{grid-template-columns:1fr}.priceGrid{grid-template-columns:1fr}.licenseGrid,.grid,.formulaAdminGrid,.formulaSplitTools,.inspectionIdentityGrid,.inspectionHeaderGrid{grid-template-columns:1fr}.formulaAdmin .wide{grid-column:auto}.mktWrap{padding:0 14px}.replyTable,.replyTable tbody,.replyTable tr,.replyTable th,.replyTable td{display:block;width:100%}.replyTable th{padding:9px 0 5px}.inspectionIdentityValue{font-size:19px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
-</style><meta name="buytest-build" content="buytest-v75-formula-subgroups">
+</style><meta name="buytest-build" content="buytest-v76-expert-calibration-266">
 </head><body>
 
 <section id="marketingLanding">
@@ -562,6 +562,7 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
 <footer>© 2026 BuyTest · כל הזכויות שמורות · קונה? בודק!</footer>
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@7.0.0/dist/tesseract.min.js" crossorigin="anonymous"></script>
+<script src="expert-calibration-v3.js"></script>
 <script>
 const VEHICLE_ID='56063a99-8a3e-4ff4-912e-5966c0279bad';
 const OWNERS_ID='bb2355dc-9ec7-4f06-9c3f-3344672171da';
@@ -2922,10 +2923,11 @@ const expertCalibrationDecisions=[{"id":"engine_block_damage","category":"מנו
 {"id":"fog_lamp","category":"מערכת תאורה","title":"פנס ערפל","phrases":["פנס ערפל קדמי שבור"],"formulaIds":[],"aliasIds":["sample-028"],"classification":"actual","severity":"low","agePolicy":"no_effect","note":"","updatedAt":"2026-09-04T13:18:42.880Z"}];
 const expertClassificationMap={actual:'actual_finding',context:'context_dependent',disclaimer:'limitation_or_disclaimer',history:'repair_history_or_evidence',wear:'context_dependent',split:'actual_finding'};
 const expertSeverityLabels={safety:'דגש בטיחותי',high:'משמעות גבוהה',medium:'משמעות בינונית',low:'משמעות נמוכה',none:'ללא משקל עצמאי'};
+const activeExpertCalibrationDecisions=globalThis.BUYTEST_EXPERT_CALIBRATION_EXPORT?.decisions||expertCalibrationDecisions;
 const expertDecisionByFormulaId=new Map();
 const expertDecisionByAliasId=new Map();
 const expertDecisionByPhrase=new Map();
-expertCalibrationDecisions.forEach(decision=>{
+activeExpertCalibrationDecisions.forEach(decision=>{
   (decision.formulaIds||[]).forEach(id=>expertDecisionByFormulaId.set(id,decision));
   (decision.aliasIds||[]).forEach(id=>expertDecisionByAliasId.set(id,decision));
   (decision.phrases||[]).forEach(phrase=>expertDecisionByPhrase.set(normalizeFindingText(phrase),decision));
@@ -2944,16 +2946,18 @@ function expertDecisionForFormula(formula){
 
 function expertSeverityFor(decision,formula){
   const text=normalizeFindingText(formula?.text||'');
-  if(decision.id==='control_arm_bushings') return 'low';
-  if((decision.id==='body_paint_repairs'||decision.id==='frame_cosmetic') && /מצב ירוד/.test(text)) return 'high';
+  const conceptId=decision.sourceConceptId||decision.id;
+  if(conceptId==='control_arm_bushings') return 'low';
+  if((conceptId==='body_paint_repairs'||conceptId==='frame_cosmetic') && /מצב ירוד/.test(text)) return 'high';
   if(decision.classification!=='split') return decision.severity;
   return /הלחמ|חיבורים לא מקוריים לרוחב/.test(text)?'high':decision.severity;
 }
 
 function expertConclusion(decision,severity){
-  if(decision.id==='engine_warranty') return 'ללא ממצא תומך, הנוסח „אין אחריות על המנוע” הוא הסתייגות כללית ואינו מקבל משקל עצמאי.';
-  if(decision.id==='control_arm_bushings') return 'נרשם ממצא בתותבים או במשולשים במתלה הקדמי. יש לבדוק את חומרתו ואת הטיפול הנדרש במוסך.';
-  if((decision.id==='body_paint_repairs'||decision.id==='frame_cosmetic') && severity==='high') return 'ניסוח מפורש של מצב פחחות וצבע ירוד הוא ממצא בעל משמעות גבוהה, ויש לברר את היקף התיקונים אצל בעל מקצוע מתאים.';
+  const conceptId=decision.sourceConceptId||decision.id;
+  if(conceptId==='engine_warranty') return 'ללא ממצא תומך, הנוסח „אין אחריות על המנוע” הוא הסתייגות כללית ואינו מקבל משקל עצמאי.';
+  if(conceptId==='control_arm_bushings') return 'נרשם ממצא בתותבים או במשולשים במתלה הקדמי. יש לבדוק את חומרתו ואת הטיפול הנדרש במוסך.';
+  if((conceptId==='body_paint_repairs'||conceptId==='frame_cosmetic') && severity==='high') return 'ניסוח מפורש של מצב פחחות וצבע ירוד הוא ממצא בעל משמעות גבוהה, ויש לברר את היקף התיקונים אצל בעל מקצוע מתאים.';
   let base='';
   if(decision.classification==='disclaimer') base='זהו ניסוח של הסתייגות כללית או מגבלת בדיקה. הוא אינו קובע לבדו שקיימת תקלה ברכב ואינו מביע עמדה על עבודת המכון.';
   else if(decision.classification==='history') base='זהו מידע על תיקון, פירוק או החלפה קודמים; אין להסיק ממנו לבדו שקיימת תקלה פעילה.';
@@ -2964,8 +2968,7 @@ function expertConclusion(decision,severity){
   else if(severity==='medium') base='זהו ממצא בעל משמעות בינונית; יש לברר את חומרתו ואת הטיפול הנדרש.';
   else if(severity==='low') base='זהו ממצא בעל משמעות נמוכה; יש לבדוק את מצב החלק ואת הטיפול הנדרש.';
   else base='לממצא אין משקל עצמאי ללא ממצא נוסף שמחזק אותו.';
-  const note=severity==='low'&&/גבוה/.test(decision.note||'')?'':decision.note;
-  return note?base+' '+note:base;
+  return base;
 }
 
 function applyExpertCalibration(rule,formula){
@@ -2989,7 +2992,8 @@ function applyExpertCalibration(rule,formula){
     sourceText,
     expertDecision:decision
   };
-  if(decision.id==='oil_burning'&&/לבדוק (?:תצרוכת|צריכת) שמן/.test(normalizeFindingText(sourceText))){
+  const conceptId=decision.sourceConceptId||decision.id;
+  if(conceptId==='oil_burning'&&/לבדוק (?:תצרוכת|צריכת) שמן/.test(normalizeFindingText(sourceText))){
     calibrated.tag='הסתייגות כללית';
     calibrated.tone='clarify';
     calibrated.classification='limitation_or_disclaimer';
@@ -2997,7 +3001,7 @@ function applyExpertCalibration(rule,formula){
     calibrated.meaning='הנוסח ממליץ לבדוק תצרוכת שמן בנסיעה. הוא אינו קובע לבדו שהמנוע שורף שמן.';
     calibrated.decision='אין לספור את המשפט כליקוי עצמאי. יש לייחס משקל רק לממצא ממשי נוסף, אם נרשם לצד ההמלצה.';
   }
-  if(decision.id==='gearbox_mount'){
+  if(conceptId==='gearbox_mount'||/תושבת תיבת הילוכים פגומה/.test(normalizeFindingText(sourceText))){
     calibrated.tag='ליקוי נקודתי';
     calibrated.tone='clarify';
     calibrated.reportSeverity='low';
@@ -3673,7 +3677,7 @@ function contextNoteFor(item){
   return 'בגיל ובקילומטראז׳ האלה משקל הממצא בינוני; ממצאים נוספים באותה מערכת יכולים להעלות אותו.';
 }
 
-const customerRestrictedWording=/(?:עלות|מחיר|שווי|סחירות|ירידת\s*ערך|הוצאה|כלכל|כספי|כדאי|כדאיות|לקנות|קניית|אי[־-]?קנייה|פסיל|לברוח|כיסוי\s*תחת|משפט\s*כיסוי|מקצועיות\s*המכון|המכון\s*(?:טעה|התרשל|הטעה|לא\s*מקצועי))/i;
+const customerRestrictedWording=/(?:עלות|מחיר|שווי|סחירות|ירידת\s*ערך|הוצאה|כלכל|כספי|כדאי|כדאיות|לקנות|קניית|אי[־-]?קנייה|פסיל|לברוח|כסת.?ח|כיסוי\s*תחת|משפט\s*כיסוי|מקצועיות\s*המכון|המכון\s*(?:טעה|התרשל|הטעה|לא\s*מקצועי))/i;
 
 function neutralCustomerDirection(item){
   if(item?.classification==='limitation_or_disclaimer') return 'זהו ניסוח של הסתייגות כללית או מגבלת בדיקה. הוא אינו קובע לבדו שקיימת תקלה ואינו מביע עמדה על עבודת המכון.';
