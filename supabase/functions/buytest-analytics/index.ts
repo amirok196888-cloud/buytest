@@ -57,7 +57,7 @@ async function isAdmin(pin: string) {
 }
 
 async function trackEvent(eventType: string, visitorId: string, sessionId: string) {
-  if (!['page_view', 'free_started'].includes(eventType) || !VALID_ID.test(visitorId) || !VALID_ID.test(sessionId)) {
+  if (!['page_view', 'free_started', 'free_completed', 'consultation_opened'].includes(eventType) || !VALID_ID.test(visitorId) || !VALID_ID.test(sessionId)) {
     throw new Error("invalid_event");
   }
   await serviceRequest("/rest/v1/buytest_analytics_events?on_conflict=event_type,session_id", {
