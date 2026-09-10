@@ -67,6 +67,72 @@ async function trackEvent(eventType: string, visitorId: string, sessionId: strin
   });
 }
 
+function cleanText(value: unknown, maxLength: number) {
+  return String(value || "").replace(/\s+/g, " ").trim().slice(0, maxLength);
+}
+
+async function saveFeedback(body: Record<string, unknown>) {
+  const visitorId = String(body.visitorId || "");
+  const sessionId = String(body.sessionId || "");
+  const ratingNumber = Number(body.rating || 0);
+  const rating = Number.isInteger(ratingNumber) && ratingNumber >= 1 && ratingNumber <= 5 ? ratingNumber : null;
+  const comment = cleanText(body.comment, 1000);
+  const customerName = cleanText(body.customerName, 80);
+  const customerEmail = cleanText(body.customerEmail, 160).toLowerCase();
+  const vehiclePlate = String(body.vehiclePlate || "").replace(/\D/g, "").slice(0, 8);
+  const honeypot = cleanText(body.website, 120);
+  if (honeypot || !VALID_ID.test(visitorId) || !VALID_ID.test(sessionId) || (!rating && !comment)) throw new Error("invalid_feedback");
+  if (customerEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)) throw new Error("invalid_feedback");
+  await serviceRequest("/rest/v1/buytest_feedback?on_conflict=session_id", {
+    method: "POST",
+    headers: { "Prefer": "resolution=merge-duplicates,return=minimal" },
+    body: JSON.stringify({
+      rating,
+      comment,
+      customer_name: customerName,
+      customer_email: customerEmail,
+      vehicle_plate: vehiclePlate,
+      visitor_id: visitorId,
+      session_id: sessionId,
+      updated_at: new Date().toISOString(),
+    }),
+  });
+}
+
+async function listFeedback() {
+  return await serviceRequest("/rest/v1/buytest_feedback?select=id,rating,comment,customer_name,customer_email,vehicle_plate,created_at,updated_at&order=updated_at.desc&limit=100", {
+    method: "GET",
+  });
+}
+
+async function listOrders() {
+  const rows = await serviceRequest("/rest/v1/buytest_orders?select=id,plate,plan,amount_agorot,status,created_at,paid_at,updated_at,expires_at,provider_payload&order=created_at.desc&limit=100", {
+    method: "GET",
+  });
+  if (!Array.isArray(rows)) return [];
+  return rows.map((row) => {
+    const item = row && typeof row === "object" ? row as Record<string, unknown> : {};
+    const providerPayload = item.provider_payload && typeof item.provider_payload === "object" && !Array.isArray(item.provider_payload)
+      ? item.provider_payload as Record<string, unknown>
+      : {};
+    const progress = providerPayload.progress && typeof providerPayload.progress === "object" && !Array.isArray(providerPayload.progress)
+      ? providerPayload.progress
+      : {};
+    return {
+      id: item.id,
+      plate: item.plate,
+      plan: item.plan,
+      amount_agorot: item.amount_agorot,
+      status: item.status,
+      created_at: item.created_at,
+      paid_at: item.paid_at,
+      updated_at: item.updated_at,
+      expires_at: item.expires_at,
+      progress,
+    };
+  });
+}
+
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get("origin");
   if (req.method === "OPTIONS") {
@@ -84,6 +150,10 @@ Deno.serve(async (req: Request) => {
       await trackEvent(String(body.eventType || ""), String(body.visitorId || ""), String(body.sessionId || ""));
       return json(origin, { ok: true });
     }
+    if (body.action === "feedback_submit") {
+      await saveFeedback(body);
+      return json(origin, { ok: true });
+    }
     if (body.action === "stats") {
       const pin = String(req.headers.get("x-buytest-manager-pin") || body.adminPin || "");
       if (!await isAdmin(pin)) return json(origin, { ok: false, error: "admin_denied" }, 403);
@@ -94,10 +164,21 @@ Deno.serve(async (req: Request) => {
       });
       return json(origin, { ok: true, stats });
     }
+    if (body.action === "feedback_list") {
+      const pin = String(req.headers.get("x-buytest-manager-pin") || body.adminPin || "");
+      if (!await isAdmin(pin)) return json(origin, { ok: false, error: "admin_denied" }, 403);
+      return json(origin, { ok: true, feedback: await listFeedback() });
+    }
+    if (body.action === "orders_list") {
+      const pin = String(req.headers.get("x-buytest-manager-pin") || body.adminPin || "");
+      if (!await isAdmin(pin)) return json(origin, { ok: false, error: "admin_denied" }, 403);
+      return json(origin, { ok: true, orders: await listOrders() });
+    }
     return json(origin, { ok: false, error: "invalid_action" }, 400);
   } catch (error) {
     console.error("BuyTest analytics error", error);
     const name = error instanceof Error ? error.message : "analytics_failed";
-    return json(origin, { ok: false, error: name === "invalid_event" ? name : "analytics_failed" }, name === "invalid_event" ? 400 : 500);
+    const invalid = ["invalid_event", "invalid_feedback"].includes(name);
+    return json(origin, { ok: false, error: invalid ? name : "analytics_failed" }, invalid ? 400 : 500);
   }
 });

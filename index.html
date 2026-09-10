@@ -82,8 +82,9 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#07131aef;border-top:1p
 .legalSheet h2,.legalSheet h3{margin-top:0}.legalSheet h3{margin-top:22px}
 .legalClose{position:sticky;top:0;float:left;border:0;border-radius:10px;padding:8px 14px;font-weight:700}
 
-.feedbackBox{display:none;margin:18px 0;padding:18px;border:1px solid #31515c;border-radius:16px;background:#102832}
+.feedbackBox{display:block;margin:24px auto;padding:18px;border:1px solid #31515c;border-radius:16px;background:#102832;max-width:760px}
 .feedbackBox h3{margin:0 0 8px}.feedbackBox textarea{width:100%;min-height:110px;box-sizing:border-box;border-radius:12px;padding:12px;font:inherit}
+.feedbackGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}.feedbackGrid .field{margin:0}.feedbackGrid input{width:100%;background:#fff;color:#17242b;border:1px solid #cbd8dd;border-radius:12px;padding:12px;font-size:16px}.feedbackActions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.feedbackActions .whatsappLink{display:flex;align-items:center;justify-content:center;min-height:46px;border-radius:12px;background:#25d366;color:#082b18;text-decoration:none;font-weight:900}.feedbackStatus{display:none;margin-top:10px;padding:10px 12px;border-radius:10px;font-weight:800}.feedbackStatus.show{display:block}.feedbackStatus.error{background:#fff0f0;color:#8f2525}.feedbackStatus.success{background:#e8f7f2;color:#075e48}.feedbackHoneypot{position:absolute!important;left:-10000px!important;width:1px!important;height:1px!important;overflow:hidden!important}.managerFeedbackList,.managerOrderList{display:grid;gap:10px;margin-top:14px}.managerFeedbackItem,.managerOrderItem{background:#fff;border:1px solid #d9e2e6;border-radius:13px;padding:13px}.managerFeedbackItem.new{border-color:#e3a400;background:#fffdf5}.managerFeedbackItemHead,.managerOrderItemHead{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}.managerFeedbackNew{display:inline-flex;margin-inline-start:7px;padding:3px 8px;border-radius:999px;background:#ffe7a3;color:#6d5200;font-size:11px;font-weight:950}.managerFeedbackItemMeta,.managerOrderItemMeta{color:#60717a;font-size:13px;margin:6px 0}.managerFeedbackItemComment{white-space:pre-wrap;line-height:1.55}.managerFeedbackEmpty{padding:16px;text-align:center;color:#60717a;background:#fff;border:1px dashed #cbd8dd;border-radius:12px}.managerOrderStatus{display:inline-flex;align-items:center;padding:4px 9px;border-radius:999px;font-size:12px;font-weight:900;background:#eef4f6;color:#47626c}.managerOrderStatus.paid{background:#dff5e9;color:#17643c}.managerOrderStatus.failed,.managerOrderStatus.cancelled,.managerOrderStatus.expired{background:#fff0f0;color:#8f2525}.managerOrderProgress{margin-top:8px;padding:8px 10px;border-radius:9px;background:#f2f7f8;color:#35515c;font-weight:800;font-size:13px}
 .clarificationBox{display:none;margin-top:18px;padding:18px;border:2px solid #0fa87e;border-radius:18px;background:#f4fbf9}
 .clarificationBox.show{display:block}.clarificationBox h3{margin:0 0 7px;font-size:22px}.clarificationBox>.sub{margin-bottom:14px}
 .clarificationChoices{display:grid;grid-template-columns:1fr;gap:12px}.clarificationChoice{border:1px solid #cbd8dd;border-radius:15px;padding:15px;background:#fff;display:flex;flex-direction:column;align-items:stretch}
@@ -205,14 +206,14 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
 .ocrReview{display:none;margin-top:12px;padding-top:12px;border-top:1px solid #d9e2e6}.ocrReview .secondary{margin-top:8px}
 .formulaAdmin{display:none;border:2px solid #285f7a;background:#f2f8fb}.formulaAdminGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.formulaAdmin .wide{grid-column:1/-1}.formulaAdmin input,.formulaAdmin select,.formulaAdmin textarea{width:100%;background:#fff}.formulaAdmin textarea{min-height:80px}.formulaAdminStats{padding:11px 13px;border-radius:12px;background:#e7f3f8;color:#173f52;font-weight:800;margin:10px 0}.formulaAdminList{max-height:420px;overflow:auto;border:1px solid #d9e2e6;border-radius:12px;background:#fff;margin-top:12px}.formulaAdminItem{padding:10px 12px;border-bottom:1px solid #e6edef}.formulaAdminItem:last-child{border-bottom:0}.formulaAdminItem small{display:block;color:#60717a;margin-top:3px}.formulaAdminItemHead{display:flex;align-items:flex-start;gap:9px}.formulaAdminItemHead input{width:auto;margin-top:4px;flex:0 0 auto}.formulaAdminItemHead label{cursor:pointer;flex:1}.formulaSubgroupBadge{display:inline-block;margin-top:5px;padding:3px 8px;border-radius:999px;background:#e3f5ef;color:#075e48;font-size:12px;font-weight:800}.formulaSplitTools{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end;margin:12px 0;padding:12px;border:1px solid #b9d4df;border-radius:12px;background:#fff}.formulaSplitTools button{min-height:46px}.formulaAdminActions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}.formulaAdminActions button{flex:1;min-width:150px}.contextNote{margin-top:8px;padding:9px 11px;border-radius:10px;background:#eef4f6;color:#35515c}.matchSource{font-size:12px;color:#60717a;margin-top:7px}
 .customerReplyAdmin{display:none;margin-top:20px;padding:18px;border:2px solid #285f7a;border-radius:16px;background:#f2f8fb}.customerReplyAdmin h2{margin-bottom:6px}.replyTable{width:100%;border-collapse:separate;border-spacing:0 9px}.replyTable th{width:160px;text-align:right;vertical-align:top;padding:12px 0 0 10px;color:#35515c}.replyTable td{padding:0}.replyTable input,.replyTable textarea{width:100%;box-sizing:border-box;background:#fff}.replyTable textarea{min-height:92px}.replyTable textarea.replyAnswer{min-height:170px}.replyActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.replyActions button{flex:1;min-width:150px}.replyDrafts{margin-top:16px;border-top:1px solid #cbd8dd;padding-top:14px}.replyDraftItem{background:#fff;border:1px solid #d9e2e6;border-radius:12px;padding:12px;margin:9px 0}.replyDraftItem small{display:block;color:#60717a;margin:4px 0 8px}.replyDraftItem .miniActions{display:flex;gap:7px;flex-wrap:wrap}.replyDraftItem .miniActions button{padding:8px 11px;font-size:13px}.replySafetyNote{margin:10px 0;padding:11px 13px;border-radius:12px;background:#fff7e8;border:1px solid #f0cf8a;color:#694d13;line-height:1.55}
-.analyticsPanel{display:none;border:2px solid #0b7f67;background:linear-gradient(135deg,#f1fbf8,#fff)}.analyticsHead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}.analyticsHead h2{margin:0}.analyticsRanges{display:flex;gap:7px;flex-wrap:wrap}.analyticsRanges button{min-height:38px;padding:7px 12px;background:#fff;color:#35515c;border:1px solid #b9d4df}.analyticsRanges button.active{background:#0b7f67;color:#fff;border-color:#0b7f67}.analyticsGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:16px 0}.analyticsMetric{padding:16px 12px;border:1px solid #cce4dc;border-radius:14px;background:#fff;text-align:center}.analyticsMetric strong{display:block;color:#075e48;font-size:38px;line-height:1.05}.analyticsMetric span{display:block;margin-top:7px;color:#35515c;font-weight:900;line-height:1.35}.analyticsNote{margin:0;color:#60717a;font-size:13px;line-height:1.55}.analyticsStatus{min-height:24px;margin-top:8px;color:#60717a;font-weight:800}.analyticsStatus.error{color:#a52b2b}
+.analyticsPanel{display:none;border:2px solid #0b7f67;background:linear-gradient(135deg,#f1fbf8,#fff)}.analyticsHead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}.analyticsHead h2{margin:0}.analyticsRanges{display:flex;gap:7px;flex-wrap:wrap}.analyticsRanges button{min-height:38px;padding:7px 12px;background:#fff;color:#35515c;border:1px solid #b9d4df}.analyticsRanges button.active{background:#0b7f67;color:#fff;border-color:#0b7f67}.analyticsGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:16px 0}.analyticsMetric{padding:16px 12px;border:1px solid #cce4dc;border-radius:14px;background:#fff;text-align:center}.analyticsMetricButton{width:100%;font:inherit;color:inherit}.analyticsMetricButton.hasNew{border-color:#e3a400;background:#fff7dc;box-shadow:0 0 0 2px rgba(227,164,0,.18)}.analyticsMetricButton.hasNew strong{color:#9a6500}.analyticsMetric strong{display:block;color:#075e48;font-size:38px;line-height:1.05}.analyticsMetric span{display:block;margin-top:7px;color:#35515c;font-weight:900;line-height:1.35}.analyticsNote{margin:0;color:#60717a;font-size:13px;line-height:1.55}.analyticsStatus{min-height:24px;margin-top:8px;color:#60717a;font-weight:800}.analyticsStatus.error{color:#a52b2b}
 .guidedSection{padding:0!important;overflow:hidden}.guidedSection>summary{list-style:none;cursor:pointer;padding:18px;display:flex;align-items:center;gap:12px;font-size:20px;font-weight:900}.guidedSection>summary::-webkit-details-marker{display:none}.guidedSection>summary:after{content:'פתיחה';margin-right:auto;font-size:12px;color:#0b7f67;background:#e8f7f2;border-radius:999px;padding:6px 10px}.guidedSection[open]>summary:after{content:'סגירה'}.guidedSection>.stepContent{padding:0 18px 18px}.questionCount{color:#60717a;font-size:13px;font-weight:800;margin-bottom:9px}.guidedChecks .check{display:none}.guidedChecks .check.active{display:block}.checkTitle{display:block;font-size:18px;line-height:1.55;margin-bottom:14px}.quickChoices{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.quickChoice{background:#eef4f6;color:#17323c;border:1px solid #cbd8dd;padding:11px 7px;font-size:13px}.quickChoice.selected{background:#0fa87e;color:#fff;border-color:#0b8d6b}.quickChoice.issue.selected{background:#d97b24;border-color:#bd671b}.quickChoice.skip.selected{background:#71818a;border-color:#5f6e76}.guidedNav{display:flex;align-items:center;gap:10px;margin-top:12px}.guidedNav button{flex:1;background:#eaf2f5;color:#17323c;border:1px solid #cbd8dd}.guidedProgress{font-size:13px;font-weight:800;color:#60717a;white-space:nowrap}.licenseDetails{margin:12px 0;border:1px solid #d9e2e6;border-radius:12px;background:#f8fafb}.licenseDetails>summary{padding:13px;font-weight:900;cursor:pointer}.licenseDetails>div{padding:0 13px 13px}.legalCompact{margin:12px 0 0!important;padding:12px!important}.legalCompact p{margin:0 0 9px;color:#50666f}.legalCompact a,.legalCompact button{color:#0b7f67;background:none;border:0;text-decoration:underline;padding:0;font:inherit;font-weight:800}.simpleFinding textarea{background:#fff;color:#17242b}.managerOnly{display:none}
 .stageTitle{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.stagePriceTag{display:inline-flex;align-items:center;min-height:30px;padding:5px 11px;border-radius:999px;background:#e8f7f2;color:#075e48;border:1px solid #b9e1d5;font-size:14px;font-weight:900;line-height:1.25;white-space:nowrap}.stagePriceTag.free{background:#e9f7ee;color:#17643c;border-color:#bfe1ca}.includedTag{display:inline-flex;margin-inline-start:auto;padding:4px 9px;border-radius:999px;background:#edf5f7;color:#47626c;font-size:12px;font-weight:850;white-space:nowrap}.clarificationBox .stageTitle{margin:0 0 7px}.serviceIntro{border:2px solid #b9e1d5;background:linear-gradient(135deg,#f5fcfa,#fff)}.serviceIntro .serviceIntroList{margin:12px 0 0;padding-right:20px;color:#50666f;line-height:1.75}.serviceIntro .caseLabel{margin-bottom:10px}.card h2,.guidedSection>summary{line-height:1.35}.primary,.secondary,.mktBtn{font-size:16px;line-height:1.35}.priceCard{box-shadow:0 7px 20px rgba(16,45,53,.06)}
 @media(max-width:500px){.quickChoices{grid-template-columns:1fr}.quickChoice{font-size:14px}.guidedSection>summary{font-size:18px}}
 @media(max-width:760px){.mktHero{padding:30px 0 24px}.mktHeroGrid,.mktAbout,.afterGrid,.clarificationChoices{grid-template-columns:1fr}.mktGrid3{grid-template-columns:1fr}.mktOutcome{grid-template-columns:1fr 1fr}.mktHeroCard{padding:18px}.mktLead{font-size:18px}.mktCtas{flex-direction:column}.mktBtn{width:100%}main{padding-top:12px}.card{padding:18px;margin:20px 0}.credentials strong{font-size:25px}.credentials span{font-size:16px}.scopeStrip{grid-template-columns:1fr}.mktStep{grid-template-columns:38px 1fr}.mktNum{width:38px;height:38px}.mktStepPrice{grid-column:2;text-align:right}.mktBundle{align-items:flex-start;flex-direction:column}.guidedSection>summary{align-items:flex-start;flex-wrap:wrap}.guidedSection>summary:after{margin-right:0;margin-inline-start:auto}.includedTag{order:3;margin-inline-start:0}}
-@media(max-width:460px){.mktOutcome{grid-template-columns:1fr}.priceGrid{grid-template-columns:1fr}.licenseGrid,.grid,.formulaAdminGrid,.formulaSplitTools,.inspectionIdentityGrid,.inspectionHeaderGrid,.analyticsGrid{grid-template-columns:1fr}.formulaAdmin .wide{grid-column:auto}.mktWrap{padding:0 14px}.replyTable,.replyTable tbody,.replyTable tr,.replyTable th,.replyTable td{display:block;width:100%}.replyTable th{padding:9px 0 5px}.inspectionIdentityValue{font-size:19px}.analyticsMetric{display:flex;align-items:center;justify-content:space-between;text-align:right}.analyticsMetric strong{font-size:32px;order:2}.analyticsMetric span{margin-top:0}}
+@media(max-width:460px){.mktOutcome{grid-template-columns:1fr}.priceGrid{grid-template-columns:1fr}.licenseGrid,.grid,.formulaAdminGrid,.formulaSplitTools,.inspectionIdentityGrid,.inspectionHeaderGrid,.analyticsGrid,.feedbackGrid,.feedbackActions{grid-template-columns:1fr}.formulaAdmin .wide{grid-column:auto}.mktWrap{padding:0 14px}.replyTable,.replyTable tbody,.replyTable tr,.replyTable th,.replyTable td{display:block;width:100%}.replyTable th{padding:9px 0 5px}.inspectionIdentityValue{font-size:19px}.analyticsMetric{display:flex;align-items:center;justify-content:space-between;text-align:right}.analyticsMetric strong{font-size:32px;order:2}.analyticsMetric span{margin-top:0}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
-</style><meta name="buytest-build" content="buytest-v78-meta-pixel">
+</style><meta name="buytest-build" content="buytest-v79-feedback-whatsapp">
 </head><body>
 <noscript><img height="1" width="1" style="display:none" alt=""
 src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscript=1"
@@ -353,7 +354,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 
 <section class="card analyticsPanel" id="managerAnalyticsPanel" aria-labelledby="managerAnalyticsTitle">
   <div class="analyticsHead">
-    <div><h2 id="managerAnalyticsTitle">פעילות באתר</h2><p class="sub" style="margin:4px 0 0">שלושת המספרים החשובים, בלי עומס.</p></div>
+    <div><h2 id="managerAnalyticsTitle">פעילות באתר</h2><p class="sub" style="margin:4px 0 0">המספרים החשובים, בלי עומס.</p></div>
     <button class="secondary" type="button" onclick="loadBuyTestAnalytics()">רענון</button>
   </div>
   <div class="analyticsRanges" aria-label="טווח הצגת הנתונים">
@@ -366,9 +367,28 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
     <article class="analyticsMetric"><strong id="analyticsVisits">—</strong><span>כניסות לאתר</span></article>
     <article class="analyticsMetric"><strong id="analyticsFreeStarts">—</strong><span>התחילו בדיקה חינמית</span></article>
     <article class="analyticsMetric"><strong id="analyticsPaidEntries">—</strong><span>נכנסו לשירות בתשלום</span></article>
+    <button class="analyticsMetric analyticsMetricButton" id="analyticsFeedbackMetric" type="button" onclick="openBuyTestFeedback()" aria-label="פתיחת התגובות החדשות"><strong id="analyticsNewFeedback">—</strong><span>תגובות חדשות</span></button>
   </div>
   <p class="analyticsNote">הכניסות והתחלות הבדיקה נספרות מרגע הפעלת המדידה. התשלום נספר רק לאחר שהתקבל אישור תשלום בפועל.</p>
   <div class="analyticsStatus" id="analyticsStatus" role="status" aria-live="polite"></div>
+</section>
+
+<section class="card analyticsPanel" id="managerOrdersPanel" aria-labelledby="managerOrdersTitle">
+  <div class="analyticsHead">
+    <div><h2 id="managerOrdersTitle">לקוחות ותשלומים</h2><p class="sub" style="margin:4px 0 0">הזמנות אחרונות, מצב התשלום והאם השירות הושלם.</p></div>
+    <button class="secondary" type="button" onclick="loadBuyTestOrders()">רענון הזמנות</button>
+  </div>
+  <div class="analyticsStatus" id="managerOrdersStatus" role="status" aria-live="polite"></div>
+  <div class="managerOrderList" id="managerOrderList"></div>
+</section>
+
+<section class="card analyticsPanel" id="managerFeedbackPanel" aria-labelledby="managerFeedbackTitle">
+  <div class="analyticsHead">
+    <div><h2 id="managerFeedbackTitle">תגובות מהאתר</h2><p class="sub" style="margin:4px 0 0">תגובות שהלקוחות שלחו נשמרות כאן ומוצגות רק לאחר כניסת מנהל.</p></div>
+    <button class="secondary" type="button" onclick="loadBuyTestFeedback()">רענון תגובות</button>
+  </div>
+  <div class="analyticsStatus" id="managerFeedbackStatus" role="status" aria-live="polite"></div>
+  <div class="managerFeedbackList" id="managerFeedbackList"></div>
 </section>
 
 <section class="card formulaAdmin" id="managerFormulaPanel">
@@ -546,8 +566,13 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 <div class="clarificationAdminPending" id="clarificationAdminPending"><b>הגדרת מנהל:</b> אזור הפניות מוכן, והוא יוצג ללקוחות לאחר הכנסת כתובת המייל העסקית.</div>
 </main>
 <section class="feedbackBox" id="feedbackBox">
-<h3>איך הייתה הבדיקה?</h3>
-<p class="sub">נשמח לשמוע מה היה ברור, מה עזר ומה כדאי לשפר.</p>
+<h3>תגובה ל־BuyTest</h3>
+<p class="sub">אפשר לכתוב לנו מכל שלב באתר. התגובה תישמר במערכת ותופיע לבעל האתר באזור המנהל.</p>
+<div class="feedbackGrid">
+  <div class="field"><label for="feedbackName">שם (רשות)</label><input id="feedbackName" autocomplete="name" maxlength="80" placeholder="שם פרטי"></div>
+  <div class="field"><label for="feedbackEmail">מייל לחזרה (רשות)</label><input id="feedbackEmail" type="email" autocomplete="email" maxlength="160" placeholder="name@example.com"></div>
+  <div class="field"><label for="feedbackVehiclePlate">מספר רכב (רשות)</label><input id="feedbackVehiclePlate" inputmode="numeric" maxlength="8" placeholder="מספר הרכב"></div>
+</div>
 <div aria-label="דירוג" class="stars">
 <button class="star" onclick="setRating(1)" type="button">★</button>
 <button class="star" onclick="setRating(2)" type="button">★</button>
@@ -555,9 +580,14 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 <button class="star" onclick="setRating(4)" type="button">★</button>
 <button class="star" onclick="setRating(5)" type="button">★</button>
 </div>
-<textarea id="feedbackText" placeholder="כתוב כאן תגובה..."></textarea>
-<button class="primary full" onclick="submitFeedback()" type="button">שלח תגובה</button>
-<div class="feedbackThanks" id="feedbackThanks">✓ תודה! התגובה נשמרה במכשיר זה.</div>
+<label for="feedbackText">התגובה שלך</label>
+<textarea id="feedbackText" maxlength="1000" placeholder="כתוב כאן תגובה או קושי שנתקלת בו..."></textarea>
+<div class="feedbackHoneypot" aria-hidden="true"><label for="feedbackWebsite">אתר</label><input id="feedbackWebsite" tabindex="-1" autocomplete="off"></div>
+<div class="feedbackActions">
+  <button class="primary full" id="feedbackSubmitButton" onclick="submitFeedback()" type="button">שלח תגובה</button>
+  <a class="whatsappLink" href="https://wa.me/message/NDZWEYLNXPZ4M1" target="_blank" rel="noopener">שליחת הודעה בוואטסאפ</a>
+</div>
+<div class="feedbackStatus" id="feedbackThanks" role="status" aria-live="polite"></div>
 </section>
 <div class="legalLinks">
 <button onclick="openLegal('terms')">תנאי שימוש</button>
@@ -584,7 +614,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
       <h2>מדיניות פרטיות</h2>
       <p>מספר הרכב שנבדק נשלח למאגרי המידע הציבוריים הדרושים להצגת הנתונים. לצורך זיהוי הטקסט, תמונות או עמודי PDF מסיכום הבוחן ומהבדיקה הממוחשבת עשויים להישלח אל Google Cloud Vision דרך שירות מאובטח של BuyTest. לאחר הפענוח מתבצעת בדיקת אימות מקומית בדפדפן באמצעות Tesseract; אם Vision אינו זמין, המנוע המקומי עשוי לשמש כגיבוי. בגרסה זו BuyTest אינו שומר את קובצי הדוח בשרת שלו, והם אינם מצורפים ל־PDF המופק.</p>
       <p>שם מזמין/ת הבדיקה והטקסט שזוהה בקובץ משמשים רק לביצוע התהליך ולהפקת הסיכום. אין לצלם מספר זהות, חתימה, כתובת, טלפון, לוגו או מידע אישי שאינו נחוץ. השימוש בשירותי הזיהוי כפוף גם לתנאי השירות ולמדיניות הפרטיות של ספק השירות.</p>
-      <p>לצורך מדידת פעילות האתר נשמרים מזהים אקראיים של דפדפן וביקור, ללא שם, מספר רכב או כתובת IP. המדידה כוללת כניסה לאתר והתחלת הבדיקה החינמית. לצורך מדידת פרסום ושיפור קמפיינים נעשה שימוש גם ב־Meta Pixel, שעשוי להעביר ל־Meta מידע טכני על ביקור ופעולות באתר בהתאם למדיניות Meta. נתוני התשלום מעובדים בדף המאובטח של Cardcom ובהתאם למדיניות שלו. BuyTest אינו מקבל ואינו שומר את מספר הכרטיס. בעל השליטה במידע הוא עמוס רוקח, מפעיל BuyTest. לפנייה בנושא פרטיות, עיון או תיקון מידע אפשר לכתוב ל־buytest2026@gmail.com.</p>
+      <p>לצורך מדידת פעילות האתר נשמרים מזהים אקראיים של דפדפן וביקור, ללא שם, מספר רכב או כתובת IP. המדידה כוללת כניסה לאתר והתחלת הבדיקה החינמית. תגובה שנשלחת בטופס נשמרת במערכת BuyTest יחד עם הדירוג ועם שם, מייל או מספר רכב רק אם המשתמש בחר למסור אותם; המידע מוצג לבעל האתר באזור המנהל לצורך מענה ושיפור השירות. לצורך מדידת פרסום ושיפור קמפיינים נעשה שימוש גם ב־Meta Pixel, שעשוי להעביר ל־Meta מידע טכני על ביקור ופעולות באתר בהתאם למדיניות Meta. נתוני התשלום מעובדים בדף המאובטח של Cardcom ובהתאם למדיניות שלו. BuyTest אינו מקבל ואינו שומר את מספר הכרטיס. בעל השליטה במידע הוא עמוס רוקח, מפעיל BuyTest. לפנייה בנושא פרטיות, עיון או תיקון מידע אפשר לכתוב ל־buytest2026@gmail.com.</p>
     </div>
     <div id="cancelText" class="legalPage" style="display:none">
       <h2>ביטול עסקה והחזרים</h2>
@@ -623,11 +653,14 @@ const BUYTEST_PAYMENT_RETURN_KEY='buytestPaymentReturnPendingV1';
 const BUYTEST_ANALYTICS_VISITOR_KEY='buytestAnalyticsVisitorV1';
 const BUYTEST_ANALYTICS_SESSION_KEY='buytestAnalyticsSessionV1';
 const BUYTEST_META_PURCHASE_KEY_PREFIX='buytestMetaPurchaseV1:';
+const BUYTEST_FEEDBACK_SEEN_KEY='buytestFeedbackSeenAtV1';
 const BUYTEST_RECENT_PAYMENT_WINDOW_MS=30*60*1000;
 const BUYTEST_ANALYTICS_SESSION_MS=30*60*1000;
 let buyTestLastPaymentStatus='';
 let buyTestAccessCheckPromise=null;
 let buyTestAnalyticsRange='all';
+let buyTestFeedbackItems=[];
+let buyTestFeedbackLoaded=false;
 function buyTestMetaTrack(eventName,parameters={}){
   if(typeof window.fbq!=='function'||new URLSearchParams(location.search).has('manager')||document.body.classList.contains('manager-mode')) return;
   try{window.fbq('track',eventName,parameters)}catch(error){console.warn('BuyTest Meta event skipped:',error)}
@@ -1143,11 +1176,44 @@ function setRating(n){
   feedbackRating=n;
   document.querySelectorAll('.star').forEach((x,i)=>x.classList.toggle('on',i<n));
 }
-function submitFeedback(){
+async function submitFeedback(){
   const text=document.getElementById('feedbackText').value.trim();
   if(!feedbackRating && !text){alert('אפשר לתת דירוג או לכתוב תגובה.');return}
-  localStorage.setItem('vehicleCheckFeedback',JSON.stringify({rating:feedbackRating,text,date:new Date().toISOString()}));
-  document.getElementById('feedbackThanks').style.display='block';
+  const email=document.getElementById('feedbackEmail').value.trim();
+  if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){alert('כתובת המייל אינה תקינה. אפשר לתקן אותה או להשאיר את השדה ריק.');return}
+  const button=document.getElementById('feedbackSubmitButton');
+  const status=document.getElementById('feedbackThanks');
+  button.disabled=true;
+  button.textContent='שולח...';
+  status.className='feedbackStatus';
+  status.textContent='';
+  try{
+    const identity=buyTestAnalyticsIdentity();
+    const enteredPlate=document.getElementById('feedbackVehiclePlate').value.replace(/\D/g,'');
+    const activePlate=String(plate()||'').replace(/\D/g,'');
+    await callBuyTestAnalyticsService({
+      action:'feedback_submit',
+      ...identity,
+      rating:feedbackRating,
+      comment:text,
+      customerName:document.getElementById('feedbackName').value.trim(),
+      customerEmail:email,
+      vehiclePlate:enteredPlate||activePlate,
+      website:document.getElementById('feedbackWebsite').value
+    });
+    status.textContent='✓ תודה! התגובה נשלחה ל־BuyTest ותופיע באזור המנהל.';
+    status.className='feedbackStatus show success';
+    document.getElementById('feedbackText').value='';
+    feedbackRating=0;
+    document.querySelectorAll('.star').forEach(x=>x.classList.remove('on'));
+  }catch(error){
+    console.error('BuyTest feedback submission failed:',error);
+    status.textContent='לא הצלחנו לשלוח את התגובה כרגע. אפשר לנסות שוב או לשלוח לנו הודעה בוואטסאפ.';
+    status.className='feedbackStatus show error';
+  }finally{
+    button.disabled=false;
+    button.textContent='שלח תגובה';
+  }
 }
 function openLegal(which){
   document.querySelectorAll('.legalPage').forEach(x=>x.style.display='none');
@@ -1323,6 +1389,95 @@ async function loadBuyTestAnalytics(range=buyTestAnalyticsRange){
   }catch(error){
     console.error('BuyTest analytics loading failed:',error);
     if(status){status.textContent='לא ניתן לטעון כרגע את נתוני הפעילות.';status.classList.add('error')}
+  }
+}
+function renderBuyTestOrders(items){
+  const list=document.getElementById('managerOrderList');
+  if(!list) return;
+  if(!Array.isArray(items)||!items.length){
+    list.innerHTML='<div class="managerFeedbackEmpty">עדיין אין הזמנות במערכת.</div>';
+    return;
+  }
+  const planLabels={premium:'בדיקה לפני המכון',report:'פענוח דוח',consultation:'התייעצות',bundle:'חבילה מלאה'};
+  const statusLabels={pending:'ממתין',payment_ready:'עבר לדף תשלום',paid:'שולם',cancelled:'בוטל',expired:'פג תוקף',failed:'נכשל',refunded:'זוכה'};
+  list.innerHTML=items.map(item=>{
+    const status=String(item.status||'');
+    const paidAt=item.paid_at?new Date(item.paid_at).toLocaleString('he-IL',{dateStyle:'short',timeStyle:'short'}):'';
+    const createdAt=item.created_at?new Date(item.created_at).toLocaleString('he-IL',{dateStyle:'short',timeStyle:'short'}):'';
+    const progress=item.progress&&typeof item.progress==='object'?item.progress:{};
+    const progressText=progress.reportCompleted?'הפענוח הושלם':progress.preInspectionCompleted?'הבדיקה לפני המכון הושלמה':'השירות עדיין לא סומן כהושלם';
+    return `<article class="managerOrderItem"><div class="managerOrderItemHead"><strong>רכב ${escapeHtml(String(item.plate||'—'))}</strong><span class="managerOrderStatus ${escapeHtml(status)}">${escapeHtml(statusLabels[status]||status||'לא ידוע')}</span></div><div class="managerOrderItemMeta">${escapeHtml(planLabels[item.plan]||String(item.plan||''))} · ${(Number(item.amount_agorot||0)/100).toLocaleString('he-IL')} ₪ · נוצרה ${escapeHtml(createdAt)}${paidAt?' · שולם '+escapeHtml(paidAt):''}</div><div class="managerOrderProgress">${escapeHtml(progressText)}</div></article>`;
+  }).join('');
+}
+async function loadBuyTestOrders(){
+  const status=document.getElementById('managerOrdersStatus');
+  if(status){status.textContent='טוען הזמנות...';status.classList.remove('error')}
+  try{
+    const data=await callBuyTestAnalyticsService({action:'orders_list'},{manager:true});
+    renderBuyTestOrders(data.orders||[]);
+    if(status) status.textContent='נמצאו '+Number((data.orders||[]).length).toLocaleString('he-IL')+' הזמנות · עודכן '+new Date().toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});
+  }catch(error){
+    console.error('BuyTest orders loading failed:',error);
+    if(status){status.textContent='לא ניתן לטעון כרגע את ההזמנות.';status.classList.add('error')}
+  }
+}
+function buyTestFeedbackSeenAt(){
+  try{return Number(localStorage.getItem(BUYTEST_FEEDBACK_SEEN_KEY)||0)||0}catch(_error){return 0}
+}
+function buyTestFeedbackTime(item){
+  const timestamp=Date.parse(String(item?.updated_at||item?.created_at||''));
+  return Number.isFinite(timestamp)?timestamp:0;
+}
+function updateBuyTestFeedbackMetric(items=buyTestFeedbackItems){
+  const seenAt=buyTestFeedbackSeenAt();
+  const unread=Array.isArray(items)?items.filter(item=>buyTestFeedbackTime(item)>seenAt).length:0;
+  const count=document.getElementById('analyticsNewFeedback');
+  const metric=document.getElementById('analyticsFeedbackMetric');
+  if(count) count.textContent=unread.toLocaleString('he-IL');
+  if(metric) metric.classList.toggle('hasNew',unread>0);
+}
+async function openBuyTestFeedback(){
+  if(!buyTestFeedbackLoaded) await loadBuyTestFeedback();
+  const newest=Math.max(0,...buyTestFeedbackItems.map(buyTestFeedbackTime));
+  try{localStorage.setItem(BUYTEST_FEEDBACK_SEEN_KEY,String(newest||Date.now()))}catch(_error){}
+  updateBuyTestFeedbackMetric();
+  renderBuyTestFeedback(buyTestFeedbackItems);
+  document.getElementById('managerFeedbackPanel')?.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function renderBuyTestFeedback(items){
+  const list=document.getElementById('managerFeedbackList');
+  if(!list) return;
+  if(!Array.isArray(items)||!items.length){
+    list.innerHTML='<div class="managerFeedbackEmpty">עדיין לא התקבלו תגובות מהאתר.</div>';
+    return;
+  }
+  const seenAt=buyTestFeedbackSeenAt();
+  list.innerHTML=items.map(item=>{
+    const rating=Number(item.rating||0);
+    const stars=rating?'★'.repeat(Math.max(1,Math.min(5,rating))):'ללא דירוג';
+    const name=String(item.customer_name||'').trim()||'לקוח ללא שם';
+    const email=String(item.customer_email||'').trim();
+    const vehiclePlate=String(item.vehicle_plate||'').replace(/\D/g,'');
+    const dateValue=item.updated_at||item.created_at;
+    const date=dateValue?new Date(dateValue).toLocaleString('he-IL',{dateStyle:'short',timeStyle:'short'}):'';
+    const details=[vehiclePlate?'רכב '+vehiclePlate:'',email].filter(Boolean).map(escapeHtml).join(' · ');
+    const isNew=buyTestFeedbackTime(item)>seenAt;
+    return `<article class="managerFeedbackItem${isNew?' new':''}"><div class="managerFeedbackItemHead"><strong>${escapeHtml(name)}${isNew?'<span class="managerFeedbackNew">חדש</span>':''}</strong><span aria-label="דירוג">${escapeHtml(stars)}</span></div><div class="managerFeedbackItemMeta">${details||'לא נמסרו פרטי קשר'}${date?' · '+escapeHtml(date):''}</div><div class="managerFeedbackItemComment">${escapeHtml(String(item.comment||'ללא מלל'))}</div></article>`;
+  }).join('');
+}
+async function loadBuyTestFeedback(){
+  const status=document.getElementById('managerFeedbackStatus');
+  if(status){status.textContent='טוען תגובות...';status.classList.remove('error')}
+  try{
+    const data=await callBuyTestAnalyticsService({action:'feedback_list'},{manager:true});
+    buyTestFeedbackItems=Array.isArray(data.feedback)?data.feedback:[];
+    buyTestFeedbackLoaded=true;
+    renderBuyTestFeedback(buyTestFeedbackItems);
+    updateBuyTestFeedbackMetric();
+    if(status) status.textContent='נמצאו '+Number(buyTestFeedbackItems.length).toLocaleString('he-IL')+' תגובות · עודכן '+new Date().toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});
+  }catch(error){
+    console.error('BuyTest feedback loading failed:',error);
+    if(status){status.textContent='לא ניתן לטעון כרגע את התגובות.';status.classList.add('error')}
   }
 }
 async function restoreBuyTestAccess({requiredPlate='',onReturn=false,scroll=true}={}){
@@ -1580,6 +1735,12 @@ async function openManagerPreview(){
   const analyticsPanel=document.getElementById('managerAnalyticsPanel');
   if(analyticsPanel) analyticsPanel.style.display='block';
   void loadBuyTestAnalytics();
+  const ordersPanel=document.getElementById('managerOrdersPanel');
+  if(ordersPanel) ordersPanel.style.display='block';
+  void loadBuyTestOrders();
+  const feedbackPanel=document.getElementById('managerFeedbackPanel');
+  if(feedbackPanel) feedbackPanel.style.display='block';
+  void loadBuyTestFeedback();
   const replyPanel=document.getElementById('customerReplyAdmin');
   if(replyPanel) replyPanel.style.display='block';
   initFormulaAdmin();
@@ -5505,8 +5666,11 @@ window.addEventListener('DOMContentLoaded',async()=>{
   }
   const purchaseBox=document.getElementById('purchaseBox');
   if(purchaseBox) purchaseBox.style.display='none';
-  const feedbackBox=document.getElementById('feedbackBox');
-  if(feedbackBox) feedbackBox.style.display='none';
+  const feedbackPlate=document.getElementById('feedbackVehiclePlate');
+  if(feedbackPlate&&!feedbackPlate.value){
+    const storedPlate=String(storedBuyTestPayment()?.plate||'').replace(/\D/g,'');
+    if(storedPlate) feedbackPlate.value=storedPlate;
+  }
   syncVehicleLookupButton();
   updateBuyTestRoadmap();
   await runBuyTestAccessInitialization();
