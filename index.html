@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="BuyTest">
 <meta property="og:title" content="BuyTest | כל הדרך לקניית רכב במקום אחד">
 <meta property="og:description" content="מתחילים בחינם לפני שנוסעים לרכב וממשיכים לבדיקה מודרכת, לפענוח הדוח והסריקה ולהתייעצות עם בוחן רכב.">
-<meta property="og:url" content="https://amirok196888-cloud.github.io/buytest/?v=85">
+<meta property="og:url" content="https://amirok196888-cloud.github.io/buytest/?v=87">
 <meta property="og:image" content="https://amirok196888-cloud.github.io/buytest/buytest-social-full-flow-v85.jpg">
 <meta property="og:image:url" content="https://amirok196888-cloud.github.io/buytest/buytest-social-full-flow-v85.jpg">
 <meta property="og:image:secure_url" content="https://amirok196888-cloud.github.io/buytest/buytest-social-full-flow-v85.jpg">
@@ -221,8 +221,42 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
 @media(max-width:760px){.mktHero{padding:30px 0 24px}.mktHeroGrid,.mktAbout,.afterGrid,.clarificationChoices{grid-template-columns:1fr}.mktGrid3{grid-template-columns:1fr}.mktOutcome{grid-template-columns:1fr 1fr}.mktHeroCard{padding:18px}.mktLead{font-size:18px}.mktCtas{flex-direction:column}.mktBtn{width:100%}main{padding-top:12px}.card{padding:18px;margin:20px 0}.credentials strong{font-size:25px}.credentials span{font-size:16px}.scopeStrip{grid-template-columns:1fr}.mktStep{grid-template-columns:38px 1fr}.mktNum{width:38px;height:38px}.mktStepPrice{grid-column:2;text-align:right}.mktBundle{align-items:flex-start;flex-direction:column}.guidedSection>summary{align-items:flex-start;flex-wrap:wrap}.guidedSection>summary:after{margin-right:0;margin-inline-start:auto}.includedTag{order:3;margin-inline-start:0}}
 @media(max-width:620px){.managerCategoryGrid{grid-template-columns:1fr}.managerCategory{min-height:0}.managerOrderTools{align-items:stretch;flex-direction:column}.managerOrderTools .field{max-width:none;width:100%}.managerCompactHead{display:none}.managerCompactRow{grid-template-columns:1fr auto;padding:12px}.managerCompactRow>*:nth-child(3),.managerCompactRow>*:nth-child(4){grid-column:1/-1}.managerCompactRow>*:nth-child(4){font-size:12px}}
 @media(max-width:460px){.mktOutcome{grid-template-columns:1fr}.priceGrid{grid-template-columns:1fr}.licenseGrid,.grid,.formulaAdminGrid,.formulaSplitTools,.inspectionIdentityGrid,.inspectionHeaderGrid,.analyticsGrid,.feedbackGrid,.feedbackActions{grid-template-columns:1fr}.formulaAdmin .wide{grid-column:auto}.mktWrap{padding:0 14px}.replyTable,.replyTable tbody,.replyTable tr,.replyTable th,.replyTable td{display:block;width:100%}.replyTable th{padding:9px 0 5px}.inspectionIdentityValue{font-size:19px}.analyticsMetric{display:flex;align-items:center;justify-content:space-between;text-align:right}.analyticsMetric strong{font-size:32px;order:2}.analyticsMetric span{margin-top:0}}
+/* BuyTest V87: clear controls without turning legal text links into tiles. */
+#landing button,#appShell button{
+  background:#0b8f70;
+  color:#fff;
+  border:1px solid #08745b;
+  box-shadow:0 3px 9px rgba(11,127,103,.16);
+}
+#landing .mktBtnPrimary,#appShell .primary{background:#0fa87e;color:#fff;border-color:#0b8d6b}
+#landing .mktBtnLight,#appShell .secondary,
+#appShell .guidedNav button,#appShell .preFlowNav button,
+#appShell .routeChoice button:not(.active),#appShell .quickChoice,
+#appShell .managerPlanButtons button,#appShell .analyticsRanges button:not(.active){
+  background:#dff5ee;
+  color:#075e48;
+  border-color:#79c9b1;
+}
+#appShell .quickChoice.issue{background:#fff0dc;color:#87501a;border-color:#edbd83}
+#appShell .quickChoice.skip{background:#e8eef0;color:#415760;border-color:#b9c8ce}
+#appShell .quickChoice.selected{background:#0fa87e;color:#fff;border-color:#0b8d6b}
+#appShell .quickChoice.issue.selected{background:#d97b24;color:#fff;border-color:#bd671b}
+#appShell .quickChoice.skip.selected{background:#71818a;color:#fff;border-color:#5f6e76}
+#appShell button:disabled{background:#dfe5e7;color:#8a9599;border-color:#ccd5d8;box-shadow:none}
+#vehicleLookup .plate input{border:2px solid #a9bec6;box-shadow:inset 0 0 0 1px #fff}
+#appShell .licenseDetails{background:#eaf8f3;border-color:#98d5c3;overflow:hidden}
+#appShell .licenseDetails>summary{background:#d7f2e9;color:#075e48}
+#appShell .guidedSection>summary{background:#edf9f5;color:#17352d}
+#appShell .legalLinks button,#appShell .legalCompact button,#appShell .legalBeforePlate button,
+#appShell .star,#appShell .analyticsMetricButton{
+  background:transparent;
+  border:0;
+  box-shadow:none;
+}
+#appShell .legalLinks button,#appShell .legalCompact button,#appShell .legalBeforePlate button{color:#0b7f67}
+.imageModal button{background:#0b8f70;color:#fff;border:1px solid #08745b}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
-</style><meta name="buytest-build" content="buytest-v85-previsit-flow">
+</style><meta name="buytest-build" content="buytest-v87-complete-controls">
 </head><body>
 <noscript><img height="1" width="1" style="display:none" alt=""
 src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscript=1"
@@ -875,7 +909,22 @@ async function fetchRecords(resource,p){
   }
 }
 function preVisitFirst(...values){return values.find(value=>value!==null&&value!==undefined&&String(value).trim()!=='')??null}
-function preVisitOwnerDate(record){const raw=preVisitFirst(record?.baalut_dt,record?.baalut_date,record?.date);const date=raw?new Date(raw):null;return date&&!Number.isNaN(date.getTime())?date.getTime():0}
+function preVisitOwnerDate(record){
+  const raw=preVisitFirst(record?.baalut_dt,record?.baalut_date,record?.date);
+  if(raw===null) return 0;
+  const compact=String(raw).trim();
+  if(/^\d{6}$/.test(compact)) return Number(compact);
+  const date=new Date(raw);
+  return Number.isNaN(date.getTime())?0:Number(`${date.getFullYear()}${String(date.getMonth()+1).padStart(2,'0')}`);
+}
+function vehicleOriginality(vehicle,owners,active){
+  const explicit=preVisitFirst(vehicle?.mkoriut_nm,active?.mkoriut_nm);
+  if(explicit!==null) return explicit;
+  const firstOwnership=[...(owners||[])]
+    .filter(record=>preVisitFirst(record?.baalut,record?.baalut_nm)!==null)
+    .sort((a,b)=>preVisitOwnerDate(a)-preVisitOwnerDate(b))[0];
+  return preVisitFirst(firstOwnership?.baalut,firstOwnership?.baalut_nm);
+}
 function preVisitFormatPlate(value){const digits=String(value||'').replace(/\D/g,'');return digits.length===8?`${digits.slice(0,3)}-${digits.slice(3,5)}-${digits.slice(5)}`:`${digits.slice(0,2)}-${digits.slice(2,5)}-${digits.slice(5)}`}
 let currentPreVisitQuestions=[];
 let currentPreVisitAdUrl='';
@@ -887,7 +936,7 @@ function renderPreVisitQuestions(p,vehicle,owners,active){
   const trim=preVisitFirst(vehicle?.ramat_gimur,vehicle?.ramat_gimur_nm,active?.ramat_gimur,active?.ramat_gimur_nm);
   const year=preVisitFirst(vehicle?.shnat_yitzur,active?.shnat_yitzur);
   const km=preVisitFirst(vehicle?.kilometer_test_aharon,active?.kilometer_test_aharon);
-  const origin=preVisitFirst(vehicle?.mkoriut_nm,active?.mkoriut_nm);
+  const origin=vehicleOriginality(vehicle,owners,active);
   const ownership=preVisitFirst(active?.baalut,active?.baalut_nm,latestOwner?.baalut,latestOwner?.baalut_nm);
   const testDate=preVisitFirst(vehicle?.tokef_dt,active?.tokef_dt);
   const shown=value=>value===null?'לא צוין במאגר':String(value);
@@ -970,7 +1019,7 @@ async function loadVehicle(){
   document.getElementById('vMaker').textContent=first(vr?.tozeret_nm,ar?.tozeret_nm,ar?.tozeret_eretz_nm);
   document.getElementById('vModel').textContent=first(vr?.kinuy_mishari,vr?.degem_nm,ar?.kinuy_mishari,ar?.degem_nm);
   document.getElementById('vYear').textContent=first(vr?.shnat_yitzur,ar?.shnat_yitzur);
-  document.getElementById('vOrigin').textContent=first(vr?.mkoriut_nm,ar?.mkoriut_nm);
+  document.getElementById('vOrigin').textContent=first(vehicleOriginality(vr,owners,ar));
   document.getElementById('vColor').textContent=first(vr?.tzeva_rechev,ar?.tzeva_rechev);
   document.getElementById('vVin').textContent=first(vr?.misgeret,ar?.misgeret);
   document.getElementById('vEngine').textContent=first(vr?.mispar_manoa,ar?.mispar_manoa);
