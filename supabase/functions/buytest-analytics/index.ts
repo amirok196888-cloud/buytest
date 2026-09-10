@@ -56,14 +56,15 @@ async function isAdmin(pin: string) {
   return Boolean(pin) && Boolean(expected) && await sha256(pin.trim()) === expected;
 }
 
-async function trackEvent(eventType: string, visitorId: string, sessionId: string) {
+async function trackEvent(eventType: string, visitorId: string, sessionId: string, vehiclePlateValue: unknown) {
   if (!['page_view', 'free_started', 'free_completed', 'consultation_opened'].includes(eventType) || !VALID_ID.test(visitorId) || !VALID_ID.test(sessionId)) {
     throw new Error("invalid_event");
   }
+  const vehiclePlate = String(vehiclePlateValue || "").replace(/\D/g, "").slice(0, 8);
   await serviceRequest("/rest/v1/buytest_analytics_events?on_conflict=event_type,session_id", {
     method: "POST",
-    headers: { "Prefer": "resolution=ignore-duplicates,return=minimal" },
-    body: JSON.stringify({ event_type: eventType, visitor_id: visitorId, session_id: sessionId }),
+    headers: { "Prefer": "resolution=merge-duplicates,return=minimal" },
+    body: JSON.stringify({ event_type: eventType, visitor_id: visitorId, session_id: sessionId, vehicle_plate: /^\d{7,8}$/.test(vehiclePlate) ? vehiclePlate : null }),
   });
 }
 
@@ -133,6 +134,27 @@ async function listOrders() {
   });
 }
 
+async function listFreeActivity() {
+  const rows = await serviceRequest("/rest/v1/buytest_analytics_events?select=event_type,vehicle_plate,session_id,created_at&event_type=in.(free_started,free_completed)&order=created_at.desc&limit=500", {
+    method: "GET",
+  });
+  if (!Array.isArray(rows)) return [];
+  const sessions = new Map<string, { plate: string; started_at: string; completed_at: string; completed: boolean }>();
+  for (const row of rows) {
+    const item = row && typeof row === "object" ? row as Record<string, unknown> : {};
+    const sessionId = String(item.session_id || "");
+    if (!sessionId) continue;
+    const current = sessions.get(sessionId) || { plate: "", started_at: "", completed_at: "", completed: false };
+    const eventType = String(item.event_type || "");
+    const createdAt = String(item.created_at || "");
+    current.plate = String(item.vehicle_plate || current.plate || "");
+    if (eventType === "free_started") current.started_at = createdAt;
+    if (eventType === "free_completed") { current.completed = true; current.completed_at = createdAt; }
+    sessions.set(sessionId, current);
+  }
+  return Array.from(sessions.values()).sort((a, b) => String(b.completed_at || b.started_at).localeCompare(String(a.completed_at || a.started_at)));
+}
+
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get("origin");
   if (req.method === "OPTIONS") {
@@ -147,7 +169,7 @@ Deno.serve(async (req: Request) => {
 
   try {
     if (body.action === "track") {
-      await trackEvent(String(body.eventType || ""), String(body.visitorId || ""), String(body.sessionId || ""));
+      await trackEvent(String(body.eventType || ""), String(body.visitorId || ""), String(body.sessionId || ""), body.vehiclePlate);
       return json(origin, { ok: true });
     }
     if (body.action === "feedback_submit") {
@@ -172,7 +194,8 @@ Deno.serve(async (req: Request) => {
     if (body.action === "orders_list") {
       const pin = String(req.headers.get("x-buytest-manager-pin") || body.adminPin || "");
       if (!await isAdmin(pin)) return json(origin, { ok: false, error: "admin_denied" }, 403);
-      return json(origin, { ok: true, orders: await listOrders() });
+      const [orders, freeActivity] = await Promise.all([listOrders(), listFreeActivity()]);
+      return json(origin, { ok: true, orders, freeActivity });
     }
     return json(origin, { ok: false, error: "invalid_action" }, 400);
   } catch (error) {
