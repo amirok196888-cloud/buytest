@@ -15,6 +15,7 @@ const PLANS = {
 type PlanKey = keyof typeof PLANS;
 type CardcomConfig = { terminalNumber: number; apiName: string; enabled: boolean };
 type StageProgress = { preInspectionCompleted: boolean; reportCompleted: boolean };
+const TRAFFIC_SOURCES = new Set(["google", "meta", "direct", "other", "unknown"]);
 
 function responseHeaders(origin: string | null) {
   return {
@@ -39,6 +40,10 @@ function cleanPhone(value: unknown) {
 }
 function cleanText(value: unknown, maxLength: number) {
   return String(value ?? "").replace(/[\u0000-\u001f\u007f]/g, " ").replace(/\s+/g, " ").trim().slice(0, maxLength);
+}
+function cleanTrafficSource(value: unknown) {
+  const source = cleanText(value, 20).toLowerCase();
+  return TRAFFIC_SOURCES.has(source) ? source : "unknown";
 }
 function cleanEmail(value: unknown) { return cleanText(value, 50).toLowerCase(); }
 function validEmail(value: string) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value); }
@@ -235,6 +240,10 @@ async function createPayment(origin: string | null, body: Record<string, unknown
   const customerName = cleanText(body.customerName, 50);
   const email = cleanEmail(body.email);
   const phone = cleanPhone(body.phone);
+  const trafficSource = cleanTrafficSource(body.trafficSource);
+  const utmSource = cleanText(body.utmSource, 80) || null;
+  const utmMedium = cleanText(body.utmMedium, 80) || null;
+  const utmCampaign = cleanText(body.utmCampaign, 120) || null;
   if (!isPlan(planKey) || !/^\d{7,8}$/.test(plate) || !validEmail(email) || customerName.length < 2 || !/^05\d{8}$/.test(phone) || body.acceptedTerms !== true) {
     return json(origin, { ok: false, error: "invalid_payment_request" }, 400);
   }
@@ -262,6 +271,10 @@ async function createPayment(origin: string | null, body: Record<string, unknown
     plan: planKey,
     amount_agorot: plan.amountAgorot,
     status: "pending",
+    traffic_source: trafficSource,
+    utm_source: utmSource,
+    utm_medium: utmMedium,
+    utm_campaign: utmCampaign,
     expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
     provider_payload: { provider: "cardcom", stage: "creating", progress: inheritedProgress, priorOrderId: priorOrderId || null },
   });

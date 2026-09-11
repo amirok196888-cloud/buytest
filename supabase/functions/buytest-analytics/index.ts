@@ -4,6 +4,7 @@ const ALLOWED_ORIGIN = "https://amirok196888-cloud.github.io";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 const VALID_ID = /^[A-Za-z0-9_-]{20,80}$/;
+const TRAFFIC_SOURCES = new Set(["google", "meta", "direct", "other", "unknown"]);
 
 function cors(origin: string | null) {
   return {
@@ -56,7 +57,17 @@ async function isAdmin(pin: string) {
   return Boolean(pin) && Boolean(expected) && await sha256(pin.trim()) === expected;
 }
 
-async function trackEvent(eventType: string, visitorId: string, sessionId: string, vehiclePlateValue: unknown) {
+function cleanAttribution(body: Record<string, unknown>) {
+  const sourceValue = String(body.trafficSource || "").toLowerCase();
+  return {
+    traffic_source: TRAFFIC_SOURCES.has(sourceValue) ? sourceValue : "unknown",
+    utm_source: cleanText(body.utmSource, 80) || null,
+    utm_medium: cleanText(body.utmMedium, 80) || null,
+    utm_campaign: cleanText(body.utmCampaign, 120) || null,
+  };
+}
+
+async function trackEvent(eventType: string, visitorId: string, sessionId: string, vehiclePlateValue: unknown, body: Record<string, unknown>) {
   if (!['page_view', 'free_started', 'free_completed', 'consultation_opened'].includes(eventType) || !VALID_ID.test(visitorId) || !VALID_ID.test(sessionId)) {
     throw new Error("invalid_event");
   }
@@ -64,7 +75,13 @@ async function trackEvent(eventType: string, visitorId: string, sessionId: strin
   await serviceRequest("/rest/v1/buytest_analytics_events?on_conflict=event_type,session_id", {
     method: "POST",
     headers: { "Prefer": "resolution=merge-duplicates,return=minimal" },
-    body: JSON.stringify({ event_type: eventType, visitor_id: visitorId, session_id: sessionId, vehicle_plate: /^\d{7,8}$/.test(vehiclePlate) ? vehiclePlate : null }),
+    body: JSON.stringify({
+      event_type: eventType,
+      visitor_id: visitorId,
+      session_id: sessionId,
+      vehicle_plate: /^\d{7,8}$/.test(vehiclePlate) ? vehiclePlate : null,
+      ...cleanAttribution(body),
+    }),
   });
 }
 
@@ -107,7 +124,7 @@ async function listFeedback() {
 }
 
 async function listOrders() {
-  const rows = await serviceRequest("/rest/v1/buytest_orders?select=id,plate,plan,amount_agorot,status,created_at,paid_at,updated_at,expires_at,provider_payload&order=created_at.desc&limit=100", {
+  const rows = await serviceRequest("/rest/v1/buytest_orders?select=id,plate,plan,amount_agorot,status,traffic_source,created_at,paid_at,updated_at,expires_at,provider_payload&order=created_at.desc&limit=100", {
     method: "GET",
   });
   if (!Array.isArray(rows)) return [];
@@ -125,6 +142,7 @@ async function listOrders() {
       plan: item.plan,
       amount_agorot: item.amount_agorot,
       status: item.status,
+      traffic_source: item.traffic_source,
       created_at: item.created_at,
       paid_at: item.paid_at,
       updated_at: item.updated_at,
@@ -169,7 +187,7 @@ Deno.serve(async (req: Request) => {
 
   try {
     if (body.action === "track") {
-      await trackEvent(String(body.eventType || ""), String(body.visitorId || ""), String(body.sessionId || ""), body.vehiclePlate);
+      await trackEvent(String(body.eventType || ""), String(body.visitorId || ""), String(body.sessionId || ""), body.vehiclePlate, body);
       return json(origin, { ok: true });
     }
     if (body.action === "feedback_submit") {
