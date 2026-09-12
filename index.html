@@ -147,12 +147,29 @@ body.report-complete .clarificationBox.show,body.plan-consultation .clarificatio
 .checklistMainButton{width:100%;min-height:58px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 18px;border-radius:15px;background:#0fa87e;color:#fff;font-size:19px;font-weight:950;text-align:right}
 .checklistMainButton .checklistChevron{font-size:25px;line-height:1;transition:transform .2s ease}
 .checklistMainButton[aria-expanded="true"] .checklistChevron{transform:rotate(180deg)}
-.checklistTopicMenu{display:grid;gap:9px;margin-top:12px}
+.checklistTopicMenu{display:grid;gap:10px;margin-top:12px}
 .checklistTopicMenu[hidden]{display:none}
-.checklistTopicButton{width:100%;min-height:54px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 15px;border:1px solid #cbd8dd;border-radius:13px;background:#fff;color:#17323c;font-size:16px;font-weight:850;text-align:right;box-shadow:0 3px 12px rgba(23,50,60,.05)}
-.checklistTopicButton:active{background:#eaf8f3;border-color:#0fa87e}
-.checklistTopicButton span:last-child{font-size:23px;color:#0fa87e}
-.checklistTopicReturn{width:100%;margin-top:11px;padding:10px 12px;border:1px solid #b9d8cf;border-radius:11px;background:#fff;color:#0b7058;font-weight:850}
+.checklistIntro{margin:0 2px 2px;color:#50666f;font-size:14px;line-height:1.5}
+.checklistTopicButton{width:100%;min-height:66px;display:grid;grid-template-columns:38px 1fr 34px;align-items:center;gap:11px;padding:11px 13px;border:1px solid #cbd8dd;border-radius:14px;background:#fff;color:#17323c;text-align:right;box-shadow:0 3px 12px rgba(23,50,60,.05)}
+.checklistTopicButton:active,.checklistTopicButton.next{background:#effaf6;border-color:#0fa87e}
+.checklistTopicButton.completed{background:#f5fbf8;border-color:#b9d8cf}
+.checklistTopicNumber{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#eaf2f5;color:#28444e;font-weight:950}
+.checklistTopicButton.next .checklistTopicNumber{background:#0fa87e;color:#fff}
+.checklistTopicButton.completed .checklistTopicNumber{background:#dff4eb;color:#0b7058}
+.checklistTopicCopy{display:grid;gap:3px}
+.checklistTopicCopy strong{font-size:16px;line-height:1.35}
+.checklistTopicCopy small{color:#60717a;font-size:12px;font-weight:800}
+.checklistTopicButton.next .checklistTopicCopy small{color:#0b7058}
+.checklistTopicState{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;color:#0fa87e;font-size:24px;font-weight:950}
+.checklistTopicButton.completed .checklistTopicState{background:#0fa87e;color:#fff;font-size:17px}
+.checklistSummaryWrap{margin-top:2px;padding-top:12px;border-top:1px solid #d9e2e6}
+.checklistSummaryWrap[hidden]{display:none}
+.checklistSummaryButton{width:100%;background:#17323c;color:#fff}
+.checklistCompletionHint{margin:2px 2px 0;color:#60717a;font-size:12px;line-height:1.45}
+.guidedTopicHeader{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:17px 18px;border-bottom:1px solid #e0e8eb;background:#f7fafb;color:#17323c;font-size:20px;font-weight:950}
+.topicBackLink{flex:none;background:transparent;color:#0b7058;border:0;padding:7px 4px;font-size:13px;text-decoration:underline}
+.guidedNav .guidedNext{background:#0fa87e;color:#fff;border-color:#0fa87e}
+.guidedNav .guidedNext:disabled{background:#dce6e8;color:#829198;border-color:#d2dde0}
 .preFlowProgress{display:none;margin:22px 0 10px;padding:15px 17px;border:1px solid #c8ded7;border-radius:16px;background:#f3fbf8}.preFlowProgress.show{display:block}.preFlowProgress strong{display:block;margin-bottom:8px}.preFlowTrack{height:8px;border-radius:999px;background:#dfeae7;overflow:hidden}.preFlowTrack span{display:block;height:100%;width:20%;background:#0fa87e;transition:width .2s ease}.preFlowScreen{display:none!important}.preFlowScreen.active{display:block!important}.preFlowNav{display:flex;gap:9px;margin-top:16px}.preFlowNav button{flex:1}.consultationLocked,.consultationUnlocked{display:none}.report-complete .clarificationBox.show .consultationLocked{display:block}.plan-consultation .clarificationBox.show .consultationLocked,.plan-bundle.stage-consultation-open .clarificationBox.show .consultationLocked,.manager-mode.manager-all .clarificationBox.show .consultationLocked{display:none}.plan-consultation .clarificationBox.show .consultationUnlocked,.plan-bundle.stage-consultation-open .clarificationBox.show .consultationUnlocked,.manager-mode.manager-all .clarificationBox.show .consultationUnlocked{display:block}.singlePlan{max-width:560px;margin:14px auto 0}.uploadPanel{transition:border-color .2s ease,background .2s ease}.uploadPanel:has(.uploadState.show){border-color:#0fa87e;background:#f3fbf8}
 @media(max-width:700px){.routeCards{grid-template-columns:1fr}.routeChoice{flex-direction:column}.preFlowNav{flex-direction:column-reverse}}
 .preVisitCard{border:2px solid #0fa87e;background:linear-gradient(145deg,#f2fbf8,#fff);box-shadow:0 12px 32px rgba(15,168,126,.12)}
@@ -370,7 +387,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 </section>
 
 
-<div class="preFlowProgress freeAfterLookup" id="preFlowProgress" aria-live="polite"><strong id="preFlowProgressText">שלב 1 מתוך 6 · לפני שנוסעים</strong><div class="preFlowTrack" aria-hidden="true"><span id="preFlowProgressBar"></span></div><button class="checklistTopicReturn" id="checklistTopicReturn" type="button" onclick="showChecklistLauncher({scroll:true,open:true})" style="display:none">חזרה לנושאי הצ׳קליסט</button></div>
+<div class="preFlowProgress freeAfterLookup" id="preFlowProgress" aria-live="polite"><strong id="preFlowProgressText">שלב 1 מתוך 6 · לפני שנוסעים</strong><div class="preFlowTrack" aria-hidden="true"><span id="preFlowProgressBar"></span></div></div>
 <section class="card freeAfterLookup preFlowScreen preVisitCard" id="preVisitSection" data-pre-step="0" style="display:none">
   <span class="preVisitBadge">חדש · בחינם</span>
   <h2>לפני שנוסעים: 5 שאלות שכדאי לשאול את המוכר</h2>
@@ -565,32 +582,55 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 
 <section class="card checklistLauncher" id="checklistLauncher" style="display:none" aria-label="צ׳קליסט לפני המכון">
   <button class="checklistMainButton" id="checklistMainButton" type="button" aria-expanded="false" aria-controls="checklistTopicMenu" onclick="toggleChecklistTopics()">
-    <span>פתיחת הצ׳קליסט לפני המכון</span><span class="checklistChevron" aria-hidden="true">⌄</span>
+    <span id="checklistMainButtonText">פתיחת הצ׳קליסט לפני המכון</span><span class="checklistChevron" aria-hidden="true">⌄</span>
   </button>
   <div class="checklistTopicMenu" id="checklistTopicMenu" hidden>
-    <button class="checklistTopicButton" type="button" onclick="openChecklistTopic(2)"><span>שאלות למוכר ליד הרכב</span><span aria-hidden="true">‹</span></button>
-    <button class="checklistTopicButton" type="button" onclick="openChecklistTopic(3)"><span>בדיקה חיצונית</span><span aria-hidden="true">‹</span></button>
-    <button class="checklistTopicButton" type="button" onclick="openChecklistTopic(4)"><span>בדיקה פנימית ונסיעה</span><span aria-hidden="true">‹</span></button>
+    <p class="checklistIntro">בחר נושא. בכל פעם תופיע שאלה אחת בלבד.</p>
+    <button class="checklistTopicButton" data-checklist-step="2" type="button" onclick="openChecklistTopic(2)">
+      <span class="checklistTopicNumber">1</span><span class="checklistTopicCopy"><strong>שאלות למוכר ליד הרכב</strong><small>הבא לביצוע</small></span><span class="checklistTopicState" aria-hidden="true">‹</span>
+    </button>
+    <button class="checklistTopicButton" data-checklist-step="3" type="button" onclick="openChecklistTopic(3)">
+      <span class="checklistTopicNumber">2</span><span class="checklistTopicCopy"><strong>בדיקה חיצונית</strong><small>טרם הושלם</small></span><span class="checklistTopicState" aria-hidden="true">‹</span>
+    </button>
+    <button class="checklistTopicButton" data-checklist-step="4" type="button" onclick="openChecklistTopic(4)">
+      <span class="checklistTopicNumber">3</span><span class="checklistTopicCopy"><strong>בדיקה פנימית ונסיעה</strong><small>טרם הושלם</small></span><span class="checklistTopicState" aria-hidden="true">‹</span>
+    </button>
+    <div class="checklistSummaryWrap" id="checklistSummaryWrap" hidden>
+      <button class="checklistSummaryButton" type="button" onclick="showPreFlowStep(5)">הפקת סיכום הצ׳קליסט</button>
+    </div>
+    <p class="checklistCompletionHint" id="checklistCompletionHint">בסיום כל נושא תחזור לכאן אוטומטית.</p>
   </div>
 </section>
-<details class="card freeAfterLookup preFlowScreen guidedSection" id="sellerSection" data-pre-step="2" style="display:none"><summary><span>שאלות נוספות למוכר ליד הרכב</span></summary><div class="stepContent"><p class="sub">שאלה אחת בכל פעם. בחר תשובה פשוטה; רק במקרה שצריך בירור ייפתח מקום לפירוט.</p>
-<div id="sellerChecks"></div><div class="preFlowNav"><button class="secondary" type="button" onclick="showPreFlowStep(1)">חזרה</button><button class="primary" type="button" onclick="showPreFlowStep(3)">המשך לבדיקה החיצונית</button></div></div></details>
+
+<section class="card freeAfterLookup preFlowScreen guidedSection" id="sellerSection" data-pre-step="2" style="display:none">
+  <div class="guidedTopicHeader"><span>שאלות למוכר ליד הרכב</span><button class="topicBackLink" type="button" onclick="showChecklistLauncher({scroll:true,open:true})">כל הנושאים</button></div>
+  <div class="stepContent"><p class="sub">שאלה אחת בכל פעם. בחר תשובה פשוטה; רק במקרה שצריך בירור ייפתח מקום לפירוט.</p><div id="sellerChecks"></div></div>
+</section>
 <div id="purchaseBox" style="display:none"></div>
-<details class="card freeAfterLookup preFlowScreen guidedSection" id="externalSection" data-pre-step="3" style="display:none"><summary><span>בדיקה חיצונית</span></summary><div class="stepContent"><p class="sub">בדיקה אחת בכל פעם. אין צורך בידע מקצועי — סמן רק את מה שראית.</p>
-<div id="externalChecks"></div><div class="preFlowNav"><button class="secondary" type="button" onclick="showPreFlowStep(2)">חזרה</button><button class="primary" type="button" onclick="showPreFlowStep(4)">המשך לבדיקה הפנימית ולנסיעה</button></div></div></details>
-<details class="card freeAfterLookup preFlowScreen guidedSection" id="selfSection" data-pre-step="4" style="display:none"><summary><span>בדיקה פנימית ונסיעה קצרה</span></summary><div class="stepContent"><p class="sub">התקדם שאלה־שאלה. אם אינך יכול לבדוק סעיף, בחר „לא בדקתי”.</p>
-<div id="selfChecks"></div>
-<div class="photoBox"><h3>תיעוד תמונות</h3>
-<p class="sub">אפשר לצרף עד ארבע תמונות של הרכב או של ממצאים שתרצה לתעד. הן יוצגו בעמוד השני של הסיכום.</p>
-<button class="secondary full" type="button" onclick="document.getElementById('vehiclePhotos').click()">📷 הוסף עד 4 תמונות לבדיקה</button>
-<input id="vehiclePhotos" type="file" accept="image/*" capture="environment" multiple style="display:none" onchange="addVehiclePhotos(this)">
-<div id="photoPreview" class="photoPreview"></div></div><div class="preFlowNav"><button class="secondary" type="button" onclick="showPreFlowStep(3)">חזרה</button><button class="primary" type="button" onclick="showPreFlowStep(5)">המשך לסיכום</button></div></div></details>
-<section class="card freeAfterLookup preFlowScreen" id="preSummarySection" data-pre-step="5" style="display:none"><h2>סיכום הבדיקה העצמית</h2><p class="sub">הסיכום מרכז את הבדיקות והתמונות שהזנת ומכין קובץ מסודר לשמירה או לשליחה. הוא אינו קובע אם להיכנס לבדיקה ואינו מחליף בדיקה במכון.</p>
-<button class="primary full" onclick="buildReport()">הפקת סיכום הבדיקה העצמית</button>
-<div class="report" id="report"></div>
-<button class="primary full" id="pdfBtn" onclick="shareReportPdf('pdfBtn')" style="display:none">שיתוף כ־PDF</button>
-<div class="info"><b>חשוב:</b> BuyTest אינו קובע שהרכב תקין, בטוח או כדאי לרכישה. כל החלטה נשארת בידי המשתמש.</div>
-<div class="preFlowNav"><button class="secondary" type="button" onclick="showPreFlowStep(4)">חזרה</button><button class="primary" type="button" onclick="setCustomerRoute('report');startPayment('report')">המשך לאחר הבדיקה במכון: פענוח הדוח – 49 ₪</button></div>
+<section class="card freeAfterLookup preFlowScreen guidedSection" id="externalSection" data-pre-step="3" style="display:none">
+  <div class="guidedTopicHeader"><span>בדיקה חיצונית</span><button class="topicBackLink" type="button" onclick="showChecklistLauncher({scroll:true,open:true})">כל הנושאים</button></div>
+  <div class="stepContent"><p class="sub">בדיקה אחת בכל פעם. אין צורך בידע מקצועי — סמן רק את מה שראית.</p><div id="externalChecks"></div></div>
+</section>
+<section class="card freeAfterLookup preFlowScreen guidedSection" id="selfSection" data-pre-step="4" style="display:none">
+  <div class="guidedTopicHeader"><span>בדיקה פנימית ונסיעה קצרה</span><button class="topicBackLink" type="button" onclick="showChecklistLauncher({scroll:true,open:true})">כל הנושאים</button></div>
+  <div class="stepContent"><p class="sub">התקדם שאלה־שאלה. אם אינך יכול לבדוק סעיף, בחר „לא בדקתי”.</p>
+    <div id="selfChecks"></div>
+    <div class="photoBox"><h3>תיעוד תמונות</h3>
+      <p class="sub">אפשר לצרף עד ארבע תמונות של הרכב או של ממצאים שתרצה לתעד. הן יוצגו בעמוד השני של הסיכום.</p>
+      <button class="secondary full" type="button" onclick="document.getElementById('vehiclePhotos').click()">📷 הוסף עד 4 תמונות לבדיקה</button>
+      <input id="vehiclePhotos" type="file" accept="image/*" capture="environment" multiple style="display:none" onchange="addVehiclePhotos(this)">
+      <div id="photoPreview" class="photoPreview"></div>
+    </div>
+  </div>
+</section>
+<section class="card freeAfterLookup preFlowScreen" id="preSummarySection" data-pre-step="5" style="display:none">
+  <h2>סיכום הצ׳קליסט לפני המכון</h2>
+  <p class="sub">הסיכום מרכז את הבדיקות והתמונות שהזנת ומכין קובץ מסודר לשמירה או לשליחה. הוא אינו קובע אם להיכנס לבדיקה ואינו מחליף בדיקה במכון.</p>
+  <button class="primary full" onclick="buildReport()">הפקת סיכום הצ׳קליסט</button>
+  <div class="report" id="report"></div>
+  <button class="primary full" id="pdfBtn" onclick="shareReportPdf('pdfBtn')" style="display:none">שיתוף כ־PDF</button>
+  <div class="info"><b>חשוב:</b> BuyTest אינו קובע שהרכב תקין, בטוח או כדאי לרכישה. כל החלטה נשארת בידי המשתמש.</div>
+  <div class="preFlowNav"><button class="primary" type="button" onclick="setCustomerRoute('report');startPayment('report')">המשך לאחר הבדיקה במכון: פענוח הדוח – 49 ₪</button></div>
 </section>
 
 <section class="card paidOnly reportFeature" id="afterInspectionSection" style="display:none">
@@ -909,11 +949,68 @@ function setCustomerRoute(route){
 }
 const preFlowTitles=['לפני שנוסעים','בדיקת רישיון הרכב','שאלות ליד הרכב','בדיקה חיצונית','בדיקה פנימית ונסיעה','סיכום'];
 const checklistTopicSteps=[2,3,4];
+const checklistCompletedSteps=new Set();
+let checklistVehiclePlate='';
+
+function resetChecklistProgress(){
+  checklistCompletedSteps.clear();
+  document.querySelectorAll('.guidedChecks').forEach(list=>{
+    if(list._buytestAdvanceTimer) clearTimeout(list._buytestAdvanceTimer);
+    list.dataset.current='0';
+    list.querySelectorAll('.check').forEach((check,index)=>{
+      delete check.dataset.answer;
+      check.classList.toggle('active',index===0);
+      check.querySelectorAll('.quickChoice').forEach(choice=>choice.classList.remove('selected'));
+      const done=check.querySelector('.done');
+      if(done) done.checked=false;
+      const finding=check.querySelector('.finding');
+      if(finding) finding.classList.remove('open');
+      const textarea=check.querySelector('textarea');
+      if(textarea) textarea.value='';
+    });
+    renderGuided(list);
+  });
+  syncChecklistMenu();
+}
+
+function checklistListForStep(step){
+  return document.querySelector(`[data-pre-step="${Number(step)}"] .guidedChecks`);
+}
+function checklistTopicIsComplete(step){
+  const list=checklistListForStep(step);
+  const checks=list?[...list.querySelectorAll('.check')]:[];
+  return checks.length>0&&checks.every(check=>Boolean(check.dataset.answer));
+}
+function syncChecklistMenu(){
+  checklistTopicSteps.forEach(step=>{
+    if(checklistTopicIsComplete(step)) checklistCompletedSteps.add(step);
+  });
+  const nextStep=checklistTopicSteps.find(step=>!checklistCompletedSteps.has(step));
+  document.querySelectorAll('.checklistTopicButton[data-checklist-step]').forEach(button=>{
+    const step=Number(button.dataset.checklistStep);
+    const completed=checklistCompletedSteps.has(step);
+    const next=step===nextStep;
+    button.classList.toggle('completed',completed);
+    button.classList.toggle('next',next);
+    const status=button.querySelector('.checklistTopicCopy small');
+    const icon=button.querySelector('.checklistTopicState');
+    if(status) status.textContent=completed?'הושלם':next?'הבא לביצוע':'טרם הושלם';
+    if(icon) icon.textContent=completed?'✓':'‹';
+  });
+  const allComplete=checklistTopicSteps.every(step=>checklistCompletedSteps.has(step));
+  const summary=document.getElementById('checklistSummaryWrap');
+  const hint=document.getElementById('checklistCompletionHint');
+  const mainText=document.getElementById('checklistMainButtonText');
+  if(summary) summary.hidden=!allComplete;
+  if(hint) hint.textContent=allComplete?'כל הנושאים הושלמו. אפשר להפיק סיכום.':'בסיום כל נושא תחזור לכאן אוטומטית.';
+  if(mainText) mainText.textContent=allComplete?'הצ׳קליסט הושלם':'פתיחת הצ׳קליסט לפני המכון';
+}
 function setChecklistMenuState(open){
   const menu=document.getElementById('checklistTopicMenu');
   const button=document.getElementById('checklistMainButton');
   if(menu) menu.hidden=!open;
   if(button) button.setAttribute('aria-expanded',open?'true':'false');
+  if(open) syncChecklistMenu();
 }
 function closeChecklistTopic(){
   document.getElementById('preFlowProgress')?.classList.remove('show');
@@ -927,6 +1024,7 @@ function showChecklistLauncher({scroll=true,open=false}={}){
   const launcher=document.getElementById('checklistLauncher');
   launcher?.style.removeProperty('display');
   closeChecklistTopic();
+  syncChecklistMenu();
   setChecklistMenuState(open);
   if(scroll) launcher?.scrollIntoView({behavior:'smooth',block:'start'});
 }
@@ -937,8 +1035,31 @@ function toggleChecklistTopics(){
   setChecklistMenuState(willOpen);
 }
 function openChecklistTopic(index){
+  const step=Number(index);
+  const list=checklistListForStep(step);
+  if(list){
+    const checks=[...list.querySelectorAll('.check')];
+    const firstUnanswered=checks.findIndex(check=>!check.dataset.answer);
+    list.dataset.current=String(firstUnanswered>=0?firstUnanswered:0);
+    renderGuided(list);
+  }
   setChecklistMenuState(false);
-  showPreFlowStep(index);
+  showPreFlowStep(step);
+}
+function completeChecklistTopic(step){
+  const numericStep=Number(step);
+  const list=checklistListForStep(numericStep);
+  const checks=list?[...list.querySelectorAll('.check')]:[];
+  const firstUnanswered=checks.findIndex(check=>!check.dataset.answer);
+  if(firstUnanswered>=0){
+    list.dataset.current=String(firstUnanswered);
+    renderGuided(list);
+    return false;
+  }
+  checklistCompletedSteps.add(numericStep);
+  syncChecklistMenu();
+  showChecklistLauncher({scroll:true,open:true});
+  return true;
 }
 function showPreFlowStep(index,{scroll=true}={}){
   const safe=Math.max(0,Math.min(preFlowTitles.length-1,Number(index)||0));
@@ -960,8 +1081,6 @@ function showPreFlowStep(index,{scroll=true}={}){
   const topicPosition=checklistTopicSteps.indexOf(safe);
   if(text) text.textContent=safe===0?'שלב חינמי · לפני שנוסעים':safe===1?'בדיקת רישיון הרכב · שלב נפרד':safe===5?'סיום הצ׳קליסט · סיכום הבדיקה':`נושא ${topicPosition+1} מתוך ${checklistTopicSteps.length} · ${preFlowTitles[safe]}`;
   if(bar) bar.style.width=(safe===0||safe===1||safe===5)?'100%':`${((topicPosition+1)/checklistTopicSteps.length)*100}%`;
-  const topicReturn=document.getElementById('checklistTopicReturn');
-  if(topicReturn) topicReturn.style.display=(safe>=2&&safe<5)?'block':'none';
   if(scroll) progress?.scrollIntoView({behavior:'smooth',block:'start'});
 }
 function apiUrl(resource,p){return'https://data.gov.il/api/3/action/datastore_search?resource_id='+resource+'&filters='+encodeURIComponent(JSON.stringify({mispar_rechev:Number(p)}))+'&limit=20'}
@@ -1087,6 +1206,10 @@ async function loadVehicle(){
     return;
   }
   const first=(...values)=>values.find(v=>v!==null&&v!==undefined&&String(v).trim()!=='')??'לא צוין במאגר';
+  if(checklistVehiclePlate!==p){
+    resetChecklistProgress();
+    checklistVehiclePlate=p;
+  }
   document.getElementById('vPlate').textContent=p;
   document.getElementById('vMaker').textContent=first(vr?.tozeret_nm,ar?.tozeret_nm,ar?.tozeret_eretz_nm);
   document.getElementById('vModel').textContent=first(vr?.kinuy_mishari,vr?.degem_nm,ar?.kinuy_mishari,ar?.degem_nm);
@@ -1124,7 +1247,7 @@ const external=['בדוק אם קיימים הבדלי גוון בצבע בין 
 const self=['מצב הצמיגים תקין ומידותיהם תואמות למידות הרשומות ברישיון הרכב','קיים גלגל רזרבי תקין או ערכת תיקון/ניפוח בהתאם לציוד הרכב','לא נשארו נורות אזהרה חריגות לאחר התנעה','המזגן פועל ומקרר','חלונות, מראות וציוד חשמלי בסיסי פועלים','הבלאי בתא הנוסעים נראה סביר ביחס לק״מ','בהעברה ל־D ול־R אין מכה או רעש חריג','בוצעה נסיעת מבחן קצרה ולא נשמעו רעשים, נקישות או רעידות חריגות','אין עשן או נזילה בולטים לעין','מצב שמן המנוע אינו מציג סימן ברור לבוצה חריגה'];
 function makeChecks(arr,start,mode='visual'){
   const labels=mode==='seller'?['התשובה ברורה','צריך לברר','לא שאלתי']:['לא ראיתי בעיה','ראיתי משהו חריג','לא בדקתי'];
-  return `<div class="guidedChecks" data-current="0">${arr.map((t,i)=>`<div class="check${i===0?' active':''}" data-index="${i}"><div class="questionCount">שאלה ${i+1} מתוך ${arr.length}</div><input type="checkbox" class="done" hidden><b class="checkTitle">${t}</b><div class="quickChoices"><button class="quickChoice" type="button" onclick="setCheckState(this,'ok')">${labels[0]}</button><button class="quickChoice issue" type="button" onclick="setCheckState(this,'issue')">${labels[1]}</button><button class="quickChoice skip" type="button" onclick="setCheckState(this,'skip')">${labels[2]}</button></div><div class="finding simpleFinding"><textarea placeholder="כתוב בקצרה מה דורש בירור"></textarea></div></div>`).join('')}<div class="guidedNav"><button type="button" onclick="moveGuided(this,-1)">הקודם</button><span class="guidedProgress">1 מתוך ${arr.length}</span><button type="button" onclick="moveGuided(this,1)">הבא</button></div></div>`;
+  return `<div class="guidedChecks" data-current="0">${arr.map((t,i)=>`<div class="check${i===0?' active':''}" data-index="${i}"><div class="questionCount">שאלה ${i+1} מתוך ${arr.length}</div><input type="checkbox" class="done" hidden><b class="checkTitle">${t}</b><div class="quickChoices"><button class="quickChoice" type="button" onclick="setCheckState(this,'ok')">${labels[0]}</button><button class="quickChoice issue" type="button" onclick="setCheckState(this,'issue')">${labels[1]}</button><button class="quickChoice skip" type="button" onclick="setCheckState(this,'skip')">${labels[2]}</button></div><div class="finding simpleFinding"><textarea placeholder="כתוב בקצרה מה דורש בירור"></textarea></div></div>`).join('')}<div class="guidedNav"><button class="guidedPrevious" type="button" onclick="moveGuided(this,-1)">הקודם</button><span class="guidedProgress">1 מתוך ${arr.length}</span><button class="guidedNext" type="button" onclick="moveGuided(this,1)">הבא</button></div></div>`;
 }
 function renderGuided(list){
   const checks=[...list.querySelectorAll('.check')];
@@ -1133,26 +1256,60 @@ function renderGuided(list){
   checks.forEach((check,index)=>check.classList.toggle('active',index===current));
   const progress=list.querySelector('.guidedProgress');
   if(progress) progress.textContent=`${current+1} מתוך ${checks.length}`;
-  const nav=[...list.querySelectorAll('.guidedNav button')];
-  if(nav[0]) nav[0].disabled=current===0;
-  if(nav[1]) nav[1].disabled=current===checks.length-1;
+  const previous=list.querySelector('.guidedPrevious');
+  const next=list.querySelector('.guidedNext');
+  const answered=Boolean(checks[current]?.dataset.answer);
+  if(previous) previous.disabled=current===0;
+  if(next){
+    next.disabled=!answered;
+    next.textContent=current===checks.length-1?'סיום הנושא':'הבא';
+  }
 }
-function moveGuided(button,delta){const list=button.closest('.guidedChecks');list.dataset.current=String(Number(list.dataset.current||0)+delta);renderGuided(list)}
+function moveGuided(button,delta){
+  const list=button.closest('.guidedChecks');
+  const checks=[...list.querySelectorAll('.check')];
+  const current=Math.max(0,Math.min(checks.length-1,Number(list.dataset.current||0)));
+  if(delta<0){
+    list.dataset.current=String(Math.max(0,current-1));
+    renderGuided(list);
+    return;
+  }
+  if(!checks[current]?.dataset.answer) return;
+  if(current===checks.length-1){
+    const step=Number(list.closest('[data-pre-step]')?.dataset.preStep);
+    completeChecklistTopic(step);
+    return;
+  }
+  list.dataset.current=String(current+1);
+  renderGuided(list);
+}
 function setCheckState(button,state){
   const check=button.closest('.check');
+  const list=button.closest('.guidedChecks');
   check.dataset.answer=state;
   check.querySelectorAll('.quickChoice').forEach(item=>item.classList.toggle('selected',item===button));
-  const done=check.querySelector('.done');if(done) done.checked=state!=='skip';
-  const finding=check.querySelector('.finding');if(finding) finding.classList.toggle('open',state==='issue');
+  const done=check.querySelector('.done');
+  if(done) done.checked=state!=='skip';
+  const finding=check.querySelector('.finding');
+  if(finding) finding.classList.toggle('open',state==='issue');
+  renderGuided(list);
+  if(list._buytestAdvanceTimer) clearTimeout(list._buytestAdvanceTimer);
+  if(state!=='issue'){
+    list._buytestAdvanceTimer=setTimeout(()=>{
+      const next=list.querySelector('.guidedNext');
+      if(next&&!next.disabled) moveGuided(next,1);
+    },320);
+  }
 }
 document.getElementById('sellerChecks').innerHTML=makeChecks(seller,10,'seller');
 document.getElementById('externalChecks').innerHTML=makeChecks(external,20);
 document.getElementById('selfChecks').innerHTML=makeChecks(self,30);
 document.querySelectorAll('.guidedChecks').forEach(renderGuided);
+syncChecklistMenu();
 
 
 
-// כתובת המייל העסקית הפעילה לפניות לקוחות.
+// כתובת המייל העסקית הפעילה לפניות לקוחות.// כתובת המייל העסקית הפעילה לפניות לקוחות.
 const BUYTEST_CONTACT_EMAIL='buytest2026@gmail.com';
 let clarificationFindingOptions=[];
 function setClarificationFindingOptions(items){
