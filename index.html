@@ -383,7 +383,6 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
     <span>פתיחת הצ׳קליסט לפני המכון</span><span class="checklistChevron" aria-hidden="true">⌄</span>
   </button>
   <div class="checklistTopicMenu" id="checklistTopicMenu" hidden>
-    <button class="checklistTopicButton" type="button" onclick="openChecklistTopic(0)"><span>לפני שנוסעים</span><span aria-hidden="true">‹</span></button>
     <button class="checklistTopicButton" type="button" onclick="openChecklistTopic(2)"><span>שאלות למוכר ליד הרכב</span><span aria-hidden="true">‹</span></button>
     <button class="checklistTopicButton" type="button" onclick="openChecklistTopic(3)"><span>בדיקה חיצונית</span><span aria-hidden="true">‹</span></button>
     <button class="checklistTopicButton" type="button" onclick="openChecklistTopic(4)"><span>בדיקה פנימית ונסיעה</span><span aria-hidden="true">‹</span></button>
@@ -914,11 +913,11 @@ function setCustomerRoute(route){
   }else if(hasVehicle){
     const offer=document.getElementById('fullCheckOffer');
     if(offer) offer.style.display='none';
-    showChecklistLauncher({scroll:true,open:false});
+    unlockFreeSections();showPreFlowStep(0);
   }
 }
 const preFlowTitles=['לפני שנוסעים','בדיקת רישיון הרכב','שאלות ליד הרכב','בדיקה חיצונית','בדיקה פנימית ונסיעה','סיכום'];
-const checklistTopicSteps=[0,2,3,4,5];
+const checklistTopicSteps=[2,3,4,5];
 function setChecklistMenuState(open){
   const menu=document.getElementById('checklistTopicMenu');
   const button=document.getElementById('checklistMainButton');
@@ -969,8 +968,8 @@ function showPreFlowStep(index,{scroll=true}={}){
   const text=document.getElementById('preFlowProgressText');
   const bar=document.getElementById('preFlowProgressBar');
   const topicPosition=checklistTopicSteps.indexOf(safe);
-  if(text) text.textContent=safe===1?'בדיקת רישיון הרכב · שלב נפרד':`נושא ${topicPosition+1} מתוך ${checklistTopicSteps.length} · ${preFlowTitles[safe]}`;
-  if(bar) bar.style.width=safe===1?'100%':`${((topicPosition+1)/checklistTopicSteps.length)*100}%`;
+  if(text) text.textContent=safe===0?'שלב חינמי · לפני שנוסעים':safe===1?'בדיקת רישיון הרכב · שלב נפרד':`נושא ${topicPosition+1} מתוך ${checklistTopicSteps.length} · ${preFlowTitles[safe]}`;
+  if(bar) bar.style.width=(safe===0||safe===1)?'100%':`${((topicPosition+1)/checklistTopicSteps.length)*100}%`;
   if(scroll) progress?.scrollIntoView({behavior:'smooth',block:'start'});
 }
 function apiUrl(resource,p){return'https://data.gov.il/api/3/action/datastore_search?resource_id='+resource+'&filters='+encodeURIComponent(JSON.stringify({mispar_rechev:Number(p)}))+'&limit=20'}
@@ -1121,7 +1120,7 @@ async function loadVehicle(){
   if(restored) return;
   if(customerEntryRoute==='free'){
     if(offer) offer.style.display='none';
-    showChecklistLauncher({scroll:true,open:false});
+    unlockFreeSections();showPreFlowStep(0);
   }else{
     document.getElementById('preFlowProgress')?.classList.remove('show');
     document.querySelectorAll('.preFlowScreen').forEach(section=>section.classList.remove('active'));
@@ -1520,7 +1519,7 @@ function applyPlanAccess(planKey,{scroll=false,progress=buyTestStageProgress}={}
   document.querySelectorAll('.paidOnly').forEach(section=>section.style.removeProperty('display'));
   showClarificationOptions();
   if(scroll){
-    if(planKey==='premium'){showChecklistLauncher({scroll:true,open:false});}
+    if(planKey==='premium'){unlockFreeSections();showPreFlowStep(0);}
     else{
       const target=planKey==='bundle'?(buyTestStageProgress.reportCompleted?document.getElementById('clarificationBox'):buyTestStageProgress.preInspectionCompleted?document.getElementById('afterInspectionSection'):document.getElementById('licenseMatchSection')):planKey==='report'?document.getElementById('afterInspectionSection'):document.getElementById('clarificationBox');
       target?.scrollIntoView({behavior:'smooth',block:'start'});
