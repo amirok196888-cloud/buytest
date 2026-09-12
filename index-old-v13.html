@@ -192,7 +192,7 @@ footer{position:static;background:#edf2f4;border-top:1px solid #d9e2e6;color:#60
 <section class="card" id="adminPanel">
 <h2>ניהול BuyTest</h2>
 <p class="sub">לאחר שקיבלת תשלום ב־Bit, צור קוד פתיחה חד־פעמי ושלח אותו ללקוח.</p>
-<div class="field"><label>קוד מנהל</label><input id="adminPin" inputmode="numeric" type="password" placeholder="קוד מנהל"/></div>
+<div class="field"><label>קוד מנהל</label><input id="adminPin" inputmode="text" type="password" autocomplete="current-password" autocapitalize="none" spellcheck="false" placeholder="קוד מנהל"/></div>
 <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
 <button class="primary" type="button" onclick="adminCreateCode()">צור קוד לבדיקה</button>
 <button type="button" onclick="adminRefreshCodes()">רענן רשימה</button>
