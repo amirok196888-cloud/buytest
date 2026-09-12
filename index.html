@@ -143,12 +143,7 @@ body.report-complete .clarificationBox.show,body.plan-consultation .clarificatio
 .paymentActions{display:grid;grid-template-columns:1fr;gap:9px;margin-top:16px}
 .paymentActions button{margin:0}
 .priceCard{position:relative;transition:border-color .2s ease,opacity .2s ease,transform .2s ease}.priceCard.locked{opacity:.7;border-style:dashed}.priceCard.current{border-color:#0fa87e;box-shadow:0 0 0 2px rgba(15,168,126,.14),0 7px 20px rgba(16,45,53,.06)}.priceCard.completed{border-color:#72c7ae;background:#f3fbf8}.stageState{display:block;margin:9px 0 11px;padding:7px 10px;border-radius:9px;background:#edf5f7;color:#405c66;font-size:13px;font-weight:850}.priceCard.current .stageState{background:#e1f7ef;color:#075e48}.priceCard.completed .stageState{background:#dff5e9;color:#17643c}.priceCard.locked .stageState{background:#f1f3f4;color:#5f6b70}.priceCard button:disabled{cursor:not-allowed;opacity:.75}.sequenceNotice{margin:12px 0 15px;padding:13px 14px;border-radius:13px;background:#eef8f5;border:1px solid #b9e1d5;color:#244c42;font-weight:800;line-height:1.55}
-.routeCards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}.routeCard{border:2px solid #d9e2e6;border-radius:19px;padding:18px;background:#fff;box-shadow:0 8px 24px rgba(16,45,53,.06)}.routeCard.free{border-color:#78ceb4;background:#f3fbf8}.routeCard.paid{border-color:#b8cdd5}.routeCard h3{margin:7px 0 6px;font-size:21px}.routeCard p{margin:0 0 14px;color:#50666f;line-height:1.55}.routePrice{display:inline-flex;padding:5px 10px;border-radius:999px;background:#e8f7f2;color:#075e48;font-weight:950}.routeChoice{display:flex;gap:8px;margin:0 0 12px}.routeChoice button{flex:1;border:1px solid #cbd8dd;background:#f5f8f9;color:#28444e}.routeChoice button.active{background:#102d35;color:#fff;border-color:#102d35}.legalBeforePlate{margin:0 0 12px!important}.legalBeforePlate p{font-size:13px}.vehicleHint{margin:0 0 12px;padding:10px 12px;border-radius:11px;background:#eef7fb;color:#28444e;font-size:14px;font-weight:800}.licenseLauncher{border:1px solid #cbd8dd;background:#fff;padding:14px;margin-top:22px}
-.licenseLauncher h2{margin-bottom:6px}
-.licenseLauncher .sub{margin-bottom:12px}
-.licenseLaunchButton{width:100%;min-height:54px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 16px;border:1px solid #b9d8cf;border-radius:13px;background:#eef8f5;color:#0b7058;font-size:17px;font-weight:900;text-align:right}
-.licenseLaunchButton span:last-child{font-size:23px}
-.checklistLauncher{border:2px solid #0fa87e;background:linear-gradient(145deg,#f2fbf8,#fff);padding:14px;margin-top:14px}
+.routeCards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}.routeCard{border:2px solid #d9e2e6;border-radius:19px;padding:18px;background:#fff;box-shadow:0 8px 24px rgba(16,45,53,.06)}.routeCard.free{border-color:#78ceb4;background:#f3fbf8}.routeCard.paid{border-color:#b8cdd5}.routeCard h3{margin:7px 0 6px;font-size:21px}.routeCard p{margin:0 0 14px;color:#50666f;line-height:1.55}.routePrice{display:inline-flex;padding:5px 10px;border-radius:999px;background:#e8f7f2;color:#075e48;font-weight:950}.routeChoice{display:flex;gap:8px;margin:0 0 12px}.routeChoice button{flex:1;border:1px solid #cbd8dd;background:#f5f8f9;color:#28444e}.routeChoice button.active{background:#102d35;color:#fff;border-color:#102d35}.legalBeforePlate{margin:0 0 12px!important}.legalBeforePlate p{font-size:13px}.vehicleHint{margin:0 0 12px;padding:10px 12px;border-radius:11px;background:#eef7fb;color:#28444e;font-size:14px;font-weight:800}.checklistLauncher{border:2px solid #0fa87e;background:linear-gradient(145deg,#f2fbf8,#fff);padding:14px;margin-top:14px}
 .checklistMainButton{width:100%;min-height:58px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 18px;border-radius:15px;background:#0fa87e;color:#fff;font-size:19px;font-weight:950;text-align:right}
 .checklistMainButton .checklistChevron{font-size:25px;line-height:1;transition:transform .2s ease}
 .checklistMainButton[aria-expanded="true"] .checklistChevron{transform:rotate(180deg)}
@@ -373,23 +368,9 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 
 </div></div><div id="rawlink" style="display:none"></div></div>
 </section>
-<section class="card freeAfterLookup licenseLauncher" id="licenseLauncher" style="display:none" aria-label="בדיקת רישיון הרכב">
-  <h2>בדיקת רישיון הרכב</h2>
-  <p class="sub">בדיקה נפרדת להתאמת הרישיון לרכב ולמוכר. היא אינה חלק מהצ׳קליסט שלפני המכון.</p>
-  <button class="licenseLaunchButton" type="button" onclick="showLicenseCheck()"><span>פתיחת בדיקת הרישיון</span><span aria-hidden="true">‹</span></button>
-</section>
-<section class="card freeAfterLookup checklistLauncher" id="checklistLauncher" style="display:none" aria-label="צ׳קליסט לפני המכון">
-  <button class="checklistMainButton" id="checklistMainButton" type="button" aria-expanded="false" aria-controls="checklistTopicMenu" onclick="toggleChecklistTopics()">
-    <span>פתיחת הצ׳קליסט לפני המכון</span><span class="checklistChevron" aria-hidden="true">⌄</span>
-  </button>
-  <div class="checklistTopicMenu" id="checklistTopicMenu" hidden>
-    <button class="checklistTopicButton" type="button" onclick="openChecklistTopic(2)"><span>שאלות למוכר ליד הרכב</span><span aria-hidden="true">‹</span></button>
-    <button class="checklistTopicButton" type="button" onclick="openChecklistTopic(3)"><span>בדיקה חיצונית</span><span aria-hidden="true">‹</span></button>
-    <button class="checklistTopicButton" type="button" onclick="openChecklistTopic(4)"><span>בדיקה פנימית ונסיעה</span><span aria-hidden="true">‹</span></button>
-    <button class="checklistTopicButton" type="button" onclick="openChecklistTopic(5)"><span>סיכום הבדיקה העצמית</span><span aria-hidden="true">‹</span></button>
-  </div>
-</section>
-<div class="preFlowProgress freeAfterLookup" id="preFlowProgress" aria-live="polite"><strong id="preFlowProgressText">שלב 1 מתוך 6 · לפני שנוסעים</strong><div class="preFlowTrack" aria-hidden="true"><span id="preFlowProgressBar"></span></div><button class="checklistTopicReturn" type="button" onclick="showChecklistLauncher({scroll:true,open:true})">חזרה לנושאי הצ׳קליסט</button></div>
+
+
+<div class="preFlowProgress freeAfterLookup" id="preFlowProgress" aria-live="polite"><strong id="preFlowProgressText">שלב 1 מתוך 6 · לפני שנוסעים</strong><div class="preFlowTrack" aria-hidden="true"><span id="preFlowProgressBar"></span></div><button class="checklistTopicReturn" id="checklistTopicReturn" type="button" onclick="showChecklistLauncher({scroll:true,open:true})" style="display:none">חזרה לנושאי הצ׳קליסט</button></div>
 <section class="card freeAfterLookup preFlowScreen preVisitCard" id="preVisitSection" data-pre-step="0" style="display:none">
   <span class="preVisitBadge">חדש · בחינם</span>
   <h2>לפני שנוסעים: 5 שאלות שכדאי לשאול את המוכר</h2>
@@ -424,7 +405,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
       <p class="sub" style="margin:10px 0 0">הצילום מוצג לצד הנתונים כדי שתוכל להשוות ביניהם. אין כאן קביעה אוטומטית שהמודעה נכונה.</p>
     </div>
   </details>
-  <div class="preFlowNav"><button class="primary" type="button" onclick="showPreFlowStep(1)">המשך לבדיקה כשרואים את הרכב</button></div>
+  <div class="preFlowNav"><button class="primary" type="button" onclick="showPreFlowStep(1)">פתיחת בדיקת הרישיון</button></div>
 </section>
 <section class="card" id="fullCheckOffer" style="display:none">
 <h2>פענוח דוח המכון</h2>
@@ -578,10 +559,20 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
     <div class="quickChoices"><button class="quickChoice" type="button" onclick="setCheckState(this,'ok')">הכול תואם</button><button class="quickChoice issue" type="button" onclick="setCheckState(this,'issue')">מצאתי אי־התאמה</button><button class="quickChoice skip" type="button" onclick="setCheckState(this,'skip')">לא בדקתי</button></div>
     <div class="finding simpleFinding"><textarea placeholder="תאר בקצרה את אי־ההתאמה"></textarea></div>
   </div>
-  <div class="preFlowNav"><button class="primary" type="button" onclick="showPreFlowStep(2)">המשך לשאלות למוכר</button></div>
+  <div class="preFlowNav"><button class="primary" type="button" onclick="showChecklistLauncher({scroll:true,open:false})">המשך לפתיחת הצ׳קליסט</button></div>
   </div>
 </details>
 
+<section class="card checklistLauncher" id="checklistLauncher" style="display:none" aria-label="צ׳קליסט לפני המכון">
+  <button class="checklistMainButton" id="checklistMainButton" type="button" aria-expanded="false" aria-controls="checklistTopicMenu" onclick="toggleChecklistTopics()">
+    <span>פתיחת הצ׳קליסט לפני המכון</span><span class="checklistChevron" aria-hidden="true">⌄</span>
+  </button>
+  <div class="checklistTopicMenu" id="checklistTopicMenu" hidden>
+    <button class="checklistTopicButton" type="button" onclick="openChecklistTopic(2)"><span>שאלות למוכר ליד הרכב</span><span aria-hidden="true">‹</span></button>
+    <button class="checklistTopicButton" type="button" onclick="openChecklistTopic(3)"><span>בדיקה חיצונית</span><span aria-hidden="true">‹</span></button>
+    <button class="checklistTopicButton" type="button" onclick="openChecklistTopic(4)"><span>בדיקה פנימית ונסיעה</span><span aria-hidden="true">‹</span></button>
+  </div>
+</section>
 <details class="card freeAfterLookup preFlowScreen guidedSection" id="sellerSection" data-pre-step="2" style="display:none"><summary><span>שאלות נוספות למוכר ליד הרכב</span></summary><div class="stepContent"><p class="sub">שאלה אחת בכל פעם. בחר תשובה פשוטה; רק במקרה שצריך בירור ייפתח מקום לפירוט.</p>
 <div id="sellerChecks"></div><div class="preFlowNav"><button class="secondary" type="button" onclick="showPreFlowStep(1)">חזרה</button><button class="primary" type="button" onclick="showPreFlowStep(3)">המשך לבדיקה החיצונית</button></div></div></details>
 <div id="purchaseBox" style="display:none"></div>
@@ -917,7 +908,7 @@ function setCustomerRoute(route){
   }
 }
 const preFlowTitles=['לפני שנוסעים','בדיקת רישיון הרכב','שאלות ליד הרכב','בדיקה חיצונית','בדיקה פנימית ונסיעה','סיכום'];
-const checklistTopicSteps=[2,3,4,5];
+const checklistTopicSteps=[2,3,4];
 function setChecklistMenuState(open){
   const menu=document.getElementById('checklistTopicMenu');
   const button=document.getElementById('checklistMainButton');
@@ -949,14 +940,13 @@ function openChecklistTopic(index){
   setChecklistMenuState(false);
   showPreFlowStep(index);
 }
-function showLicenseCheck(){
-  setChecklistMenuState(false);
-  showPreFlowStep(1);
-}
 function showPreFlowStep(index,{scroll=true}={}){
   const safe=Math.max(0,Math.min(preFlowTitles.length-1,Number(index)||0));
   const launcher=document.getElementById('checklistLauncher');
-  launcher?.style.removeProperty('display');
+  if(launcher){
+    if(safe<2) launcher.style.display='none';
+    else launcher.style.removeProperty('display');
+  }
   setChecklistMenuState(false);
   const progress=document.getElementById('preFlowProgress');
   progress?.classList.add('show');
@@ -968,8 +958,10 @@ function showPreFlowStep(index,{scroll=true}={}){
   const text=document.getElementById('preFlowProgressText');
   const bar=document.getElementById('preFlowProgressBar');
   const topicPosition=checklistTopicSteps.indexOf(safe);
-  if(text) text.textContent=safe===0?'שלב חינמי · לפני שנוסעים':safe===1?'בדיקת רישיון הרכב · שלב נפרד':`נושא ${topicPosition+1} מתוך ${checklistTopicSteps.length} · ${preFlowTitles[safe]}`;
-  if(bar) bar.style.width=(safe===0||safe===1)?'100%':`${((topicPosition+1)/checklistTopicSteps.length)*100}%`;
+  if(text) text.textContent=safe===0?'שלב חינמי · לפני שנוסעים':safe===1?'בדיקת רישיון הרכב · שלב נפרד':safe===5?'סיום הצ׳קליסט · סיכום הבדיקה':`נושא ${topicPosition+1} מתוך ${checklistTopicSteps.length} · ${preFlowTitles[safe]}`;
+  if(bar) bar.style.width=(safe===0||safe===1||safe===5)?'100%':`${((topicPosition+1)/checklistTopicSteps.length)*100}%`;
+  const topicReturn=document.getElementById('checklistTopicReturn');
+  if(topicReturn) topicReturn.style.display=(safe>=2&&safe<5)?'block':'none';
   if(scroll) progress?.scrollIntoView({behavior:'smooth',block:'start'});
 }
 function apiUrl(resource,p){return'https://data.gov.il/api/3/action/datastore_search?resource_id='+resource+'&filters='+encodeURIComponent(JSON.stringify({mispar_rechev:Number(p)}))+'&limit=20'}
