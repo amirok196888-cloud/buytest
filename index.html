@@ -143,7 +143,17 @@ body.report-complete .clarificationBox.show,body.plan-consultation .clarificatio
 .paymentActions{display:grid;grid-template-columns:1fr;gap:9px;margin-top:16px}
 .paymentActions button{margin:0}
 .priceCard{position:relative;transition:border-color .2s ease,opacity .2s ease,transform .2s ease}.priceCard.locked{opacity:.7;border-style:dashed}.priceCard.current{border-color:#0fa87e;box-shadow:0 0 0 2px rgba(15,168,126,.14),0 7px 20px rgba(16,45,53,.06)}.priceCard.completed{border-color:#72c7ae;background:#f3fbf8}.stageState{display:block;margin:9px 0 11px;padding:7px 10px;border-radius:9px;background:#edf5f7;color:#405c66;font-size:13px;font-weight:850}.priceCard.current .stageState{background:#e1f7ef;color:#075e48}.priceCard.completed .stageState{background:#dff5e9;color:#17643c}.priceCard.locked .stageState{background:#f1f3f4;color:#5f6b70}.priceCard button:disabled{cursor:not-allowed;opacity:.75}.sequenceNotice{margin:12px 0 15px;padding:13px 14px;border-radius:13px;background:#eef8f5;border:1px solid #b9e1d5;color:#244c42;font-weight:800;line-height:1.55}
-.routeCards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}.routeCard{border:2px solid #d9e2e6;border-radius:19px;padding:18px;background:#fff;box-shadow:0 8px 24px rgba(16,45,53,.06)}.routeCard.free{border-color:#78ceb4;background:#f3fbf8}.routeCard.paid{border-color:#b8cdd5}.routeCard h3{margin:7px 0 6px;font-size:21px}.routeCard p{margin:0 0 14px;color:#50666f;line-height:1.55}.routePrice{display:inline-flex;padding:5px 10px;border-radius:999px;background:#e8f7f2;color:#075e48;font-weight:950}.routeChoice{display:flex;gap:8px;margin:0 0 12px}.routeChoice button{flex:1;border:1px solid #cbd8dd;background:#f5f8f9;color:#28444e}.routeChoice button.active{background:#102d35;color:#fff;border-color:#102d35}.legalBeforePlate{margin:0 0 12px!important}.legalBeforePlate p{font-size:13px}.vehicleHint{margin:0 0 12px;padding:10px 12px;border-radius:11px;background:#eef7fb;color:#28444e;font-size:14px;font-weight:800}.preFlowProgress{display:none;margin:22px 0 10px;padding:15px 17px;border:1px solid #c8ded7;border-radius:16px;background:#f3fbf8}.preFlowProgress.show{display:block}.preFlowProgress strong{display:block;margin-bottom:8px}.preFlowTrack{height:8px;border-radius:999px;background:#dfeae7;overflow:hidden}.preFlowTrack span{display:block;height:100%;width:20%;background:#0fa87e;transition:width .2s ease}.preFlowScreen{display:none!important}.preFlowScreen.active{display:block!important}.preFlowNav{display:flex;gap:9px;margin-top:16px}.preFlowNav button{flex:1}.consultationLocked,.consultationUnlocked{display:none}.report-complete .clarificationBox.show .consultationLocked{display:block}.plan-consultation .clarificationBox.show .consultationLocked,.plan-bundle.stage-consultation-open .clarificationBox.show .consultationLocked,.manager-mode.manager-all .clarificationBox.show .consultationLocked{display:none}.plan-consultation .clarificationBox.show .consultationUnlocked,.plan-bundle.stage-consultation-open .clarificationBox.show .consultationUnlocked,.manager-mode.manager-all .clarificationBox.show .consultationUnlocked{display:block}.singlePlan{max-width:560px;margin:14px auto 0}.uploadPanel{transition:border-color .2s ease,background .2s ease}.uploadPanel:has(.uploadState.show){border-color:#0fa87e;background:#f3fbf8}
+.routeCards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}.routeCard{border:2px solid #d9e2e6;border-radius:19px;padding:18px;background:#fff;box-shadow:0 8px 24px rgba(16,45,53,.06)}.routeCard.free{border-color:#78ceb4;background:#f3fbf8}.routeCard.paid{border-color:#b8cdd5}.routeCard h3{margin:7px 0 6px;font-size:21px}.routeCard p{margin:0 0 14px;color:#50666f;line-height:1.55}.routePrice{display:inline-flex;padding:5px 10px;border-radius:999px;background:#e8f7f2;color:#075e48;font-weight:950}.routeChoice{display:flex;gap:8px;margin:0 0 12px}.routeChoice button{flex:1;border:1px solid #cbd8dd;background:#f5f8f9;color:#28444e}.routeChoice button.active{background:#102d35;color:#fff;border-color:#102d35}.legalBeforePlate{margin:0 0 12px!important}.legalBeforePlate p{font-size:13px}.vehicleHint{margin:0 0 12px;padding:10px 12px;border-radius:11px;background:#eef7fb;color:#28444e;font-size:14px;font-weight:800}.checklistLauncher{border:2px solid #0fa87e;background:linear-gradient(145deg,#f2fbf8,#fff);padding:14px;margin-top:22px}
+.checklistMainButton{width:100%;min-height:58px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 18px;border-radius:15px;background:#0fa87e;color:#fff;font-size:19px;font-weight:950;text-align:right}
+.checklistMainButton .checklistChevron{font-size:25px;line-height:1;transition:transform .2s ease}
+.checklistMainButton[aria-expanded="true"] .checklistChevron{transform:rotate(180deg)}
+.checklistTopicMenu{display:grid;gap:9px;margin-top:12px}
+.checklistTopicMenu[hidden]{display:none}
+.checklistTopicButton{width:100%;min-height:54px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 15px;border:1px solid #cbd8dd;border-radius:13px;background:#fff;color:#17323c;font-size:16px;font-weight:850;text-align:right;box-shadow:0 3px 12px rgba(23,50,60,.05)}
+.checklistTopicButton:active{background:#eaf8f3;border-color:#0fa87e}
+.checklistTopicButton span:last-child{font-size:23px;color:#0fa87e}
+.checklistTopicReturn{width:100%;margin-top:11px;padding:10px 12px;border:1px solid #b9d8cf;border-radius:11px;background:#fff;color:#0b7058;font-weight:850}
+.preFlowProgress{display:none;margin:22px 0 10px;padding:15px 17px;border:1px solid #c8ded7;border-radius:16px;background:#f3fbf8}.preFlowProgress.show{display:block}.preFlowProgress strong{display:block;margin-bottom:8px}.preFlowTrack{height:8px;border-radius:999px;background:#dfeae7;overflow:hidden}.preFlowTrack span{display:block;height:100%;width:20%;background:#0fa87e;transition:width .2s ease}.preFlowScreen{display:none!important}.preFlowScreen.active{display:block!important}.preFlowNav{display:flex;gap:9px;margin-top:16px}.preFlowNav button{flex:1}.consultationLocked,.consultationUnlocked{display:none}.report-complete .clarificationBox.show .consultationLocked{display:block}.plan-consultation .clarificationBox.show .consultationLocked,.plan-bundle.stage-consultation-open .clarificationBox.show .consultationLocked,.manager-mode.manager-all .clarificationBox.show .consultationLocked{display:none}.plan-consultation .clarificationBox.show .consultationUnlocked,.plan-bundle.stage-consultation-open .clarificationBox.show .consultationUnlocked,.manager-mode.manager-all .clarificationBox.show .consultationUnlocked{display:block}.singlePlan{max-width:560px;margin:14px auto 0}.uploadPanel{transition:border-color .2s ease,background .2s ease}.uploadPanel:has(.uploadState.show){border-color:#0fa87e;background:#f3fbf8}
 @media(max-width:700px){.routeCards{grid-template-columns:1fr}.routeChoice{flex-direction:column}.preFlowNav{flex-direction:column-reverse}}
 .preVisitCard{border:2px solid #0fa87e;background:linear-gradient(145deg,#f2fbf8,#fff);box-shadow:0 12px 32px rgba(15,168,126,.12)}
 .preVisitBadge{display:inline-flex;align-items:center;padding:6px 11px;border-radius:999px;background:#dff6ee;color:#075e48;font-size:13px;font-weight:950}.preVisitCard h2{margin:10px 0 6px;font-size:25px}.preVisitLead{margin:0 0 14px;color:#50666f;line-height:1.6}
@@ -358,7 +368,20 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 
 </div></div><div id="rawlink" style="display:none"></div></div>
 </section>
-<div class="preFlowProgress freeAfterLookup" id="preFlowProgress" aria-live="polite"><strong id="preFlowProgressText">שלב 1 מתוך 6 · לפני שנוסעים</strong><div class="preFlowTrack" aria-hidden="true"><span id="preFlowProgressBar"></span></div></div>
+<section class="card freeAfterLookup checklistLauncher" id="checklistLauncher" style="display:none" aria-label="צ׳קליסט בדיקת רכב">
+  <button class="checklistMainButton" id="checklistMainButton" type="button" aria-expanded="false" aria-controls="checklistTopicMenu" onclick="toggleChecklistTopics()">
+    <span>פתיחת הצ׳קליסט</span><span class="checklistChevron" aria-hidden="true">⌄</span>
+  </button>
+  <div class="checklistTopicMenu" id="checklistTopicMenu" hidden>
+    <button class="checklistTopicButton" type="button" onclick="openChecklistTopic(0)"><span>לפני שנוסעים</span><span aria-hidden="true">‹</span></button>
+    <button class="checklistTopicButton" type="button" onclick="openChecklistTopic(1)"><span>התאמת רישיון הרכב</span><span aria-hidden="true">‹</span></button>
+    <button class="checklistTopicButton" type="button" onclick="openChecklistTopic(2)"><span>שאלות למוכר ליד הרכב</span><span aria-hidden="true">‹</span></button>
+    <button class="checklistTopicButton" type="button" onclick="openChecklistTopic(3)"><span>בדיקה חיצונית</span><span aria-hidden="true">‹</span></button>
+    <button class="checklistTopicButton" type="button" onclick="openChecklistTopic(4)"><span>בדיקה פנימית ונסיעה</span><span aria-hidden="true">‹</span></button>
+    <button class="checklistTopicButton" type="button" onclick="openChecklistTopic(5)"><span>סיכום הבדיקה העצמית</span><span aria-hidden="true">‹</span></button>
+  </div>
+</section>
+<div class="preFlowProgress freeAfterLookup" id="preFlowProgress" aria-live="polite"><strong id="preFlowProgressText">שלב 1 מתוך 6 · לפני שנוסעים</strong><div class="preFlowTrack" aria-hidden="true"><span id="preFlowProgressBar"></span></div><button class="checklistTopicReturn" type="button" onclick="showChecklistLauncher({scroll:true,open:true})">חזרה לנושאי הצ׳קליסט</button></div>
 <section class="card freeAfterLookup preFlowScreen preVisitCard" id="preVisitSection" data-pre-step="0" style="display:none">
   <span class="preVisitBadge">חדש · בחינם</span>
   <h2>לפני שנוסעים: 5 שאלות שכדאי לשאול את המוכר</h2>
@@ -875,19 +898,53 @@ function setCustomerRoute(route){
   customerEntryRoute=route==='report'?'report':'free';
   const hasVehicle=document.getElementById('vehicleData')?.style.display==='block';
   if(customerEntryRoute==='report'){
+    document.getElementById('checklistLauncher')?.style.setProperty('display','none');
     document.getElementById('preFlowProgress')?.classList.remove('show');
     document.querySelectorAll('.preFlowScreen').forEach(section=>section.classList.remove('active'));
     if(hasVehicle) document.getElementById('fullCheckOffer').style.display='block';
   }else if(hasVehicle){
     const offer=document.getElementById('fullCheckOffer');
     if(offer) offer.style.display='none';
-    unlockFreeSections();
-    showPreFlowStep(0);
+    showChecklistLauncher({scroll:true,open:false});
   }
 }
 const preFlowTitles=['לפני שנוסעים','התאמת רישיון','שאלות ליד הרכב','בדיקה חיצונית','בדיקה פנימית ונסיעה','סיכום'];
+function setChecklistMenuState(open){
+  const menu=document.getElementById('checklistTopicMenu');
+  const button=document.getElementById('checklistMainButton');
+  if(menu) menu.hidden=!open;
+  if(button) button.setAttribute('aria-expanded',open?'true':'false');
+}
+function closeChecklistTopic(){
+  document.getElementById('preFlowProgress')?.classList.remove('show');
+  document.querySelectorAll('.preFlowScreen').forEach(section=>{
+    section.classList.remove('active');
+    if(section.tagName==='DETAILS') section.open=false;
+  });
+}
+function showChecklistLauncher({scroll=true,open=false}={}){
+  unlockFreeSections();
+  const launcher=document.getElementById('checklistLauncher');
+  launcher?.style.removeProperty('display');
+  closeChecklistTopic();
+  setChecklistMenuState(open);
+  if(scroll) launcher?.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function toggleChecklistTopics(){
+  const menu=document.getElementById('checklistTopicMenu');
+  const willOpen=Boolean(menu?.hidden);
+  if(willOpen) closeChecklistTopic();
+  setChecklistMenuState(willOpen);
+}
+function openChecklistTopic(index){
+  setChecklistMenuState(false);
+  showPreFlowStep(index);
+}
 function showPreFlowStep(index,{scroll=true}={}){
   const safe=Math.max(0,Math.min(preFlowTitles.length-1,Number(index)||0));
+  const launcher=document.getElementById('checklistLauncher');
+  launcher?.style.removeProperty('display');
+  setChecklistMenuState(false);
   const progress=document.getElementById('preFlowProgress');
   progress?.classList.add('show');
   document.querySelectorAll('.preFlowScreen').forEach(section=>{
@@ -1048,9 +1105,8 @@ async function loadVehicle(){
   const restored=await restoreBuyTestAccessWithRetry({requiredPlate:p,scroll:true});
   if(restored) return;
   if(customerEntryRoute==='free'){
-    unlockFreeSections();
     if(offer) offer.style.display='none';
-    showPreFlowStep(0);
+    showChecklistLauncher({scroll:true,open:false});
   }else{
     document.getElementById('preFlowProgress')?.classList.remove('show');
     document.querySelectorAll('.preFlowScreen').forEach(section=>section.classList.remove('active'));
@@ -1449,7 +1505,7 @@ function applyPlanAccess(planKey,{scroll=false,progress=buyTestStageProgress}={}
   document.querySelectorAll('.paidOnly').forEach(section=>section.style.removeProperty('display'));
   showClarificationOptions();
   if(scroll){
-    if(planKey==='premium'){unlockFreeSections();showPreFlowStep(0);}
+    if(planKey==='premium'){showChecklistLauncher({scroll:true,open:false});}
     else{
       const target=planKey==='bundle'?(buyTestStageProgress.reportCompleted?document.getElementById('clarificationBox'):buyTestStageProgress.preInspectionCompleted?document.getElementById('afterInspectionSection'):document.getElementById('licenseMatchSection')):planKey==='report'?document.getElementById('afterInspectionSection'):document.getElementById('clarificationBox');
       target?.scrollIntoView({behavior:'smooth',block:'start'});
