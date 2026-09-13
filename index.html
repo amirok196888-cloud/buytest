@@ -783,7 +783,7 @@ function buyTestGoogleTrackFreeStartedOnce(vehiclePlate){
   const storageKey=BUYTEST_GOOGLE_FREE_STARTED_KEY_PREFIX+(plate||'unknown');
   try{if(sessionStorage.getItem(storageKey)==='1') return}catch(_error){}
   try{
-    window.gtag('event','conversion',{send_to:'AW-18445003355/2Y9UCOZwkPYcENvUodtE',value:1.0,currency:'ILS'});
+    window.gtag('event','conversion',{send_to:'AW-18445003355/2Y9UCO2wkPYcENvUodtE',value:1.0,currency:'ILS'});
     sessionStorage.setItem(storageKey,'1');
   }catch(error){console.warn('BuyTest Google Ads conversion skipped:',error)}
 }
