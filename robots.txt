@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://amirok196888-cloud.github.io/buytest/sitemap.xml
