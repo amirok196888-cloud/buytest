@@ -759,6 +759,7 @@ const BUYTEST_ANALYTICS_VISITOR_KEY='buytestAnalyticsVisitorV1';
 const BUYTEST_ANALYTICS_SESSION_KEY='buytestAnalyticsSessionV1';
 const BUYTEST_ATTRIBUTION_KEY='buytestTrafficAttributionV1';
 const BUYTEST_META_PURCHASE_KEY_PREFIX='buytestMetaPurchaseV1:';
+const BUYTEST_GOOGLE_PURCHASE_KEY_PREFIX='buytestGooglePurchaseV1:';
 const BUYTEST_GOOGLE_FREE_STARTED_KEY_PREFIX='buytestGoogleFreeStartedV1:';
 const BUYTEST_FEEDBACK_SEEN_KEY='buytestFeedbackSeenAtV1';
 const BUYTEST_RECENT_PAYMENT_WINDOW_MS=30*60*1000;
@@ -796,6 +797,22 @@ function buyTestMetaTrackPurchaseOnce(payment){
   const plan=buytestPlans[payment.plan]||buytestPlans.report;
   buyTestMetaTrack('Purchase',{value:Number(plan.price)||49,currency:'ILS',content_name:plan.name,content_ids:[String(payment.plan||'report')],content_type:'product'});
   try{localStorage.setItem(storageKey,'1')}catch(_error){}
+}
+function buyTestGoogleTrackPurchaseOnce(payment){
+  if(typeof window.gtag!=='function'||new URLSearchParams(location.search).has('manager')||document.body.classList.contains('manager-mode')) return;
+  if(!payment?.orderId) return;
+  const storageKey=BUYTEST_GOOGLE_PURCHASE_KEY_PREFIX+String(payment.orderId);
+  try{if(localStorage.getItem(storageKey)==='1') return}catch(_error){}
+  const plan=buytestPlans[payment.plan]||buytestPlans.report;
+  try{
+    window.gtag('event','conversion',{
+      send_to:'AW-18445003355/SgEYCPHcq_YcENvUodtE',
+      value:Number(plan.price)||49,
+      currency:'ILS',
+      transaction_id:String(payment.orderId)
+    });
+    localStorage.setItem(storageKey,'1');
+  }catch(error){console.warn('BuyTest Google Ads purchase conversion skipped:',error)}
 }
 function googleVisionReady(){
   return /^https:\/\/.+\/functions\/v1\/vision-ocr$/.test(GOOGLE_VISION_PROXY_ENDPOINT)
@@ -1829,6 +1846,7 @@ async function restoreBuyTestAccess({requiredPlate='',onReturn=false,scroll=true
       const progress=normalizedStageProgress(data.progress);
       saveBuyTestPayment({...saved,plate:data.plate,plan:data.plan,expiresAt,accessToken:data.accessToken,progress});
       buyTestMetaTrackPurchaseOnce({orderId:saved.orderId,plan:data.plan});
+      buyTestGoogleTrackPurchaseOnce({orderId:saved.orderId,plan:data.plan});
       const input=document.getElementById('plate');
       if(input&&!input.value) input.value=data.plate;
       activatePurchasedPlan(data.plan,{scroll,progress});
