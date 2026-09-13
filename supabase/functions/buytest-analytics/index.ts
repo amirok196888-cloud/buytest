@@ -5,6 +5,8 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 const VALID_ID = /^[A-Za-z0-9_-]{20,80}$/;
 const TRAFFIC_SOURCES = new Set(["google", "meta", "direct", "other", "unknown"]);
+const MILEAGE_SOURCES = new Set(["ministry_last_test", "inspection_report"]);
+const MILEAGE_DATE_BASES = new Set(["test_date", "captured_date"]);
 
 function cors(origin: string | null) {
   return {
@@ -117,6 +119,59 @@ async function saveFeedback(body: Record<string, unknown>) {
   });
 }
 
+function validIsoDate(value: string) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const parsed = new Date(`${value}T00:00:00Z`);
+  if (Number.isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== value) return false;
+  const year = Number(value.slice(0, 4));
+  const tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+  return year >= 1990 && value <= tomorrow;
+}
+
+async function saveMileageObservation(body: Record<string, unknown>) {
+  const visitorId = String(body.visitorId || "");
+  const sessionId = String(body.sessionId || "");
+  const observations = Array.isArray(body.observations) ? body.observations : [body];
+  if (!VALID_ID.test(visitorId) || !VALID_ID.test(sessionId) || observations.length < 1 || observations.length > 25) {
+    throw new Error("invalid_mileage_observation");
+  }
+  const rows = [];
+  for (const rawObservation of observations) {
+    const observation = rawObservation && typeof rawObservation === "object" && !Array.isArray(rawObservation)
+      ? rawObservation as Record<string, unknown>
+      : {};
+    const vehiclePlate = String(observation.vehiclePlate || "").replace(/\D/g, "").slice(0, 8);
+    const mileage = Number(observation.mileage);
+    const sourceType = String(observation.sourceType || "");
+    const recordedOn = String(observation.recordedOn || "");
+    const dateBasis = String(observation.dateBasis || "");
+    if (
+      !/^\d{7,8}$/.test(vehiclePlate) ||
+      !Number.isInteger(mileage) ||
+      mileage < 1 ||
+      mileage > 5000000 ||
+      !MILEAGE_SOURCES.has(sourceType) ||
+      !MILEAGE_DATE_BASES.has(dateBasis) ||
+      !validIsoDate(recordedOn)
+    ) throw new Error("invalid_mileage_observation");
+    rows.push({
+      vehicle_plate: vehiclePlate,
+      mileage,
+      source_type: sourceType,
+      recorded_on: recordedOn,
+      date_basis: dateBasis,
+      visitor_id: visitorId,
+      session_id: sessionId,
+      observation_key: await sha256(`${vehiclePlate}|${sourceType}|${mileage}|${recordedOn}`),
+    });
+  }
+  await serviceRequest("/rest/v1/buytest_mileage_observations?on_conflict=observation_key", {
+    method: "POST",
+    headers: { "Prefer": "resolution=ignore-duplicates,return=minimal" },
+    body: JSON.stringify(rows),
+  });
+}
+
 async function listFeedback() {
   return await serviceRequest("/rest/v1/buytest_feedback?select=id,rating,comment,customer_name,customer_email,vehicle_plate,created_at,updated_at&order=updated_at.desc&limit=100", {
     method: "GET",
@@ -194,6 +249,10 @@ Deno.serve(async (req: Request) => {
       await saveFeedback(body);
       return json(origin, { ok: true });
     }
+    if (body.action === "mileage_record") {
+      await saveMileageObservation(body);
+      return json(origin, { ok: true });
+    }
     if (body.action === "stats") {
       const pin = String(req.headers.get("x-buytest-manager-pin") || body.adminPin || "");
       if (!await isAdmin(pin)) return json(origin, { ok: false, error: "admin_denied" }, 403);
@@ -219,7 +278,7 @@ Deno.serve(async (req: Request) => {
   } catch (error) {
     console.error("BuyTest analytics error", error);
     const name = error instanceof Error ? error.message : "analytics_failed";
-    const invalid = ["invalid_event", "invalid_feedback"].includes(name);
+    const invalid = ["invalid_event", "invalid_feedback", "invalid_mileage_observation"].includes(name);
     return json(origin, { ok: false, error: invalid ? name : "analytics_failed" }, invalid ? 400 : 500);
   }
 });
