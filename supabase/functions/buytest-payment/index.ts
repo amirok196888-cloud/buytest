@@ -13,7 +13,12 @@ const PLANS = {
   bundle: { amountAgorot: 12000, title: "חבילת BuyTest המלאה", scopes: ["premium", "report", "consultation"] },
 } as const;
 type PlanKey = keyof typeof PLANS;
-type CardcomConfig = { terminalNumber: number; apiName: string; enabled: boolean };
+type CardcomConfig = {
+  terminalNumber: number;
+  apiName: string;
+  enabled: boolean;
+  departmentId?: number;
+};
 type StageProgress = { preInspectionCompleted: boolean; reportCompleted: boolean };
 const TRAFFIC_SOURCES = new Set(["google", "meta", "direct", "other", "unknown"]);
 
@@ -104,16 +109,19 @@ async function privateConfig(name: string) {
   return typeof value === "string" ? value.trim() : "";
 }
 async function cardcomConfig(): Promise<CardcomConfig> {
-  const [terminalValue, apiName, enabledValue] = await Promise.all([
+  const [terminalValue, apiName, enabledValue, departmentValue] = await Promise.all([
     privateConfig("cardcom_terminal_number"),
     privateConfig("cardcom_api_name"),
     privateConfig("cardcom_payments_enabled"),
+    privateConfig("cardcom_buytest_department_id"),
   ]);
   const terminalNumber = Number(terminalValue);
+  const departmentId = Number(departmentValue);
   return {
     terminalNumber,
     apiName,
     enabled: Number.isInteger(terminalNumber) && terminalNumber > 0 && apiName.length > 0 && /^(1|true|yes|enabled)$/i.test(enabledValue),
+    departmentId: Number.isInteger(departmentId) && departmentId > 0 ? departmentId : undefined,
   };
 }
 async function insertOrder(values: Record<string, unknown>) {
@@ -248,6 +256,8 @@ async function createPayment(origin: string | null, body: Record<string, unknown
     return json(origin, { ok: false, error: "invalid_payment_request" }, 400);
   }
   const plan = PLANS[planKey];
+  const productCode = `BUYTEST-${planKey.toUpperCase()}`;
+  const productName = `BuyTest · ${plan.title}`;
   let inheritedProgress: StageProgress = { preInspectionCompleted: false, reportCompleted: false };
   let priorOrderId = "";
   if (planKey === "consultation") {
@@ -292,7 +302,7 @@ async function createPayment(origin: string | null, body: Record<string, unknown
       FailedRedirectUrl: `${SITE_URL}?buytest_payment=failed&order=${encodeURIComponent(orderId)}`,
       CancelRedirectUrl: `${SITE_URL}?buytest_payment=cancelled&order=${encodeURIComponent(orderId)}`,
       WebHookUrl: WEBHOOK_URL,
-      ProductName: plan.title,
+      ProductName: productName,
       Language: "he",
       ISOCoinId: 1,
       UIDefinition: {
@@ -308,8 +318,18 @@ async function createPayment(origin: string | null, body: Record<string, unknown
         Email: email,
         Mobile: phone,
         IsSendByEmail: true,
-        Products: [{ Description: `${plan.title} · רכב ${plate}`, Quantity: 1, UnitCost: plan.amountAgorot / 100 }],
+        Comments: "שירות BuyTest · ROKACH DIGITAL",
+        DepartmentId: config.departmentId,
+        Products: [{
+          ProductID: productCode,
+          Description: `${productName} · רכב ${plate}`,
+          Quantity: 1,
+          UnitCost: plan.amountAgorot / 100,
+          TotalLineCost: plan.amountAgorot / 100,
+          IsVatFree: false,
+        }],
         ExternalId: orderId,
+        IsAllowEditDocument: true,
         Language: "he",
       },
     });
