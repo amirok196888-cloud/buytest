@@ -35,6 +35,10 @@
         <input class="ltr" id="terminal" inputmode="numeric" value="197356" required>
       </div>
       <div class="field">
+        <label for="department">מספר מחלקת BuyTest בקארדקום (אופציונלי)</label>
+        <input class="ltr" id="department" inputmode="numeric" placeholder="לדוגמה: 1">
+      </div>
+      <div class="field">
         <label for="api-name">API Name</label>
         <input class="ltr" id="api-name" autocomplete="off" autocapitalize="none" spellcheck="false" required>
       </div>
@@ -74,6 +78,7 @@
           body: JSON.stringify({
             setupToken: token,
             terminalNumber: document.getElementById("terminal").value,
+            departmentId: document.getElementById("department").value,
             apiName: document.getElementById("api-name").value,
             apiPassword: document.getElementById("api-password").value
           })
