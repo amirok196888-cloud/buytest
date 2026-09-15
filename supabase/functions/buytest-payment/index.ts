@@ -9,7 +9,8 @@ const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 const PLANS = {
   premium: { amountAgorot: 4900, title: "בדיקה עצמית לפני המכון", scopes: ["premium"] },
   report: { amountAgorot: 4900, title: "פענוח דוח המכון", scopes: ["report"] },
-  consultation: { amountAgorot: 4900, title: "התייעצות אישית", scopes: ["consultation"] },
+  consultation: { amountAgorot: 4900, title: "התייעצות אישית לאחר פענוח", scopes: ["consultation"] },
+  prebuy: { amountAgorot: 7900, title: "ייעוץ לפני רכישה בוואטסאפ · עד 10 שאלות · 24 שעות", scopes: ["prebuy"] },
   bundle: { amountAgorot: 12000, title: "חבילת BuyTest המלאה", scopes: ["premium", "report", "consultation"] },
 } as const;
 type PlanKey = keyof typeof PLANS;
@@ -244,7 +245,8 @@ async function verifiedPriorOrder(body: Record<string, unknown>, plate: string) 
 async function createPayment(origin: string | null, body: Record<string, unknown>) {
   if (origin !== ALLOWED_ORIGIN) return json(origin, { ok: false, error: "origin_not_allowed" }, 403);
   const planKey = String(body.plan || "");
-  const plate = cleanPlate(body.plate);
+  const enteredPlate = cleanPlate(body.plate);
+  const plate = planKey === "prebuy" ? (enteredPlate || "GENERAL") : enteredPlate;
   const customerName = cleanText(body.customerName, 50);
   const email = cleanEmail(body.email);
   const phone = cleanPhone(body.phone);
@@ -252,7 +254,7 @@ async function createPayment(origin: string | null, body: Record<string, unknown
   const utmSource = cleanText(body.utmSource, 80) || null;
   const utmMedium = cleanText(body.utmMedium, 80) || null;
   const utmCampaign = cleanText(body.utmCampaign, 120) || null;
-  if (!isPlan(planKey) || !/^\d{7,8}$/.test(plate) || !validEmail(email) || customerName.length < 2 || !/^05\d{8}$/.test(phone) || body.acceptedTerms !== true) {
+  if (!isPlan(planKey) || (planKey !== "prebuy" && !/^\d{7,8}$/.test(plate)) || !validEmail(email) || customerName.length < 2 || !/^05\d{8}$/.test(phone) || body.acceptedTerms !== true) {
     return json(origin, { ok: false, error: "invalid_payment_request" }, 400);
   }
   const plan = PLANS[planKey];
