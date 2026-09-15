@@ -162,7 +162,7 @@ body.plan-prebuy .prePurchaseConsultationBox{display:block}
 .consultationFormGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}.consultationFormGrid .wide{grid-column:1/-1}
 .route-consultation #vehicleLookup .plate input{display:none}.route-consultation #vehicleLookup .plate button{width:100%}
 .routeContext{display:none;margin:0 0 13px;padding:12px 14px;border-radius:13px;border:1px solid #b9e1d5;background:#edf9f5;color:#184f41;font-weight:850;line-height:1.5}.routeContext.show{display:block}.routeContext strong{display:block;font-size:16px}.routeContext span{display:block;margin-top:2px;font-size:13px;font-weight:700}.vehicleDataDetails,.preVisitFactsDetails{margin:12px 0;border:1px solid #cfe1dc;border-radius:13px;background:#f8fcfb;overflow:hidden}.vehicleDataDetails>summary,.preVisitFactsDetails>summary{cursor:pointer;padding:13px 15px;color:#075e48;font-weight:950;list-style:none}.vehicleDataDetails>summary::-webkit-details-marker,.preVisitFactsDetails>summary::-webkit-details-marker{display:none}.vehicleDataDetails>summary:after,.preVisitFactsDetails>summary:after{content:'פתיחה';float:left;padding:3px 8px;border-radius:999px;background:#dff5ee;font-size:12px}.vehicleDataDetails[open]>summary:after,.preVisitFactsDetails[open]>summary:after{content:'סגירה'}.vehicleDataDetails>.grid,.preVisitFactsDetails>.preVisitFacts{margin:0;padding:0 13px 13px}
-.managerHub{display:none;margin:14px 0;padding:12px;border:1px solid #b9d4df;border-radius:16px;background:#edf5f7}.managerHubTitle{display:block;margin:0 0 9px;color:#244753}.managerHubGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.managerHub button{min-height:46px;background:#fff!important;color:#17323c!important;border:1px solid #b9d4df!important;box-shadow:none!important}.managerHub button.active{background:#0b7f67!important;color:#fff!important;border-color:#0b7f67!important}.managerToolsDetails{margin-top:10px;border-top:1px solid #9dd9c7}.managerToolsDetails>summary{cursor:pointer;padding:11px 0 0;font-weight:900}.managerToolsDetails .managerPlanControls{margin-top:8px}.manager-mode .managerHub{display:block}
+.managerHub{display:none;margin:14px 0;padding:12px;border:1px solid #b9d4df;border-radius:16px;background:#edf5f7}.managerHubTitle{display:block;margin:0 0 9px;color:#244753}.managerHubGrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}.managerHub button{min-height:46px;background:#fff!important;color:#17323c!important;border:1px solid #b9d4df!important;box-shadow:none!important}.managerHub button.active{background:#0b7f67!important;color:#fff!important;border-color:#0b7f67!important}.managerToolsDetails{margin-top:10px;border-top:1px solid #9dd9c7}.managerToolsDetails>summary{cursor:pointer;padding:11px 0 0;font-weight:900}.managerToolsDetails .managerPlanControls{margin-top:8px}.manager-mode .managerHub{display:block}
 .manager-entry #marketingLanding,.manager-entry #vehicleLookup,.manager-entry #feedbackBox{display:none!important}.manager-dashboard #marketingLanding,.manager-dashboard #vehicleLookup,.manager-dashboard #fullCheckOffer,.manager-dashboard .preFlowProgress,.manager-dashboard .preFlowScreen,.manager-dashboard .paidOnly,.manager-dashboard .clarificationBox,.manager-dashboard #feedbackBox{display:none!important}
 @media(max-width:700px){.routeCards{grid-template-columns:1fr}.routeChoice{flex-direction:column}.preFlowNav{flex-direction:column-reverse}.managerHubGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .preVisitCard{border:2px solid #0fa87e;background:linear-gradient(145deg,#f2fbf8,#fff);box-shadow:0 12px 32px rgba(15,168,126,.12)}
@@ -441,7 +441,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 
 <section class="card" id="managerActiveNotice" style="display:none;border:2px solid #0ea67b;background:#e8f7f2;color:#075e48">
   <b>מצב מנהל פעיל</b>
-  <details class="managerToolsDetails">
+  <details class="managerToolsDetails" open>
   <summary>כלי בדיקה ותצוגת מסלולים</summary>
   <div class="managerPlanControls">
     <b>בדיקת תצוגת מסלולים:</b>
@@ -461,7 +461,8 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 <nav class="managerHub" id="managerHub" aria-label="תפריט מנהל">
   <b class="managerHubTitle">ניהול BuyTest</b>
   <div class="managerHubGrid">
-    <button class="active" type="button" data-manager-panel="analytics" onclick="showManagerPanel('analytics')">פעילות</button>
+    <button class="active" type="button" data-manager-panel="site" onclick="previewPlanAsManager('all')">האתר המלא</button>
+    <button type="button" data-manager-panel="analytics" onclick="showManagerPanel('analytics')">פעילות</button>
     <button type="button" data-manager-panel="orders" onclick="showManagerPanel('orders')">לקוחות</button>
     <button type="button" data-manager-panel="feedback" onclick="showManagerPanel('feedback')">תגובות</button>
     <button type="button" data-manager-panel="formulas" onclick="showManagerPanel('formulas')">מאגר נוסחים</button>
@@ -2099,6 +2100,13 @@ function runBuyTestAccessInitialization(){
 function previewPlanAsManager(planKey='all'){
   if(!document.body.classList.contains('manager-mode')) return;
   document.body.classList.remove('manager-dashboard');
+  ['managerAnalyticsPanel','managerOrdersPanel','managerFeedbackPanel','managerFormulaPanel'].forEach(id=>{
+    const panel=document.getElementById(id);
+    if(panel) panel.style.display='none';
+  });
+  const replyPanel=document.getElementById('customerReplyAdmin');
+  if(replyPanel) replyPanel.style.display='none';
+  document.querySelectorAll('[data-manager-panel]').forEach(button=>button.classList.toggle('active',button.dataset.managerPanel==='site'));
   const status=document.getElementById('managerPlanStatus');
   if(planKey==='all'){
     document.body.classList.remove(...buytestPlanClasses);
@@ -2227,7 +2235,8 @@ async function openManagerPreview(){
     alert(error?.message==='admin_denied'?'קוד מנהל שגוי':'לא ניתן לאמת כרגע את כניסת המנהל. לא נפתחו כלי הניהול.');
     return;
   }
-  document.body.classList.add('manager-mode','manager-all','manager-dashboard');
+  document.body.classList.remove('manager-entry','manager-dashboard');
+  document.body.classList.add('manager-mode','manager-all');
   document.querySelectorAll('.paidOnly').forEach(section=>section.style.removeProperty('display'));
   const purchaseBox=document.getElementById('purchaseBox');
   if(purchaseBox) purchaseBox.style.display='none';
@@ -2241,7 +2250,8 @@ async function openManagerPreview(){
   void loadBuyTestFeedback();
   renderCustomerReplyDrafts();
   showClarificationOptions();
-  showManagerPanel(formulasOnly?'formulas':'analytics',{scroll:formulasOnly});
+  if(formulasOnly) showManagerPanel('formulas',{scroll:true});
+  else previewPlanAsManager('all');
 }
 
 function showManagerPanel(panel='analytics',{scroll=true}={}){
