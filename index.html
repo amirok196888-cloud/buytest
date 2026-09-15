@@ -278,7 +278,7 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
 #appShell .legalLinks button,#appShell .legalCompact button,#appShell .legalBeforePlate button{color:#0b7f67}
 .imageModal button{background:#0b8f70;color:#fff;border:1px solid #08745b}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
-</style><meta name="buytest-build" content="buytest-v91-whatsapp-consultation">
+</style><meta name="buytest-build" content="buytest-v92-identified-whatsapp">
 </head><body>
 <noscript><img height="1" width="1" style="display:none" alt=""
 src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscript=1"
@@ -663,9 +663,9 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
       <div class="field"><label for="prebuyCustomerName"><b>השם שלך</b></label><input id="prebuyCustomerName" autocomplete="name" maxlength="50" placeholder="שם מלא"></div>
       <div class="field"><label for="prebuyVehiclePlate"><b>מספר רכב (רשות)</b></label><input id="prebuyVehiclePlate" inputmode="numeric" maxlength="8" placeholder="רק אם יש רכב מסוים" oninput="sanitizePlateInput(this)"></div>
       <div class="field wide"><label for="prebuyAdLink"><b>קישור למודעת הרכב (רשות)</b></label><input id="prebuyAdLink" type="url" inputmode="url" dir="ltr" maxlength="500" placeholder="https://..."></div>
-      <div class="field wide"><label for="prebuyQuestion"><b>השאלה הראשונה שלך</b></label><textarea id="prebuyQuestion" maxlength="1500" oninput="updatePrebuyCounter()" placeholder="לדוגמה: איך נכון לבחור בין שני דגמים לפני שמתחילים לחפש?"></textarea><div class="clarificationCounter" id="prebuyCounter"><span>השאלה הראשונה מתוך עד 10 שאלות</span><span id="prebuyCharacterCount">0 מתוך 1500</span></div></div>
+      <div class="field wide"><label for="prebuyQuestion"><b>השאלות שלך (עד 10)</b></label><textarea id="prebuyQuestion" maxlength="2000" oninput="updatePrebuyCounter()" placeholder="כתבו כל שאלה בשורה חדשה. לדוגמה:&#10;איזה מידע כדאי לבקש מהמוכר?&#10;מה חשוב לבדוק במודעה?"></textarea><div class="clarificationCounter" id="prebuyCounter"><span>כתבו כל שאלה בשורה חדשה</span><span id="prebuyCharacterCount">0 מתוך 2000</span></div></div>
     </div>
-    <p class="formNote">בלחיצה תיפתח הודעת WhatsApp מוכנה עם מספר ההזמנה, הפרטים שמילאת והשאלה הראשונה. אפשר לצרף תמונות או מסמכים בתוך WhatsApp.</p>
+    <p class="formNote">בלחיצה תיפתח הודעת WhatsApp מזוהה ומוכנה עם הפרטים והשאלות שמילאת. אפשר לצרף תמונות או מסמכים בתוך WhatsApp.</p>
     <div class="info" role="note"><b>שעות מענה:</b> ימים א׳–ה׳: 09:00–18:00 · יום ו׳: 09:00–13:00.<br>בשבתות ובחגים אין מענה. אפשר לשלוח בכל שעה; חלון 24 השעות מתחיל במענה הראשון של עמוס.</div>
     <button class="primary full" type="button" onclick="openPrebuyWhatsApp()">פתיחת הודעה מוכנה בוואטסאפ</button>
   </div>
@@ -683,10 +683,11 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
   </div>
   <div class="consultationUnlocked">
   <div class="clarificationForm show" id="clarificationForm">
-    <div class="field"><label for="clarificationQuestion"><b id="clarificationQuestionLabel">מה חשוב לך שאבדוק בדוח?</b></label><textarea id="clarificationQuestion" maxlength="1500" oninput="updateClarificationCounter()" placeholder="אפשר לכתוב בקצרה מה תרצה לברר ולצרף את דוח הבדיקה למייל"></textarea><div class="clarificationCounter" id="clarificationCounter"><span>תיאור קצר של הבירור</span><span id="clarificationCharacterCount">0 מתוך 1500</span></div></div>
-    <p class="formNote" id="clarificationFormNote">לאחר הלחיצה תיפתח אפליקציית המייל. יש לצרף את דוח הבדיקה המלא כדי לאפשר מענה מדויק ככל האפשר.</p>
+    <div class="field"><label for="clarificationCustomerName"><b>השם שלך</b></label><input id="clarificationCustomerName" autocomplete="name" maxlength="50" placeholder="שם מלא"></div>
+    <div class="field"><label for="clarificationQuestion"><b id="clarificationQuestionLabel">מה חשוב לך שאבדוק בדוח?</b></label><textarea id="clarificationQuestion" maxlength="2000" oninput="updateClarificationCounter()" placeholder="כתבו כאן את השאלות או הממצאים שתרצו לברר"></textarea><div class="clarificationCounter" id="clarificationCounter"><span>השאלות שלך על הדוח</span><span id="clarificationCharacterCount">0 מתוך 2000</span></div></div>
+    <p class="formNote" id="clarificationFormNote">לאחר הלחיצה תיפתח הודעת WhatsApp מזוהה ומוכנה. אפשר לצרף בתוך WhatsApp את דוח הבדיקה או את סיכום BuyTest.</p>
     <div class="info" role="note"><b>שעות מענה מהבוחן:</b> ימים א׳–ה׳: 09:00–18:00 · יום ו׳: 09:00–13:00.<br>בשבתות ובחגים אין מענה. אפשר לשלוח הודעה בכל שעה; המענה יינתן בשעות אלה.</div>
-    <button class="primary full" type="button" onclick="sendClarificationEmail()">פתיחת בקשת התייעצות במייל</button>
+    <button class="primary full" type="button" onclick="openPostReportWhatsApp()">פתיחת הודעה מוכנה בוואטסאפ</button>
   </div>
   </div>
   <section class="customerReplyAdmin" id="customerReplyAdmin">
@@ -712,7 +713,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
     <div class="replyDrafts"><h3 style="margin:0 0 5px">טיוטות שנשמרו במכשיר זה</h3><div id="customerReplyDrafts"></div></div>
   </section>
 </section>
-<div class="clarificationAdminPending" id="clarificationAdminPending"><b>הגדרת מנהל:</b> אזור הפניות מוכן, והוא יוצג ללקוחות לאחר הכנסת כתובת המייל העסקית.</div>
+<div class="clarificationAdminPending" id="clarificationAdminPending"><b>הגדרת מנהל:</b> אזור הפניות מוכן, והוא יוצג ללקוחות לאחר הגדרת קישור WhatsApp עסקי.</div>
 </main>
 <section class="feedbackBox" id="feedbackBox">
 <h3>תגובה ל־BuyTest</h3>
@@ -734,7 +735,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 <div class="feedbackHoneypot" aria-hidden="true"><label for="feedbackWebsite">אתר</label><input id="feedbackWebsite" tabindex="-1" autocomplete="off"></div>
 <div class="feedbackActions">
   <button class="primary full" id="feedbackSubmitButton" onclick="submitFeedback()" type="button">שלח תגובה</button>
-  <a class="whatsappLink" href="https://wa.me/message/NDZWEYLNXPZ4M1" target="_blank" rel="noopener">שליחת הודעה בוואטסאפ</a>
+  <a class="whatsappLink" href="https://wa.me/972552715782" onclick="event.preventDefault();openGeneralBuyTestWhatsApp()" rel="noopener">שליחת הודעה בוואטסאפ</a>
 </div>
 <div class="feedbackStatus" id="feedbackThanks" role="status" aria-live="polite"></div>
 </section>
@@ -1218,9 +1219,10 @@ document.querySelectorAll('.guidedChecks').forEach(renderGuided);
 
 
 
-// כתובת המייל העסקית הפעילה לפניות לקוחות.
+// ערוצי הקשר העסקיים הפעילים.
 const BUYTEST_CONTACT_EMAIL='buytest2026@gmail.com';
-const BUYTEST_WHATSAPP_URL='https://wa.me/message/NDZWEYLNXPZ4M1';
+const BUYTEST_WHATSAPP_NUMBER='972552715782';
+const BUYTEST_WHATSAPP_URL=`https://wa.me/${BUYTEST_WHATSAPP_NUMBER}`;
 let clarificationFindingOptions=[];
 function setClarificationFindingOptions(items){
   const select=document.getElementById('clarificationFinding');
@@ -1270,12 +1272,26 @@ function updatePrebuyCounter(){
   count.textContent=`${question.value.length} מתוך ${limit}`;
   counter.classList.toggle('limit',question.value.length>=limit);
 }
+function consultationQuestions(value){
+  return String(value||'').split(/\n+/).map(item=>item.replace(/^\s*\d+[.)-]?\s*/,'').trim()).filter(Boolean);
+}
+function numberedConsultationQuestions(value){
+  return consultationQuestions(value).map((item,index)=>`${index+1}. ${item}`).join('\n');
+}
+function openBuyTestWhatsApp(message){
+  if(!/^https:\/\/wa\.me\/\d{8,15}$/.test(BUYTEST_WHATSAPP_URL)){alert('קישור הוואטסאפ העסקי עדיין לא הוגדר.');return false;}
+  location.href=BUYTEST_WHATSAPP_URL+'?text='+encodeURIComponent(message);
+  return true;
+}
+function openGeneralBuyTestWhatsApp(){
+  openBuyTestWhatsApp(['🔵 BuyTest | פנייה כללית','', 'שלום עמוס, הגעתי מאתר BuyTest וברצוני לקבל מידע.'].join('\n'));
+}
 function showClarificationOptions(){
   const box=document.getElementById('clarificationBox');
   const pending=document.getElementById('clarificationAdminPending');
-  const hasEmail=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(BUYTEST_CONTACT_EMAIL);
-  if(box) box.classList.toggle('show',hasEmail);
-  if(pending) pending.style.display=!hasEmail&&document.body.classList.contains('manager-mode')?'block':'none';
+  const hasWhatsapp=/^https:\/\/wa\.me\/\d{8,15}$/.test(BUYTEST_WHATSAPP_URL);
+  if(box) box.classList.toggle('show',hasWhatsapp);
+  if(pending) pending.style.display=!hasWhatsapp&&document.body.classList.contains('manager-mode')?'block':'none';
 }
 function selectClarification(){
   const form=document.getElementById('clarificationForm');
@@ -1286,9 +1302,10 @@ function selectClarification(){
   setTimeout(()=>question.focus({preventScroll:true}),350);
 }
 function openPrebuyWhatsApp(){
-  if(!/^https:\/\/(wa\.me|api\.whatsapp\.com)\//.test(BUYTEST_WHATSAPP_URL)){alert('קישור הוואטסאפ העסקי עדיין לא הוגדר.');return;}
   const question=document.getElementById('prebuyQuestion').value.trim();
-  if(question.length<5){alert('יש לכתוב את השאלה הראשונה לפני פתיחת WhatsApp.');return;}
+  const questions=consultationQuestions(question);
+  if(!questions.length||question.length<5){alert('יש לכתוב לפחות שאלה אחת לפני פתיחת WhatsApp.');return;}
+  if(questions.length>10){alert('הייעוץ כולל עד 10 שאלות. יש לאחד או להסיר שאלות לפני השליחה.');return;}
   const saved=storedBuyTestPayment()||{};
   const optionalPlate=String(document.getElementById('prebuyVehiclePlate')?.value||'').replace(/\D/g,'');
   if(optionalPlate&&!/^\d{7,8}$/.test(optionalPlate)){alert('מספר רכב צריך להכיל 7 או 8 ספרות, או שאפשר להשאיר את השדה ריק.');return;}
@@ -1299,33 +1316,44 @@ function openPrebuyWhatsApp(){
     try{const parsed=new URL(adLink);if(!['http:','https:'].includes(parsed.protocol)) throw new Error()}catch(_error){alert('קישור המודעה אינו תקין. אפשר לתקן אותו או להשאיר את השדה ריק.');return;}
   }
   const body=[
-    'שלום עמוס, רכשתי ייעוץ אישי בוואטסאפ דרך BuyTest.',
+    '🔵 BuyTest | ייעוץ לפני רכישה',
+    '',
+    'שלום עמוס, רכשתי ייעוץ אישי לפני רכישת רכב.',
     '',
     `שם: ${customerName}`,
     `מספר רכב: ${vehiclePlate}`,
-    `מספר הזמנה: ${saved.orderId||'לא זמין'}`,
     `קישור למודעה: ${adLink}`,
     '',
-    'השאלה הראשונה שלי:',
-    question,
+    'השאלות שלי:',
+    numberedConsultationQuestions(question),
     '',
     'החבילה: נושא ייעוץ אחד, עד 10 שאלות, במשך 24 שעות ממועד המענה הראשון.',
     'אפשר לצרף כאן תמונות, צילום מודעה או דוח בדיקה לפי הצורך.'
-  ].filter(Boolean).join('\n');
+  ].join('\n');
   void trackBuyTestEvent('consultation_opened');
-  const separator=BUYTEST_WHATSAPP_URL.includes('?')?'&':'?';
-  location.href=BUYTEST_WHATSAPP_URL+separator+'text='+encodeURIComponent(body);
+  openBuyTestWhatsApp(body);
 }
-function sendClarificationEmail(){
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(BUYTEST_CONTACT_EMAIL)){alert('כתובת המייל העסקית עדיין לא הוגדרה.');return;}
+function openPostReportWhatsApp(){
   const question=document.getElementById('clarificationQuestion').value.trim();
-  if(question.length<5){alert('יש לכתוב את השאלה לפני פתיחת הודעת המייל.');return;}
+  if(question.length<5){alert('יש לכתוב את השאלה לפני פתיחת WhatsApp.');return;}
+  const saved=storedBuyTestPayment()||{};
   const vehiclePlate=plate()||'לא הוזן';
-  const owner=document.getElementById('inspectionOwnerName')?.value.trim()||'לא הוזן';
-  const subject=`בקשת התייעצות אישית · רכב ${vehiclePlate}`;
-  const body=['סוג הפנייה: התייעצות אישית עם בוחן רכב · התשלום אושר',`מספר רכב: ${vehiclePlate}`,`שם מזמין הבדיקה: ${owner}`,'','יש לצרף את דוח הבדיקה המלא כדי לאפשר מענה מקצועי ומדויק ככל האפשר.','','מה חשוב לבדוק בדוח:',question,'','מומלץ לצרף להודעה את קובץ ה־PDF של BuyTest.'].filter(Boolean).join('\n');
+  const customerName=document.getElementById('clarificationCustomerName')?.value.trim()||saved.customerName||document.getElementById('inspectionOwnerName')?.value.trim()||'לא הוזן';
+  const body=[
+    '🟢 BuyTest | ייעוץ לאחר פענוח דוח',
+    '',
+    'שלום עמוס, רכשתי התייעצות אישית לאחר פענוח הדוח.',
+    '',
+    `שם: ${customerName}`,
+    `מספר רכב: ${vehiclePlate}`,
+    '',
+    'השאלות שלי על הדוח:',
+    question,
+    '',
+    'אצרף כאן את דוח הבדיקה או את סיכום BuyTest לצורך המענה.'
+  ].join('\n');
   void trackBuyTestEvent('consultation_opened');
-  location.href=`mailto:${BUYTEST_CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  openBuyTestWhatsApp(body);
 }
 
 function openCustomerReplyPanel(){
@@ -1964,6 +1992,8 @@ async function restoreBuyTestAccess({requiredPlate='',onReturn=false,scroll=true
       if(input&&!input.value&&data.plan!=='prebuy') input.value=data.plate;
       const prebuyName=document.getElementById('prebuyCustomerName');
       if(prebuyName&&!prebuyName.value&&saved.customerName) prebuyName.value=saved.customerName;
+      const clarificationName=document.getElementById('clarificationCustomerName');
+      if(clarificationName&&!clarificationName.value&&saved.customerName) clarificationName.value=saved.customerName;
       activatePurchasedPlan(data.plan,{scroll,progress});
       const expiry=expiresAt?new Date(expiresAt).toLocaleString('he-IL'):'בעוד 48 שעות';
       showBuyTestAccessNotice(data.plan==='prebuy'
