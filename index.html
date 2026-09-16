@@ -264,6 +264,8 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
   border-color:#79c9b1;
 }
 #appShell .clarifyChoice{background:#fff0dc;color:#87501a;border-color:#edbd83}
+#appShell .preFlowNav .flowNext:not(:disabled){background:#123e4b;color:#fff;border-color:#0b303a;box-shadow:0 5px 14px rgba(18,62,75,.24)}
+#appShell .preFlowNav .flowNext:not(:disabled):hover{background:#0b303a}
 #appShell button:disabled{background:#dfe5e7;color:#8a9599;border-color:#ccd5d8;box-shadow:none}
 #vehicleLookup .plate input{border:2px solid #a9bec6;box-shadow:inset 0 0 0 1px #fff}
 #appShell .licenseDetails{background:#eaf8f3;border-color:#98d5c3;overflow:hidden}
@@ -278,7 +280,7 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
 #appShell .legalLinks button,#appShell .legalCompact button,#appShell .legalBeforePlate button{color:#0b7f67}
 .imageModal button{background:#0b8f70;color:#fff;border:1px solid #08745b}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
-</style><meta name="buytest-build" content="buytest-v105-simple-checklist">
+</style><meta name="buytest-build" content="buytest-v107-single-flow-button">
 </head><body>
 <noscript><img height="1" width="1" style="display:none" alt=""
 src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscript=1"
@@ -424,7 +426,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
       <p class="sub" style="margin:10px 0 0">הצילום מוצג לצד הנתונים כדי שתוכל להשוות ביניהם. אין כאן קביעה אוטומטית שהמודעה נכונה.</p>
     </div>
   </details>
-  <div class="preFlowNav"><button class="primary" type="button" onclick="showPreFlowStep(1)">המשך להתאמת הרכב לרישיון</button></div>
+  <div class="preFlowNav"><button class="primary flowNext" type="button" onclick="showPreFlowStep(1)">סיום הבדיקה המקדימה והמשך להתאמת הרישיון</button></div>
 </section>
 <section class="card" id="fullCheckOffer" style="display:none">
 <span class="bundleBadge">הרכב זוהה</span>
@@ -584,22 +586,22 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
     <button class="clarifyChoice" type="button" onclick="setCheckState(this,'issue')">צריך בירור</button>
     <div class="finding simpleFinding"><textarea placeholder="מה צריך לברר?" oninput="updateChecklistSection(this.closest('.checklistStep'))"></textarea></div>
   </div>
-  <div class="preFlowNav"><button class="primary" type="button" onclick="showPreFlowStep(2)">סיימתי התאמת רישיון — פתיחת הבדיקה החינמית</button></div>
+  <div class="preFlowNav"><button class="primary flowNext" type="button" onclick="showPreFlowStep(2)">סיום בדיקת הרישיון והמשך לשאלות למוכר</button></div>
   </div>
 </details>
 
 <details class="card freeAfterLookup preFlowScreen guidedSection checklistStep" id="sellerSection" data-pre-step="2" style="display:none"><summary><span>שאלות למוכר ליד הרכב</span></summary><div class="stepContent"><p class="sub">בכל שאלה סמן „תקין”. אם צריך לבדוק משהו, לחץ „צריך בירור” וכתוב מה לברר.</p>
-<div id="sellerChecks"></div><div class="preFlowNav"><button class="secondary" type="button" onclick="showPreFlowStep(1)">חזרה לרישיון</button><button class="primary checklistNext" type="button" onclick="showPreFlowStep(3)" disabled>סיימתי — לפתוח בדיקה חיצונית</button></div></div></details>
+<div id="sellerChecks"></div><div class="preFlowNav"><button class="primary checklistNext flowNext" type="button" onclick="showPreFlowStep(3)" disabled>סיום שאלות למוכר והמשך לבדיקה החיצונית</button></div></div></details>
 <div id="purchaseBox" style="display:none"></div>
 <details class="card freeAfterLookup preFlowScreen guidedSection checklistStep" id="externalSection" data-pre-step="3" style="display:none"><summary><span>בדיקה חיצונית</span></summary><div class="stepContent"><p class="sub">בכל בדיקה סמן „תקין”. אם משהו דורש בדיקה נוספת, לחץ „צריך בירור” וכתוב מה לברר.</p>
-<div id="externalChecks"></div><div class="preFlowNav"><button class="secondary" type="button" onclick="showPreFlowStep(2)">חזרה לשאלות למוכר</button><button class="primary checklistNext" type="button" onclick="showPreFlowStep(4)" disabled>סיימתי — לפתוח בדיקה פנימית</button></div></div></details>
+<div id="externalChecks"></div><div class="preFlowNav"><button class="primary checklistNext flowNext" type="button" onclick="showPreFlowStep(4)" disabled>סיום הבדיקה החיצונית והמשך לבדיקה הפנימית</button></div></div></details>
 <details class="card freeAfterLookup preFlowScreen guidedSection checklistStep" id="selfSection" data-pre-step="4" style="display:none"><summary><span>בדיקה פנימית ונסיעה קצרה</span></summary><div class="stepContent"><p class="sub">בכל בדיקה סמן „תקין”. אם משהו דורש בדיקה נוספת, לחץ „צריך בירור” וכתוב מה לברר.</p>
 <div id="selfChecks"></div>
 <div class="photoBox"><h3>תיעוד תמונות</h3>
 <p class="sub">אפשר לצרף עד ארבע תמונות של הרכב או של ממצאים שתרצה לתעד. הן יוצגו בעמוד השני של הסיכום.</p>
 <button class="secondary full" type="button" onclick="document.getElementById('vehiclePhotos').click()">📷 הוסף עד 4 תמונות לבדיקה</button>
 <input id="vehiclePhotos" type="file" accept="image/*" capture="environment" multiple style="display:none" onchange="addVehiclePhotos(this)">
-<div id="photoPreview" class="photoPreview"></div></div><div class="preFlowNav"><button class="secondary" type="button" onclick="showPreFlowStep(3)">חזרה לבדיקה החיצונית</button><button class="primary checklistNext" type="button" onclick="showPreFlowStep(5)" disabled>סיימתי — הצגת הסיכום</button></div></div></details>
+<div id="photoPreview" class="photoPreview"></div></div><div class="preFlowNav"><button class="primary checklistNext flowNext" type="button" onclick="showPreFlowStep(5)" disabled>סיום הבדיקה הפנימית והמשך לסיכום</button></div></div></details>
 <section class="card freeAfterLookup preFlowScreen" id="preSummarySection" data-pre-step="5" style="display:none"><h2>סיכום הבדיקה העצמית</h2><p class="sub">הסיכום מרכז את הבדיקות והתמונות שהזנת ומכין קובץ מסודר לשמירה או לשליחה. הוא אינו קובע אם להיכנס לבדיקה ואינו מחליף בדיקה במכון.</p>
 <button class="primary full" onclick="buildReport()">הפקת סיכום הבדיקה העצמית</button>
 <div class="report" id="report"></div>
