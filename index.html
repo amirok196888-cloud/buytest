@@ -158,6 +158,7 @@ body.plan-prebuy .prePurchaseConsultationBox{display:block}
 .routeCards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}.routeCard{border:2px solid #d9e2e6;border-radius:19px;padding:18px;background:#fff;box-shadow:0 8px 24px rgba(16,45,53,.06)}.routeCard.free{border-color:#78ceb4;background:#f3fbf8}.routeCard.paid{border-color:#b8cdd5}.routeCard h3{margin:7px 0 6px;font-size:21px}.routeCard p{margin:0 0 14px;color:#50666f;line-height:1.55}.routePrice{display:inline-flex;padding:5px 10px;border-radius:999px;background:#e8f7f2;color:#075e48;font-weight:950}.routeChoice{display:flex;gap:8px;margin:0 0 12px}.routeChoice button{flex:1;border:1px solid #cbd8dd;background:#f5f8f9;color:#28444e}.routeChoice button.active{background:#102d35;color:#fff;border-color:#102d35}.legalBeforePlate{margin:0 0 12px!important}.legalBeforePlate p{font-size:13px}.vehicleHint{margin:0 0 12px;padding:10px 12px;border-radius:11px;background:#eef7fb;color:#28444e;font-size:14px;font-weight:800}.preFlowProgress{display:none;margin:22px 0 10px;padding:15px 17px;border:1px solid #c8ded7;border-radius:16px;background:#f3fbf8}.preFlowProgress.show{display:block}.preFlowProgress strong{display:block;margin-bottom:4px;font-size:19px}.preFlowProgress span{display:block;color:#416158;line-height:1.5}.preFlowScreen{display:none!important}.preFlowScreen.active,.preFlowScreen.checklistVisible{display:block!important}.preFlowNav{display:flex;gap:9px;margin-top:16px}.preFlowNav button{flex:1}.consultationLocked,.consultationUnlocked{display:none}.report-complete .clarificationBox.show .consultationLocked{display:block}.plan-consultation .clarificationBox.show .consultationLocked,.plan-bundle.stage-consultation-open .clarificationBox.show .consultationLocked,.manager-mode.manager-all .clarificationBox.show .consultationLocked{display:none}.plan-consultation .clarificationBox.show .consultationUnlocked,.plan-bundle.stage-consultation-open .clarificationBox.show .consultationUnlocked,.manager-mode.manager-all .clarificationBox.show .consultationUnlocked{display:block}.singlePlan{max-width:560px;margin:14px auto 0}.uploadPanel{transition:border-color .2s ease,background .2s ease}.uploadPanel:has(.uploadState.show){border-color:#0fa87e;background:#f3fbf8}
 .routeCard.consultation{grid-column:1/-1;border-color:#128c7e;background:linear-gradient(135deg,#e8fff5,#f8fffc);box-shadow:0 12px 30px rgba(18,140,126,.2)}
 .routeCard.consultation h3{font-size:25px;color:#075e48}.routeCard.consultation p{font-size:17px;color:#173f37}
+.routeCardConsent{margin:0 0 12px;padding:11px 12px;border:1px solid #9fd8c7;border-radius:12px;background:#fff;color:#173f37;font-size:14px;line-height:1.45}.routeCardConsent label{display:flex;align-items:flex-start;gap:9px}.routeCardConsent input{width:20px;height:20px;flex:0 0 auto;margin-top:1px}.routeCardLegalLinks{display:flex;gap:8px;flex-wrap:wrap;margin:8px 29px 0 0}.routeCardLegalLinks button{padding:0;background:transparent;color:#075e48;text-decoration:underline;font-size:13px}.routeCard .mktBtn:disabled{opacity:.55;cursor:not-allowed;box-shadow:none}
 .consultationRouteBadge{display:inline-flex;padding:6px 11px;border-radius:999px;background:#128c7e;color:#fff;font-size:13px;font-weight:950}
 .mktBtnWhatsApp{width:100%;background:#25d366;color:#073b24;border:2px solid #128c7e;box-shadow:0 8px 18px rgba(18,140,126,.25);font-size:19px}
 .consultationPackage{margin:12px 0;padding:13px;border-radius:14px;background:#e8f7f2;color:#075e48;font-weight:900;line-height:1.65}
@@ -307,7 +308,11 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
     <span class="consultationRouteBadge">מסלול ישיר · WhatsApp בלבד</span>
     <h3>ייעוץ אישי לפני רכישת רכב</h3>
     <p><b>נושא אחד · עד 10 שאלות · 24 שעות</b><br>שולחים שאלות לעמוס ומקבלים הכוונה אישית בוואטסאפ. לא חייבים לבחור רכב מסוים.</p>
-    <button class="mktBtn mktBtnWhatsApp" type="button" onclick="chooseCustomerRoute('consultation')">רכישת ייעוץ בוואטסאפ — 79 ₪</button>
+    <div class="routeCardConsent">
+      <label><input id="landingConsultationLegalAccept" type="checkbox" onchange="syncLandingConsultationButton()"><span>קראתי ואני מסכים/ה לתנאי השימוש, למדיניות הפרטיות ולמדיניות הביטול.</span></label>
+      <div class="routeCardLegalLinks"><button type="button" onclick="openLegal('terms')">תנאי שימוש</button><button type="button" onclick="openLegal('privacy')">מדיניות פרטיות</button><button type="button" onclick="openLegal('cancel')">מדיניות ביטול</button></div>
+    </div>
+    <button class="mktBtn mktBtnWhatsApp" id="landingConsultationButton" type="button" onclick="startLandingConsultationPayment()" disabled>רכישת ייעוץ בוואטסאפ — 79 ₪</button>
   </article>
   <article class="routeCard free">
     <h3>לפני שנוסעים לראות את הרכב</h3>
@@ -986,6 +991,22 @@ function chooseCustomerRoute(route){
   setCustomerRoute(route);
   document.getElementById('vehicleLookup')?.scrollIntoView({behavior:'smooth',block:'start'});
   setTimeout(()=>route==='consultation'?document.getElementById('entryLegalAccept')?.focus({preventScroll:true}):document.getElementById('plate')?.focus({preventScroll:true}),450);
+}
+function syncLandingConsultationButton(){
+  const accepted=!!document.getElementById('landingConsultationLegalAccept')?.checked;
+  const button=document.getElementById('landingConsultationButton');
+  if(button) button.disabled=!accepted;
+}
+async function startLandingConsultationPayment(){
+  if(!document.getElementById('landingConsultationLegalAccept')?.checked){
+    document.getElementById('landingConsultationLegalAccept')?.focus({preventScroll:true});
+    return;
+  }
+  setCustomerRoute('consultation');
+  const entryConsent=document.getElementById('entryLegalAccept');
+  if(entryConsent) entryConsent.checked=true;
+  syncVehicleLookupButton();
+  await startPayment('prebuy');
 }
 function setCustomerRoute(route){
   customerEntryRoute=['report','consultation'].includes(route)?route:'free';
