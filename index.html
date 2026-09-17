@@ -2314,10 +2314,7 @@ async function initializeBuyTestAccess(){
       await resumePaidVehicleFlow(saved.plate);
       return;
     }
-    const createdAt=Date.parse(String(saved.createdAt||''));
-    const recentPayment=Number.isFinite(createdAt)&&Date.now()-createdAt>=0&&Date.now()-createdAt<BUYTEST_RECENT_PAYMENT_WINDOW_MS;
-    if(!recentPayment||!['','pending','payment_ready'].includes(buyTestLastPaymentStatus)) return;
-    showBuyTestAccessNotice('בודק את אישור התשלום ופותח את האתר...');
+    return;
   }
   else if(!manualAccess) showBuyTestAccessNotice('התשלום הסתיים. מאמת את האישור ופותח את האתר...');
   for(let attempt=0;attempt<40;attempt++){
