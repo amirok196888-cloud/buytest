@@ -203,6 +203,7 @@ async function listOrders() {
       updated_at: item.updated_at,
       expires_at: item.expires_at,
       progress,
+      balcarReportReady: Boolean(providerPayload.balcarReportId || providerPayload.balcarExternalRef),
     };
   });
 }
