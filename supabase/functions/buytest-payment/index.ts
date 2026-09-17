@@ -7,11 +7,12 @@ const CARDCOM_API_URL = "https://secure.cardcom.solutions/api/v11";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 const PLANS = {
+  balcar: { amountAgorot: 1500, title: "דוח Balcar לרכב", scopes: ["balcar"] },
   premium: { amountAgorot: 4900, title: "בדיקה עצמית לפני המכון", scopes: ["premium"] },
   report: { amountAgorot: 4900, title: "פענוח דוח המכון", scopes: ["report"] },
   consultation: { amountAgorot: 4900, title: "התייעצות אישית לאחר פענוח", scopes: ["consultation"] },
   prebuy: { amountAgorot: 7900, title: "ייעוץ לפני רכישה בוואטסאפ · עד 10 שאלות · 24 שעות", scopes: ["prebuy"] },
-  bundle: { amountAgorot: 12000, title: "חבילת BuyTest המלאה", scopes: ["premium", "report", "consultation"] },
+  bundle: { amountAgorot: 12000, title: "חבילת BuyB4Test המלאה", scopes: ["premium", "report", "consultation"] },
 } as const;
 type PlanKey = keyof typeof PLANS;
 type CardcomConfig = {
@@ -100,7 +101,7 @@ async function serviceRequest(path: string, init: RequestInit = {}) {
   const raw = await response.text();
   let data: unknown = null;
   try { data = raw ? JSON.parse(raw) : null; } catch { data = raw; }
-  if (!response.ok) throw new Error("database_request_failed");
+  if (!response.ok) throw new Error(`database_request_failed_${response.status}`);
   return data;
 }
 async function privateConfig(name: string) {
@@ -247,6 +248,7 @@ async function createPayment(origin: string | null, body: Record<string, unknown
   const planKey = String(body.plan || "");
   const enteredPlate = cleanPlate(body.plate);
   const plate = planKey === "prebuy" ? (enteredPlate || "GENERAL") : enteredPlate;
+  const directCheckout = body.directCheckout === true;
   const customerName = cleanText(body.customerName, 50);
   const email = cleanEmail(body.email);
   const phone = cleanPhone(body.phone);
@@ -254,12 +256,13 @@ async function createPayment(origin: string | null, body: Record<string, unknown
   const utmSource = cleanText(body.utmSource, 80) || null;
   const utmMedium = cleanText(body.utmMedium, 80) || null;
   const utmCampaign = cleanText(body.utmCampaign, 120) || null;
-  if (!isPlan(planKey) || (planKey !== "prebuy" && !/^\d{7,8}$/.test(plate)) || !validEmail(email) || customerName.length < 2 || !/^05\d{8}$/.test(phone) || body.acceptedTerms !== true) {
+  const customerDetailsValid = directCheckout || (validEmail(email) && customerName.length >= 2 && /^05\d{8}$/.test(phone));
+  if (!isPlan(planKey) || (planKey !== "prebuy" && !/^\d{7,8}$/.test(plate)) || !customerDetailsValid || body.acceptedTerms !== true) {
     return json(origin, { ok: false, error: "invalid_payment_request" }, 400);
   }
   const plan = PLANS[planKey];
   const productCode = `BUYTEST-${planKey.toUpperCase()}`;
-  const productName = `BuyTest · ${plan.title}`;
+  const productName = Array.from(`BuyB4Test · ${plan.title}`).slice(0, 50).join("");
   let inheritedProgress: StageProgress = { preInspectionCompleted: false, reportCompleted: false };
   let priorOrderId = "";
   if (planKey === "consultation") {
@@ -316,11 +319,11 @@ async function createPayment(origin: string | null, body: Record<string, unknown
       },
       Document: {
         DocumentTypeToCreate: "Auto",
-        Name: customerName,
+        Name: customerName || "לקוח BuyB4Test",
         Email: email,
         Mobile: phone,
         IsSendByEmail: true,
-        Comments: "שירות BuyTest · ROKACH DIGITAL",
+        Comments: "שירות BuyB4Test · ROKACH DIGITAL",
         DepartmentId: config.departmentId,
         Products: [{
           ProductID: productCode,
@@ -436,8 +439,13 @@ Deno.serve(async (req: Request) => {
   try {
     const action = String(body.action || "");
     if (action === "health") {
-      const config = await cardcomConfig();
-      return json(origin, { ok: true, paymentConfigured: config.enabled, provider: config.enabled ? "cardcom" : "cardcom_pending" });
+      try {
+        const config = await cardcomConfig();
+        return json(origin, { ok: true, paymentConfigured: config.enabled, provider: config.enabled ? "cardcom" : "cardcom_pending" });
+      } catch (error) {
+        const reason = error instanceof Error ? error.message : "health_check_failed";
+        return json(origin, { ok: false, error: reason, serverEnvironmentConfigured: Boolean(SUPABASE_URL && SERVICE_ROLE_KEY) }, 503);
+      }
     }
     if (action === "create") return await createPayment(origin, body);
     if (action === "status") return await paymentStatus(origin, body);
