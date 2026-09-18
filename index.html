@@ -312,17 +312,17 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
       <label><input id="landingConsultationLegalAccept" type="checkbox" onchange="syncLandingConsultationButton()"><span>קראתי ואני מסכים/ה לתנאי השימוש, למדיניות הפרטיות ולמדיניות הביטול.</span></label>
       <div class="routeCardLegalLinks"><button type="button" onclick="openLegal('terms')">לחץ לפתיחת תנאי השימוש</button><button type="button" onclick="openLegal('privacy')">לחץ לפתיחת מדיניות הפרטיות</button><button type="button" onclick="openLegal('cancel')">לחץ לפתיחת מדיניות הביטול</button></div>
     </div>
-    <button class="mktBtn mktBtnWhatsApp" id="landingConsultationButton" type="button" onclick="startLandingConsultationPayment()" disabled>לחץ לרכישת ייעוץ בוואטסאפ — 79 ₪</button>
+    <button class="mktBtn mktBtnWhatsApp" id="landingConsultationButton" type="button" data-analytics-click="click_landing_consultation" onclick="startLandingConsultationPayment()" disabled>לחץ לרכישת ייעוץ בוואטסאפ — 79 ₪</button>
   </article>
   <article class="routeCard free">
     <h3>לפני שנוסעים לראות את הרכב</h3>
     <p>שלב חינמי קצר וממוקד, ובסיומו אפשרות להזמנת דוח Balcar.</p>
-    <button class="mktBtn mktBtnPrimary" type="button" onclick="chooseCustomerRoute('free')">לחץ להתחלת השלב החינמי ולהפקת דוח בל״קר</button>
+    <button class="mktBtn mktBtnPrimary" type="button" data-analytics-click="click_landing_free" onclick="chooseCustomerRoute('free')">לחץ להתחלת השלב החינמי ולהפקת דוח בל״קר</button>
   </article>
   <article class="routeCard paid">
     <h3>כבר יש לך דוח מהמכון?</h3>
     <p>מספר רכב, תשלום והעלאת הדוח לפענוח מסודר.</p>
-    <button class="mktBtn mktBtnLight" type="button" onclick="chooseCustomerRoute('report')">לחץ לפענוח דוח — 49 ₪</button>
+    <button class="mktBtn mktBtnLight" type="button" data-analytics-click="click_landing_report" onclick="chooseCustomerRoute('report')">לחץ לפענוח דוח — 49 ₪</button>
   </article>
 </div>
 </div>
@@ -365,7 +365,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 <details><summary>האם BuyTest אומר אם לקנות את הרכב?</summary><p>לא. אין המלצת קנייה או אי־קנייה, אין הערכת שווי או עלות תיקון ואין קביעה לגבי ירידת ערך. BuyTest משקף משמעויות ושאלות לבירור בלבד; ההחלטה היא של המשתמש.</p></details>
 </div>
 </div></div>
-<div class="mktSection"><div class="mktWrap"><div class="mktFinal"><h2>קונה רכב יד שנייה?</h2><p>התחל בנתוני הרכב ופתח תיק אחד שממשיך איתך גם אחרי הבדיקה במכון.</p><a class="mktBtn mktBtnPrimary" href="#appShell">לחץ להצגת נתוני הרכב</a></div></div></div>
+<div class="mktSection"><div class="mktWrap"><div class="mktFinal"><h2>קונה רכב יד שנייה?</h2><p>התחל בנתוני הרכב ופתח תיק אחד שממשיך איתך גם אחרי הבדיקה במכון.</p><a class="mktBtn mktBtnPrimary" data-analytics-click="click_vehicle_lookup" href="#appShell">לחץ להצגת נתוני הרכב</a></div></div></div>
 </section>
 <div id="appShell">
 <main>
@@ -384,7 +384,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
   </label>
   <div class="legalConsentError" id="entryLegalError" role="alert">כדי להמשיך, יש לסמן את אישור תנאי השימוש ומדיניות הפרטיות.</div>
 </div>
-<div class="plate"><input id="plate" inputmode="numeric" maxlength="8" autocomplete="off" aria-label="מספר רכב" placeholder="מספר רכב" oninput="sanitizePlateInput(this);syncVehicleLookupButton()"/><button class="primary" id="vehicleLookupButton" onclick="loadVehicle()" disabled>לחץ להצגת נתוני הרכב</button></div>
+<div class="plate"><input id="plate" inputmode="numeric" maxlength="8" autocomplete="off" aria-label="מספר רכב" placeholder="מספר רכב" oninput="sanitizePlateInput(this);syncVehicleLookupButton()"/><button class="primary" id="vehicleLookupButton" data-analytics-click="click_vehicle_lookup" onclick="loadVehicle()" disabled>לחץ להצגת נתוני הרכב</button></div>
 <div class="status" id="status"><div id="statusMsg">טוען...</div><details class="vehicleDataDetails" id="vehicleData" style="display:none"><summary>פרטי הרכב מהמאגר</summary><div class="grid">
 <div class="box"><div class="label">מספר רכב</div><div class="value" id="vPlate">—</div></div>
 <div class="box"><div class="label">יצרן</div><div class="value" id="vMaker">—</div></div>
@@ -416,17 +416,17 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
     <h3>מה לשאול לפני שקובעים לראות את הרכב</h3>
     <ol id="preVisitQuestionList"></ol>
     <div class="preVisitActions">
-      <button class="primary" type="button" onclick="copyPreVisitQuestions(this)">לחץ להעתקת השאלות למוכר</button>
+      <button class="primary" type="button" data-analytics-click="click_copy_questions" onclick="copyPreVisitQuestions(this)">לחץ להעתקת השאלות למוכר</button>
     </div>
     <div class="preVisitToast" id="preVisitToast" role="status" aria-live="polite">השאלות הועתקו</div>
   </div>
-  <div class="preFlowNav"><button class="primary flowNext" type="button" onclick="showPreFlowStep(1)">לחץ לסיום הבדיקה המקדימה ולהמשך להתאמת הרישיון</button></div>
+  <div class="preFlowNav"><button class="primary flowNext" type="button" data-analytics-click="click_free_next" onclick="showPreFlowStep(1)">לחץ לסיום הבדיקה המקדימה ולהמשך להתאמת הרישיון</button></div>
 </section>
 <section class="card" id="fullCheckOffer" style="display:none">
 <span class="bundleBadge">הרכב זוהה</span>
 <h2>ממשיכים לפענוח הדוח</h2>
 <p class="sub">תשלום מאובטח של 49 ₪ יפתח מיד את העלאת סיכום הבוחן והבדיקה הממוחשבת ואת הפקת סיכום ה־PDF.</p>
-<button class="primary planBtn" id="reportPlanButton" type="button" onclick="startPayment('report')">לחץ למעבר לתשלום מאובטח — 49 ₪</button>
+<button class="primary planBtn" id="reportPlanButton" type="button" data-analytics-click="click_report_plan" onclick="startPayment('report')">לחץ למעבר לתשלום מאובטח — 49 ₪</button>
 <details class="planBoundary"><summary><b>מה כולל השירות ומהם גבולותיו?</b></summary><p>העלאת סיכום הבוחן והבדיקה הממוחשבת, פענוח הממצאים וסיכום PDF. BuyTest אינו קובע אם לקנות את הרכב, אינו מעריך מחירי תיקון או ירידת ערך ואינו מדרג את עבודת מכון הבדיקה.</p></details>
 <div class="devMsg" id="paymentMsg" role="status" aria-live="polite"></div>
 </section>
@@ -488,6 +488,13 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
     <table class="analyticsSourceTable" aria-label="מדדי פעילות לפי מקור הגעה">
       <thead><tr><th scope="col">מקור</th><th scope="col">כניסות</th><th scope="col">התחילו חינם</th><th scope="col">סיימו חינם</th><th scope="col">תשלומים</th></tr></thead>
       <tbody id="analyticsSourceRows"><tr><td>טוען…</td><td>—</td><td>—</td><td>—</td><td>—</td></tr></tbody>
+    </table>
+  </div>
+  <h3 class="analyticsSourceTitle">פירוט הלחיצות לפי מקור וכפתור</h3>
+  <div class="analyticsSourceWrap">
+    <table class="analyticsSourceTable analyticsClickTable" aria-label="פירוט לחיצות לפי מקור וכפתור">
+      <thead><tr><th scope="col">מקור</th><th scope="col">כפתור / פעולה</th><th scope="col">לחיצות</th><th scope="col">מקור קמפיין</th></tr></thead>
+      <tbody id="analyticsClickRows"><tr><td colspan="4">טוען…</td></tr></tbody>
     </table>
   </div>
   <p class="analyticsNote">הכניסות והתחלות הבדיקה נספרות מרגע הפעלת המדידה. התשלום נספר רק לאחר שהתקבל אישור תשלום בפועל.</p>
@@ -581,33 +588,33 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
     <button class="clarifyChoice" type="button" onclick="setCheckState(this,'issue')">לחץ לציון שצריך בירור</button>
     <div class="finding simpleFinding"><textarea placeholder="מה צריך לברר?" oninput="updateChecklistSection(this.closest('.checklistStep'))"></textarea></div>
   </div>
-  <div class="preFlowNav"><button class="primary flowNext" type="button" onclick="showPreFlowStep(2)">לחץ לסיום בדיקת הרישיון ולהמשך לבדיקה החיצונית</button></div>
+  <div class="preFlowNav"><button class="primary flowNext" type="button" data-analytics-click="click_license_next" onclick="showPreFlowStep(2)">לחץ לסיום בדיקת הרישיון ולהמשך לבדיקה החיצונית</button></div>
   </div>
 </details>
 
 <div id="purchaseBox" style="display:none"></div>
 <details class="card freeAfterLookup preFlowScreen guidedSection checklistStep" id="externalSection" data-pre-step="2" style="display:none"><summary><span>בדיקה חיצונית</span></summary><div class="stepContent"><p class="sub">בכל בדיקה סמן „תקין”. אם משהו דורש בדיקה נוספת, לחץ „צריך בירור” וכתוב מה לברר.</p>
-<div id="externalChecks"></div><div class="preFlowNav"><button class="primary checklistNext flowNext" type="button" onclick="showPreFlowStep(3)" disabled>לחץ לסיום הבדיקה החיצונית ולהמשך לבדיקה הפנימית</button></div></div></details>
+<div id="externalChecks"></div><div class="preFlowNav"><button class="primary checklistNext flowNext" type="button" data-analytics-click="click_external_next" onclick="showPreFlowStep(3)" disabled>לחץ לסיום הבדיקה החיצונית ולהמשך לבדיקה הפנימית</button></div></div></details>
 <details class="card freeAfterLookup preFlowScreen guidedSection checklistStep" id="selfSection" data-pre-step="3" style="display:none"><summary><span>בדיקה פנימית ונסיעה קצרה</span></summary><div class="stepContent"><p class="sub">בכל בדיקה סמן „תקין”. אם משהו דורש בדיקה נוספת, לחץ „צריך בירור” וכתוב מה לברר.</p>
 <div id="selfChecks"></div>
 <div class="photoBox"><h3>תיעוד תמונות</h3>
 <p class="sub">אפשר לצרף עד ארבע תמונות של הרכב או של ממצאים שתרצה לתעד. הן יוצגו בעמוד השני של הסיכום.</p>
 <button class="secondary full" type="button" onclick="document.getElementById('vehiclePhotos').click()">לחץ להוספת עד 4 תמונות לבדיקה</button>
 <input id="vehiclePhotos" type="file" accept="image/*" capture="environment" multiple style="display:none" onchange="addVehiclePhotos(this)">
-<div id="photoPreview" class="photoPreview"></div></div><div class="preFlowNav"><button class="primary checklistNext flowNext" type="button" onclick="showPreFlowStep(4)" disabled>לחץ לסיום הבדיקה הפנימית ולהמשך לסיכום</button></div></div></details>
+<div id="photoPreview" class="photoPreview"></div></div><div class="preFlowNav"><button class="primary checklistNext flowNext" type="button" data-analytics-click="click_self_next" onclick="showPreFlowStep(4)" disabled>לחץ לסיום הבדיקה הפנימית ולהמשך לסיכום</button></div></div></details>
 <section class="card freeAfterLookup preFlowScreen" id="preSummarySection" data-pre-step="4" style="display:none"><h2>סיכום הבדיקה העצמית</h2><p class="sub">הסיכום מרכז את הבדיקות והתמונות שהזנת ומכין קובץ מסודר לשמירה או לשליחה. הוא אינו קובע אם להיכנס לבדיקה ואינו מחליף בדיקה במכון.</p>
-<button class="primary full" onclick="buildReport()">לחץ להפקת סיכום הבדיקה העצמית</button>
+<button class="primary full" data-analytics-click="click_free_summary" onclick="buildReport()">לחץ להפקת סיכום הבדיקה העצמית</button>
 <div class="report" id="report"></div>
-<button class="primary full" id="pdfBtn" onclick="shareReportPdf('pdfBtn')" style="display:none">לחץ לשיתוף הסיכום כ־PDF</button>
+<button class="primary full" id="pdfBtn" data-analytics-click="click_pdf" onclick="shareReportPdf('pdfBtn')" style="display:none">לחץ לשיתוף הסיכום כ־PDF</button>
 <div class="info"><b>חשוב:</b> BuyTest אינו קובע שהרכב תקין, בטוח או כדאי לרכישה. כל החלטה נשארת בידי המשתמש.</div>
 <div class="balcarOffer">
   <h3>דוח Balcar לרכב — 15 ₪</h3>
   <p>מיד לאחר אישור התשלום נזמין את הדוח אוטומטית, נציג את הנתונים שהתקבלו ונאפשר לפתוח את דוח Balcar המקורי ולהוריד או לשתף תקציר PDF.</p>
   <span class="balcarComingSoon">עבר ביטוחי מורחב — בפיתוח וצפוי להתווסף בקרוב</span>
-  <button class="primary full" id="balcarPlanButton" type="button" onclick="startBalcarPayment()">לחץ להזמנת דוח Balcar — 15 ₪</button>
+  <button class="primary full" id="balcarPlanButton" type="button" data-analytics-click="click_balcar" onclick="startBalcarPayment()">לחץ להזמנת דוח Balcar — 15 ₪</button>
   <div class="devMsg" id="balcarEligibilityMsg" role="status" aria-live="polite"></div>
 </div>
-<div class="preFlowNav"><button class="secondary" type="button" onclick="showPreFlowStep(3)">לחץ לחזרה לבדיקה</button><button class="primary" type="button" onclick="setCustomerRoute('report');startPayment('report')">לחץ לפענוח מלא של דוח המכון — 49 ₪</button></div>
+<div class="preFlowNav"><button class="secondary" type="button" onclick="showPreFlowStep(3)">לחץ לחזרה לבדיקה</button><button class="primary" type="button" data-analytics-click="click_report_plan" onclick="setCustomerRoute('report');startPayment('report')">לחץ לפענוח מלא של דוח המכון — 49 ₪</button></div>
 </section>
 
 <section class="card paidOnly balcarFeature" id="balcarReportSection" style="display:none">
@@ -618,7 +625,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
   <div class="balcarSummaryGrid" id="balcarSummaryGrid"></div>
   <div class="balcarReportActions" id="balcarReportActions" style="display:none">
     <a id="balcarOriginalReport" href="#" target="_blank" rel="noopener">פתיחת דוח Balcar המקורי</a>
-    <button class="primary" id="balcarPdfBtn" type="button" onclick="shareReportPdf('balcarPdfBtn')">לחץ לשיתוף תקציר ה־PDF</button>
+    <button class="primary" id="balcarPdfBtn" type="button" data-analytics-click="click_balcar_pdf" onclick="shareReportPdf('balcarPdfBtn')">לחץ לשיתוף תקציר ה־PDF</button>
   </div>
   <div class="info"><b>גבולות המידע:</b> השירות מציג רק נתונים שהתקבלו בדוח Balcar. עבר ביטוחי מורחב, תאונות, ירידת ערך ואובדן להלכה אינם כלולים בשלב זה. נתון חסר יוצג כ־„אין נתון” ולא כמידע תקין.</div>
 </section>
@@ -639,7 +646,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
   <div class="uploadPanel required">
     <h3>סיכום הבוחן · חובה</h3>
     <p class="sub">אפשר להעלות PDF, צילום מלא או צילום מסך. המערכת חותכת, מגדילה וסורקת אוטומטית את אזור הסיכום.</p>
-    <button class="secondary full" type="button" onclick="document.getElementById('examinerSummaryFile').click()">לחץ להעלאת PDF או צילום ברור</button>
+    <button class="secondary full" type="button" data-analytics-click="click_report_upload" onclick="document.getElementById('examinerSummaryFile').click()">לחץ להעלאת PDF או צילום ברור</button>
     <input id="examinerSummaryFile" type="file" accept="image/*,application/pdf" style="display:none" onchange="handleInspectionFile(this,'summary')">
     <div class="uploadState" id="summaryUploadState" role="status" aria-live="polite"></div>
     <div class="ocrReview" id="summaryReviewArea">
@@ -662,11 +669,11 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 
 <div class="info"><b>פענוח אוטומטי:</b> המערכת קוראת את סיכום הבוחן ומפרשת קודי תקלה מהבדיקה הממוחשבת לפי המערכת, מצב הקוד ודגשי האבחון. ההסבר נותן כיוון לבדיקה ואינו קובע שרכיב מסוים פגום. קטע שלא נקרא בוודאות לא ייכלל במסקנות.</div>
 <div class="info"><b>רמות המשמעות בפענוח:</b><br>• <b>משמעות גבוהה</b> — ממצא המחייב בירור מקצועי והשלמת בדיקות לפי הצורך.<br>• <b>משמעות נמוכה</b> — ממצא נקודתי, תחזוקתי או תלוי הקשר שאינו מכריע לבדו.<br>• <b>משמעות שולית</b> — מידע לידיעה שאינו תקלה בפני עצמו, כגון תאריך מצבר שטרם מלאו לו שנתיים.<br>• <b>הסתייגות כללית / מגבלת בדיקה</b> — ניסוח שאינו קובע לבדו שקיימת תקלה ואינו מביע עמדה על עבודת המכון.</div>
-<button class="primary full" id="analyseReportButton" type="button" onclick="analyseInspectionReport()">לחץ לפענוח הדוח ולהצגת משמעות הממצאים</button>
+<button class="primary full" id="analyseReportButton" type="button" data-analytics-click="click_analyze" onclick="analyseInspectionReport()">לחץ לפענוח הדוח ולהצגת משמעות הממצאים</button>
 <div class="scanStatus" id="analysisStatus" role="status" aria-live="polite"></div>
 <p class="sub" style="text-align:center;margin-top:8px">ההסבר יוצג מיד על המסך. לאחר מכן ניתן לשתף PDF מסודר בן 4–5 עמודים: פענוח דוח הבדיקה בשניים או שלושה עמודים לפי אורכו, עד ארבע תמונות והבהרות משפטיות, ופענוח נפרד של הבדיקה הממוחשבת.</p>
 <div class="interpretation" id="afterInterpretation"></div>
-<button class="primary full" id="finalPdfBtn" onclick="shareReportPdf('finalPdfBtn')" style="display:none">לחץ לשיתוף הסיכום המלא כ־PDF</button>
+<button class="primary full" id="finalPdfBtn" data-analytics-click="click_report_pdf" onclick="shareReportPdf('finalPdfBtn')" style="display:none">לחץ לשיתוף הסיכום המלא כ־PDF</button>
 <button class="secondary full returnBtn" type="button" onclick="returnToVehicle()">לחץ לחזרה לנתוני הרכב</button>
 </section>
 <section class="clarificationBox prePurchaseConsultationBox" id="prePurchaseConsultationBox" aria-labelledby="prePurchaseConsultationTitle">
@@ -683,7 +690,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
     </div>
     <p class="formNote">בלחיצה תיפתח הודעת WhatsApp מזוהה ומוכנה עם הפרטים והשאלות שמילאת. אפשר לצרף תמונות או מסמכים בתוך WhatsApp.</p>
     <div class="info" role="note"><b>שעות מענה:</b> ימים א׳–ה׳: 09:00–18:00 · יום ו׳: 09:00–13:00.<br>בשבתות ובחגים אין מענה. אפשר לשלוח בכל שעה; חלון 24 השעות מתחיל במענה הראשון של עמוס.</div>
-    <button class="primary full" type="button" onclick="openPrebuyWhatsApp()">לחץ לפתיחת הודעה מוכנה בוואטסאפ</button>
+    <button class="primary full" type="button" data-analytics-click="click_prebuy_whatsapp" onclick="openPrebuyWhatsApp()">לחץ לפתיחת הודעה מוכנה בוואטסאפ</button>
   </div>
 </section>
 <section class="clarificationBox" id="clarificationBox" aria-labelledby="clarificationTitle">
@@ -694,7 +701,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
     <article class="clarificationChoice paid">
       <h4>מענה אישי על דוח אחד ורכב אחד</h4>
       <p>ההתייעצות מפרשת את הממצאים ומכוונת לבדיקות המשך. היא אינה כוללת החלטת קנייה, הערכת מחיר תיקון, שמאות או קביעה לגבי מקצועיות המכון.</p>
-      <button class="primary full" id="consultationPlanButton" type="button" onclick="startPayment('consultation')">לחץ לפתיחת התייעצות אישית – 49 ₪</button>
+      <button class="primary full" id="consultationPlanButton" type="button" data-analytics-click="click_consultation_plan" onclick="startPayment('consultation')">לחץ לפתיחת התייעצות אישית – 49 ₪</button>
     </article>
   </div>
   <div class="consultationUnlocked">
@@ -703,7 +710,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
     <div class="field"><label for="clarificationQuestion"><b id="clarificationQuestionLabel">מה חשוב לך שאבדוק בדוח?</b></label><textarea id="clarificationQuestion" maxlength="2000" oninput="updateClarificationCounter()" placeholder="כתבו כאן את השאלות או הממצאים שתרצו לברר"></textarea><div class="clarificationCounter" id="clarificationCounter"><span>השאלות שלך על הדוח</span><span id="clarificationCharacterCount">0 מתוך 2000</span></div></div>
     <p class="formNote" id="clarificationFormNote">לאחר הלחיצה תיפתח הודעת WhatsApp מזוהה ומוכנה. אפשר לצרף בתוך WhatsApp את דוח הבדיקה או את סיכום BuyTest.</p>
     <div class="info" role="note"><b>שעות מענה מהבוחן:</b> ימים א׳–ה׳: 09:00–18:00 · יום ו׳: 09:00–13:00.<br>בשבתות ובחגים אין מענה. אפשר לשלוח הודעה בכל שעה; המענה יינתן בשעות אלה.</div>
-    <button class="primary full" type="button" onclick="openPostReportWhatsApp()">לחץ לפתיחת הודעה מוכנה בוואטסאפ</button>
+    <button class="primary full" type="button" data-analytics-click="click_post_report_whatsapp" onclick="openPostReportWhatsApp()">לחץ לפתיחת הודעה מוכנה בוואטסאפ</button>
   </div>
   </div>
   <section class="customerReplyAdmin" id="customerReplyAdmin">
@@ -2043,6 +2050,35 @@ async function trackBuyTestEvent(eventType){
     await callBuyTestAnalyticsService({action:'track',eventType,vehiclePlate:plate(),...identity,...attribution});
   }catch(error){console.warn('BuyTest analytics event skipped:',error)}
 }
+const BUYTEST_CLICK_LABELS={
+  click_landing_consultation:'ייעוץ אישי בוואטסאפ — דף פתיחה',
+  click_landing_free:'התחלת השלב החינמי — דף פתיחה',
+  click_landing_report:'פענוח דוח — דף פתיחה',
+  click_vehicle_lookup:'הצגת נתוני הרכב',
+  click_copy_questions:'העתקת שאלות למוכר',
+  click_free_next:'המשך מהבדיקה המקדימה',
+  click_license_next:'המשך מהתאמת הרישיון',
+  click_external_next:'המשך מהבדיקה החיצונית',
+  click_self_next:'המשך מהבדיקה הפנימית',
+  click_free_summary:'הפקת סיכום הבדיקה החינמית',
+  click_pdf:'שיתוף סיכום חינמי כ־PDF',
+  click_balcar:'הזמנת דוח Balcar — 15 ₪',
+  click_balcar_pdf:'שיתוף תקציר Balcar כ־PDF',
+  click_report_plan:'מעבר לפענוח דוח — 49 ₪',
+  click_report_upload:'העלאת סיכום בוחן',
+  click_analyze:'פענוח דוח המכון',
+  click_report_pdf:'שיתוף סיכום פענוח כ־PDF',
+  click_prebuy_whatsapp:'פתיחת ייעוץ לפני רכישה בוואטסאפ',
+  click_consultation_plan:'פתיחת התייעצות אישית',
+  click_post_report_whatsapp:'פתיחת התייעצות אחרי פענוח בוואטסאפ'
+};
+function trackBuyTestClick(event){
+  const target=event.target instanceof Element?event.target.closest('[data-analytics-click]'):null;
+  if(!target||target.disabled) return;
+  const eventType=String(target.dataset.analyticsClick||'');
+  if(eventType) void trackBuyTestEvent(eventType);
+}
+document.addEventListener('click',trackBuyTestClick,true);
 const BUYTEST_SOURCE_LABELS={google:'Google',meta:'Facebook / Instagram',direct:'כניסה ישירה',other:'מקורות אחרים',unknown:'לא ידוע (נתונים ישנים)'};
 function renderBuyTestSourceAnalytics(rows){
   const body=document.getElementById('analyticsSourceRows');
@@ -2052,6 +2088,22 @@ function renderBuyTestSourceAnalytics(rows){
     const item=bySource.get(source)||{};
     const number=value=>Number(value||0).toLocaleString('he-IL');
     return `<tr><td>${BUYTEST_SOURCE_LABELS[source]}</td><td>${number(item.visits)}</td><td>${number(item.freeStarts)}</td><td>${number(item.freeCompleted)}</td><td>${number(item.payments)}</td></tr>`;
+  }).join('');
+}
+function renderBuyTestClickAnalytics(rows){
+  const body=document.getElementById('analyticsClickRows');
+  if(!body) return;
+  const list=Array.isArray(rows)?rows.filter(item=>Number(item?.clicks||0)>0):[];
+  if(!list.length){
+    body.innerHTML='<tr><td colspan="4">אין עדיין לחיצות מפורטות בטווח הזה. מרגע פרסום הגרסה הזו כל לחיצה תופיע כאן לפי מקור וכפתור.</td></tr>';
+    return;
+  }
+  const number=value=>Number(value||0).toLocaleString('he-IL');
+  body.innerHTML=list.map(item=>{
+    const source=String(item?.source||'unknown');
+    const campaign=[item?.utmSource,item?.utmMedium,item?.utmCampaign].map(value=>String(value||'').trim()).filter(Boolean).join(' / ')||'—';
+    const label=BUYTEST_CLICK_LABELS[String(item?.eventType||'')]||String(item?.eventType||'לחיצה');
+    return `<tr><td>${escapeHtml(BUYTEST_SOURCE_LABELS[source]||source)}</td><td>${escapeHtml(label)}</td><td>${number(item?.clicks)}</td><td dir="ltr">${escapeHtml(campaign)}</td></tr>`;
   }).join('');
 }
 async function loadBuyTestAnalytics(range=buyTestAnalyticsRange){
@@ -2066,6 +2118,7 @@ async function loadBuyTestAnalytics(range=buyTestAnalyticsRange){
     document.getElementById('analyticsFreeStarts').textContent=Number(stats.freeStarts||0).toLocaleString('he-IL');
     document.getElementById('analyticsPaidEntries').textContent=Number(stats.paidEntries||0).toLocaleString('he-IL');
     renderBuyTestSourceAnalytics(stats.sources);
+    renderBuyTestClickAnalytics(data.clicks);
     if(status) status.textContent='עודכן '+new Date().toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});
   }catch(error){
     console.error('BuyTest analytics loading failed:',error);
