@@ -7,6 +7,35 @@ const VALID_ID = /^[A-Za-z0-9_-]{20,80}$/;
 const TRAFFIC_SOURCES = new Set(["google", "meta", "direct", "other", "unknown"]);
 const MILEAGE_SOURCES = new Set(["ministry_last_test", "inspection_report"]);
 const MILEAGE_DATE_BASES = new Set(["test_date", "captured_date"]);
+const CLICK_EVENT_TYPES = new Set([
+  "click_landing_consultation",
+  "click_landing_free",
+  "click_landing_report",
+  "click_vehicle_lookup",
+  "click_copy_questions",
+  "click_free_next",
+  "click_license_next",
+  "click_external_next",
+  "click_self_next",
+  "click_free_summary",
+  "click_pdf",
+  "click_balcar",
+  "click_balcar_pdf",
+  "click_report_plan",
+  "click_report_upload",
+  "click_analyze",
+  "click_report_pdf",
+  "click_prebuy_whatsapp",
+  "click_consultation_plan",
+  "click_post_report_whatsapp",
+]);
+const TRACK_EVENT_TYPES = new Set([
+  "page_view",
+  "free_started",
+  "free_completed",
+  "consultation_opened",
+  ...CLICK_EVENT_TYPES,
+]);
 
 function cors(origin: string | null) {
   return {
@@ -70,7 +99,7 @@ function cleanAttribution(body: Record<string, unknown>) {
 }
 
 async function trackEvent(eventType: string, visitorId: string, sessionId: string, vehiclePlateValue: unknown, body: Record<string, unknown>) {
-  if (!['page_view', 'free_started', 'free_completed', 'consultation_opened'].includes(eventType) || !VALID_ID.test(visitorId) || !VALID_ID.test(sessionId)) {
+  if (!TRACK_EVENT_TYPES.has(eventType) || !VALID_ID.test(visitorId) || !VALID_ID.test(sessionId)) {
     throw new Error("invalid_event");
   }
   const vehiclePlate = String(vehiclePlateValue || "").replace(/\D/g, "").slice(0, 8);
@@ -84,6 +113,13 @@ async function trackEvent(eventType: string, visitorId: string, sessionId: strin
       vehicle_plate: /^\d{7,8}$/.test(vehiclePlate) ? vehiclePlate : null,
       ...cleanAttribution(body),
     }),
+  });
+}
+
+async function clickSummary(range: string) {
+  return await serviceRequest("/rest/v1/rpc/buytest_analytics_click_summary", {
+    method: "POST",
+    body: JSON.stringify({ p_range: range }),
   });
 }
 
@@ -258,11 +294,14 @@ Deno.serve(async (req: Request) => {
       const pin = String(req.headers.get("x-buytest-manager-pin") || body.adminPin || "");
       if (!await isAdmin(pin)) return json(origin, { ok: false, error: "admin_denied" }, 403);
       const range = ['today', '7d', '30d', 'all'].includes(String(body.range)) ? String(body.range) : 'all';
-      const stats = await serviceRequest("/rest/v1/rpc/buytest_analytics_summary", {
-        method: "POST",
-        body: JSON.stringify({ p_range: range }),
-      });
-      return json(origin, { ok: true, stats });
+      const [stats, clicks] = await Promise.all([
+        serviceRequest("/rest/v1/rpc/buytest_analytics_summary", {
+          method: "POST",
+          body: JSON.stringify({ p_range: range }),
+        }),
+        clickSummary(range),
+      ]);
+      return json(origin, { ok: true, stats, clicks });
     }
     if (body.action === "feedback_list") {
       const pin = String(req.headers.get("x-buytest-manager-pin") || body.adminPin || "");
