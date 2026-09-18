@@ -1951,14 +1951,15 @@ function buyTestTrafficAttribution(){
   const utmCampaign=buyTestAttributionText(params.get('utm_campaign'),120);
   const hasGoogleClick=params.has('gclid')||utmSource==='google'||utmSource==='googleads'||utmSource==='adwords';
   const hasMetaClick=params.has('fbclid')||['facebook','instagram','meta','fb','ig'].includes(utmSource);
-  const hasCampaignSignal=hasGoogleClick||hasMetaClick||Boolean(utmSource||utmMedium||utmCampaign);
+  const hasTikTokClick=params.has('ttclid')||['tiktok','tiktokads','tiktok_ads','tt'].includes(utmSource);
+  const hasCampaignSignal=hasGoogleClick||hasMetaClick||hasTikTokClick||Boolean(utmSource||utmMedium||utmCampaign);
   let saved=null;
   try{saved=JSON.parse(localStorage.getItem(BUYTEST_ATTRIBUTION_KEY)||'null')}catch(_error){}
   const savedAt=Number(saved?.capturedAt||0);
-  const savedValid=['google','meta','direct','other'].includes(String(saved?.trafficSource||''))&&Date.now()-savedAt<BUYTEST_ATTRIBUTION_WINDOW_MS;
+  const savedValid=['google','meta','tiktok','direct','other'].includes(String(saved?.trafficSource||''))&&Date.now()-savedAt<BUYTEST_ATTRIBUTION_WINDOW_MS;
   if(hasCampaignSignal){
     const attribution={
-      trafficSource:hasGoogleClick?'google':hasMetaClick?'meta':'other',
+      trafficSource:hasGoogleClick?'google':hasMetaClick?'meta':hasTikTokClick?'tiktok':'other',
       utmSource,
       utmMedium,
       utmCampaign,
@@ -2079,12 +2080,12 @@ function trackBuyTestClick(event){
   if(eventType) void trackBuyTestEvent(eventType);
 }
 document.addEventListener('click',trackBuyTestClick,true);
-const BUYTEST_SOURCE_LABELS={google:'Google',meta:'Facebook / Instagram',direct:'כניסה ישירה',other:'מקורות אחרים',unknown:'לא ידוע (נתונים ישנים)'};
+const BUYTEST_SOURCE_LABELS={google:'Google',meta:'Facebook / Instagram',tiktok:'TikTok',direct:'כניסה ישירה',other:'מקורות אחרים',unknown:'לא ידוע (נתונים ישנים)'};
 function renderBuyTestSourceAnalytics(rows){
   const body=document.getElementById('analyticsSourceRows');
   if(!body) return;
   const bySource=new Map((Array.isArray(rows)?rows:[]).map(item=>[String(item?.source||'unknown'),item||{}]));
-  body.innerHTML=['google','meta','direct','other','unknown'].map(source=>{
+  body.innerHTML=['google','meta','tiktok','direct','other','unknown'].map(source=>{
     const item=bySource.get(source)||{};
     const number=value=>Number(value||0).toLocaleString('he-IL');
     return `<tr><td>${BUYTEST_SOURCE_LABELS[source]}</td><td>${number(item.visits)}</td><td>${number(item.freeStarts)}</td><td>${number(item.freeCompleted)}</td><td>${number(item.payments)}</td></tr>`;
