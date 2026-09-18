@@ -27,8 +27,8 @@
 <meta name="twitter:title" content="BuyB4Test | כל הדרך לקניית רכב במקום אחד">
 <meta name="twitter:description" content="מתחילים בחינם לפני שנוסעים לרכב וממשיכים לבדיקה מודרכת ולפענוח מקצועי אחרי המכון.">
 <meta name="twitter:image" content="https://amirok196888-cloud.github.io/buytest/buyb4test-social-v108.jpg">
-<link rel="icon" type="image/png" href="buytest-icon-512.png">
-<link rel="apple-touch-icon" href="buytest-icon-512.png">
+<link rel="icon" type="image/png" href="buyb4test-icon-512.png">
+<link rel="apple-touch-icon" href="buyb4test-icon-512.png">
 <title>BuyB4Test | לפני שנוסעים לרכב ועד לפענוח הדוח</title>
 <!-- Meta Pixel Code -->
 <script>
@@ -120,6 +120,7 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#07131aef;border-top:1p
 .trustItem{background:#0b2028;border-radius:14px;padding:12px;font-size:13px}
 .landingFine{font-size:12px;color:#9fb4ba;margin-top:16px;line-height:1.5}
 #appShell{display:block}
+.appBrandLogo{display:block;width:min(360px,88vw);height:auto;margin:0 auto 16px;padding:10px 14px;border-radius:16px;background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.22)}
 @media(max-width:600px){.inspectorWrap{grid-template-columns:1fr}.speech:after{display:none}.inspectorArt{}.brandLogo{font-size:36px}.trustRow{grid-template-columns:1fr}.landingTag{font-size:22px}}
 #landing .landingCard{padding-bottom:20px}
 
@@ -293,7 +294,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 <div class="mktHero">
 <div class="mktWrap mktHeroGrid">
 <div>
-<img class="mktBrandLogo" src="buyb4test-logo.svg" alt="BuyB4Test">
+<img class="mktBrandLogo" src="buyb4test-logo-clean.png" alt="BUYB4TEST — בדיקת רכב לפני ואחרי הקנייה">
 <span class="mktEyebrow">BuyB4Test · מהמודעה ועד אחרי המכון</span>
 <h1>לפני שנוסעים לרכב — <span>ועד לפענוח הדוח</span></h1>
 <p class="mktLead"><strong>בחרו מה אתם צריכים עכשיו — בדיקה חינמית, ייעוץ אישי לפני רכישה או פענוח דוח שכבר קיבלתם.</strong></p>
@@ -369,7 +370,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 </section>
 <div id="appShell">
 <main>
-<section class="hero"><div class="icon">🔎🚗</div><h1>לפני המכון ואחרי המכון</h1><p>תהליך אחד לרכב אחד: הכנה לבדיקה והסבר של סיכום הבוחן.</p></section>
+<section class="hero"><img class="appBrandLogo" src="buyb4test-logo-clean.png" alt="BUYB4TEST — בדיקת רכב לפני ואחרי הקנייה"><h1>לפני המכון ואחרי המכון</h1><p>תהליך אחד לרכב אחד: הכנה לבדיקה והסבר של סיכום הבוחן.</p></section>
 <div class="promise">BuyTest מסביר וממקד שאלות. הוא אינו נותן הערכת שווי, עלות תיקון או המלצה אם לקנות את הרכב.</div><div class="expert"><strong>מבוסס על למעלה מ־15 שנות ניסיון בבדיקות רכב לפני קנייה</strong><span>עמוס רוקח · הנדסאי רכב · בוחן רכב לפני קנייה</span></div>
 
 
@@ -715,7 +716,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
   </div>
   <section class="customerReplyAdmin" id="customerReplyAdmin">
     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-      <img src="buyb4test-logo.svg" alt="BuyB4Test" width="120" height="120" style="width:86px;height:auto;object-fit:contain">
+      <img src="buyb4test-logo-clean.png" alt="BUYB4TEST — בדיקת רכב לפני ואחרי הקנייה" width="1932" height="814" style="width:180px;height:auto;object-fit:contain">
       <div><h2>מענה ללקוח</h2><p class="sub" style="margin:0">אזור מנהל: הזן את פרטי הפנייה ואת ההסבר שלך, הפק תשובה ממותגת ופתח מייל מוכן לשליחה.</p></div>
     </div>
     <table class="replyTable" aria-label="פרטי המענה ללקוח"><tbody>
@@ -1596,7 +1597,7 @@ async function downloadCustomerReplyPdf(){
       ctx.font='700 26px Arial, sans-serif';ctx.fillStyle='#0b6f58';ctx.fillText('BuyB4Test · מענה ללקוח',W-margin,y);y+=55;
     }
     newPage();drawPageHeader(true);
-    const logo=await btLoadImage('buyb4test-logo.svg');
+    const logo=await btLoadImage('buyb4test-logo-clean.png');
     if(logo){
       const maxW=300,maxH=150,scale=Math.min(maxW/logo.width,maxH/logo.height);
       const iw=Math.round(logo.width*scale),ih=Math.round(logo.height*scale);
@@ -6230,7 +6231,7 @@ function btDrawPdfEntries(ctx,entries,startY,endY,width,margin){
 async function btBuildThreePageAfterReportPdf(){
   const W=1240,H=1754,margin=82,contentWidth=W-margin*2;
   const canvases=[];
-  const brandLogo=await btLoadImage('buyb4test-logo.svg');
+  const brandLogo=await btLoadImage('buyb4test-logo-clean.png');
   const vehicle=currentVehicleIdentity();
   const owner=document.getElementById('inspectionOwnerName')?.value.trim()||'לא צוין';
   const km=interpretedReportKm!=null?fmtNum(interpretedReportKm)+' ק״מ (נקרא מסיכום הבוחן)':loadedKm!=null?fmtNum(loadedKm)+' ק״מ (ממאגר הרישוי)':'לא צוין';
@@ -6378,7 +6379,7 @@ async function btBuildPdfBlob({isBalcar=false}={}){
   function rule(){ensure(30);ctx.fillStyle='#10a77b';ctx.fillRect(margin,y,W-margin*2,5);y+=30}
 
   newPage();
-  const brandLogo=await btLoadImage('buyb4test-logo.svg');
+  const brandLogo=await btLoadImage('buyb4test-logo-clean.png');
   if(brandLogo){
     const logoW=520;
     const logoH=Math.round(logoW*brandLogo.height/brandLogo.width);
