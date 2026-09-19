@@ -10,9 +10,9 @@ const PLANS = {
   balcar: { amountAgorot: 1500, title: "דוח Balcar לרכב", scopes: ["balcar"] },
   premium: { amountAgorot: 4900, title: "בדיקה עצמית לפני המכון", scopes: ["premium"] },
   report: { amountAgorot: 4900, title: "פענוח דוח המכון", scopes: ["report"] },
-  consultation: { amountAgorot: 4900, title: "התייעצות אישית לאחר פענוח", scopes: ["consultation"] },
+  consultation: { amountAgorot: 14900, title: "התייעצות אישית לאחר פענוח", scopes: ["consultation"] },
   prebuy: { amountAgorot: 7900, title: "ייעוץ לפני רכישה בוואטסאפ · עד 10 שאלות · 24 שעות", scopes: ["prebuy"] },
-  bundle: { amountAgorot: 12000, title: "חבילת BuyB4Test המלאה", scopes: ["premium", "report", "consultation"] },
+  bundle: { amountAgorot: 12000, title: "חבילת BuyTest המלאה", scopes: ["premium", "report", "consultation"] },
 } as const;
 type PlanKey = keyof typeof PLANS;
 type CardcomConfig = {
@@ -262,7 +262,7 @@ async function createPayment(origin: string | null, body: Record<string, unknown
   }
   const plan = PLANS[planKey];
   const productCode = `BUYTEST-${planKey.toUpperCase()}`;
-  const productName = Array.from(`BuyB4Test · ${plan.title}`).slice(0, 50).join("");
+  const productName = Array.from(`BuyTest · ${plan.title}`).slice(0, 50).join("");
   let inheritedProgress: StageProgress = { preInspectionCompleted: false, reportCompleted: false };
   let priorOrderId = "";
   if (planKey === "consultation") {
@@ -319,11 +319,11 @@ async function createPayment(origin: string | null, body: Record<string, unknown
       },
       Document: {
         DocumentTypeToCreate: "Auto",
-        Name: customerName || "לקוח BuyB4Test",
+        Name: customerName || "לקוח BuyTest",
         Email: email,
         Mobile: phone,
         IsSendByEmail: true,
-        Comments: "שירות BuyB4Test · ROKACH DIGITAL",
+        Comments: "שירות BuyTest · ROKACH DIGITAL",
         DepartmentId: config.departmentId,
         Products: [{
           ProductID: productCode,
