@@ -2457,7 +2457,8 @@ async function submitBuyTestPayment(){
   const status=document.getElementById('paymentStatus');
   const button=document.getElementById('paymentSubmitButton');
   status.classList.remove('error');
-  if(customerName.length<2||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||!/^05\d[-\d\s]{7,10}$/.test(phone)||!acceptedTerms){
+  const normalizedPhone=phone.replace(/[-\s()]/g,'').replace(/^\+972/,'0').replace(/^972/,'0');
+  if(customerName.length<2||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||!/^05\d{8}$/.test(normalizedPhone)||!acceptedTerms){
     status.textContent='יש למלא שם, כתובת אימייל וטלפון נייד ולאשר את התנאים.';status.classList.add('error');return;
   }
   button.disabled=true;button.textContent='יוצר דף תשלום מאובטח...';status.textContent='מעביר אותך ל־Cardcom. עדיין לא בוצע חיוב.';
