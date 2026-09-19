@@ -168,7 +168,7 @@ body.plan-prebuy .prePurchaseConsultationBox{display:block}
 .consultationFormGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}.consultationFormGrid .wide{grid-column:1/-1}
 .route-consultation #vehicleLookup .plate input{display:none}.route-consultation #vehicleLookup .plate button{width:100%}
 .routeContext{display:none;margin:0 0 13px;padding:12px 14px;border-radius:13px;border:1px solid #b9e1d5;background:#edf9f5;color:#184f41;font-weight:850;line-height:1.5}.routeContext.show{display:block}.routeContext strong{display:block;font-size:16px}.routeContext span{display:block;margin-top:2px;font-size:13px;font-weight:700}.vehicleDataDetails,.preVisitFactsDetails{margin:12px 0;border:1px solid #cfe1dc;border-radius:13px;background:#f8fcfb;overflow:hidden}.vehicleDataDetails>summary,.preVisitFactsDetails>summary{cursor:pointer;padding:13px 15px;color:#075e48;font-weight:950;list-style:none}.vehicleDataDetails>summary::-webkit-details-marker,.preVisitFactsDetails>summary::-webkit-details-marker{display:none}.vehicleDataDetails>summary:after,.preVisitFactsDetails>summary:after{content:'פתיחה';float:left;padding:3px 8px;border-radius:999px;background:#dff5ee;font-size:12px}.vehicleDataDetails[open]>summary:after,.preVisitFactsDetails[open]>summary:after{content:'סגירה'}.vehicleDataDetails>.grid,.preVisitFactsDetails>.preVisitFacts{margin:0;padding:0 13px 13px}
-.managerHub{display:none;margin:14px 0;padding:12px;border:1px solid #b9d4df;border-radius:16px;background:#edf5f7}.managerHubTitle{display:block;margin:0 0 9px;color:#244753}.managerHubGrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}.managerHub button{min-height:46px;background:#fff!important;color:#17323c!important;border:1px solid #b9d4df!important;box-shadow:none!important}.managerHub button.active{background:#0b7f67!important;color:#fff!important;border-color:#0b7f67!important}.managerToolsDetails{margin-top:10px;border-top:1px solid #9dd9c7}.managerToolsDetails>summary{cursor:pointer;padding:11px 0 0;font-weight:900}.managerToolsDetails .managerPlanControls{margin-top:8px}.manager-mode .managerHub{display:block}
+.managerHub{display:none;margin:14px auto;padding:12px;border:1px solid #b9d4df;border-radius:16px;background:#edf5f7;max-width:980px}.managerHubTitle{display:block;margin:0 0 9px;color:#244753}.managerHubGrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}.managerHub button{min-height:46px;background:#fff!important;color:#17323c!important;border:1px solid #b9d4df!important;box-shadow:none!important}.managerHub button.active{background:#0b7f67!important;color:#fff!important;border-color:#0b7f67!important}.managerToolsDetails{margin-top:10px;border-top:1px solid #9dd9c7}.managerToolsDetails>summary{cursor:pointer;padding:11px 0 0;font-weight:900}.managerToolsDetails .managerPlanControls{margin-top:8px}.manager-mode .managerHub{display:block}.manager-mode #managerActiveNotice{display:none!important}.managerModeBadge{display:none}.manager-mode .managerModeBadge{display:block;max-width:980px;margin:0 auto 12px;padding:10px 14px;border-radius:12px;background:#fff7e8;color:#765600;text-align:center;font-weight:900}
 .manager-entry #marketingLanding,.manager-entry #vehicleLookup,.manager-entry #feedbackBox,html.manager-link #marketingLanding{display:none!important}.manager-entry #managerPreviewBox,html.manager-link #managerPreviewBox{display:block!important;max-width:620px;margin:28px auto;position:relative;z-index:20}.managerLoginForm{display:grid;gap:12px}.managerLoginForm label{font-weight:900;font-size:18px}.managerLoginForm input{width:100%;height:54px;border:2px solid #9fcfc0;border-radius:14px;padding:0 15px;background:#fff;color:#17242b;font-size:20px;text-align:center}.manager-entry #managerPreviewBox button,html.manager-link #managerPreviewBox button{width:100%;min-height:56px;font-size:19px}.manager-dashboard #marketingLanding,.manager-dashboard #vehicleLookup,.manager-dashboard #fullCheckOffer,.manager-dashboard .preFlowProgress,.manager-dashboard .preFlowScreen,.manager-dashboard .paidOnly,.manager-dashboard .clarificationBox,.manager-dashboard #feedbackBox{display:none!important}
 @media(max-width:700px){.routeCards{grid-template-columns:1fr}.routeChoice{flex-direction:column}.preFlowNav{flex-direction:column-reverse}.managerHubGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .preVisitCard{border:2px solid #0fa87e;background:linear-gradient(145deg,#f2fbf8,#fff);box-shadow:0 12px 32px rgba(15,168,126,.12)}
@@ -286,7 +286,7 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
 #appShell .legalLinks button,#appShell .legalCompact button,#appShell .legalBeforePlate button{color:#0b7f67}
 .imageModal button{background:#0b8f70;color:#fff;border:1px solid #08745b}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
-</style><meta name="buytest-build" content="buytest-v127-complete-upload">
+</style><meta name="buytest-build" content="buytest-v128-manager-customer-view">
 </head><body>
 <script>
 (function(){
@@ -444,12 +444,13 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
   <b class="managerHubTitle">ניהול BuyTest</b>
   <div class="managerHubGrid">
     <button class="active" type="button" data-manager-panel="site" onclick="previewPlanAsManager('all')">האתר המלא</button>
-    <button type="button" data-manager-panel="analytics" onclick="showManagerPanel('analytics')">פעילות</button>
+    <button type="button" data-manager-panel="analytics" onclick="showManagerPanel('analytics')">נתוני קמפיינים</button>
     <button type="button" data-manager-panel="orders" onclick="showManagerPanel('orders')">לקוחות</button>
     <button type="button" data-manager-panel="feedback" onclick="showManagerPanel('feedback')">תגובות</button>
     <button type="button" data-manager-panel="formulas" onclick="showManagerPanel('formulas')">מאגר נוסחים</button>
   </div>
 </nav>
+<div class="managerModeBadge">מצב מנהל — כל שלב ניתן לפתיחה ללא תשלום</div>
 
 <section class="card analyticsPanel" id="managerAnalyticsPanel" aria-labelledby="managerAnalyticsTitle">
   <div class="analyticsHead">
@@ -1863,6 +1864,12 @@ async function loadPaidBalcarReport(){
   return balcarLoadPromise;
 }
 async function startBalcarPayment(){
+  if(document.body.classList.contains('manager-mode')){
+    applyPlanAccess('balcar',{scroll:true});
+    const status=document.getElementById('balcarOrderStatus');
+    if(status){status.textContent='מצב מנהל — שלב Balcar נפתח ללא הזמנה וללא חיוב.';status.classList.remove('error');}
+    return;
+  }
   const vehiclePlate=plate();
   const button=document.getElementById('balcarPlanButton');
   const message=document.getElementById('balcarEligibilityMsg');
@@ -2356,10 +2363,11 @@ function previewPlanAsManager(planKey='all'){
   document.querySelectorAll('[data-manager-panel]').forEach(button=>button.classList.toggle('active',button.dataset.managerPanel==='site'));
   const status=document.getElementById('managerPlanStatus');
   if(planKey==='all'){
-    document.body.classList.remove(...buytestPlanClasses);
-    document.body.classList.add('manager-all');
-    showClarificationOptions();
-    if(status) status.textContent='מוצגים כרגע כל חלקי המערכת.';
+    document.body.classList.remove(...buytestPlanClasses,'manager-all','stage-report-open','stage-consultation-open','report-complete');
+    setBuyTestStageProgress({});
+    document.querySelectorAll('.paidOnly').forEach(section=>section.style.display='none');
+    if(status) status.textContent='מוצג האתר המלא כפי שהלקוח רואה אותו.';
+    document.getElementById('marketingLanding')?.scrollIntoView({behavior:'smooth',block:'start'});
     return;
   }
   if(!applyPlanAccess(planKey)) return;
@@ -2369,6 +2377,16 @@ async function startPayment(planKey='report'){
   if(buyTestPaymentStarting) return;
   const selectedKey=Object.prototype.hasOwnProperty.call(buytestPlans,planKey)?planKey:'report';
   const plan=buytestPlans[selectedKey];
+  if(document.body.classList.contains('manager-mode')){
+    const progress=selectedKey==='consultation'
+      ?{preInspectionCompleted:true,reportCompleted:true}
+      :selectedKey==='report'
+        ?{preInspectionCompleted:true,reportCompleted:false}
+        :buyTestStageProgress;
+    applyPlanAccess(selectedKey,{scroll:true,progress});
+    showBuyTestAccessNotice('מצב מנהל — השלב נפתח ללא תשלום.');
+    return;
+  }
   if(selectedKey==='consultation'&&!buyTestStageProgress.reportCompleted){
     showBuyTestAccessNotice('ההתייעצות על הדוח נפתחת רק לאחר השלמת פענוח דוח המכון.',true);
     document.getElementById('reportPlanCard')?.scrollIntoView({behavior:'smooth',block:'center'});
@@ -2491,18 +2509,23 @@ async function openManagerPreview(codeValue){
     if(status){status.classList.add('show');status.textContent=error?.message==='admin_denied'?'קוד המנהל שגוי.':'לא ניתן לאמת כרגע את הכניסה. נסה שוב.';}
     return;
   }
-  document.body.classList.remove('manager-entry','manager-dashboard');
-  document.body.classList.add('manager-mode','manager-all');
-  document.querySelectorAll('.paidOnly').forEach(section=>section.style.removeProperty('display'));
+  document.documentElement.classList.remove('manager-link');
+  document.body.classList.remove('manager-entry','manager-dashboard','manager-all');
+  document.body.classList.add('manager-mode');
   const purchaseBox=document.getElementById('purchaseBox');
   if(purchaseBox) purchaseBox.style.display='none';
   const managerBox=document.getElementById('managerPreviewBox');
   if(managerBox) managerBox.style.display='none';
   const offer=document.getElementById('fullCheckOffer');
-  if(offer) offer.style.display='none';
+  if(offer) offer.style.removeProperty('display');
   const notice=document.getElementById('managerActiveNotice');
   const formulasOnly=new URLSearchParams(location.search).get('manager')==='formulas';
-  if(notice){notice.style.display='block';if(!formulasOnly) notice.scrollIntoView({behavior:'smooth',block:'start'});}
+  if(notice) notice.style.display='none';
+  const hub=document.getElementById('managerHub');
+  const badge=document.querySelector('.managerModeBadge');
+  const landing=document.getElementById('marketingLanding');
+  if(hub&&landing) document.body.insertBefore(hub,landing);
+  if(badge&&landing) document.body.insertBefore(badge,landing);
   void syncFormulaAdminFromServer().catch(error=>console.warn('BuyTest formula sync skipped:',error));
   void loadBuyTestFeedback();
   renderCustomerReplyDrafts();
