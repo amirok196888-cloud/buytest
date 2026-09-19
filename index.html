@@ -818,6 +818,8 @@ const BUYTEST_ATTRIBUTION_KEY='buytestTrafficAttributionV1';
 const BUYTEST_META_PURCHASE_KEY_PREFIX='buytestMetaPurchaseV1:';
 const BUYTEST_GOOGLE_PURCHASE_KEY_PREFIX='buytestGooglePurchaseV1:';
 const BUYTEST_GOOGLE_FREE_STARTED_KEY_PREFIX='buytestGoogleFreeStartedV1:';
+const BUYTEST_GOOGLE_FREE_COMPLETED_KEY_PREFIX='buytestGoogleFreeCompletedV1:';
+const BUYTEST_GOOGLE_CHECKOUT_KEY_PREFIX='buytestGoogleCheckoutV1:';
 const BUYTEST_FEEDBACK_SEEN_KEY='buytestFeedbackSeenAtV1';
 const BUYTEST_RECENT_PAYMENT_WINDOW_MS=30*60*1000;
 const BUYTEST_ANALYTICS_SESSION_MS=30*60*1000;
@@ -846,6 +848,30 @@ function buyTestGoogleTrackFreeStartedOnce(vehiclePlate){
     window.gtag('event','conversion',{send_to:'AW-18445003355/2Y9UCO2wkPYcENvUodtE',value:1.0,currency:'ILS'});
     sessionStorage.setItem(storageKey,'1');
   }catch(error){console.warn('BuyTest Google Ads conversion skipped:',error)}
+}
+function buyTestGoogleTrackFreeCompletedOnce(vehiclePlate){
+  if(typeof window.gtag!=='function'||new URLSearchParams(location.search).has('manager')||document.body.classList.contains('manager-mode')) return;
+  const plate=String(vehiclePlate||'').replace(/\D/g,'');
+  const storageKey=BUYTEST_GOOGLE_FREE_COMPLETED_KEY_PREFIX+(plate||'unknown');
+  try{if(sessionStorage.getItem(storageKey)==='1') return}catch(_error){}
+  try{
+    window.gtag('event','conversion',{send_to:'AW-18445003355/u0-qCLe8k_0cENvUodtE',value:1.0,currency:'ILS'});
+    sessionStorage.setItem(storageKey,'1');
+  }catch(error){console.warn('BuyTest Google Ads free-completed conversion skipped:',error)}
+}
+function buyTestGoogleTrackCheckoutOnce(payment,plan){
+  if(typeof window.gtag!=='function'||new URLSearchParams(location.search).has('manager')||document.body.classList.contains('manager-mode')) return;
+  if(!payment?.orderId) return;
+  const storageKey=BUYTEST_GOOGLE_CHECKOUT_KEY_PREFIX+String(payment.orderId);
+  try{if(sessionStorage.getItem(storageKey)==='1') return}catch(_error){}
+  try{
+    window.gtag('event','conversion',{
+      send_to:'AW-18445003355/tGV9CLq8k_0cENvUodtE',
+      value:Number(plan?.price)||1,
+      currency:'ILS'
+    });
+    sessionStorage.setItem(storageKey,'1');
+  }catch(error){console.warn('BuyTest Google Ads checkout conversion skipped:',error)}
 }
 function buyTestMetaTrackPurchaseOnce(payment){
   const params=new URLSearchParams(location.search);
@@ -2439,6 +2465,7 @@ async function submitBuyTestPayment(){
     saveBuyTestPayment({orderId:payment.orderId,clientSecret:payment.clientSecret,plate:payment.plate,plan:payment.plan,customerName,email,phone,progress:normalizedStageProgress(payment.progress),createdAt:new Date().toISOString()});
     sessionStorage.setItem(BUYTEST_PAYMENT_RETURN_KEY,'1');
     buyTestMetaTrack('InitiateCheckout',{value:Number(plan.price)||49,currency:'ILS',content_name:plan.name,content_ids:[String(planKey)],content_type:'product'});
+    buyTestGoogleTrackCheckoutOnce(payment,plan);
     location.assign(payment.paymentUrl);
   }catch(error){
     console.error('BuyTest payment start failed:',error);
@@ -5162,6 +5189,7 @@ async function buildReport(){
   reportText=[preReportText,afterReportText].filter(Boolean).join('\n\n');
   prepareReportPdf('pdfBtn');
   void trackBuyTestEvent('free_completed');
+  buyTestGoogleTrackFreeCompletedOnce(data.plate||document.getElementById('vPlate')?.textContent||document.getElementById('plate')?.value||'');
   await completeBuyTestStage('premium');
   report.scrollIntoView({behavior:'smooth',block:'start'});
 }
