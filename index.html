@@ -5189,6 +5189,7 @@ async function buildReport(){
   reportText=[preReportText,afterReportText].filter(Boolean).join('\n\n');
   prepareReportPdf('pdfBtn');
   void trackBuyTestEvent('free_completed');
+  buyTestMetaTrackCustom('FreeCheckCompleted',{content_name:'בדיקה עצמית לפני המכון'});
   buyTestGoogleTrackFreeCompletedOnce(data.plate||document.getElementById('vPlate')?.textContent||document.getElementById('plate')?.value||'');
   await completeBuyTestStage('premium');
   report.scrollIntoView({behavior:'smooth',block:'start'});
