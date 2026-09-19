@@ -290,6 +290,11 @@ Deno.serve(async (req: Request) => {
       await saveMileageObservation(body);
       return json(origin, { ok: true });
     }
+    if (body.action === "admin_auth") {
+      const pin = String(req.headers.get("x-buytest-manager-pin") || body.adminPin || "");
+      if (!await isAdmin(pin)) return json(origin, { ok: false, error: "admin_denied" }, 403);
+      return json(origin, { ok: true });
+    }
     if (body.action === "stats") {
       const pin = String(req.headers.get("x-buytest-manager-pin") || body.adminPin || "");
       if (!await isAdmin(pin)) return json(origin, { ok: false, error: "admin_denied" }, 403);
