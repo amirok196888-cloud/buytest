@@ -1,5 +1,5 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://amirok196888-cloud.github.io/buytest/sitemap.xml
+Sitemap: https://buytest.co.il/sitemap.xml
 # BuyTest checklist flow deployment: 2026-09-16
