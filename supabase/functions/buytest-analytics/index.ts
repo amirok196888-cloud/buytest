@@ -110,17 +110,16 @@ async function trackEvent(eventType: string, visitorId: string, sessionId: strin
     throw new Error("invalid_event");
   }
   const vehiclePlate = String(vehiclePlateValue || "").replace(/\D/g, "").slice(0, 8);
-  await serviceRequest("/rest/v1/buytest_analytics_events?on_conflict=event_type,session_id", {
+  await serviceRequest("/rest/v1/rpc/buytest_track_analytics_event", {
     method: "POST",
-    headers: { "Prefer": "resolution=merge-duplicates,return=minimal" },
     body: JSON.stringify({
-      event_type: eventType,
-      visitor_id: visitorId,
-      session_id: sessionId,
-      vehicle_plate: /^\d{7,8}$/.test(vehiclePlate) ? vehiclePlate : null,
-      page_path: cleanText(body.pagePath, 220) || "",
-      page_title: cleanText(body.pageTitle, 180) || null,
-      ...cleanAttribution(body),
+      p_event_type: eventType,
+      p_visitor_id: visitorId,
+      p_session_id: sessionId,
+      p_vehicle_plate: /^\d{7,8}$/.test(vehiclePlate) ? vehiclePlate : null,
+      p_page_path: cleanText(body.pagePath, 220) || "",
+      p_page_title: cleanText(body.pageTitle, 180) || null,
+      p_attribution: cleanAttribution(body),
     }),
   });
 }
