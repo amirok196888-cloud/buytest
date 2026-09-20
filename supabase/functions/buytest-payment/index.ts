@@ -11,7 +11,7 @@ const PLANS = {
   premium: { amountAgorot: 4900, title: "בדיקה עצמית לפני המכון", scopes: ["premium"] },
   report: { amountAgorot: 4900, title: "פענוח דוח המכון", scopes: ["report"] },
   consultation: { amountAgorot: 14900, title: "התייעצות אישית לאחר פענוח", scopes: ["consultation"] },
-  prebuy: { amountAgorot: 7900, title: "ייעוץ לפני רכישה בוואטסאפ · עד 10 שאלות · 24 שעות", scopes: ["prebuy"] },
+  prebuy: { amountAgorot: 7900, title: "ייעוץ לפני רכישה בוואטסאפ · ההתייעצות פתוחה ל־48 שעות", scopes: ["prebuy"] },
   bundle: { amountAgorot: 12000, title: "חבילת BuyTest המלאה", scopes: ["premium", "report", "consultation"] },
 } as const;
 type PlanKey = keyof typeof PLANS;
