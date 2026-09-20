@@ -468,9 +468,24 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
   </div>
   <div class="analyticsGrid" aria-live="polite">
     <article class="analyticsMetric"><strong id="analyticsVisits">—</strong><span>כניסות לאתר</span></article>
+    <article class="analyticsMetric"><strong id="analyticsBlogViews">—</strong><span>קוראים בבלוג</span></article>
     <article class="analyticsMetric"><strong id="analyticsFreeStarts">—</strong><span>התחילו בדיקה חינמית</span></article>
     <article class="analyticsMetric"><strong id="analyticsPaidEntries">—</strong><span>נכנסו לשירות בתשלום</span></article>
     <button class="analyticsMetric analyticsMetricButton" id="analyticsFeedbackMetric" type="button" onclick="openBuyTestFeedback()" aria-label="פתיחת התגובות החדשות"><strong id="analyticsNewFeedback">—</strong><span>תגובות חדשות</span></button>
+  </div>
+  <h3 class="analyticsSourceTitle">כניסות לבלוג לפי כתבה</h3>
+  <div class="analyticsSourceWrap">
+    <table class="analyticsSourceTable" aria-label="כניסות לבלוג לפי כתבה">
+      <thead><tr><th scope="col">כתבה</th><th scope="col">קוראים</th><th scope="col">עברו לאתר</th></tr></thead>
+      <tbody id="analyticsBlogArticleRows"><tr><td>טוען…</td><td>—</td><td>—</td></tr></tbody>
+    </table>
+  </div>
+  <h3 class="analyticsSourceTitle">מקורות הכניסה לבלוג</h3>
+  <div class="analyticsSourceWrap">
+    <table class="analyticsSourceTable" aria-label="מקורות הכניסה לבלוג">
+      <thead><tr><th scope="col">מקור</th><th scope="col">קוראים</th><th scope="col">עברו לאתר</th></tr></thead>
+      <tbody id="analyticsBlogSourceRows"><tr><td>טוען…</td><td>—</td><td>—</td></tr></tbody>
+    </table>
   </div>
   <h3 class="analyticsSourceTitle">פירוט לפי מקור הגעה</h3>
   <div class="analyticsSourceWrap">
@@ -2100,6 +2115,15 @@ function renderBuyTestClickAnalytics(rows){
     return `<tr><td>${escapeHtml(BUYTEST_SOURCE_LABELS[source]||source)}</td><td>${escapeHtml(label)}</td><td>${number(item?.clicks)}</td><td dir="ltr">${escapeHtml(campaign)}</td></tr>`;
   }).join('');
 }
+function renderBuyTestBlogAnalytics(blog){
+  const number=value=>Number(value||0).toLocaleString('he-IL');
+  const articleBody=document.getElementById('analyticsBlogArticleRows');
+  const sourceBody=document.getElementById('analyticsBlogSourceRows');
+  const articles=Array.isArray(blog?.articles)?blog.articles:[];
+  const sources=Array.isArray(blog?.sources)?blog.sources:[];
+  if(articleBody) articleBody.innerHTML=articles.length?articles.map(item=>`<tr><td>${escapeHtml(item.title||item.path||'כתבה')}</td><td>${number(item.views)}</td><td>${number(item.toSite)}</td></tr>`).join(''):'<tr><td colspan="3">אין עדיין כניסות לכתבות בטווח הזה.</td></tr>';
+  if(sourceBody) sourceBody.innerHTML=sources.length?sources.map(item=>{const source=String(item?.source||'unknown');return `<tr><td>${escapeHtml(BUYTEST_SOURCE_LABELS[source]||source)}</td><td>${number(item.views)}</td><td>${number(item.toSite)}</td></tr>`}).join(''):'<tr><td colspan="3">אין עדיין נתוני מקור לבלוג בטווח הזה.</td></tr>';
+}
 async function loadBuyTestAnalytics(range=buyTestAnalyticsRange){
   buyTestAnalyticsRange=['today','7d','30d','all'].includes(range)?range:'all';
   document.querySelectorAll('[data-analytics-range]').forEach(button=>button.classList.toggle('active',button.dataset.analyticsRange===buyTestAnalyticsRange));
@@ -2108,11 +2132,14 @@ async function loadBuyTestAnalytics(range=buyTestAnalyticsRange){
   try{
     const data=await callBuyTestAnalyticsService({action:'stats',range:buyTestAnalyticsRange},{manager:true});
     const stats=data.stats||{};
+    const blog=data.blog||{};
     document.getElementById('analyticsVisits').textContent=Number(stats.visits||0).toLocaleString('he-IL');
+    document.getElementById('analyticsBlogViews').textContent=Number(blog.views||0).toLocaleString('he-IL');
     document.getElementById('analyticsFreeStarts').textContent=Number(stats.freeStarts||0).toLocaleString('he-IL');
     document.getElementById('analyticsPaidEntries').textContent=Number(stats.paidEntries||0).toLocaleString('he-IL');
     renderBuyTestSourceAnalytics(stats.sources);
     renderBuyTestClickAnalytics(data.clicks);
+    renderBuyTestBlogAnalytics(blog);
     if(status) status.textContent='עודכן '+new Date().toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});
   }catch(error){
     console.error('BuyTest analytics loading failed:',error);
