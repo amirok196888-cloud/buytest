@@ -1,6 +1,10 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
-const ALLOWED_ORIGIN = "https://amirok196888-cloud.github.io";
+const ALLOWED_ORIGINS = new Set([
+  "https://buytest.co.il",
+  "https://www.buytest.co.il",
+  "https://amirok196888-cloud.github.io",
+]);
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 const VALID_ID = /^[A-Za-z0-9_-]{20,80}$/;
@@ -31,6 +35,8 @@ const CLICK_EVENT_TYPES = new Set([
 ]);
 const TRACK_EVENT_TYPES = new Set([
   "page_view",
+  "blog_view",
+  "blog_to_site",
   "free_started",
   "free_completed",
   "consultation_opened",
@@ -38,8 +44,9 @@ const TRACK_EVENT_TYPES = new Set([
 ]);
 
 function cors(origin: string | null) {
+  const allowedOrigin = origin && ALLOWED_ORIGINS.has(origin) ? origin : "https://buytest.co.il";
   return {
-    "Access-Control-Allow-Origin": origin === ALLOWED_ORIGIN ? origin : ALLOWED_ORIGIN,
+    "Access-Control-Allow-Origin": allowedOrigin,
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-buytest-manager-pin",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Access-Control-Max-Age": "86400",
@@ -111,6 +118,8 @@ async function trackEvent(eventType: string, visitorId: string, sessionId: strin
       visitor_id: visitorId,
       session_id: sessionId,
       vehicle_plate: /^\d{7,8}$/.test(vehiclePlate) ? vehiclePlate : null,
+      page_path: cleanText(body.pagePath, 220) || "",
+      page_title: cleanText(body.pageTitle, 180) || null,
       ...cleanAttribution(body),
     }),
   });
@@ -268,11 +277,11 @@ async function listFreeActivity() {
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get("origin");
   if (req.method === "OPTIONS") {
-    if (origin !== ALLOWED_ORIGIN) return json(origin, { ok: false, error: "origin_not_allowed" }, 403);
+    if (!origin || !ALLOWED_ORIGINS.has(origin)) return json(origin, { ok: false, error: "origin_not_allowed" }, 403);
     return new Response(null, { status: 204, headers: cors(origin) });
   }
   if (req.method !== "POST") return json(origin, { ok: false, error: "method_not_allowed" }, 405);
-  if (origin !== ALLOWED_ORIGIN) return json(origin, { ok: false, error: "origin_not_allowed" }, 403);
+  if (!origin || !ALLOWED_ORIGINS.has(origin)) return json(origin, { ok: false, error: "origin_not_allowed" }, 403);
 
   let body: Record<string, unknown>;
   try { body = await req.json(); } catch { return json(origin, { ok: false, error: "invalid_json" }, 400); }
@@ -299,14 +308,18 @@ Deno.serve(async (req: Request) => {
       const pin = String(req.headers.get("x-buytest-manager-pin") || body.adminPin || "");
       if (!await isAdmin(pin)) return json(origin, { ok: false, error: "admin_denied" }, 403);
       const range = ['today', '7d', '30d', 'all'].includes(String(body.range)) ? String(body.range) : 'all';
-      const [stats, clicks] = await Promise.all([
+      const [stats, clicks, blog] = await Promise.all([
         serviceRequest("/rest/v1/rpc/buytest_analytics_summary", {
           method: "POST",
           body: JSON.stringify({ p_range: range }),
         }),
         clickSummary(range),
+        serviceRequest("/rest/v1/rpc/buytest_blog_analytics_summary", {
+          method: "POST",
+          body: JSON.stringify({ p_range: range }),
+        }),
       ]);
-      return json(origin, { ok: true, stats, clicks });
+      return json(origin, { ok: true, stats, clicks, blog });
     }
     if (body.action === "feedback_list") {
       const pin = String(req.headers.get("x-buytest-manager-pin") || body.adminPin || "");
