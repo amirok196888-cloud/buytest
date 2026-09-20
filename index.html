@@ -694,7 +694,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
       <div class="field wide"><label for="prebuyQuestion"><b>במה תרצו להתחיל?</b></label><textarea id="prebuyQuestion" maxlength="2000" oninput="updatePrebuyCounter()" placeholder="כתבו את השאלה או הנושא הראשון שתרצו לברר. לאחר פתיחת הוואטסאפ תוכלו להמשיך את ההתייעצות במשך 48 שעות."></textarea><div class="clarificationCounter" id="prebuyCounter"><span>השאלה או הנושא הראשון להתייעצות</span><span id="prebuyCharacterCount">0 מתוך 2000</span></div></div>
     </div>
     <p class="formNote">בלחיצה תיפתח הודעת WhatsApp מזוהה ומוכנה עם הפרטים והשאלות שמילאת. אפשר לצרף תמונות או מסמכים בתוך WhatsApp.</p>
-    <div class="info" role="note"><b>שעות מענה:</b> ימים א׳–ה׳: 09:00–18:00 · יום ו׳: 09:00–13:00.<br>בשבתות ובחגים אין מענה. אפשר לשלוח בכל שעה; חלון 24 השעות מתחיל במענה הראשון של עמוס.</div>
+    <div class="info" role="note"><b>שעות מענה:</b> ימים א׳–ה׳: 09:00–18:00 · יום ו׳: 09:00–13:00.<br>בשבתות ובחגים אין מענה. אפשר לשלוח בכל שעה; ההתייעצות פתוחה למשך 48 שעות ממועד אישור התשלום.</div>
     <button class="primary full" type="button" data-analytics-click="click_prebuy_whatsapp" onclick="openPrebuyWhatsApp()">לחץ לפתיחת הודעה מוכנה בוואטסאפ</button>
   </div>
 </section>
@@ -2324,7 +2324,7 @@ async function restoreBuyTestAccess({requiredPlate='',onReturn=false,scroll=true
 async function restoreBuyTestAccessWithRetry(options={},attempts=3){
   for(let attempt=0;attempt<attempts;attempt++){
     const lastAttempt=attempt===attempts-1;
-    if(await restoreBuyTestAccess({...options,onReturn:lastAttempt})) return true;
+    if(await restoreBuyTestAccess({...options,onReturn:Boolean(options.onReturn)&&lastAttempt})) return true;
     if(!lastAttempt) await new Promise(resolve=>setTimeout(resolve,700));
   }
   return false;
@@ -5612,6 +5612,9 @@ window.addEventListener('DOMContentLoaded',async()=>{
   const flowProgress=document.getElementById('preFlowProgress');
   if(flowProgress&&preVisitSection) flowProgress.insertAdjacentElement('afterend',preVisitSection);
   if(preVisitSection&&licenseMatchSection) preVisitSection.insertAdjacentElement('afterend',licenseMatchSection);
+  const consultationOffer=document.querySelector('#preSummarySection .consultationOffer');
+  const prePurchaseConsultationBox=document.getElementById('prePurchaseConsultationBox');
+  if(consultationOffer&&prePurchaseConsultationBox) consultationOffer.insertAdjacentElement('afterend',prePurchaseConsultationBox);
   document.querySelectorAll('.paidOnly').forEach(x=>x.style.display='none');
   const managerBox=document.getElementById('managerPreviewBox');
   const managerParams=new URLSearchParams(location.search);
@@ -5631,7 +5634,7 @@ window.addEventListener('DOMContentLoaded',async()=>{
   }
   syncVehicleLookupButton();
   updateBuyTestRoadmap();
-  await runBuyTestAccessInitialization();
+  if(!isManagerLink) await runBuyTestAccessInitialization();
 });
 window.addEventListener('pageshow',async event=>{
   buyTestPaymentStarting=false;
