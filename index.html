@@ -3426,9 +3426,28 @@ function formulaOverrideKey(category,text){
   return normalizeFindingText(category)+'|'+normalizeFindingText(text);
 }
 
-function formulaOverrideFor(category,text){
+function formulaOverrideFor(category,text,kind='',id=''){
+  const rows=loadFormulaOverrides();
+  const sourceKind=kind?serverFormulaSourceKind(kind):'';
+  if(sourceKind&&id){
+    const byIdentity=rows.find(item=>item.source_kind===sourceKind&&String(item.source_id)===String(id));
+    if(byIdentity) return byIdentity;
+  }
   const key=formulaOverrideKey(category,text);
-  return loadFormulaOverrides().find(item=>formulaOverrideKey(item.category,item.text)===key)||null;
+  return rows.find(item=>formulaOverrideKey(item.category,item.text)===key)||null;
+}
+
+function formulaOverrideForFinding(item){
+  const itemId=String(item?.id||'');
+  const byIdentity=loadFormulaOverrides().find(row=>{
+    const sourceId=String(row.source_id||'');
+    if(row.source_kind==='formula') return itemId===('formula-'+sourceId);
+    if(row.source_kind==='observed') return itemId===('formula-alias-'+sourceId)||itemId===('alias-'+sourceId);
+    if(row.source_kind==='knowledge') return itemId===sourceId;
+    return false;
+  });
+  if(byIdentity) return byIdentity;
+  return formulaOverrideFor(item?.category||'',item?.sourceText||item?.matchedTerm||'');
 }
 
 function saveFormulaOverrideRows(rows){
@@ -3497,13 +3516,14 @@ async function syncFormulaAdminFromServer(){
 function applyManagerFormulaOverride(item){
   if(!item) return item;
   const source=item.sourceText||item.matchedTerm||'';
-  const override=formulaOverrideFor(item.category,source);
+  const override=formulaOverrideForFinding(item);
   const managerMeaning=item.managerMeaning||override?.meaning||'';
   const managerDecision=item.managerDecision||override?.decision||'';
   if(!override&&!managerMeaning&&!managerDecision) return item;
   const overrideSeverity=override?.report_severity||item.reportSeverity;
   return {
     ...item,
+    category:override?.category||item.category,
     classification:override?.classification_type||item.classification,
     reportSeverity:overrideSeverity==='none'?null:overrideSeverity,
     tag:override?.report_severity?(expertSeverityLabels[override.report_severity]||item.tag):item.tag,
@@ -3549,7 +3569,10 @@ function formulaAdminRows(){
   const base=rawFormulaDatabase.filter(isOperationalFormula).map(item=>({kind:'base',id:item.id,text:item.text,category:item.category,subgroup:item.subgroup||'',type:item.classification?.type||'context_dependent',severity:item.classification?.severity==='review'?'medium':(item.classification?.severity||'none'),meaning:item.meaning||'',decision:item.decision||'',question:item.question||'',procedure127:Boolean(item.procedure_127)}));
   const observed=observedFormulaAliases.filter(isOperationalFormula).map(item=>({kind:'observed',id:item.id,text:item.text,category:item.category,subgroup:item.subgroup||'',type:item.classification_type||'context_dependent',severity:item.report_severity||'none',meaning:item.meaning||'',decision:item.decision||'',question:item.question||''}));
   const custom=loadCustomFormulas().filter(isOperationalFormula).map(item=>({kind:'custom',id:item.id,text:item.text,category:item.category,subgroup:item.subgroup||'',type:item.classification_type||'context_dependent',severity:item.report_severity||'none',meaning:item.meaning||'',decision:item.decision||'',question:item.question||''}));
-  return [...custom,...observed,...base].map(item=>{const override=formulaOverrideFor(item.category,item.text);return {...item,override,subgroup:override?.subgroup??item.subgroup??''};});
+  return [...custom,...observed,...base].map(item=>{
+    const override=formulaOverrideFor(item.category,item.text,item.kind,item.id);
+    return {...item,sourceCategory:item.category,override,category:override?.category??item.category,subgroup:override?.subgroup??item.subgroup??''};
+  });
 }
 
 function formulaAdminKey(item){return item.kind+'|'+item.id;}
@@ -3648,13 +3671,14 @@ async function saveCustomFormula(){
 
   if(editingFormulaTarget&&editingFormulaTarget.kind!=='custom'){
     const overrides=loadFormulaOverrides();
-    const existingIndex=overrides.findIndex(item=>formulaOverrideKey(item.category,item.text)===formulaOverrideKey(editingFormulaTarget.category,editingFormulaTarget.text));
+    const sourceKind=serverFormulaSourceKind(editingFormulaTarget.kind);
+    const existingIndex=overrides.findIndex(item=>item.source_kind===sourceKind&&String(item.source_id)===String(editingFormulaTarget.id));
     const template=classificationTemplate(type,category,textValue);
     const value={
       id:existingIndex>=0?overrides[existingIndex].id:('override-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7)),
       source_kind:serverFormulaSourceKind(editingFormulaTarget.kind),
       source_id:editingFormulaTarget.id,
-      category:editingFormulaTarget.category,
+      category,
       text:editingFormulaTarget.text,
       subgroup:subgroupValue,
       classification_type:type,
@@ -3730,7 +3754,7 @@ function adminRulePreview(item){
 function editFormulaEntry(kind,id){
   const item=formulaAdminRows().find(row=>row.kind===kind&&row.id===id);
   if(!item) return;
-  editingFormulaTarget={kind,id,category:item.category,text:item.text};
+  editingFormulaTarget={kind,id,category:item.category,sourceCategory:item.sourceCategory||item.category,text:item.text};
   editingCustomFormulaId=kind==='custom'?id:null;
   const preview=adminRulePreview(item);
   const override=item.override;
@@ -3743,7 +3767,7 @@ function editFormulaEntry(kind,id){
   document.getElementById('formulaDecision').value=override?.decision||item.decision||preview.decision||professionalDecision(preview);
   document.getElementById('formulaQuestion').value=override?.question||item.question||preview.question||'';
   if(kind!=='custom'){
-    document.getElementById('formulaCategory').disabled=true;
+    document.getElementById('formulaCategory').disabled=false;
     document.getElementById('formulaText').readOnly=true;
   }
   document.getElementById('formulaSaveButton').textContent='שמור שינויים';
