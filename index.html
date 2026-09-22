@@ -3081,6 +3081,7 @@ const findingKnowledgeBase=[
   {id:'rim-scuffs-report',terms:['שפשופים בחישוקים','שפשופים חישוקים'],patterns:[/שפשופ[א-ת]*.*חישוק/],category:'צמיגים וחישוקים',tag:'משמעות נמוכה',tone:'clarify',classification:'actual_finding',reportSeverity:'low',meaning:'נרשמו שפשופים בחישוקים.',decision:'זהו בדרך כלל ממצא קוסמטי, אך יש לוודא שאין עיקום, סדק או איבוד לחץ.'},
   {id:'front-lamps-damaged-report',terms:['פנס חזית פגומים','פנסי חזית פגומים','פנס חזית פגום','מיחקת פגומים'],patterns:[/פנס[י]?\s*חזית.*פגומ/,/מיחקת\s*פגומ/],category:'מערכת תאורה',tag:'משמעות נמוכה',tone:'clarify',classification:'actual_finding',reportSeverity:'low',meaning:'נרשם נזק בפנסי החזית.',decision:'יש לבדוק את פעולת הפנסים, התושבות והאטימה ולהביא בחשבון תיקון או החלפה.'},
   {id:'transmission-disc-wear-report',terms:['נקישות בלאי דיסקיות בתיבת הילוכים','בלאי דיסקיות בתיבת הילוכים'],patterns:[/(?:נקיש[א-ת]*\s*)?בלאי\s*דיסק[א-ת]*.*הילוכים/],category:'תיבת העברת הכוח',tag:'משמעות בינונית',tone:'clarify',classification:'actual_finding',reportSeverity:'medium',meaning:'נרשמו נקישות ובלאי בדיסקיות תיבת ההילוכים.',decision:'יש לבצע בדיקת תיבה ממוקדת ולהביא בחשבון תיקון אפשרי ועלות במערכת ההילוכים.'},
+  {id:'gearbox-driving-vibration-report',terms:['רעידות בנסיעה','רעידה בנסיעה','רעידות בתיבת הילוכים','רעידות בגיר'],patterns:[/רעיד[א-ת]*.*נסיעה/],categoryHints:['תיבת הילוכים','תיבת העברת הכוח'],category:'תיבת הילוכים',tag:'משמעות גבוהה',tone:'safety',classification:'actual_finding',reportSeverity:'high',meaning:'נרשמו רעידות בנסיעה תחת סעיף תיבת ההילוכים או מערכת העברת הכוח. זהו ממצא ממשי שיכול להיות קשור לתיבה או למכלולים נלווים, אך מקורו המדויק דורש אבחון.',decision:'זהו ממצא בעל משמעות גבוהה. יש לבצע בדיקה ממוקדת של תיבת ההילוכים ומערכת העברת הכוח, לזהות מתי הרעידות מופיעות ולהעריך את היקף הטיפול לפני קבלת החלטה.'},
   {id:'engine-gear-mounts-report',terms:['לבדוק תושבות מנוע וגיר','תושבות מנוע וגיר'],patterns:[/תושבות.*מנוע.*גיר/,/לבדוק\s*תושבות.*גיר/],category:'תיבת העברת הכוח',tag:'משמעות נמוכה',tone:'clarify',classification:'actual_finding',reportSeverity:'low',meaning:'נרשמה דרישה לבדוק את תושבות המנוע והגיר, לצד סימון של תושבת פגומה.',decision:'יש לזהות איזו תושבת פגומה ולהביא בחשבון החלפה.'},
   {id:'gearbox-mount-report',terms:['תושבת תיבת הילוכים פגומה','תושבת תיבת ההילוכים פגומה','תושבת גיר פגומה'],patterns:[/תושבת\s+(?:תיבת\s+ה?ילוכים|גיר)\s+פגומ/],category:'תיבת הילוכים',tag:'ליקוי נקודתי',tone:'clarify',classification:'actual_finding',reportSeverity:'low',suppresses:['gear-shift'],meaning:'נרשמה תושבת פגומה של תיבת ההילוכים. התושבת מחברת את התיבה למרכב ומבודדת תנועה ורעידות; הממצא אינו קובע שתיבת ההילוכים עצמה פגומה.',decision:'יש לבדוק ולהחליף את התושבת לפי הצורך ולהביא בחשבון את עלות הטיפול. אין לסווג את תיבת ההילוכים כלא תקינה על סמך ממצא זה בלבד.'},
   {id:'gearbox-software-update-report',terms:['לבדוק עידכון גירסה לגיר','לבדוק עדכון גרסה לגיר'],patterns:[/לבדוק.*(?:עידכון|עדכון).*גירס?ה.*גיר/],category:'תיבת העברת הכוח',tag:'בדיקת המשך',tone:'clarify',classification:'recommendation',meaning:'הדוח ממליץ לבדוק אם נדרש עדכון תוכנה לתיבת ההילוכים.',decision:'אין לספור זאת לבדה כתקלה מכנית; יש לבדוק במוסך לפי מספר השלדה אם קיים עדכון רלוונטי.'},
@@ -5026,17 +5027,13 @@ function analysisTextBlock(title,result,computerResult=null){
       if(group.decision) text+=`• משמעות מקצועית: ${group.decision}\n`;
     });
   }
-  if(result.unknown?.length){
-    const unknown=compactUniqueTexts(result.unknown);
-    text+='ניסוחים לבירור\n'+unknown.map(item=>`• ${item}`).join('\n')+'\n';
-  }
   if(!isComputer){
     const conclusion=professionalOverallConclusion(result,computerResult);
     text+='תמונה מקצועית מסכמת\n';
     if(conclusion.highConclusion) text+=`מסקנת משמעות גבוהה\n• ${conclusion.highConclusion}\n`;
     text+=`מסקנת משמעות נמוכה\n• ${conclusion.lowConclusion}\n• הבהרה: ${conclusion.disclaimer}\n`;
   }
-  if(!groups.length&&!result.unknown?.length) text+='• לא זוהה ניסוח שניתן לפרש בבטחה מתוך המאגר המקצועי.\n';
+  if(!groups.length) text+='• לא זוהו ממצאים שניתן לסווג אוטומטית. יש להסתמך על דוח המקור ולברר כל ממצא מהותי עם בעל מקצוע.\n';
   return text.trim();
 }
 
@@ -5054,7 +5051,7 @@ function inspectionRequesterAdvisory(ownerName){
     .replace(/\s+/g,' ')
     .trim();
   if(!normalized) return null;
-  const knownCommercial=/(?:לובינסקי|כלמוביל|קרסו|פריסבי|אוטודיל|אוטו דיל|אוטוסנטר|אוטו סנטר|אלבר|אוויס|avis|הרץ|hertz|אלדן|קל אוטו|טרייד מוביל|שלמה סיקסט|שלמה רכב|lease4u|budget)/;
+  const knownCommercial=/(?:לובינסקי|לוינסקי|כלמוביל|קרסו|פריסבי|אוטודיל|אוטו דיל|אוטוסנטר|אוטו סנטר|אלבר|אוויס|avis|הרץ|hertz|אלדן|קל אוטו|טרייד מוביל|שלמה סיקסט|שלמה רכב|lease4u|budget)/;
   const businessMarker=/(?:סוכנות|ליסינג|טרייד|מוטורס|מגרש(?:י)? רכב|חברת רכב|רכב בעמ|בעמ|בע מ)/;
   if(!knownCommercial.test(normalized)&&!businessMarker.test(normalized)) return null;
   const title='⚠ הבדיקה הוזמנה כנראה מטעם גורם מסחרי';
@@ -5130,14 +5127,12 @@ async function analyseInspectionReport(){
   if(summaryResult.findings.length){
     html+='<h4>סיכום הבוחן לפי מערכות</h4>'+compactAnalysisHtml(summaryResult,false);
   }
-  html+=unknownFindingsHtml(summaryResult.unknown);
   if(computerText){
     html+='<h4>בדיקה ממוחשבת</h4>'+computerIdentityHtml(computerResult.vehicleIdentity)+(computerResult.findings.length?computerFindingsHtml(computerResult):'<p>לא נמצא בדף סימון מפורש או קוד שניתן לשקף בבטחה.</p>');
-    html+=unknownFindingsHtml(computerResult.unknown);
   }
   html+=professionalOverallConclusionHtml(summaryResult,computerResult);
-  if(!totalFindings&&!totalUnknown){
-    html+='<div class="unknownList"><b>לא זוהו בדוח ממצאים שניתן להתאים בבטחה למאגר המקצועי.</b></div>';
+  if(!totalFindings){
+    html+='<p class="info">לא זוהו ממצאים שניתן לסווג אוטומטית. יש להסתמך על דוח המקור ולברר כל ממצא מהותי עם בעל מקצוע.</p>';
   }
 
   const box=document.getElementById('afterInterpretation');
