@@ -2,17 +2,22 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const BALCAR_BASE = "https://api.balcar.co.il/api/biz/v1";
-const BALCAR_SERVICE_ID = 207;
+const BALCAR_SERVICE_ID = 206;
 const BALCAR_API_KEY = Deno.env.get("BALCAR_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const admin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, { auth: { persistSession: false } });
 const ADMIN_PIN_HASH = "46a30a10bf067f6c3bede12312c987e43ec06920de6cbbe15617079c1f19ab10";
-const ALLOWED_ORIGIN = "https://amirok196888-cloud.github.io";
+const ALLOWED_ORIGINS = new Set([
+  "https://buytest.co.il",
+  "https://www.buytest.co.il",
+  "https://amirok196888-cloud.github.io",
+]);
 
 function responseHeaders(origin: string | null) {
+  const allowedOrigin = origin && ALLOWED_ORIGINS.has(origin) ? origin : "https://buytest.co.il";
   return {
-    "Access-Control-Allow-Origin": origin === ALLOWED_ORIGIN ? origin : ALLOWED_ORIGIN,
+    "Access-Control-Allow-Origin": allowedOrigin,
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Access-Control-Max-Age": "86400",
@@ -137,13 +142,16 @@ Deno.serve(async (req: Request) => {
 
       const eligibility = await balcarRaw(`/vehicles/${encodeURIComponent(plate)}/eligibility?serviceId=${BALCAR_SERVICE_ID}`);
       if (eligibility.status < 200 || eligibility.status >= 300) return json(origin, eligibility.data, eligibility.status);
-      if (recordValue(eligibility.data).requiresSellerDetails === true) {
+      if (recordValue(eligibility.data).requiresSellerDetails === true && (!body.ownershipDate || !body.ownerIsraeliId)) {
         return json(origin, { error: { code: "seller_details_required" } }, 422);
       }
 
+      const payload: Record<string, unknown> = { serviceId: BALCAR_SERVICE_ID, plate, externalRef };
+      if (body.ownershipDate) payload.ownershipDate = String(body.ownershipDate);
+      if (body.ownerIsraeliId) payload.ownerIsraeliId = String(body.ownerIsraeliId).replace(/\D/g, "");
       const result = await balcarRaw("/reports", {
         method: "POST",
-        body: JSON.stringify({ serviceId: BALCAR_SERVICE_ID, plate, externalRef }),
+        body: JSON.stringify(payload),
       });
       if (result.status >= 200 && result.status < 300) {
         await rememberReport(order, reportIdFrom(result.data), externalRef);
