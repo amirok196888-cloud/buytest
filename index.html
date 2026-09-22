@@ -1300,8 +1300,10 @@ function setCheckState(control,state){
   }
   updateChecklistSection(check.closest('.checklistStep'));
 }
-document.getElementById('externalChecks').innerHTML=makeChecks(external);
-document.getElementById('selfChecks').innerHTML=makeChecks(self);
+const externalChecksContainer=document.getElementById('externalChecks');
+const selfChecksContainer=document.getElementById('selfChecks');
+if(externalChecksContainer) externalChecksContainer.innerHTML=makeChecks(external);
+if(selfChecksContainer) selfChecksContainer.innerHTML=makeChecks(self);
 document.querySelectorAll('.checklistStep').forEach(updateChecklistSection);
 
 
