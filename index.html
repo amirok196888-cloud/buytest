@@ -324,8 +324,8 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
     <h3>התחלת בדיקה בחינם + הפקת עבר ביטוחי</h3>
     <p>הכנס מספר רכב והתחל מיד בדיקה חינמית קצרה וממוקדת. האפשרות להפקת דוח עבר ביטוחי תופיע בסיום השלב החינמי.</p>
     <div class="landingFreeStart">
+      <button class="mktBtn mktBtnPrimary" type="button" data-analytics-click="click_landing_free" onclick="startFreeCheckFromLanding()">התחלת בדיקה בחינם + הפקת עבר ביטוחי</button>
       <input id="plate" inputmode="numeric" maxlength="8" autocomplete="off" aria-label="מספר רכב להתחלת בדיקה בחינם" placeholder="הכנס מספר רכב" oninput="sanitizePlateInput(this);this.setCustomValidity('')" onkeydown="if(event.key==='Enter')startFreeCheckFromLanding()">
-      <button class="mktBtn mktBtnPrimary" type="button" data-analytics-click="click_landing_free" onclick="startFreeCheckFromLanding()">התחלת בדיקה בחינם</button>
     </div>
   </article>
 </div>
@@ -613,14 +613,14 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 <button class="primary full" id="pdfBtn" data-analytics-click="click_pdf" onclick="shareReportPdf('pdfBtn')" style="display:none">לחץ לשיתוף הסיכום כ־PDF</button>
 <div class="info"><b>חשוב:</b> BuyTest אינו קובע שהרכב תקין, בטוח או כדאי לרכישה. כל החלטה נשארת בידי המשתמש.</div>
 <div class="balcarOffer">
-  <h3>הפקת דוח עבר ביטוחי</h3>
-  <p>לחץ לפתיחת אפשרות ההפקה. לפני התשלום יוצגו המחיר והפרטים המדויקים של השירות.</p>
+  <h3>הפקה ופענוח דוח עבר ביטוחי</h3>
+  <p>הדוח יופק ויצורף לסיכום ולפענוח העבר הביטוחי.</p>
   <div id="insuranceSellerFields" style="display:none;margin:12px 0;padding:12px;border:1px solid #edcd7a;border-radius:12px;background:#fffaf0">
     <b>נדרשים פרטי הבעלות לצורך הפקת הדוח</b>
     <div class="field" style="margin-top:10px"><label for="insuranceOwnershipDate">תאריך תחילת הבעלות</label><input id="insuranceOwnershipDate" type="date"></div>
     <div class="field" style="margin-top:10px"><label for="insuranceOwnerId">תעודת זהות של בעל הרכב</label><input id="insuranceOwnerId" inputmode="numeric" maxlength="9" autocomplete="off" placeholder="9 ספרות" oninput="this.value=this.value.replace(/\D/g,'').slice(0,9)"></div>
   </div>
-  <button class="primary full" id="balcarPlanButton" type="button" data-analytics-click="click_insurance_history" onclick="startBalcarPayment()">הפקת דוח עבר ביטוחי — 39 ₪</button>
+  <button class="primary full" id="balcarPlanButton" type="button" data-analytics-click="click_insurance_history" onclick="startBalcarPayment()">הפקה ופענוח דוח עבר ביטוחי — 39 ₪</button>
   <div class="devMsg" id="balcarEligibilityMsg" role="status" aria-live="polite"></div>
 </div>
 <div class="balcarOffer consultationOffer">
@@ -1687,7 +1687,7 @@ function openLegal(which){
 function closeLegal(){document.getElementById('legalModal').classList.remove('open')}
 function unlockFreeSections(){document.querySelectorAll('.freeAfterLookup').forEach(x=>x.style.removeProperty('display'));}
 const buytestPlans={
-  balcar:{name:'דוח עבר ביטוחי לרכב',price:39,scope:'הפקת דוח עבר ביטוחי, הצגת הנתונים שהתקבלו, קישור לדוח המקורי ותקציר PDF'},
+  balcar:{name:'הפקה ופענוח דוח עבר ביטוחי לרכב',price:39,scope:'הפקת דוח עבר ביטוחי, פענוח הנתונים שהתקבלו, קישור לדוח המקורי ותקציר PDF'},
   premium:{name:'בדיקה עצמית לפני המכון',price:49,scope:'שאלות למוכר, בדיקות חיצוניות ופנימיות, נסיעה קצרה, תמונות וסיכום PDF'},
   report:{name:'פענוח דוח המכון',price:49,scope:'פענוח סיכום הבוחן והבדיקה הממוחשבת, אם צורפה, וסיכום PDF'},
   consultation:{name:'התייעצות אישית לאחר פענוח',price:149,scope:'מעבר אישי על דוח אחד ורכב אחד ומתן הסבר מקצועי'},
@@ -2086,7 +2086,7 @@ const BUYTEST_CLICK_LABELS={
   click_free_summary:'הפקת סיכום הבדיקה החינמית',
   click_pdf:'שיתוף סיכום חינמי כ־PDF',
   click_balcar:'הפקת דוח עבר ביטוחי — 39 ₪',
-  click_insurance_history:'הפקת דוח עבר ביטוחי',
+  click_insurance_history:'הפקה ופענוח דוח עבר ביטוחי',
   click_balcar_pdf:'שיתוף תקציר עבר ביטוחי כ־PDF',
   click_report_plan:'מעבר לפענוח דוח — 49 ₪',
   click_report_upload:'העלאת סיכום בוחן',
