@@ -325,9 +325,9 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 <div class="routeCards" aria-label="בחירת מסלול BuyTest">
   <article class="routeCard free">
     <div class="landingFreeStart">
-      <button class="mktBtn mktBtnPrimary" type="button" data-analytics-click="click_landing_free" onclick="startFreeCheckFromLanding()">התחלת בדיקה בחינם + הפקת עבר ביטוחי</button>
-      <p class="landingFreeExplanation">הכנס מספר רכב והתחל מיד בדיקה חינמית קצרה וממוקדת. האפשרות להפקת דוח עבר ביטוחי תופיע בסיום השלב החינמי.</p>
-      <input id="plate" inputmode="numeric" maxlength="8" autocomplete="off" aria-label="מספר רכב להתחלת בדיקה בחינם" placeholder="הכנס מספר רכב" oninput="sanitizePlateInput(this);this.setCustomValidity('')" onkeydown="if(event.key==='Enter')startFreeCheckFromLanding()">
+      <input id="plate" inputmode="numeric" maxlength="8" autocomplete="off" aria-label="מספר רכב" placeholder="הכנס מספר רכב" oninput="sanitizePlateInput(this);this.setCustomValidity('')" onkeydown="if(event.key==='Enter')startInsuranceAndFreeFlowFromLanding()">
+      <button class="mktBtn mktBtnPrimary" type="button" data-analytics-click="click_landing_free" onclick="startInsuranceAndFreeFlowFromLanding()">פרטי רכב מהמאגר + עבר ביטוחי — 39 ₪</button>
+      <p class="landingFreeExplanation">לאחר פתיחת פרטי הרכב יוצגו בחינם 5 שאלות למוכר והתאמת הרישיון.</p>
     </div>
   </article>
 </div>
@@ -335,7 +335,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 </div>
 </div>
 <div class="mktSection alt" id="howItWorks"><div class="mktWrap">
-<div class="mktTitle"><h2>תהליך קצר לפני הקנייה — ופענוח מקצועי אחרי המכון</h2><p>מתחילים ללא תשלום באימות רישיון הרכב ובחמש שאלות ממוקדות למוכר. לאחר מכן אפשר להפיק עבר ביטוחי, או להעלות את דוח המכון ולקבל פענוח והתייעצות אישית עם בוחן. השירות אינו מחליף בדיקה במכון ואינו מחליט עבורך.</p></div>
+<div class="mktTitle"><h2>תהליך קצר לפני הקנייה — ופענוח מקצועי אחרי המכון</h2><p>מכניסים מספר רכב, פותחים פרטי רכב מהמאגר ועבר ביטוחי, ממשיכים ל־5 שאלות למוכר ולהתאמת הרישיון, ובסיום אפשר לפתוח פענוח של סיכום דוח המכון והתייעצות אישית עם בוחן. השירות אינו מחליף בדיקה במכון ואינו מחליט עבורך.</p></div>
 <div class="mktGrid3">
 <div class="mktInfoCard"><div class="ico">🔎</div><h3>מרכז מידע</h3><p>מושך נתונים זמינים על הרכב ומציג אותם במקום אחד, בצורה ברורה ופשוטה.</p></div>
 <div class="mktInfoCard"><div class="ico">🧭</div><h3>קצר וממוקד</h3><p>אימות רישיון וחמש שאלות למוכר בלבד — בלי צ׳קליסט ארוך ובלי בדיקות שאינן מתאימות לקונה רגיל.</p></div>
@@ -363,8 +363,8 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 <div class="mktTitle"><h2>שאלות נפוצות</h2></div>
 <div class="mktFaq">
 <details><summary>האם BuyTest מחליף בדיקה במכון?</summary><p>לא. השלב הראשון מארגן בדיקות בסיסיות ודגשים למכון; השלב השני מסביר את סיכום הבוחן. השירות אינו בודק את הרכב פיזית ואינו מאשר תקינות.</p></details>
-<details><summary>מה מקבלים בחינם?</summary><p>מזינים מספר רכב, מקבלים את פרטי הרכב הזמינים ממאגרי משרד התחבורה, מאמתים את רישיון הרכב ועוברים על חמש שאלות ממוקדות שכדאי לשאול את המוכר.</p></details>
-<details><summary>מה מקבלים בדוח עבר ביטוחי?</summary><p>לאחר סיום השלב החינמי אפשר להפיק דוח עבר ביטוחי ולקבל פענוח של הנתונים, קישור לדוח המקורי ותקציר PDF. המחיר הוא 39 ₪ ומוצג לפני המעבר לתשלום.</p></details>
+<details><summary>מה מקבלים בחינם?</summary><p>מזינים מספר רכב, מקבלים את פרטי הרכב הזמינים ממאגרי משרד התחבורה, עוברים על חמש שאלות ממוקדות למוכר ופותחים את התאמת רישיון הרכב.</p></details>
+<details><summary>מה מקבלים בדוח עבר ביטוחי?</summary><p>לאחר הכנסת מספר הרכב אפשר לפתוח את פרטי הרכב מהמאגר ולהפיק דוח עבר ביטוחי, כולל פענוח הנתונים, קישור לדוח המקורי ותקציר PDF. המחיר הוא 39 ₪ ומוצג לפני המעבר לתשלום.</p></details>
 <details><summary>מה כולל פענוח הדוח וההתייעצות?</summary><p>מעלים את סיכום הבוחן, ובמידת הצורך גם את הבדיקה הממוחשבת, מקבלים פענוח מסודר וסיכום PDF, ולאחר הפענוח עוברים להתייעצות אישית עם בוחן בוואטסאפ. מחיר השירות המשולב הוא 150 ₪.</p></details>
 <details><summary>מה קורה אם חסר מידע על הרכב?</summary><p>מאגרים ציבוריים אינם תמיד מלאים. כאשר נתון אינו זמין, BuyTest מציגה זאת במקום להמציא מידע, וממליצה לאמת פרטים מהותיים מול מסמכי הרכב והגורמים המתאימים.</p></details>
 <details><summary>האם BuyTest אומר אם לקנות את הרכב?</summary><p>לא. אין המלצת קנייה או אי־קנייה, אין הערכת שווי או עלות תיקון ואין קביעה לגבי ירידת ערך. BuyTest משקף משמעויות ושאלות לבירור בלבד; ההחלטה היא של המשתמש.</p></details>
@@ -402,8 +402,20 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 
 </div></details><div id="rawlink" style="display:none"></div></div>
 </section>
+<section class="card freeAfterLookup" id="insuranceStartSection" style="display:none">
+  <div class="balcarOffer insuranceOffer">
+    <h3>פרטי רכב מהמאגר + עבר ביטוחי</h3>
+    <div id="insuranceSellerFields" style="display:none;margin:12px 0;padding:12px;border:1px solid #edcd7a;border-radius:12px;background:#fffaf0">
+      <b>נדרשים פרטי הבעלות לצורך הפקת הדוח</b>
+      <div class="field" style="margin-top:10px"><label for="insuranceOwnershipDate">תאריך תחילת הבעלות</label><input id="insuranceOwnershipDate" type="date"></div>
+      <div class="field" style="margin-top:10px"><label for="insuranceOwnerId">תעודת זהות של בעל הרכב</label><input id="insuranceOwnerId" inputmode="numeric" maxlength="9" autocomplete="off" placeholder="9 ספרות" oninput="this.value=this.value.replace(/\D/g,'').slice(0,9)"></div>
+    </div>
+    <button class="primary full" id="balcarPlanButton" type="button" data-analytics-click="click_insurance_history" onclick="startBalcarPayment()">פתיחת פרטי הרכב ועבר ביטוחי — 39 ₪</button>
+    <div class="devMsg" id="balcarEligibilityMsg" role="status" aria-live="polite"></div>
+  </div>
+</section>
 <div class="preFlowProgress freeAfterLookup" id="preFlowProgress" aria-live="polite"><strong id="preFlowProgressText">הבדיקה החינמית ברכב</strong><span id="preFlowProgressHint">מסיימים סעיף אחד — והסעיף הבא נפתח אוטומטית.</span></div>
-<section class="card freeAfterLookup preFlowScreen preVisitCard" id="preVisitSection" data-pre-step="1" style="display:none">
+<section class="card freeAfterLookup preFlowScreen preVisitCard" id="preVisitSection" data-pre-step="0" style="display:none">
   <span class="preVisitBadge">חדש · בחינם</span>
   <h2>5 שאלות שכדאי לשאול את המוכר</h2>
   <p class="preVisitLead" id="preVisitSubtitle">השאלות יותאמו לנתונים הזמינים לרכב שבחרת.</p>
@@ -423,8 +435,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
     </div>
     <div class="preVisitToast" id="preVisitToast" role="status" aria-live="polite">השאלות הועתקו</div>
   </div>
-  <p class="sub" style="margin-top:16px"><b>סיימת את השלב החינמי.</b> עכשיו אפשר לבחור את השירות המתאים להמשך.</p>
-  <div class="preFlowNav"><button class="primary flowNext" type="button" data-analytics-click="click_free_next" onclick="showPreFlowStep(2)">סיום השאלות והמשך לבחירת שירות</button></div>
+  <div class="preFlowNav"><button class="primary flowNext" type="button" data-analytics-click="click_free_next" onclick="showPreFlowStep(1)">סיום 5 השאלות והמשך להתאמת הרישיון</button></div>
 </section>
 <section class="card" id="managerActiveNotice" style="display:none;border:2px solid #0ea67b;background:#e8f7f2;color:#075e48">
   <b>מצב מנהל פעיל</b>
@@ -560,7 +571,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
   <div class="formulaAdminList" id="formulaAdminList"></div>
 </section>
 
-<details class="card freeAfterLookup preFlowScreen guidedSection" id="licenseMatchSection" data-pre-step="0" style="display:none;border:2px solid #0ea67b;" open>
+<details class="card freeAfterLookup preFlowScreen guidedSection" id="licenseMatchSection" data-pre-step="1" style="display:none;border:2px solid #0ea67b;" open>
   <summary><span>התאמת רישיון הרכב לרכב ולמוכר</span></summary>
   <div class="stepContent">
   <p class="sub" style="font-weight:700;color:#17352d;">
@@ -594,29 +605,18 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
     <button class="clarifyChoice" type="button" onclick="setCheckState(this,'issue')">👆 צריך בירור</button>
     <div class="finding simpleFinding"><textarea placeholder="מה צריך לברר?" oninput="updateChecklistSection(this.closest('.checklistStep'))"></textarea></div>
   </div>
-  <div class="preFlowNav"><button class="primary flowNext" type="button" data-analytics-click="click_license_next" onclick="showPreFlowStep(1)">סיום אימות הרישיון והמשך ל־5 שאלות למוכר</button></div>
+  <div class="preFlowNav"><button class="primary flowNext" type="button" data-analytics-click="click_license_next" onclick="showPreFlowStep(2)">סיום התאמת הרישיון והמשך לפענוח ולהתייעצות</button></div>
   </div>
 </details>
 
 <div id="purchaseBox" style="display:none"></div>
-<section class="card freeAfterLookup preFlowScreen" id="preSummarySection" data-pre-step="2" style="display:none"><h2>השלב החינמי הסתיים</h2><p class="sub">אימתת את רישיון הרכב וקיבלת חמש שאלות ממוקדות למוכר. עכשיו אפשר לבחור איך להמשיך.</p>
-<div class="info"><b>חשוב:</b> BuyTest אינו מחליף בדיקה במכון, אינו קובע שהרכב תקין או כדאי לרכישה ואינו נותן הערכת מחיר לתיקון.</div>
-<div class="balcarOffer insuranceOffer">
-  <h3>הפקה ופענוח של דוח עבר ביטוחי</h3>
-  <div id="insuranceSellerFields" style="display:none;margin:12px 0;padding:12px;border:1px solid #edcd7a;border-radius:12px;background:#fffaf0">
-    <b>נדרשים פרטי הבעלות לצורך הפקת הדוח</b>
-    <div class="field" style="margin-top:10px"><label for="insuranceOwnershipDate">תאריך תחילת הבעלות</label><input id="insuranceOwnershipDate" type="date"></div>
-    <div class="field" style="margin-top:10px"><label for="insuranceOwnerId">תעודת זהות של בעל הרכב</label><input id="insuranceOwnerId" inputmode="numeric" maxlength="9" autocomplete="off" placeholder="9 ספרות" oninput="this.value=this.value.replace(/\D/g,'').slice(0,9)"></div>
-  </div>
-  <button class="primary full" id="balcarPlanButton" type="button" data-analytics-click="click_insurance_history" onclick="startBalcarPayment()">הפקת דוח עבר ביטוחי — 39 ₪</button>
-  <div class="devMsg" id="balcarEligibilityMsg" role="status" aria-live="polite"></div>
-</div>
+<section class="card freeAfterLookup preFlowScreen" id="preSummarySection" data-pre-step="2" style="display:none">
 <div class="balcarOffer consultationOffer">
-  <h3>פענוח דוח המכון והתייעצות עם בוחן</h3>
+  <h3>פתיחת התייעצות ופענוח סיכום דוח המכון</h3>
   <p>העלה את סיכום הבוחן והבדיקה הממוחשבת, קבל פענוח מסודר וסיכום PDF, ולאחר מכן התייעצות אישית בוואטסאפ למשך 48 שעות.</p>
-  <button class="primary full" type="button" data-analytics-click="click_report_plan" onclick="startPayment('report_consultation')">פענוח דוח מכון + התייעצות עם בוחן — 150 ₪</button>
+  <button class="primary full" type="button" data-analytics-click="click_report_plan" onclick="startPayment('report_consultation')">פתיחת התייעצות + פענוח סיכום דוח המכון — 150 ₪</button>
 </div>
-<div class="preFlowNav"><button class="secondary" type="button" onclick="showPreFlowStep(1)">חזרה ל־5 השאלות</button></div>
+<div class="preFlowNav"><button class="secondary" type="button" onclick="showPreFlowStep(1)">חזרה להתאמת הרישיון</button></div>
 </section>
 
 <section class="card paidOnly balcarFeature" id="balcarReportSection" style="display:none">
@@ -705,6 +705,13 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
   <div class="clarificationForm show" id="clarificationForm">
     <div class="field"><label for="clarificationCustomerName"><b>השם שלך</b></label><input id="clarificationCustomerName" autocomplete="name" maxlength="50" placeholder="שם מלא"></div>
     <div class="field"><label for="clarificationQuestion"><b id="clarificationQuestionLabel">מה חשוב לך שאבדוק בדוח?</b></label><textarea id="clarificationQuestion" maxlength="2000" oninput="updateClarificationCounter()" placeholder="כתבו כאן את השאלות או הממצאים שתרצו לברר"></textarea><div class="clarificationCounter" id="clarificationCounter"><span>השאלות שלך על הדוח</span><span id="clarificationCharacterCount">0 מתוך 2000</span></div></div>
+    <div class="photoBox">
+      <b>צילום עד 4 תמונות לפי בקשת הבוחן · אופציונלי</b>
+      <p class="formNote">אם הבוחן יבקש תמונות נוספות, אפשר לצלם או לבחור עד ארבע תמונות ולהוסיף אותן להתייעצות.</p>
+      <button class="secondary full" type="button" onclick="document.getElementById('consultationVehiclePhotos').click()">לחץ לצילום או לבחירת תמונות</button>
+      <input id="consultationVehiclePhotos" type="file" accept="image/*" capture="environment" multiple style="display:none" onchange="addVehiclePhotos(this)">
+      <div class="photoPreview" id="photoPreview"></div>
+    </div>
     <p class="formNote" id="clarificationFormNote">לאחר הלחיצה תיפתח הודעת WhatsApp מזוהה ומוכנה. אפשר לצרף בתוך WhatsApp את דוח הבדיקה או את סיכום BuyTest.</p>
     <div class="info" role="note"><b>שעות מענה מהבוחן:</b> ימים א׳–ה׳: 09:00–18:00 · יום ו׳: 09:00–13:00.<br>בשבתות ובחגים אין מענה. אפשר לשלוח הודעה בכל שעה; המענה יינתן בשעות אלה.</div>
     <button class="primary full" type="button" data-analytics-click="click_post_report_whatsapp" onclick="openPostReportWhatsApp()">לחץ לפתיחת הודעה מוכנה בוואטסאפ</button>
@@ -1019,6 +1026,12 @@ async function startFreeCheckFromLanding(){
   document.getElementById('vehicleLookup')?.scrollIntoView({behavior:'smooth',block:'start'});
   await loadVehicle();
 }
+async function startInsuranceAndFreeFlowFromLanding(){
+  await startFreeCheckFromLanding();
+  if(!/^\d{7,8}$/.test(plate())) return;
+  document.getElementById('insuranceStartSection')?.scrollIntoView({behavior:'smooth',block:'start'});
+  await startBalcarPayment();
+}
 function syncLandingConsultationButton(){
   const accepted=!!document.getElementById('landingConsultationLegalAccept')?.checked;
   const button=document.getElementById('landingConsultationButton');
@@ -1068,7 +1081,7 @@ function setCustomerRoute(route){
     showPreFlowStep(0);
   }
 }
-const preFlowTitles=['אימות רישיון','5 שאלות למוכר','בחירת שירות'];
+const preFlowTitles=['5 שאלות למוכר','התאמת רישיון','פענוח והתייעצות'];
 function showPreFlowStep(index,{scroll=true}={}){
   const safe=Math.max(0,Math.min(preFlowTitles.length-1,Number(index)||0));
   const progress=document.getElementById('preFlowProgress');
@@ -1083,8 +1096,8 @@ function showPreFlowStep(index,{scroll=true}={}){
   });
   const text=document.getElementById('preFlowProgressText');
   const hint=document.getElementById('preFlowProgressHint');
-  if(text) text.textContent=safe===2?'השלב החינמי הושלם':`שלב ${safe+1} מתוך 2 — ${preFlowTitles[safe]}`;
-  if(hint) hint.textContent=safe===2?'בחרו את השירות המתאים להמשך.':'השלב החינמי כולל אימות רישיון וחמש שאלות למוכר בלבד.';
+  if(text) text.textContent=safe===2?'פענוח והתייעצות':`שלב ${safe+1} מתוך 2 — ${preFlowTitles[safe]}`;
+  if(hint) hint.textContent=safe===2?'פתיחת התייעצות ופענוח סיכום דוח המכון.':'השלב החינמי כולל 5 שאלות למוכר והתאמת רישיון בלבד.';
   if(scroll){
     const target=document.querySelector(`.preFlowScreen[data-pre-step="${safe}"]`)||progress;
     target?.scrollIntoView({behavior:'smooth',block:'start'});
@@ -1427,6 +1440,7 @@ function openPostReportWhatsApp(){
   const saved=storedBuyTestPayment()||{};
   const vehiclePlate=plate()||'לא הוזן';
   const customerName=document.getElementById('clarificationCustomerName')?.value.trim()||saved.customerName||document.getElementById('inspectionOwnerName')?.value.trim()||'לא הוזן';
+  const photoNote=vehiclePhotoData.length?`בחרתי ${vehiclePhotoData.length} תמונות לפי בקשת הבוחן ואצרף אותן כאן בוואטסאפ.`:'אצרף כאן את דוח הבדיקה או את סיכום BuyTest לצורך המענה.';
   const body=[
     '🟢 BuyTest | ייעוץ לאחר פענוח דוח',
     '',
@@ -1438,7 +1452,7 @@ function openPostReportWhatsApp(){
     'השאלות שלי על הדוח:',
     question,
     '',
-    'אצרף כאן את דוח הבדיקה או את סיכום BuyTest לצורך המענה.'
+    photoNote
   ].join('\n');
   void trackBuyTestEvent('consultation_opened');
   openBuyTestWhatsApp(body);
@@ -1673,9 +1687,11 @@ function openLegal(which){
 function closeLegal(){document.getElementById('legalModal').classList.remove('open')}
 function unlockFreeSections(){
   document.querySelectorAll('.freeAfterLookup').forEach(x=>x.style.removeProperty('display'));
+  const insuranceStart=document.getElementById('insuranceStartSection');
+  if(insuranceStart) insuranceStart.style.display='block';
   const license=document.getElementById('licenseMatchSection');
   const questions=document.getElementById('preVisitSection');
-  if(license&&questions&&license.nextElementSibling!==questions) license.insertAdjacentElement('afterend',questions);
+  if(license&&questions&&questions.nextElementSibling!==license) questions.insertAdjacentElement('afterend',license);
 }
 const buytestPlans={
   balcar:{name:'הפקה ופענוח דוח עבר ביטוחי לרכב',price:39,scope:'הפקת דוח עבר ביטוחי, פענוח הנתונים שהתקבלו, קישור לדוח המקורי ותקציר PDF'},
