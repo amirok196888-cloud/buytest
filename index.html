@@ -131,12 +131,13 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#07131aef;border-top:1p
 .paidOnly{display:none!important}
 body.plan-premium .premiumFeature,
 body.plan-report .reportFeature,
+body.plan-report_consultation .reportFeature,
 body.plan-balcar .balcarFeature,
 body.plan-consultation .consultationFeature,
 body.plan-bundle .premiumFeature,body.plan-bundle.stage-report-open .reportFeature,body.plan-bundle.stage-consultation-open .consultationFeature,
 body.manager-mode.manager-all .paidOnly{display:block!important}
 .clarificationBox.show{display:none}
-body.report-complete .clarificationBox.show,body.plan-consultation .clarificationBox.show,body.plan-bundle.stage-consultation-open .clarificationBox.show,body.manager-mode.manager-all .clarificationBox.show{display:block}
+body.report-complete .clarificationBox.show,body.plan-consultation .clarificationBox.show,body.plan-report_consultation.report-complete .clarificationBox.show,body.plan-bundle.stage-consultation-open .clarificationBox.show,body.manager-mode.manager-all .clarificationBox.show{display:block}
 body.plan-prebuy .prePurchaseConsultationBox{display:block}
 .balcarOffer{margin:18px 0;padding:18px;border:2px solid #0fa87e;border-radius:18px;background:linear-gradient(145deg,#eefaf6,#fff)}.balcarOffer h3{margin:0 0 7px;font-size:23px;color:#075e48}.balcarOffer p{margin:0 0 12px;line-height:1.6;color:#405c66}.insuranceOffer{padding:24px 18px;text-align:center;border-width:3px;box-shadow:0 10px 26px rgba(15,168,126,.13)}.insuranceOffer h3{margin:0 0 18px;font-size:27px;line-height:1.35}.insuranceOffer #balcarPlanButton{min-height:64px;font-size:19px;line-height:1.35;box-shadow:0 7px 18px rgba(15,168,126,.24)}.balcarComingSoon{display:inline-flex;margin:5px 0 13px;padding:6px 10px;border-radius:999px;background:#fff3cf;color:#765600;font-size:13px;font-weight:900}.balcarSummaryGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0}.balcarSummaryItem{padding:13px;border:1px solid #d7e5e1;border-radius:13px;background:#fff}.balcarSummaryItem strong{display:block;margin-bottom:5px}.balcarSummaryItem span{display:block;color:#49616a;line-height:1.45}.balcarSummaryItem.alert{border-color:#e7a0a0;background:#fff3f3}.balcarSummaryItem.good{border-color:#9fd8c7;background:#f2fbf8}.balcarSummaryItem.unknown{background:#f5f7f8}.balcarReportActions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}.balcarReportActions a{display:flex;align-items:center;justify-content:center;min-height:48px;padding:10px 14px;border-radius:12px;background:#102d35;color:#fff;text-decoration:none;font-weight:900}.balcarStatus{margin:12px 0;padding:12px;border-radius:12px;background:#eef7fb;color:#244753;font-weight:850;line-height:1.5}.balcarStatus.error{background:#fff0f0;color:#8f2525}@media(max-width:520px){.balcarSummaryGrid,.balcarReportActions{grid-template-columns:1fr}}
 .managerPlanControls{margin-top:12px;padding-top:12px;border-top:1px solid #9dd9c7}.managerPlanControls b{display:block;margin-bottom:8px}.managerPlanButtons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.managerPlanButtons button{margin:0;background:#fff;color:#075e48;border:1px solid #7fcab3}.managerPlanStatus{margin-top:8px;font-size:13px;font-weight:800}
@@ -157,7 +158,8 @@ body.plan-prebuy .prePurchaseConsultationBox{display:block}
 .paymentActions{display:grid;grid-template-columns:1fr;gap:9px;margin-top:16px}
 .paymentActions button{margin:0}
 .priceCard{position:relative;transition:border-color .2s ease,opacity .2s ease,transform .2s ease}.priceCard.locked{opacity:.7;border-style:dashed}.priceCard.current{border-color:#0fa87e;box-shadow:0 0 0 2px rgba(15,168,126,.14),0 7px 20px rgba(16,45,53,.06)}.priceCard.completed{border-color:#72c7ae;background:#f3fbf8}.stageState{display:block;margin:9px 0 11px;padding:7px 10px;border-radius:9px;background:#edf5f7;color:#405c66;font-size:13px;font-weight:850}.priceCard.current .stageState{background:#e1f7ef;color:#075e48}.priceCard.completed .stageState{background:#dff5e9;color:#17643c}.priceCard.locked .stageState{background:#f1f3f4;color:#5f6b70}.priceCard button:disabled{cursor:not-allowed;opacity:.75}.sequenceNotice{margin:12px 0 15px;padding:13px 14px;border-radius:13px;background:#eef8f5;border:1px solid #b9e1d5;color:#244c42;font-weight:800;line-height:1.55}
-.routeCards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}.routeCard{border:2px solid #d9e2e6;border-radius:19px;padding:18px;background:#fff;box-shadow:0 8px 24px rgba(16,45,53,.06)}.routeCard.free{border-color:#78ceb4;background:#f3fbf8}.routeCard.paid{border-color:#b8cdd5}.routeCard h3{margin:7px 0 6px;font-size:21px}.routeCard p{margin:0 0 14px;color:#50666f;line-height:1.55}.routePrice{display:inline-flex;padding:5px 10px;border-radius:999px;background:#e8f7f2;color:#075e48;font-weight:950}.routeChoice{display:flex;gap:8px;margin:0 0 12px}.routeChoice button{flex:1;border:1px solid #cbd8dd;background:#f5f8f9;color:#28444e}.routeChoice button.active{background:#102d35;color:#fff;border-color:#102d35}.legalBeforePlate{margin:0 0 12px!important}.legalBeforePlate p{font-size:13px}.vehicleHint{margin:0 0 12px;padding:10px 12px;border-radius:11px;background:#eef7fb;color:#28444e;font-size:14px;font-weight:800}.preFlowProgress{display:none;margin:22px 0 10px;padding:15px 17px;border:1px solid #c8ded7;border-radius:16px;background:#f3fbf8}.preFlowProgress.show{display:block}.preFlowProgress strong{display:block;margin-bottom:4px;font-size:19px}.preFlowProgress span{display:block;color:#416158;line-height:1.5}.preFlowScreen{display:none!important}.preFlowScreen.active,.preFlowScreen.checklistVisible{display:block!important}.preFlowNav{display:flex;gap:9px;margin-top:16px}.preFlowNav button{flex:1}.consultationLocked,.consultationUnlocked{display:none}.report-complete .clarificationBox.show .consultationLocked{display:block}.plan-consultation .clarificationBox.show .consultationLocked,.plan-bundle.stage-consultation-open .clarificationBox.show .consultationLocked,.manager-mode.manager-all .clarificationBox.show .consultationLocked{display:none}.plan-consultation .clarificationBox.show .consultationUnlocked,.plan-bundle.stage-consultation-open .clarificationBox.show .consultationUnlocked,.manager-mode.manager-all .clarificationBox.show .consultationUnlocked{display:block}.singlePlan{max-width:560px;margin:14px auto 0}.uploadPanel{transition:border-color .2s ease,background .2s ease}.uploadPanel:has(.uploadState.show){border-color:#0fa87e;background:#f3fbf8}
+.routeCards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}.routeCard{border:2px solid #d9e2e6;border-radius:19px;padding:18px;background:#fff;box-shadow:0 8px 24px rgba(16,45,53,.06)}.routeCard.free{border-color:#78ceb4;background:#f3fbf8}.routeCard.paid{border-color:#b8cdd5}.routeCard h3{margin:7px 0 6px;font-size:21px}.routeCard p{margin:0 0 14px;color:#50666f;line-height:1.55}.routePrice{display:inline-flex;padding:5px 10px;border-radius:999px;background:#e8f7f2;color:#075e48;font-weight:950}.routeChoice{display:flex;gap:8px;margin:0 0 12px}.routeChoice button{flex:1;border:1px solid #cbd8dd;background:#f5f8f9;color:#28444e}.routeChoice button.active{background:#102d35;color:#fff;border-color:#102d35}.legalBeforePlate{margin:0 0 12px!important}.legalBeforePlate p{font-size:13px}.vehicleHint{margin:0 0 12px;padding:10px 12px;border-radius:11px;background:#eef7fb;color:#28444e;font-size:14px;font-weight:800}.preFlowProgress{display:none;margin:22px 0 10px;padding:15px 17px;border:1px solid #c8ded7;border-radius:16px;background:#f3fbf8}.preFlowProgress.show{display:block}.preFlowProgress strong{display:block;margin-bottom:4px;font-size:19px}.preFlowProgress span{display:block;color:#416158;line-height:1.5}.preFlowScreen{display:none!important}.preFlowScreen.active,.preFlowScreen.checklistVisible{display:block!important}.preFlowNav{display:flex;gap:9px;margin-top:16px}.preFlowNav button{flex:1}.consultationLocked,.consultationUnlocked{display:none}.report-complete .clarificationBox.show .consultationLocked{display:block}.plan-consultation .clarificationBox.show .consultationLocked,.plan-report_consultation.report-complete .clarificationBox.show .consultationLocked,.plan-bundle.stage-consultation-open .clarificationBox.show .consultationLocked,.manager-mode.manager-all .clarificationBox.show .consultationLocked{display:none}.plan-consultation .clarificationBox.show .consultationUnlocked,.plan-report_consultation.report-complete .clarificationBox.show .consultationUnlocked,.plan-bundle.stage-consultation-open .clarificationBox.show .consultationUnlocked,.manager-mode.manager-all .clarificationBox.show .consultationUnlocked{display:block}.singlePlan{max-width:560px;margin:14px auto 0}.uploadPanel{transition:border-color .2s ease,background .2s ease}.uploadPanel:has(.uploadState.show){border-color:#0fa87e;background:#f3fbf8}
+#externalSection,#selfSection{display:none!important}
 .routeCard.free{grid-column:1/-1}.compactCheckList{margin:0 0 16px;padding-right:24px;line-height:1.75}.compactCheckList li{margin:7px 0}.consultationOffer{margin-top:16px}
 .landingFreeStart{display:grid;grid-template-columns:1fr;gap:12px;margin-top:0}.landingFreeStart input{min-width:0;width:100%;height:52px;border:2px solid #9fcfc0;border-radius:14px;padding:0 16px;font-size:18px;font-weight:800;background:#fff;color:#17323c}.landingFreeStart input:focus{outline:3px solid rgba(15,168,126,.18);border-color:#0fa87e}.landingFreeStart .mktBtn{width:100%;border:0;cursor:pointer}.landingFreeStart .landingFreeExplanation{margin:0;color:#50666f;font-size:16px;line-height:1.55}
 .routeCard.consultation{grid-column:1/-1;border-color:#128c7e;background:linear-gradient(135deg,#e8fff5,#f8fffc);box-shadow:0 12px 30px rgba(18,140,126,.2)}
@@ -333,10 +335,10 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 </div>
 </div>
 <div class="mktSection alt" id="howItWorks"><div class="mktWrap">
-<div class="mktTitle"><h2>ייעוץ ובדיקת רכב לפני ואחרי הבדיקה</h2><p>BuyTest מרכז את מה שכדאי לבדוק מראש, מאפשר לקבל ייעוץ במהלך התהליך ומסביר בשפה פשוטה את משמעות סיכום הבוחן לאחר בדיקת המכון. השירות אינו מחליף מכון בדיקה ואינו מחליט עבורך.</p></div>
+<div class="mktTitle"><h2>תהליך קצר לפני הקנייה — ופענוח מקצועי אחרי המכון</h2><p>מתחילים ללא תשלום באימות רישיון הרכב ובחמש שאלות ממוקדות למוכר. לאחר מכן אפשר להפיק עבר ביטוחי, או להעלות את דוח המכון ולקבל פענוח והתייעצות אישית עם בוחן. השירות אינו מחליף בדיקה במכון ואינו מחליט עבורך.</p></div>
 <div class="mktGrid3">
 <div class="mktInfoCard"><div class="ico">🔎</div><h3>מרכז מידע</h3><p>מושך נתונים זמינים על הרכב ומציג אותם במקום אחד, בצורה ברורה ופשוטה.</p></div>
-<div class="mktInfoCard"><div class="ico">🧭</div><h3>מוביל אותך שלב־שלב</h3><p>שאלות קצרות, בדיקות מעשיות ואפשרות לתיעוד מסודר — גם למי שאינו איש מקצוע.</p></div>
+<div class="mktInfoCard"><div class="ico">🧭</div><h3>קצר וממוקד</h3><p>אימות רישיון וחמש שאלות למוכר בלבד — בלי צ׳קליסט ארוך ובלי בדיקות שאינן מתאימות לקונה רגיל.</p></div>
 <div class="mktInfoCard"><div class="ico">🧾</div><h3>מסביר את סיכום הבוחן</h3><p>מזהה ניסוחים מוכרים, מסביר את משמעותם ומסמן במפורש כל ניסוח שלא ניתן לפענח בבטחה.</p></div>
 </div>
 </div></div>
@@ -361,10 +363,9 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 <div class="mktTitle"><h2>שאלות נפוצות</h2></div>
 <div class="mktFaq">
 <details><summary>האם BuyTest מחליף בדיקה במכון?</summary><p>לא. השלב הראשון מארגן בדיקות בסיסיות ודגשים למכון; השלב השני מסביר את סיכום הבוחן. השירות אינו בודק את הרכב פיזית ואינו מאשר תקינות.</p></details>
-<details><summary>מה מקבלים בחינם?</summary><p>מזינים מספר רכב ומקבלים מידע זמין ממאגרי משרד התחבורה וחמש שאלות מותאמות שכדאי לשאול לפני שנוסעים. אם ממשיכים לראות את הרכב, עוברים להתאמת הרישיון, שאלות נוספות למוכר, בדיקות ברכב, נסיעה קצרה וסיכום PDF.</p></details>
-<details><summary>מה מקבלים בדוח עבר ביטוחי?</summary><p>לאחר סיום השלב החינמי אפשר לבחור בהפקת דוח עבר ביטוחי. המחיר יוצג רק בעת פתיחת אפשרות ההפקה, לפני התשלום. לאחר אישור התשלום הדוח מוזמן אוטומטית, ומתקבלים קישור לדוח המקורי ותקציר PDF.</p></details>
-<details><summary>מה כולל הייעוץ בוואטסאפ?</summary><p>לאחר סיום הבדיקה החינמית אפשר לרכוש התייעצות ראשונה עם בוחן רכב ב־79 ₪, גם בלי להפיק דוח עבר ביטוחי. לאחר פענוח הדוח אפשר לרכוש התייעצות אישית על הממצאים ב־149 ₪.</p></details>
-<details><summary>מה כולל פענוח הדוח?</summary><p>לאחר סיום הבדיקה החינמית אפשר להמשיך לפענוח בתשלום של 49 ₪. מעלים את סיכום הבוחן, ובמידת הצורך גם את הבדיקה הממוחשבת, ומקבלים הסבר מסודר של הממצאים וסיכום PDF.</p></details>
+<details><summary>מה מקבלים בחינם?</summary><p>מזינים מספר רכב, מקבלים את פרטי הרכב הזמינים ממאגרי משרד התחבורה, מאמתים את רישיון הרכב ועוברים על חמש שאלות ממוקדות שכדאי לשאול את המוכר.</p></details>
+<details><summary>מה מקבלים בדוח עבר ביטוחי?</summary><p>לאחר סיום השלב החינמי אפשר להפיק דוח עבר ביטוחי ולקבל פענוח של הנתונים, קישור לדוח המקורי ותקציר PDF. המחיר הוא 39 ₪ ומוצג לפני המעבר לתשלום.</p></details>
+<details><summary>מה כולל פענוח הדוח וההתייעצות?</summary><p>מעלים את סיכום הבוחן, ובמידת הצורך גם את הבדיקה הממוחשבת, מקבלים פענוח מסודר וסיכום PDF, ולאחר הפענוח עוברים להתייעצות אישית עם בוחן בוואטסאפ. מחיר השירות המשולב הוא 150 ₪.</p></details>
 <details><summary>מה קורה אם חסר מידע על הרכב?</summary><p>מאגרים ציבוריים אינם תמיד מלאים. כאשר נתון אינו זמין, BuyTest מציגה זאת במקום להמציא מידע, וממליצה לאמת פרטים מהותיים מול מסמכי הרכב והגורמים המתאימים.</p></details>
 <details><summary>האם BuyTest אומר אם לקנות את הרכב?</summary><p>לא. אין המלצת קנייה או אי־קנייה, אין הערכת שווי או עלות תיקון ואין קביעה לגבי ירידת ערך. BuyTest משקף משמעויות ושאלות לבירור בלבד; ההחלטה היא של המשתמש.</p></details>
 </div>
@@ -402,9 +403,9 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 </div></details><div id="rawlink" style="display:none"></div></div>
 </section>
 <div class="preFlowProgress freeAfterLookup" id="preFlowProgress" aria-live="polite"><strong id="preFlowProgressText">הבדיקה החינמית ברכב</strong><span id="preFlowProgressHint">מסיימים סעיף אחד — והסעיף הבא נפתח אוטומטית.</span></div>
-<section class="card freeAfterLookup preFlowScreen preVisitCard" id="preVisitSection" data-pre-step="0" style="display:none">
+<section class="card freeAfterLookup preFlowScreen preVisitCard" id="preVisitSection" data-pre-step="1" style="display:none">
   <span class="preVisitBadge">חדש · בחינם</span>
-  <h2>לפני שנוסעים: 5 שאלות שכדאי לשאול את המוכר</h2>
+  <h2>5 שאלות שכדאי לשאול את המוכר</h2>
   <p class="preVisitLead" id="preVisitSubtitle">השאלות יותאמו לנתונים הזמינים לרכב שבחרת.</p>
   <details class="preVisitFactsDetails"><summary>הצגת פרטי הרכב שנמצאו</summary><div class="preVisitFacts">
     <div class="preVisitFact"><span>הרכב שנבדק</span><strong id="preVisitVehicle">—</strong></div>
@@ -415,15 +416,15 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
     <div class="preVisitFact wide"><span>חשוב להבין</span><strong id="preVisitNotice">הנתונים במאגר הציבורי עשויים להיות חלקיים ויש לאמת אותם מול רישיון הרכב והמוכר.</strong></div>
   </div></details>
   <div class="preVisitQuestions">
-    <h3>מה לשאול לפני שקובעים לראות את הרכב</h3>
+    <h3>מה חשוב לשאול את המוכר</h3>
     <ol id="preVisitQuestionList"></ol>
     <div class="preVisitActions">
       <button class="primary" type="button" data-analytics-click="click_copy_questions" onclick="copyPreVisitQuestions(this)">לחץ להעתקת השאלות למוכר</button>
     </div>
     <div class="preVisitToast" id="preVisitToast" role="status" aria-live="polite">השאלות הועתקו</div>
   </div>
-  <p class="sub" style="margin-top:16px"><b>סיימת את השאלות למוכר.</b> כשתגיע לרכב, המשך לצ׳קליסט הבדיקה.</p>
-  <div class="preFlowNav"><button class="primary flowNext" type="button" data-analytics-click="click_free_next" onclick="showPreFlowStep(1)">אני ליד הרכב — פתיחת הצ׳קליסט</button><button class="secondary" type="button" onclick="this.textContent='✓ נשמר להמשך מאוחר יותר'">שמירה והמשך מאוחר יותר</button></div>
+  <p class="sub" style="margin-top:16px"><b>סיימת את השלב החינמי.</b> עכשיו אפשר לבחור את השירות המתאים להמשך.</p>
+  <div class="preFlowNav"><button class="primary flowNext" type="button" data-analytics-click="click_free_next" onclick="showPreFlowStep(2)">סיום השאלות והמשך לבחירת שירות</button></div>
 </section>
 <section class="card" id="managerActiveNotice" style="display:none;border:2px solid #0ea67b;background:#e8f7f2;color:#075e48">
   <b>מצב מנהל פעיל</b>
@@ -514,8 +515,8 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
   <div class="managerCategoryGrid" role="tablist" aria-label="קטגוריות לקוחות">
     <button class="managerCategory" id="managerCategoryFree" type="button" role="tab" aria-selected="false" onclick="setManagerOrderCategory('free')"><span class="managerCategoryTitle">בדיקה לפני המכון</span><span class="managerCategoryPrice">חינם</span><span class="managerCategoryStats"><span class="managerCategoryStat"><strong id="managerFreeStarted">—</strong><span>התחילו</span></span><span class="managerCategoryStat"><strong id="managerFreeCompleted">—</strong><span>סיימו</span></span></span></button>
     <button class="managerCategory" id="managerCategoryBalcar" type="button" role="tab" aria-selected="false" onclick="setManagerOrderCategory('balcar')"><span class="managerCategoryTitle">דוח עבר ביטוחי</span><span class="managerCategoryPrice">39 ₪</span><span class="managerCategoryStats"><span class="managerCategoryStat"><strong id="managerBalcarPaid">—</strong><span>שילמו</span></span><span class="managerCategoryStat"><strong id="managerBalcarReady">—</strong><span>דוח הוזמן</span></span></span></button>
-    <button class="managerCategory" id="managerCategoryReport" type="button" role="tab" aria-selected="false" onclick="setManagerOrderCategory('report')"><span class="managerCategoryTitle">פענוח דוח לאחר המכון</span><span class="managerCategoryPrice">49 ₪</span><span class="managerCategoryStats"><span class="managerCategoryStat"><strong id="managerReportPaid">—</strong><span>שילמו</span></span><span class="managerCategoryStat"><strong id="managerReportCompleted">—</strong><span>השלימו</span></span></span></button>
-    <button class="managerCategory" id="managerCategoryConsultation" type="button" role="tab" aria-selected="false" onclick="setManagerOrderCategory('consultation')"><span class="managerCategoryTitle">ייעוץ לפני/אחרי בדיקה</span><span class="managerCategoryPrice">79 / 149 ₪</span><span class="managerCategoryStats"><span class="managerCategoryStat"><strong id="managerConsultationPaid">—</strong><span>שילמו</span></span><span class="managerCategoryStat"><strong id="managerConsultationOpened">—</strong><span>פתחו פנייה</span></span></span></button>
+    <button class="managerCategory" id="managerCategoryReport" type="button" role="tab" aria-selected="false" onclick="setManagerOrderCategory('report')"><span class="managerCategoryTitle">פענוח דוח + התייעצות</span><span class="managerCategoryPrice">150 ₪</span><span class="managerCategoryStats"><span class="managerCategoryStat"><strong id="managerReportPaid">—</strong><span>שילמו</span></span><span class="managerCategoryStat"><strong id="managerReportCompleted">—</strong><span>השלימו</span></span></span></button>
+    <button class="managerCategory" id="managerCategoryConsultation" type="button" role="tab" aria-selected="false" onclick="setManagerOrderCategory('consultation')"><span class="managerCategoryTitle">התייעצויות שנפתחו</span><span class="managerCategoryPrice">כלול ב־150 ₪</span><span class="managerCategoryStats"><span class="managerCategoryStat"><strong id="managerConsultationPaid">—</strong><span>שילמו</span></span><span class="managerCategoryStat"><strong id="managerConsultationOpened">—</strong><span>פתחו פנייה</span></span></span></button>
   </div>
   <div id="managerOrderDetails" hidden>
     <div class="managerOrderTools"><h3 class="managerOrderViewTitle" id="managerOrderViewTitle"></h3><div class="field"><label for="managerOrderSearch">חיפוש לפי מספר רכב</label><input id="managerOrderSearch" inputmode="numeric" autocomplete="off" placeholder="הקלד מספר רכב" oninput="managerOrderSearchChanged()"></div></div>
@@ -559,7 +560,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
   <div class="formulaAdminList" id="formulaAdminList"></div>
 </section>
 
-<details class="card freeAfterLookup preFlowScreen guidedSection" id="licenseMatchSection" data-pre-step="1" style="display:none;border:2px solid #0ea67b;" open>
+<details class="card freeAfterLookup preFlowScreen guidedSection" id="licenseMatchSection" data-pre-step="0" style="display:none;border:2px solid #0ea67b;" open>
   <summary><span>התאמת רישיון הרכב לרכב ולמוכר</span></summary>
   <div class="stepContent">
   <p class="sub" style="font-weight:700;color:#17352d;">
@@ -593,25 +594,13 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
     <button class="clarifyChoice" type="button" onclick="setCheckState(this,'issue')">👆 צריך בירור</button>
     <div class="finding simpleFinding"><textarea placeholder="מה צריך לברר?" oninput="updateChecklistSection(this.closest('.checklistStep'))"></textarea></div>
   </div>
-  <div class="preFlowNav"><button class="primary flowNext" type="button" data-analytics-click="click_license_next" onclick="showPreFlowStep(2)">לחץ לסיום בדיקת הרישיון ולהמשך לבדיקה החיצונית</button></div>
+  <div class="preFlowNav"><button class="primary flowNext" type="button" data-analytics-click="click_license_next" onclick="showPreFlowStep(1)">סיום אימות הרישיון והמשך ל־5 שאלות למוכר</button></div>
   </div>
 </details>
 
 <div id="purchaseBox" style="display:none"></div>
-<details class="card freeAfterLookup preFlowScreen guidedSection checklistStep" id="externalSection" data-pre-step="2" style="display:none"><summary><span>בדיקה חיצונית</span></summary><div class="stepContent"><p class="sub">עבור על הסעיפים וסמן בסוף אם הכול תקין או נדרש בירור.</p>
-<div id="externalChecks"></div><div class="preFlowNav"><button class="primary checklistNext flowNext" type="button" data-analytics-click="click_external_next" onclick="showPreFlowStep(3)" disabled>לחץ לסיום הבדיקה החיצונית ולהמשך לבדיקה הפנימית</button></div></div></details>
-<details class="card freeAfterLookup preFlowScreen guidedSection checklistStep" id="selfSection" data-pre-step="3" style="display:none"><summary><span>בדיקה פנימית ונסיעה קצרה</span></summary><div class="stepContent"><p class="sub">עבור על הסעיפים וסמן בסוף אם הכול תקין או נדרש בירור.</p>
-<div id="selfChecks"></div>
-<div class="photoBox"><h3>תיעוד תמונות</h3>
-<p class="sub">אפשר לצרף עד ארבע תמונות של הרכב או של ממצאים שתרצה לתעד. הן יוצגו בעמוד השני של הסיכום.</p>
-<button class="secondary full" type="button" onclick="document.getElementById('vehiclePhotos').click()">לחץ להוספת עד 4 תמונות לבדיקה</button>
-<input id="vehiclePhotos" type="file" accept="image/*" capture="environment" multiple style="display:none" onchange="addVehiclePhotos(this)">
-<div id="photoPreview" class="photoPreview"></div></div><div class="preFlowNav"><button class="primary checklistNext flowNext" type="button" data-analytics-click="click_self_next" onclick="showPreFlowStep(4)" disabled>לחץ לסיום הבדיקה הפנימית ולהמשך לסיכום</button></div></div></details>
-<section class="card freeAfterLookup preFlowScreen" id="preSummarySection" data-pre-step="4" style="display:none"><h2>סיכום הבדיקה העצמית</h2><p class="sub">הסיכום מרכז את הבדיקות והתמונות שהזנת ומכין קובץ מסודר לשמירה או לשליחה. הוא אינו קובע אם להיכנס לבדיקה ואינו מחליף בדיקה במכון.</p>
-<button class="primary full" data-analytics-click="click_free_summary" onclick="buildReport()">לחץ להפקת סיכום הבדיקה העצמית</button>
-<div class="report" id="report"></div>
-<button class="primary full" id="pdfBtn" data-analytics-click="click_pdf" onclick="shareReportPdf('pdfBtn')" style="display:none">לחץ לשיתוף הסיכום כ־PDF</button>
-<div class="info"><b>חשוב:</b> BuyTest אינו קובע שהרכב תקין, בטוח או כדאי לרכישה. כל החלטה נשארת בידי המשתמש.</div>
+<section class="card freeAfterLookup preFlowScreen" id="preSummarySection" data-pre-step="2" style="display:none"><h2>השלב החינמי הסתיים</h2><p class="sub">אימתת את רישיון הרכב וקיבלת חמש שאלות ממוקדות למוכר. עכשיו אפשר לבחור איך להמשיך.</p>
+<div class="info"><b>חשוב:</b> BuyTest אינו מחליף בדיקה במכון, אינו קובע שהרכב תקין או כדאי לרכישה ואינו נותן הערכת מחיר לתיקון.</div>
 <div class="balcarOffer insuranceOffer">
   <h3>הפקה ופענוח של דוח עבר ביטוחי</h3>
   <div id="insuranceSellerFields" style="display:none;margin:12px 0;padding:12px;border:1px solid #edcd7a;border-radius:12px;background:#fffaf0">
@@ -623,11 +612,11 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
   <div class="devMsg" id="balcarEligibilityMsg" role="status" aria-live="polite"></div>
 </div>
 <div class="balcarOffer consultationOffer">
-  <h3>התייעצות ראשונה עם בוחן רכב — 79 ₪</h3>
-  <p>אפשר להתייעץ גם בלי להפיק דוח עבר ביטוחי.</p>
-  <button class="primary full" type="button" data-analytics-click="click_landing_consultation" onclick="startPayment('prebuy')">התייעצות עם בוחן רכב — 79 ₪</button>
+  <h3>פענוח דוח המכון והתייעצות עם בוחן</h3>
+  <p>העלה את סיכום הבוחן והבדיקה הממוחשבת, קבל פענוח מסודר וסיכום PDF, ולאחר מכן התייעצות אישית בוואטסאפ למשך 48 שעות.</p>
+  <button class="primary full" type="button" data-analytics-click="click_report_plan" onclick="startPayment('report_consultation')">פענוח דוח מכון + התייעצות עם בוחן — 150 ₪</button>
 </div>
-<div class="preFlowNav"><button class="secondary" type="button" onclick="showPreFlowStep(3)">לחץ לחזרה לבדיקה</button><button class="primary" type="button" data-analytics-click="click_report_plan" onclick="startPayment('report')">לחץ לפענוח מלא של דוח המכון — 49 ₪</button></div>
+<div class="preFlowNav"><button class="secondary" type="button" onclick="showPreFlowStep(1)">חזרה ל־5 השאלות</button></div>
 </section>
 
 <section class="card paidOnly balcarFeature" id="balcarReportSection" style="display:none">
@@ -709,7 +698,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
   <div class="consultationLocked">
     <article class="clarificationChoice paid">
       <h4>התייעצות אישית על הדוח והממצאים</h4>
-      <button class="primary full" id="consultationPlanButton" type="button" data-analytics-click="click_consultation_plan" onclick="startPayment('consultation')">להתייעצות אישית עם בוחן רכב — 149 ₪</button>
+      <button class="primary full" id="consultationPlanButton" type="button" disabled>ההתייעצות כלולה בשירות ששולם — 150 ₪</button>
     </article>
   </div>
   <div class="consultationUnlocked">
@@ -787,7 +776,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
       <p><b>טל״ח:</b> בפענוח אוטומטי עלולות להתרחש טעויות זיהוי, תמלול, שיוך או פרשנות. במקרה של אי־התאמה, דוח המקור גובר. אין להסתמך על ממצא שאינו מופיע בדוח המקורי, ויש לאמת כל ממצא מהותי מול הדוח ובעל מקצוע מתאים. הבהרה זו אינה גורעת מזכויות המשתמש לפי דין.</p>
       <p>בהעלאת דוח המשתמש מצהיר שהבדיקה הוזמנה על שמו או שיש לו הרשאה מתאימה מבעל הבדיקה לעשות שימוש בקובץ לצורך השירות. BuyTest אינו טוען לבעלות בדוח המכון ואינו מפרסם או מצרף את טופס המקור לפלט. המשתמש מתבקש להעלות רק את אזור סיכום הבוחן, ללא לוגו ופרטים אישיים שאינם דרושים.</p>
       <p>BuyTest אינו קשור למכון הבדיקה ואינו מדבר בשמו. ההסבר נגזר מן הטקסט שזוהה בדוח וממאגר הסיווג המקצועי של המערכת. הסיווג אינו ביקורת, דירוג או קביעה לגבי מקצועיות המכון, דיוק עבודתו או התנהלותו. ניסוח שמסווג כ„הסתייגות כללית” או „מגבלת בדיקה” מתאר את סוג המשפט בלבד ואינו מייחס למכון כוונה פסולה.</p>
-      <p>הבדיקה העצמית לפני המכון ניתנת ללא תשלום. פענוח דוח המכון והבדיקה הממוחשבת הוא שירות נפרד בתשלום לרכב אחד. ייעוץ לפני רכישה בוואטסאפ הוא שירות עצמאי בתשלום, וההתייעצות פתוחה למשך 48 שעות ממועד אישור התשלום; אין חובה להזין מספר רכב. לאחר פענוח דוח ניתן לרכוש בנפרד התייעצות ממוקדת על הדוח. שני שירותי הייעוץ מבוססים על המידע שהמשתמש מסר בלבד ואינם בדיקה פיזית, שמאות, הערכת עלויות, המלצה לקנות או לא לקנות או קביעה לגבי מכון בדיקה.</p>
+      <p>אימות רישיון הרכב וחמש השאלות למוכר ניתנים ללא תשלום. הפענוח של דוח המכון והבדיקה הממוחשבת וההתייעצות האישית בוואטסאפ הם שירות משולב בתשלום לרכב אחד. ההתייעצות פתוחה למשך 48 שעות ממועד השלמת הפענוח. השירות מבוסס על המידע שהמשתמש מסר בלבד ואינו בדיקה פיזית, שמאות, הערכת עלויות, המלצה לקנות או לא לקנות או קביעה לגבי מכון בדיקה.</p>
       <p>התשלום מתבצע בדף המאובטח של Cardcom. שירות שמתייחס לרכב מסוים משויך למספר הרכב שהוזן; ייעוץ כללי לפני רכישה אינו מחייב מספר רכב. הגישה לשירות שנרכש נפתחת לאחר אישור התשלום למשך 48 שעות.</p>
       <p>כל הזכויות באתר, בתוכן, במבנה הבדיקה, ברשימות הבדיקה, בעיצוב ובסימני BuyTest שמורות ל־BuyTest. אין להעתיק, להפיץ או לעשות בהם שימוש מסחרי ללא אישור מראש ובכתב.</p>
     </div>
@@ -800,7 +789,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
     <div id="cancelText" class="legalPage" style="display:none">
       <h2>ביטול עסקה והחזרים</h2>
       <p>לבקשת ביטול או לבירור עסקה יש לפנות ל־buytest2026@gmail.com ולציין שם, תאריך הרכישה ומספר הרכב אם הייעוץ מתייחס לרכב מסוים. הבקשה תטופל בהתאם להוראות הדין, לסוג השירות ולשאלה אם השירות הדיגיטלי כבר החל או סופק. החזר שאושר יבוצע לאמצעי התשלום באמצעות Cardcom.</p>
-      <p>הבדיקה העצמית לפני המכון ניתנת בחינם. מחיר דוח העבר הביטוחי מוצג לפני המעבר לתשלום, והפקתו מתחילה אוטומטית לאחר אישור התשלום. פענוח דוח המכון עולה 49 ₪ לרכב אחד. התייעצות ראשונה עם בוחן רכב עולה 79 ₪. התייעצות אישית לאחר פענוח הדוח עולה 149 ₪. מפעיל השירות: עמוס רוקח, BuyTest. כתובת קשר: buytest2026@gmail.com.</p>
+      <p>אימות רישיון הרכב וחמש השאלות למוכר ניתנים בחינם. הפקה ופענוח של דוח עבר ביטוחי עולים 39 ₪. פענוח דוח המכון, סיכום PDF והתייעצות אישית עם בוחן בוואטסאפ עולים יחד 150 ₪ לרכב אחד. מפעיל השירות: עמוס רוקח, BuyTest. כתובת קשר: buytest2026@gmail.com.</p>
     </div>
   </div>
 </div>
@@ -1079,27 +1068,23 @@ function setCustomerRoute(route){
     showPreFlowStep(0);
   }
 }
-const preFlowTitles=['לפני שנוסעים','התאמת רישיון','בדיקה חיצונית','בדיקה פנימית ונסיעה','סיכום'];
+const preFlowTitles=['אימות רישיון','5 שאלות למוכר','בחירת שירות'];
 function showPreFlowStep(index,{scroll=true}={}){
   const safe=Math.max(0,Math.min(preFlowTitles.length-1,Number(index)||0));
   const progress=document.getElementById('preFlowProgress');
-  progress?.classList.toggle('show',safe>=2);
+  progress?.classList.add('show');
   document.querySelectorAll('.preFlowScreen').forEach(section=>{
     const step=Number(section.dataset.preStep);
-    const checklistStep=step>=2&&step<=3;
-    const active=step===safe&&(!checklistStep||safe===4);
+    const active=step===safe;
     section.classList.toggle('active',active);
-    section.classList.toggle('checklistVisible',checklistStep&&safe>=2);
-    section.classList.toggle('flowCurrent',checklistStep&&safe<4&&step===safe);
-    section.classList.toggle('flowComplete',checklistStep&&(step<safe||safe===4));
-    section.classList.toggle('flowLocked',checklistStep&&safe<4&&step>safe);
-    if(section.tagName==='DETAILS') section.open=checklistStep?safe<4&&step===safe:active;
-    if(checklistStep) section.setAttribute('aria-disabled',section.classList.contains('flowLocked')?'true':'false');
+    section.classList.remove('checklistVisible','flowCurrent','flowComplete','flowLocked');
+    if(section.tagName==='DETAILS') section.open=active;
+    section.setAttribute('aria-disabled',active?'false':'true');
   });
   const text=document.getElementById('preFlowProgressText');
   const hint=document.getElementById('preFlowProgressHint');
-  if(text) text.textContent=safe===4?'הבדיקה החינמית הושלמה':'הבדיקה החינמית ברכב';
-  if(hint) hint.textContent=safe===4?'שני סעיפי הבדיקה הושלמו. הסיכום מוכן להפקה.':'מסיימים סעיף אחד — והסעיף הבא נפתח אוטומטית.';
+  if(text) text.textContent=safe===2?'השלב החינמי הושלם':`שלב ${safe+1} מתוך 2 — ${preFlowTitles[safe]}`;
+  if(hint) hint.textContent=safe===2?'בחרו את השירות המתאים להמשך.':'השלב החינמי כולל אימות רישיון וחמש שאלות למוכר בלבד.';
   if(scroll){
     const target=document.querySelector(`.preFlowScreen[data-pre-step="${safe}"]`)||progress;
     target?.scrollIntoView({behavior:'smooth',block:'start'});
@@ -1684,16 +1669,22 @@ function openLegal(which){
   document.getElementById('legalModal').classList.add('open');
 }
 function closeLegal(){document.getElementById('legalModal').classList.remove('open')}
-function unlockFreeSections(){document.querySelectorAll('.freeAfterLookup').forEach(x=>x.style.removeProperty('display'));}
+function unlockFreeSections(){
+  document.querySelectorAll('.freeAfterLookup').forEach(x=>x.style.removeProperty('display'));
+  const license=document.getElementById('licenseMatchSection');
+  const questions=document.getElementById('preVisitSection');
+  if(license&&questions&&license.nextElementSibling!==questions) license.insertAdjacentElement('afterend',questions);
+}
 const buytestPlans={
   balcar:{name:'הפקה ופענוח דוח עבר ביטוחי לרכב',price:39,scope:'הפקת דוח עבר ביטוחי, פענוח הנתונים שהתקבלו, קישור לדוח המקורי ותקציר PDF'},
   premium:{name:'בדיקה עצמית לפני המכון',price:49,scope:'שאלות למוכר, בדיקות חיצוניות ופנימיות, נסיעה קצרה, תמונות וסיכום PDF'},
   report:{name:'פענוח דוח המכון',price:49,scope:'פענוח סיכום הבוחן והבדיקה הממוחשבת, אם צורפה, וסיכום PDF'},
   consultation:{name:'התייעצות אישית לאחר פענוח',price:149,scope:'מעבר אישי על דוח אחד ורכב אחד ומתן הסבר מקצועי'},
   prebuy:{name:'ייעוץ לפני רכישה בוואטסאפ',price:79,scope:'ההתייעצות פתוחה למשך 48 שעות ממועד אישור התשלום'},
+  report_consultation:{name:'פענוח דוח המכון והתייעצות עם בוחן',price:150,scope:'פענוח סיכום הבוחן והבדיקה הממוחשבת, סיכום PDF והתייעצות אישית בוואטסאפ למשך 48 שעות'},
   bundle:{name:'חבילת BuyTest המלאה',price:120,scope:'בדיקה עצמית לפני המכון, פענוח אחרי המכון והתייעצות אישית לרכב אחד'}
 };
-const buytestPlanClasses=['plan-balcar','plan-premium','plan-report','plan-consultation','plan-prebuy','plan-bundle'];
+const buytestPlanClasses=['plan-balcar','plan-premium','plan-report','plan-consultation','plan-prebuy','plan-report_consultation','plan-bundle'];
 let buyTestStageProgress={preInspectionCompleted:false,reportCompleted:false};
 function normalizedStageProgress(value){
   const progress=value&&typeof value==='object'?value:{};
@@ -1717,8 +1708,8 @@ function updateBuyTestRoadmap(){
   document.body.classList.toggle('stage-report-open',plan==='bundle'&&progress.preInspectionCompleted);
   document.body.classList.toggle('stage-consultation-open',plan==='bundle'&&progress.reportCompleted);
   if(progress.reportCompleted) setRoadmapCard('report','completed','✓ הפענוח הושלם','הפענוח הושלם',true);
-  else if(plan==='report'||plan==='bundle') setRoadmapCard('report','current','הפענוח פתוח לרכב הזה','לחץ להמשך להעלאת הדוח',true);
-  else setRoadmapCard('report','current','מוכן לפתיחה לרכב שנבחר','לחץ לפתיחת הפענוח – 49 ₪',false);
+  else if(plan==='report'||plan==='report_consultation'||plan==='bundle') setRoadmapCard('report','current','הפענוח פתוח לרכב הזה','לחץ להמשך להעלאת הדוח',true);
+  else setRoadmapCard('report','current','מוכן לפתיחה לרכב שנבחר','לחץ לפתיחת הפענוח וההתייעצות – 150 ₪',false);
   const consultationButton=document.getElementById('consultationPlanButton');
   if(consultationButton) consultationButton.disabled=plan==='consultation';
 }
@@ -1738,7 +1729,7 @@ function applyPlanAccess(planKey,{scroll=false,progress=buyTestStageProgress}={}
   if(scroll){
     if(planKey==='premium'){unlockFreeSections();showPreFlowStep(0);}
     else{
-      const target=planKey==='balcar'?document.getElementById('balcarReportSection'):planKey==='bundle'?(buyTestStageProgress.reportCompleted?document.getElementById('clarificationBox'):buyTestStageProgress.preInspectionCompleted?document.getElementById('afterInspectionSection'):document.getElementById('licenseMatchSection')):planKey==='report'?document.getElementById('afterInspectionSection'):planKey==='prebuy'?document.getElementById('prePurchaseConsultationBox'):document.getElementById('clarificationBox');
+      const target=planKey==='balcar'?document.getElementById('balcarReportSection'):planKey==='bundle'?(buyTestStageProgress.reportCompleted?document.getElementById('clarificationBox'):buyTestStageProgress.preInspectionCompleted?document.getElementById('afterInspectionSection'):document.getElementById('licenseMatchSection')):(planKey==='report'||planKey==='report_consultation')?document.getElementById('afterInspectionSection'):planKey==='prebuy'?document.getElementById('prePurchaseConsultationBox'):document.getElementById('clarificationBox');
       target?.scrollIntoView({behavior:'smooth',block:'start'});
     }
   }
@@ -2241,22 +2232,22 @@ function updateManagerCategoryCounts(){
   const paid=buyTestOrderItems.filter(item=>String(item.status)==='paid');
   const balcarPaid=paid.filter(item=>String(item.plan)==='balcar');
   const balcarReady=balcarPaid.filter(item=>item.balcarReportReady===true);
-  const reportPaid=paid.filter(item=>['report','bundle'].includes(String(item.plan)));
+  const reportPaid=paid.filter(item=>['report','report_consultation','bundle'].includes(String(item.plan)));
   const reportCompleted=reportPaid.filter(item=>item.progress?.reportCompleted===true);
-  const consultationPaid=paid.filter(item=>['consultation','prebuy'].includes(String(item.plan)));
+  const consultationPaid=paid.filter(item=>['consultation','prebuy','report_consultation'].includes(String(item.plan)));
   const values={managerFreeStarted:buyTestOrderSummary.freeStarts,managerFreeCompleted:buyTestOrderSummary.freeCompleted,managerBalcarPaid:balcarPaid.length,managerBalcarReady:balcarReady.length,managerReportPaid:reportPaid.length,managerReportCompleted:reportCompleted.length,managerConsultationPaid:consultationPaid.length,managerConsultationOpened:buyTestOrderSummary.consultationOpened};
   Object.entries(values).forEach(([id,value])=>{const node=document.getElementById(id);if(node) node.textContent=Number(value||0).toLocaleString('he-IL');});
 }
 function managerOrderItemsForCategory(){
   const query=String(document.getElementById('managerOrderSearch')?.value||'').replace(/\D/g,'');
-  const items=buyTestOrderCategory==='free'?[...buyTestFreeItems,...buyTestOrderItems.filter(item=>String(item.plan)==='premium')]:buyTestOrderItems.filter(item=>buyTestOrderCategory==='balcar'?String(item.plan)==='balcar':buyTestOrderCategory==='report'?['report','bundle'].includes(String(item.plan)):['consultation','prebuy'].includes(String(item.plan)));
+  const items=buyTestOrderCategory==='free'?[...buyTestFreeItems,...buyTestOrderItems.filter(item=>String(item.plan)==='premium')]:buyTestOrderItems.filter(item=>buyTestOrderCategory==='balcar'?String(item.plan)==='balcar':buyTestOrderCategory==='report'?['report','report_consultation','bundle'].includes(String(item.plan)):['consultation','prebuy','report_consultation'].includes(String(item.plan)));
   return items.filter(item=>!query||String(item.plate||'').includes(query));
 }
 function setManagerOrderCategory(category){
   if(!['free','balcar','report','consultation'].includes(category)) return;
   buyTestOrderCategory=category;buyTestOrderPage=1;
   const details=document.getElementById('managerOrderDetails');if(details) details.hidden=false;
-  const titles={free:'בדיקה לפני המכון — חינם',balcar:'דוח עבר ביטוחי — 39 ₪',report:'פענוח דוח לאחר המכון — 49 ₪',consultation:'ייעוץ לפני/אחרי בדיקה — 149 / 79 ₪'};
+  const titles={free:'אימות רישיון ו־5 שאלות — חינם',balcar:'דוח עבר ביטוחי — 39 ₪',report:'פענוח דוח והתייעצות — 150 ₪',consultation:'התייעצויות שנפתחו במסגרת השירות'};
   const title=document.getElementById('managerOrderViewTitle');if(title) title.textContent=titles[category];
   document.querySelectorAll('.managerCategory').forEach(button=>{const active=button.id==='managerCategory'+category[0].toUpperCase()+category.slice(1);button.classList.toggle('active',active);button.setAttribute('aria-selected',String(active));});
   const search=document.getElementById('managerOrderSearch');if(search){search.disabled=false;search.placeholder=category==='consultation'?'מספר רכב, אם קיים':'הקלד מספר רכב';search.value='';}
@@ -2274,7 +2265,7 @@ function renderBuyTestOrders(items=buyTestOrderItems){
   const totalPages=Math.max(1,Math.ceil(filtered.length/BUYTEST_ORDERS_PER_PAGE));
   buyTestOrderPage=Math.min(buyTestOrderPage,totalPages);
   const pageItems=filtered.slice((buyTestOrderPage-1)*BUYTEST_ORDERS_PER_PAGE,buyTestOrderPage*BUYTEST_ORDERS_PER_PAGE);
-  const planLabels={free:'בדיקה לפני המכון',balcar:'דוח עבר ביטוחי',premium:'מסלול קודם: בדיקה לפני המכון',report:'פענוח דוח',consultation:'התייעצות לאחר פענוח',prebuy:'ייעוץ לפני רכישה בוואטסאפ',bundle:'חבילה מלאה'};
+  const planLabels={free:'אימות רישיון ו־5 שאלות',balcar:'דוח עבר ביטוחי',premium:'מסלול קודם: בדיקה לפני המכון',report:'מסלול קודם: פענוח דוח',consultation:'מסלול קודם: התייעצות לאחר פענוח',prebuy:'מסלול קודם: ייעוץ לפני רכישה',report_consultation:'פענוח דוח + התייעצות',bundle:'מסלול קודם: חבילה מלאה'};
   const statusLabels={started:'התחיל',completed:'הושלם',pending:'ממתין',payment_ready:'עבר לדף תשלום',paid:'שולם',cancelled:'בוטל',expired:'פג תוקף',failed:'נכשל',refunded:'זוכה'};
   if(!pageItems.length){
     list.innerHTML='<div class="managerFeedbackEmpty">לא נמצאו רשומות בקטגוריה הזו.</div>';
