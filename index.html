@@ -5052,10 +5052,15 @@ function inspectionRequesterAdvisory(ownerName){
     .trim();
   if(!normalized) return null;
   const knownCommercial=/(?:לובינסקי|לוינסקי|כלמוביל|קרסו|פריסבי|אוטודיל|אוטו דיל|אוטוסנטר|אוטו סנטר|אלבר|אוויס|avis|הרץ|hertz|אלדן|קל אוטו|טרייד מוביל|שלמה סיקסט|שלמה רכב|lease4u|budget)/;
-  const businessMarker=/(?:סוכנות|ליסינג|טרייד|מוטורס|מגרש(?:י)? רכב|חברת רכב|רכב בעמ|בעמ|בע מ)/;
-  if(!knownCommercial.test(normalized)&&!businessMarker.test(normalized)) return null;
-  const title='⚠ הבדיקה הוזמנה כנראה מטעם גורם מסחרי';
-  const message='לפי שם מזמין/ת הבדיקה, ייתכן שהדוח הוזמן על ידי סוכנות, חברת ליסינג או גורם מסחרי המוכר את הרכב. אין בכך קביעה לגבי איכות הבדיקה, אך בדיקה מטעם המוכר אינה תחליף לבדיקה עצמאית מטעמכם. מומלץ לאמת את הממצאים ולשקול בדיקה נוספת במכון מורשה שאתם בוחרים ומשלמים לו, ורצוי במכון שאינו שייך לאותה רשת.';
+  const businessMarker=/(?:סוכנות|ליסינג|טרייד|מוטורס|מגרש(?:י)? רכב|חברת רכב|רכב בעמ|בעמ|בע מ|חברה|שותפות|אגודה|מוסך|מרכז שירות|יבואן)/;
+  const words=normalized.split(' ').filter(Boolean);
+  const privateNameWords=words.length>=2&&words.length<=4
+    &&words.every(word=>/^[א-תa-z]{2,}$/.test(word))
+    &&!knownCommercial.test(normalized)
+    &&!businessMarker.test(normalized);
+  if(privateNameWords) return null;
+  const title='⚠ מזמין/ת הבדיקה אינו נראה כשם של אדם פרטי';
+  const message='לפי השם שהוזן, ייתכן שהדוח הוזמן על ידי חברה, סוכנות, חברת ליסינג או גורם מסחרי. ייתכן גם שמדובר בזיהוי שאינו מדויק, ולכן אין בכך קביעה שהבדיקה אינה תקינה. עם זאת, כאשר הבדיקה לא הוזמנה על ידי הקונה עצמו, מומלץ לאמת את הממצאים ולשקול בדיקה עצמאית במכון מורשה שאתם בוחרים ומשלמים לו, ורצוי במכון שאינו שייך לאותה רשת.';
   return {title,message,pdfText:`${title}\n${message}`};
 }
 
