@@ -7,7 +7,7 @@ const CARDCOM_API_URL = "https://secure.cardcom.solutions/api/v11";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 const PLANS = {
-  balcar: { amountAgorot: 1500, title: "דוח Balcar לרכב", scopes: ["balcar"] },
+  balcar: { amountAgorot: 3900, title: "דוח עבר ביטוחי לרכב", scopes: ["balcar"] },
   premium: { amountAgorot: 4900, title: "בדיקה עצמית לפני המכון", scopes: ["premium"] },
   report: { amountAgorot: 4900, title: "פענוח דוח המכון", scopes: ["report"] },
   consultation: { amountAgorot: 14900, title: "התייעצות אישית לאחר פענוח", scopes: ["consultation"] },
