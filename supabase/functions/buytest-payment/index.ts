@@ -1,7 +1,11 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
-const ALLOWED_ORIGIN = "https://amirok196888-cloud.github.io";
-const SITE_URL = `${ALLOWED_ORIGIN}/buytest/`;
+const ALLOWED_ORIGINS = new Set([
+  "https://buytest.co.il",
+  "https://www.buytest.co.il",
+  "https://amirok196888-cloud.github.io",
+]);
+const SITE_URL = "https://buytest.co.il/";
 const WEBHOOK_URL = "https://tjxjxavxrmvbofvtnsaj.supabase.co/functions/v1/buytest-payment-webhook";
 const CARDCOM_API_URL = "https://secure.cardcom.solutions/api/v11";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
@@ -25,8 +29,9 @@ type StageProgress = { preInspectionCompleted: boolean; reportCompleted: boolean
 const TRAFFIC_SOURCES = new Set(["google", "meta", "direct", "other", "unknown"]);
 
 function responseHeaders(origin: string | null) {
+  const allowedOrigin = origin && ALLOWED_ORIGINS.has(origin) ? origin : "https://buytest.co.il";
   return {
-    "Access-Control-Allow-Origin": origin === ALLOWED_ORIGIN ? origin : ALLOWED_ORIGIN,
+    "Access-Control-Allow-Origin": allowedOrigin,
     "Access-Control-Allow-Headers": "authorization, apikey, content-type",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Access-Control-Max-Age": "86400",
