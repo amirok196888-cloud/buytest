@@ -624,7 +624,10 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
     <button class="primary" id="balcarPdfBtn" type="button" data-analytics-click="click_balcar_pdf" onclick="shareReportPdf('balcarPdfBtn')">לחץ לשיתוף תקציר ה־PDF</button>
   </div>
   <div class="info"><b>גבולות המידע:</b> השירות מציג רק נתונים שהתקבלו בדוח העבר הביטוחי. נתון חסר יוצג כ־„אין נתון” ולא כמידע תקין. הדוח אינו מחליף בדיקה במכון או בירור מול חברת הביטוח.</div>
-  <button class="primary full" id="continueFreeAfterInsurance" type="button" style="display:none;margin-top:16px" onclick="continueToFreeFlow()">המשך לשלב החינמי</button>
+  <div id="insuranceNextActions" style="display:none;gap:10px;margin-top:16px">
+    <button class="primary full" id="continueFreeAfterInsurance" type="button" onclick="continueToFreeFlow()">5 שאלות למוכר + אימות רישיון — חינם</button>
+    <button class="primary full" id="insuranceReportConsultationButton" type="button" data-analytics-click="click_report_plan" onclick="startPayment('report_consultation')">פענוח דוח המכון + התייעצות עם בוחן — 150 ₪</button>
+  </div>
 </section>
 
 <section class="card paidOnly reportFeature" id="afterInspectionSection" style="display:none">
@@ -1924,6 +1927,37 @@ function insuranceProfessionalInterpretation(data){
   const caution='דוח עבר ביטוחי משקף רק אירועים שדווחו למאגר. גם כאשר הדוח נקי, אין לוותר על בדיקה מקצועית במכון.';
   return {title:`הערה מסכמת — רמת משמעות: ${level}`,text:explanation+' '+caution};
 }
+function applyInsuranceConclusionsToSellerQuestions(data){
+  if(!Array.isArray(currentPreVisitQuestions)||currentPreVisitQuestions.length!==5) return;
+  const claims=insuranceClaims(data).map(insuranceClaimInfo);
+  const relevant=claims.filter(item=>!/צד\s*[גג׳']|third.?party/i.test(item.type));
+  const considered=relevant.length?relevant:claims;
+  const totalLoss=considered.some(item=>item.totalLoss);
+  const maxDepreciation=Math.max(0,...considered.map(item=>item.depreciation||0));
+  const maxAmount=Math.max(0,...considered.map(item=>item.amount||0));
+  if(totalLoss){
+    currentPreVisitQuestions[3]='בדוח העבר הביטוחי מופיע אובדן גמור או אובדן להלכה. האם אפשר לקבל את דוח השמאי, חשבוניות ותיעוד מלא של הנזק והתיקון?';
+  }else if(maxDepreciation>0){
+    currentPreVisitQuestions[3]=`בדוח העבר הביטוחי מופיעה ירידת ערך של ${maxDepreciation}%. באיזה אזור הייתה הפגיעה, מה תוקן והאם אפשר לקבל את דוח השמאי ותיעוד התיקון?`;
+  }else if(maxAmount>0){
+    currentPreVisitQuestions[3]=`בדוח העבר הביטוחי מופיעה תביעה בסכום של כ־${fmtNum(maxAmount)} ₪. מה היה הנזק, אילו חלקים תוקנו או הוחלפו והאם קיים תיעוד?`;
+  }else if(claims.length===0){
+    currentPreVisitQuestions[3]='בדוח העבר הביטוחי לא נמצאו תביעות. האם היו תאונות או תיקונים פרטיים שלא הופעל בגינם הביטוח?';
+  }else{
+    currentPreVisitQuestions[3]='בדוח העבר הביטוחי מופיע מידע חלקי. האם היו תאונות או תיקוני מרכב, והאם אפשר לקבל דוח שמאי או תיעוד תיקון?';
+  }
+  const followUps=[];
+  if(insurancePlateChange(data)) followUps.push('מה הסיבה לשינוי במספר הרישוי שמופיע בדוח');
+  if(data?.findings?.recall) followUps.push('האם קריאת התיקון שמופיעה בדוח טופלה אצל היבואן');
+  if(data?.findings?.stolen) followUps.push('מה ידוע על רישום הגניבה שמופיע בדוח');
+  currentPreVisitQuestions[4]=followUps.length
+    ? `${followUps.join(', ')}? בנוסף, האם קיימת היסטוריית טיפולים מלאה והאם המוכר מתחייב בבדיקה על מנוע, תיבת הילוכים ושלדה?`
+    : 'האם קיימת היסטוריית טיפולים מלאה, והאם המוכר מתחייב בבדיקה על מנוע, תיבת הילוכים ושלדה?';
+  const list=document.getElementById('preVisitQuestionList');
+  if(list) list.replaceChildren(...currentPreVisitQuestions.map(question=>{const item=document.createElement('li');item.textContent=question;return item}));
+  const subtitle=document.getElementById('preVisitSubtitle');
+  if(subtitle) subtitle.textContent='השאלות מבוססות על נתוני הרכב ועל המסקנות שהתקבלו מפענוח דוח העבר הביטוחי.';
+}
 function renderPaidBalcarReport(data){
   const vehicle=data?.vehicle||{},findings=data?.findings||{},pricing=data?.pricing||{};
   const history=balcarMileageHistory(data);
@@ -1958,8 +1992,9 @@ function renderPaidBalcarReport(data){
   prepareReportPdf('balcarPdfBtn');
   const status=document.getElementById('balcarOrderStatus');
   if(status){status.textContent='✓ הדוח מוכן. אפשר לפתוח את דוח העבר הביטוחי המקורי או לשתף את תקציר ה־PDF.';status.classList.remove('error');}
-  const continueButton=document.getElementById('continueFreeAfterInsurance');
-  if(continueButton) continueButton.style.display='block';
+  applyInsuranceConclusionsToSellerQuestions(data);
+  const nextActions=document.getElementById('insuranceNextActions');
+  if(nextActions) nextActions.style.display='grid';
 }
 let balcarLoadPromise=null;
 async function loadPaidBalcarReport(){
