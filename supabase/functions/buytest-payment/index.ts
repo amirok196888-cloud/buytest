@@ -262,6 +262,9 @@ async function createPayment(origin: string | null, body: Record<string, unknown
   const utmSource = cleanText(body.utmSource, 80) || null;
   const utmMedium = cleanText(body.utmMedium, 80) || null;
   const utmCampaign = cleanText(body.utmCampaign, 120) || null;
+  const insuranceOwnershipDate = planKey === "balcar" && /^\d{4}-\d{2}-\d{2}$/.test(String(body.ownershipDate || ""))
+    ? String(body.ownershipDate) : null;
+  const insuranceOwnerIsraeliId = planKey === "balcar" ? String(body.ownerIsraeliId || "").replace(/\D/g, "") : "";
   const customerDetailsValid = directCheckout || (validEmail(email) && customerName.length >= 2 && /^05\d{8}$/.test(phone));
   if (!isPlan(planKey) || (planKey !== "prebuy" && !/^\d{7,8}$/.test(plate)) || !customerDetailsValid || body.acceptedTerms !== true) {
     return json(origin, { ok: false, error: "invalid_payment_request" }, 400);
@@ -297,7 +300,11 @@ async function createPayment(origin: string | null, body: Record<string, unknown
     utm_medium: utmMedium,
     utm_campaign: utmCampaign,
     expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
-    provider_payload: { provider: "cardcom", stage: "creating", progress: inheritedProgress, priorOrderId: priorOrderId || null },
+    provider_payload: {
+      provider: "cardcom", stage: "creating", progress: inheritedProgress, priorOrderId: priorOrderId || null,
+      insuranceOwnershipDate,
+      insuranceOwnerIsraeliId: /^\d{9}$/.test(insuranceOwnerIsraeliId) ? insuranceOwnerIsraeliId : null,
+    },
   });
   if (!order) throw new Error("order_creation_failed");
   const returnBase = `${SITE_URL}?buytest_payment=return&order=${encodeURIComponent(orderId)}`;

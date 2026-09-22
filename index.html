@@ -624,6 +624,14 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
   <h2>דוח עבר ביטוחי לרכב</h2>
   <p class="sub">הדוח מוזמן אוטומטית עבור מספר הרכב ששולם. אין צורך בקוד פתיחה.</p>
   <div class="balcarStatus" id="balcarOrderStatus" role="status" aria-live="polite">ממתין לאישור התשלום...</div>
+  <div id="balcarPaidRetry" style="display:none;margin:12px 0;padding:14px;border:1px solid #edcd7a;border-radius:14px;background:#fffaf0">
+    <b>התשלום כבר אושר — אין לשלם שוב</b>
+    <p class="sub" style="margin:6px 0 10px">הזן שוב את פרטי הבעלות כדי לנסות להפיק את הדוח באמצעות התשלום הקיים.</p>
+    <div class="field"><label for="paidRetryOwnershipDate">תאריך תחילת הבעלות</label><input id="paidRetryOwnershipDate" type="date"></div>
+    <div class="field" style="margin-top:9px"><label for="paidRetryOwnerId">תעודת זהות של בעל הרכב</label><input id="paidRetryOwnerId" inputmode="numeric" maxlength="9" autocomplete="off" placeholder="9 ספרות" oninput="this.value=this.value.replace(/\D/g,'').slice(0,9)"></div>
+    <button class="primary full" type="button" style="margin-top:10px" onclick="retryPaidBalcarWithDetails()">בדיקה מחדש ללא תשלום נוסף</button>
+    <div class="devMsg" id="balcarPaidRetryMsg" role="status" aria-live="polite"></div>
+  </div>
   <div class="balcarSummaryGrid" id="balcarSummaryGrid"></div>
   <div class="balcarReportActions" id="balcarReportActions" style="display:none">
     <a id="balcarOriginalReport" href="#" target="_blank" rel="noopener">פתיחת דוח העבר הביטוחי המקורי</a>
@@ -1996,7 +2004,22 @@ function renderPaidBalcarReport(data){
   prepareReportPdf('balcarPdfBtn');
   const status=document.getElementById('balcarOrderStatus');
   if(status){status.textContent='✓ הדוח מוכן. אפשר לפתוח את דוח העבר הביטוחי המקורי או לשתף את תקציר ה־PDF.';status.classList.remove('error');}
+  const retry=document.getElementById('balcarPaidRetry');
+  if(retry) retry.style.display='none';
   applyInsuranceConclusionsToSellerQuestions(data);
+}
+async function retryPaidBalcarWithDetails(){
+  const ownershipDate=String(document.getElementById('paidRetryOwnershipDate')?.value||'');
+  const ownerIsraeliId=String(document.getElementById('paidRetryOwnerId')?.value||'').replace(/\D/g,'');
+  const message=document.getElementById('balcarPaidRetryMsg');
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(ownershipDate)||!/^\d{9}$/.test(ownerIsraeliId)){
+    if(message){message.classList.add('show');message.textContent='יש למלא תאריך תחילת בעלות ותעודת זהות בת 9 ספרות.';}
+    return;
+  }
+  const saved=storedBuyTestPayment();
+  localStorage.setItem(BUYTEST_INSURANCE_DETAILS_KEY,JSON.stringify({plate:String(saved?.plate||plate()),ownershipDate,ownerIsraeliId}));
+  if(message){message.classList.add('show');message.textContent='בודק מחדש באמצעות התשלום שכבר אושר...';}
+  await loadPaidBalcarReport();
 }
 let balcarLoadPromise=null;
 async function loadPaidBalcarReport(){
@@ -2027,6 +2050,8 @@ async function loadPaidBalcarReport(){
     }catch(error){
       console.error('BuyTest insurance-history order failed:',error);
       if(status){status.textContent=error?.message==='seller_details_required'?'נדרשים פרטי בעלים נוספים להפקת הדוח. לא תתבצע הזמנה נוספת; יש לפנות אלינו להשלמה או לזיכוי.':'לא ניתן להשלים כרגע את דוח העבר הביטוחי. אם התשלום אושר, אין לשלם שוב; אפשר ללחוץ בדיקה מחדש בעוד מספר דקות.';status.classList.add('error');}
+      const retry=document.getElementById('balcarPaidRetry');
+      if(retry) retry.style.display='block';
       return false;
     }
   })().finally(()=>{balcarLoadPromise=null});
@@ -2625,7 +2650,12 @@ async function submitBuyTestPayment(){
   try{
     const prior=storedBuyTestPayment();
     const attribution=buyTestTrafficAttribution();
-    const payment=await callBuyTestPaymentService({action:'create',plan:planKey,plate,customerName,email,phone,acceptedTerms:true,priorOrderId:prior?.orderId||'',priorClientSecret:prior?.clientSecret||'',...attribution});
+    let insuranceDetails={};
+    if(planKey==='balcar'){
+      try{insuranceDetails=JSON.parse(localStorage.getItem(BUYTEST_INSURANCE_DETAILS_KEY)||'{}')}catch(_error){}
+      if(String(insuranceDetails.plate||'')!==plate) insuranceDetails={};
+    }
+    const payment=await callBuyTestPaymentService({action:'create',plan:planKey,plate,customerName,email,phone,acceptedTerms:true,priorOrderId:prior?.orderId||'',priorClientSecret:prior?.clientSecret||'',...insuranceDetails,...attribution});
     saveBuyTestPayment({orderId:payment.orderId,clientSecret:payment.clientSecret,plate:payment.plate,plan:payment.plan,customerName,email,phone,progress:normalizedStageProgress(payment.progress),createdAt:new Date().toISOString()});
     sessionStorage.setItem(BUYTEST_PAYMENT_RETURN_KEY,'1');
     buyTestMetaTrack('InitiateCheckout',{value:Number(plan.price)||49,currency:'ILS',content_name:plan.name,content_ids:[String(planKey)],content_type:'product'});

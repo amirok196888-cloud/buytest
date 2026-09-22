@@ -125,6 +125,8 @@ Deno.serve(async (req: Request) => {
       const order = await paidBalcarOrder(body, plate);
       if (!order) return json(origin, { error: { code: "paid_access_required" } }, 403);
       const providerPayload = recordValue(order.provider_payload);
+      const ownershipDate = String(body.ownershipDate || providerPayload.insuranceOwnershipDate || "");
+      const ownerIsraeliId = String(body.ownerIsraeliId || providerPayload.insuranceOwnerIsraeliId || "").replace(/\D/g, "");
       const savedReportId = String(providerPayload.balcarReportId || "").trim();
       const externalRef = String(providerPayload.balcarExternalRef || `buytest-balcar-${order.id}`).slice(0, 55);
 
@@ -142,13 +144,13 @@ Deno.serve(async (req: Request) => {
 
       const eligibility = await balcarRaw(`/vehicles/${encodeURIComponent(plate)}/eligibility?serviceId=${BALCAR_SERVICE_ID}`);
       if (eligibility.status < 200 || eligibility.status >= 300) return json(origin, eligibility.data, eligibility.status);
-      if (recordValue(eligibility.data).requiresSellerDetails === true && (!body.ownershipDate || !body.ownerIsraeliId)) {
+      if (recordValue(eligibility.data).requiresSellerDetails === true && (!/^\d{4}-\d{2}-\d{2}$/.test(ownershipDate) || !/^\d{9}$/.test(ownerIsraeliId))) {
         return json(origin, { error: { code: "seller_details_required" } }, 422);
       }
 
       const payload: Record<string, unknown> = { serviceId: BALCAR_SERVICE_ID, plate, externalRef };
-      if (body.ownershipDate) payload.ownershipDate = String(body.ownershipDate);
-      if (body.ownerIsraeliId) payload.ownerIsraeliId = String(body.ownerIsraeliId).replace(/\D/g, "");
+      if (ownershipDate) payload.ownershipDate = ownershipDate;
+      if (ownerIsraeliId) payload.ownerIsraeliId = ownerIsraeliId;
       const result = await balcarRaw("/reports", {
         method: "POST",
         body: JSON.stringify(payload),
