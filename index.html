@@ -140,6 +140,7 @@ body.report-complete .clarificationBox.show,body.plan-consultation .clarificatio
 body.plan-prebuy .prePurchaseConsultationBox{display:block}
 .balcarOffer{margin:18px 0;padding:18px;border:2px solid #0fa87e;border-radius:18px;background:linear-gradient(145deg,#eefaf6,#fff)}.balcarOffer h3{margin:0 0 7px;font-size:23px;color:#075e48}.balcarOffer p{margin:0 0 12px;line-height:1.6;color:#405c66}.insuranceOffer{padding:24px 18px;text-align:center;border-width:3px;box-shadow:0 10px 26px rgba(15,168,126,.13)}.insuranceOffer h3{margin:0 0 18px;font-size:27px;line-height:1.35}.insuranceOffer #balcarPlanButton{min-height:64px;font-size:19px;line-height:1.35;box-shadow:0 7px 18px rgba(15,168,126,.24)}.balcarComingSoon{display:inline-flex;margin:5px 0 13px;padding:6px 10px;border-radius:999px;background:#fff3cf;color:#765600;font-size:13px;font-weight:900}.balcarSummaryGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0}.balcarSummaryItem{padding:13px;border:1px solid #d7e5e1;border-radius:13px;background:#fff}.balcarSummaryItem strong{display:block;margin-bottom:5px}.balcarSummaryItem span{display:block;color:#49616a;line-height:1.45}.balcarSummaryItem.alert{border-color:#e7a0a0;background:#fff3f3}.balcarSummaryItem.good{border-color:#9fd8c7;background:#f2fbf8}.balcarSummaryItem.unknown{background:#f5f7f8}.balcarReportActions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}.balcarReportActions a{display:flex;align-items:center;justify-content:center;min-height:48px;padding:10px 14px;border-radius:12px;background:#102d35;color:#fff;text-decoration:none;font-weight:900}.balcarStatus{margin:12px 0;padding:12px;border-radius:12px;background:#eef7fb;color:#244753;font-weight:850;line-height:1.5}.balcarStatus.error{background:#fff0f0;color:#8f2525}@media(max-width:520px){.balcarSummaryGrid,.balcarReportActions{grid-template-columns:1fr}}
 .managerPlanControls{margin-top:12px;padding-top:12px;border-top:1px solid #9dd9c7}.managerPlanControls b{display:block;margin-bottom:8px}.managerPlanButtons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.managerPlanButtons button{margin:0;background:#fff;color:#075e48;border:1px solid #7fcab3}.managerPlanStatus{margin-top:8px;font-size:13px;font-weight:800}
+.balcarSummaryItem.interpretation{grid-column:1/-1;border:2px solid #0fa87e;background:#eefaf6}.balcarSummaryItem.interpretation strong{font-size:20px;color:#075e48}.balcarSummaryItem.interpretation span{color:#173d35}
 .photoPreview{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
 .photoPreview img{width:100%;height:120px;object-fit:cover;border-radius:10px}
 .photoPreview button{width:100%;margin-top:4px}.photoBox{margin-top:18px}
@@ -1845,10 +1846,80 @@ function balcarStatusItem(title,value,foundText,cleanText){
   if(normalized===false) return {title,tone:'good',text:cleanText};
   return {title,tone:'unknown',text:'אין נתון בדוח שהתקבל.'};
 }
+function insuranceFirstValue(object,patterns){
+  if(!object||typeof object!=='object') return undefined;
+  for(const [key,value] of Object.entries(object)){
+    const normalized=String(key).toLowerCase().replace(/[\s_\-]/g,'');
+    if(patterns.some(pattern=>normalized.includes(pattern))) return value;
+  }
+}
+function insuranceNumber(value){
+  if(typeof value==='number'&&Number.isFinite(value)) return value;
+  const parsed=Number(String(value??'').replace(/[^0-9.\-]/g,''));
+  return Number.isFinite(parsed)?parsed:null;
+}
+function insuranceClaims(data){
+  const direct=[data?.claims,data?.insuranceClaims,data?.claimHistory,data?.insuranceHistory?.claims,data?.report?.claims,data?.data?.claims].find(Array.isArray);
+  if(direct) return direct;
+  const found=[],seen=new Set();
+  function visit(value,depth=0){
+    if(!value||depth>5||typeof value!=='object'||seen.has(value)) return;
+    seen.add(value);
+    if(Array.isArray(value)){
+      const looksLikeClaims=value.some(item=>item&&typeof item==='object'&&insuranceFirstValue(item,['claim','תביעה','damage','נזק'])!==undefined);
+      if(looksLikeClaims) value.forEach(item=>found.push(item));
+      else value.forEach(item=>visit(item,depth+1));
+      return;
+    }
+    Object.values(value).forEach(item=>visit(item,depth+1));
+  }
+  visit(data);
+  return found;
+}
+function insuranceClaimInfo(claim){
+  const amount=insuranceNumber(insuranceFirstValue(claim,['amountpaid','paidamount','claimamount','compensation','totalamount','סכום']));
+  const depreciation=insuranceNumber(insuranceFirstValue(claim,['depreciation','valuereduction','lossvalue','ירידתערך']));
+  const date=insuranceFirstValue(claim,['eventdate','damagedate','claimdate','תאריךנזק','date']);
+  const type=String(insuranceFirstValue(claim,['claimtype','damagetype','eventtype','סוגתביעה','סוגנזק','type'])||'');
+  const status=String(insuranceFirstValue(claim,['claimstatus','status','מצבתביעה'])||'');
+  const text=JSON.stringify(claim).toLowerCase();
+  return {amount,depreciation,date,type,status,totalLoss:/אובדן.{0,12}(?:להלכה|גמור)|total.{0,8}loss|constructive.{0,8}loss/.test(text)};
+}
+function insurancePlateChange(data){
+  return /החלפ.{0,10}מספר|שינוי.{0,10}מספר|previousplate|formerplate|platechange|oldlicense/.test(JSON.stringify(data).toLowerCase());
+}
+function insuranceProfessionalInterpretation(data){
+  const claims=insuranceClaims(data).map(insuranceClaimInfo);
+  const ownClaims=claims.filter(item=>!/צד\s*[גג׳']|third.?party/i.test(item.type));
+  const relevant=ownClaims.length?ownClaims:claims;
+  const totalLoss=relevant.some(item=>item.totalLoss);
+  const maxDepreciation=Math.max(0,...relevant.map(item=>item.depreciation||0));
+  const maxAmount=Math.max(0,...relevant.map(item=>item.amount||0));
+  const amountText=maxAmount?` בסכום של כ־${fmtNum(maxAmount)} ₪`:'';
+  let level='מידע חלקי — נדרשת בדיקה';
+  let explanation='לא התקבלו די נתונים מובנים כדי לקבוע את משמעות התביעות. יש לעיין בדוח המקורי ולבצע בדיקה במכון.';
+  if(totalLoss){
+    level='גבוהה מאוד';
+    explanation=`הרכב הוגדר בעבר כאובדן גמור או כאובדן להלכה${amountText}. מדובר באירוע בעל משמעות גבוהה מאוד. גם אם לא נראית פגיעה בשלדה, ייתכנו נזקים משמעותיים למרכב, למערכות הבטיחות, לכריות האוויר, למכלולים מכניים או חשמליים, או נזקי מים. יש לבצע בדיקה יסודית ולדרוש את דוח השמאי ותיעוד התיקון.`;
+  }else if(maxDepreciation>0){
+    level=maxDepreciation>=5?'בינונית עד גבוהה':'בינונית';
+    explanation=`בדוח מופיעה תביעה${amountText}, שבגינה נקבעה ירידת ערך של ${maxDepreciation}%. ירידת הערך מעידה על פגיעה בעלת משמעות מסחרית ולא רק על תיקון קוסמטי פשוט. יש לבדוק את אזור הפגיעה, המרכב, קצות השלדה, מערכות הבטיחות ואיכות התיקון, ולבקש את דוח השמאי.`;
+  }else if(maxAmount>0){
+    level=maxAmount>=30000?'בינונית — עד לבירור מהות התיקון':'נמוכה עד בינונית — בכפוף לבדיקה';
+    explanation=`בדוח מופיעה תביעה${amountText}, ללא ירידת ערך וללא אינדיקציה לאובדן להלכה או לאובדן גמור. הנתונים עשויים להתאים לתיקוני פחחות וצבע או להחלפת חלקי מרכב חיצוניים, אך מהסכום בלבד אי־אפשר לקבוע אילו חלקים נפגעו. יש לבדוק במכון את המרכב, השלדה ואיכות התיקונים.`;
+  }else if(claims.length===0){
+    level='לא נמצאו תביעות בדוח';
+    explanation='לא נמצאו תביעות במידע שהתקבל. זהו נתון חיובי, אך עבר ביטוחי נקי אינו הוכחה שהרכב לא עבר תאונה: תיקון פרטי או אירוע שלא דווח לחברת הביטוח לא יופיעו בדוח.';
+  }
+  if(insurancePlateChange(data)) explanation+=' בדוח זוהה גם שינוי במספר הרישוי; יש לברר את הסיבה ולבדוק אם חל שינוי בסיווג או בשימוש הרכב.';
+  const caution='דוח עבר ביטוחי משקף רק אירועים שדווחו למאגר. גם כאשר הדוח נקי, אין לוותר על בדיקה מקצועית במכון.';
+  return {title:`הערה מסכמת — רמת משמעות: ${level}`,text:explanation+' '+caution};
+}
 function renderPaidBalcarReport(data){
   const vehicle=data?.vehicle||{},findings=data?.findings||{},pricing=data?.pricing||{};
   const history=balcarMileageHistory(data);
   const mileage=balcarMileageResult(history);
+  const interpretation=insuranceProfessionalInterpretation(data);
   const items=[
     {title:'הרכב',tone:'unknown',text:[vehicle.manufacturer,vehicle.model,vehicle.year].filter(Boolean).join(' · ')||'פרטי הדגם לא התקבלו בדוח.'},
     {title:'בעלות ומקוריות',tone:'unknown',text:[vehicle.currentOwnershipName,vehicle.originality,vehicle.hand!=null?'יד '+vehicle.hand:null].filter(Boolean).join(' · ')||'אין נתון בדוח שהתקבל.'},
@@ -1856,7 +1927,8 @@ function renderPaidBalcarReport(data){
     balcarStatusItem('קריאת תיקון',findings.recall,'נמצאה קריאת תיקון; יש לבדוק מול היבואן אם טופלה.','לא נמצאה קריאת תיקון במקור שנבדק.'),
     {title:'היסטוריית קילומטראז׳',tone:mileage.tone,text:mileage.text},
     {title:'תוקף רישוי',tone:vehicle.testValidUntil?'good':'unknown',text:vehicle.testValidUntil?`תוקף הרישוי בדוח: ${fmtDate(vehicle.testValidUntil)}.`:'אין נתון בדוח שהתקבל.'},
-    {title:'טווח שווי שהתקבל',tone:'unknown',text:pricing.min!=null&&pricing.max!=null?`${fmtNum(pricing.min)}–${fmtNum(pricing.max)} ₪`:'אין נתון בדוח שהתקבל.'}
+    {title:'טווח שווי שהתקבל',tone:'unknown',text:pricing.min!=null&&pricing.max!=null?`${fmtNum(pricing.min)}–${fmtNum(pricing.max)} ₪`:'אין נתון בדוח שהתקבל.'},
+    {title:interpretation.title,tone:'interpretation',text:interpretation.text}
   ];
   const grid=document.getElementById('balcarSummaryGrid');
   if(grid) grid.innerHTML=items.map(item=>`<article class="balcarSummaryItem ${item.tone}"><strong>${escapeHtml(item.title)}</strong><span>${escapeHtml(item.text)}</span></article>`).join('');
@@ -1871,7 +1943,7 @@ function renderPaidBalcarReport(data){
     `מספר רכב: ${plate()||'לא צוין'}`,
     `פרטי הרכב: ${identity}`,
     ...items.slice(1).map(item=>`${item.title}: ${item.text}`),
-    'הסיכום משקף רק את הנתונים שהתקבלו בדוח ואינו מחליף את דוח המקור, בדיקה מקצועית או בירור מול חברת הביטוח.'
+    'הסיכום משקף רק את הנתונים שהתקבלו בדוח. דוח נקי אינו שולל תאונה או תיקון שלא דווחו לביטוח ואינו מחליף בדיקה מקצועית במכון.'
   ].join('\n');
   reportText=balcarSummaryText;
   prepareReportPdf('balcarPdfBtn');
