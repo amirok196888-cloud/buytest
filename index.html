@@ -414,6 +414,12 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
     <div class="devMsg" id="balcarEligibilityMsg" role="status" aria-live="polite"></div>
   </div>
 </section>
+<section class="card freeAfterLookup" id="afterInsuranceChoices" style="display:none">
+  <div style="display:grid;gap:10px">
+    <button class="primary full" id="continueFreeAfterInsurance" type="button" onclick="continueToFreeFlow()">5 שאלות למוכר + אימות רישיון — חינם</button>
+    <button class="primary full" id="insuranceReportConsultationButton" type="button" data-analytics-click="click_report_plan" onclick="startPayment('report_consultation')">פענוח דוח המכון + התייעצות עם בוחן — 150 ₪</button>
+  </div>
+</section>
 <div class="preFlowProgress freeAfterLookup" id="preFlowProgress" aria-live="polite"><strong id="preFlowProgressText">הבדיקה החינמית ברכב</strong><span id="preFlowProgressHint">מסיימים סעיף אחד — והסעיף הבא נפתח אוטומטית.</span></div>
 <section class="card freeAfterLookup preFlowScreen preVisitCard" id="preVisitSection" data-pre-step="0" style="display:none">
   <span class="preVisitBadge">חדש · בחינם</span>
@@ -624,10 +630,6 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
     <button class="primary" id="balcarPdfBtn" type="button" data-analytics-click="click_balcar_pdf" onclick="shareReportPdf('balcarPdfBtn')">לחץ לשיתוף תקציר ה־PDF</button>
   </div>
   <div class="info"><b>גבולות המידע:</b> השירות מציג רק נתונים שהתקבלו בדוח העבר הביטוחי. נתון חסר יוצג כ־„אין נתון” ולא כמידע תקין. הדוח אינו מחליף בדיקה במכון או בירור מול חברת הביטוח.</div>
-  <div id="insuranceNextActions" style="display:none;gap:10px;margin-top:16px">
-    <button class="primary full" id="continueFreeAfterInsurance" type="button" onclick="continueToFreeFlow()">5 שאלות למוכר + אימות רישיון — חינם</button>
-    <button class="primary full" id="insuranceReportConsultationButton" type="button" data-analytics-click="click_report_plan" onclick="startPayment('report_consultation')">פענוח דוח המכון + התייעצות עם בוחן — 150 ₪</button>
-  </div>
 </section>
 
 <section class="card paidOnly reportFeature" id="afterInspectionSection" style="display:none">
@@ -1683,6 +1685,8 @@ function closeLegal(){document.getElementById('legalModal').classList.remove('op
 function showInsuranceStart(){
   const insuranceStart=document.getElementById('insuranceStartSection');
   if(insuranceStart) insuranceStart.style.display='block';
+  const choices=document.getElementById('afterInsuranceChoices');
+  if(choices) choices.style.display='block';
 }
 function unlockFreeSections(){
   const progress=document.getElementById('preFlowProgress');
@@ -1993,8 +1997,6 @@ function renderPaidBalcarReport(data){
   const status=document.getElementById('balcarOrderStatus');
   if(status){status.textContent='✓ הדוח מוכן. אפשר לפתוח את דוח העבר הביטוחי המקורי או לשתף את תקציר ה־PDF.';status.classList.remove('error');}
   applyInsuranceConclusionsToSellerQuestions(data);
-  const nextActions=document.getElementById('insuranceNextActions');
-  if(nextActions) nextActions.style.display='grid';
 }
 let balcarLoadPromise=null;
 async function loadPaidBalcarReport(){
