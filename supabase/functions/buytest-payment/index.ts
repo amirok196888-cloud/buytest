@@ -1,11 +1,12 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
+const PRIMARY_ORIGIN = "https://buytest.co.il";
 const ALLOWED_ORIGINS = new Set([
-  "https://buytest.co.il",
+  PRIMARY_ORIGIN,
   "https://www.buytest.co.il",
   "https://amirok196888-cloud.github.io",
 ]);
-const SITE_URL = "https://buytest.co.il/";
+const SITE_URL = `${PRIMARY_ORIGIN}/`;
 const WEBHOOK_URL = "https://tjxjxavxrmvbofvtnsaj.supabase.co/functions/v1/buytest-payment-webhook";
 const CARDCOM_API_URL = "https://secure.cardcom.solutions/api/v11";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
@@ -29,7 +30,7 @@ type StageProgress = { preInspectionCompleted: boolean; reportCompleted: boolean
 const TRAFFIC_SOURCES = new Set(["google", "meta", "direct", "other", "unknown"]);
 
 function responseHeaders(origin: string | null) {
-  const allowedOrigin = origin && ALLOWED_ORIGINS.has(origin) ? origin : "https://buytest.co.il";
+  const allowedOrigin = origin && ALLOWED_ORIGINS.has(origin) ? origin : PRIMARY_ORIGIN;
   return {
     "Access-Control-Allow-Origin": allowedOrigin,
     "Access-Control-Allow-Headers": "authorization, apikey, content-type",
@@ -249,7 +250,7 @@ async function verifiedPriorOrder(body: Record<string, unknown>, plate: string) 
 }
 
 async function createPayment(origin: string | null, body: Record<string, unknown>) {
-  if (origin !== ALLOWED_ORIGIN) return json(origin, { ok: false, error: "origin_not_allowed" }, 403);
+  if (!origin || !ALLOWED_ORIGINS.has(origin)) return json(origin, { ok: false, error: "origin_not_allowed" }, 403);
   const planKey = String(body.plan || "");
   const enteredPlate = cleanPlate(body.plate);
   const plate = planKey === "prebuy" ? (enteredPlate || "GENERAL") : enteredPlate;
@@ -367,7 +368,7 @@ async function createPayment(origin: string | null, body: Record<string, unknown
 }
 
 async function paymentStatus(origin: string | null, body: Record<string, unknown>) {
-  if (origin !== ALLOWED_ORIGIN) return json(origin, { ok: false, error: "origin_not_allowed" }, 403);
+  if (!origin || !ALLOWED_ORIGINS.has(origin)) return json(origin, { ok: false, error: "origin_not_allowed" }, 403);
   const orderId = String(body.orderId || "");
   const clientToken = String(body.clientSecret || "");
   if (!/^[0-9a-f-]{36}$/i.test(orderId) || clientToken.length < 30) return json(origin, { ok: false, error: "invalid_status_request" }, 400);
@@ -389,7 +390,7 @@ async function paymentStatus(origin: string | null, body: Record<string, unknown
 }
 
 async function completeStage(origin: string | null, body: Record<string, unknown>) {
-  if (origin !== ALLOWED_ORIGIN) return json(origin, { ok: false, error: "origin_not_allowed" }, 403);
+  if (!origin || !ALLOWED_ORIGINS.has(origin)) return json(origin, { ok: false, error: "origin_not_allowed" }, 403);
   const orderId = String(body.orderId || "");
   const clientToken = String(body.clientSecret || "");
   const stage = String(body.stage || "");
@@ -418,7 +419,7 @@ async function completeStage(origin: string | null, body: Record<string, unknown
 }
 
 async function redeemPaidAccess(origin: string | null, body: Record<string, unknown>) {
-  if (origin !== ALLOWED_ORIGIN) return json(origin, { ok: false, error: "origin_not_allowed" }, 403);
+  if (!origin || !ALLOWED_ORIGINS.has(origin)) return json(origin, { ok: false, error: "origin_not_allowed" }, 403);
   const plate = cleanPlate(body.plate);
   const code = String(body.code ?? "").trim().toUpperCase();
   if (!/^\d{7,8}$/.test(plate) || code.length < 20 || code.length > 120) return json(origin, { ok: false, error: "invalid_redemption" }, 400);
@@ -435,7 +436,7 @@ async function redeemPaidAccess(origin: string | null, body: Record<string, unkn
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get("origin");
   if (req.method === "OPTIONS") {
-    if (origin !== ALLOWED_ORIGIN) return json(origin, { ok: false, error: "origin_not_allowed" }, 403);
+    if (!origin || !ALLOWED_ORIGINS.has(origin)) return json(origin, { ok: false, error: "origin_not_allowed" }, 403);
     return new Response(null, { status: 204, headers: responseHeaders(origin) });
   }
   if (req.method !== "POST") return json(origin, { ok: false, error: "method_not_allowed" }, 405);
