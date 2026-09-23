@@ -15,6 +15,7 @@ const PLANS = {
   balcar: { amountAgorot: 3900, title: "דוח עבר ביטוחי לרכב", scopes: ["balcar"] },
   premium: { amountAgorot: 4900, title: "בדיקה עצמית לפני המכון", scopes: ["premium"] },
   report: { amountAgorot: 4900, title: "פענוח דוח המכון", scopes: ["report"] },
+  report_consultation: { amountAgorot: 15000, title: "פענוח דוח המכון והתייעצות עם בוחן", scopes: ["report", "consultation"] },
   consultation: { amountAgorot: 14900, title: "התייעצות אישית לאחר פענוח", scopes: ["consultation"] },
   prebuy: { amountAgorot: 7900, title: "ייעוץ לפני רכישה בוואטסאפ · ההתייעצות פתוחה ל־48 שעות", scopes: ["prebuy"] },
   bundle: { amountAgorot: 12000, title: "חבילת BuyTest המלאה", scopes: ["premium", "report", "consultation"] },
@@ -226,7 +227,9 @@ async function signedEntitlement(order: Record<string, unknown>) {
   if (!signingKey) throw new Error("entitlement_signing_unavailable");
   const plan = String(order.plan) as PlanKey;
   const progress = stageProgress(order.provider_payload);
-  const scopes = plan === "bundle"
+  const scopes = plan === "report_consultation"
+    ? ["report", ...(progress.reportCompleted ? ["consultation"] : [])]
+    : plan === "bundle"
     ? ["premium", ...(progress.preInspectionCompleted ? ["report"] : []), ...(progress.reportCompleted ? ["consultation"] : [])]
     : [...PLANS[plan].scopes];
   const payload = base64Url(new TextEncoder().encode(JSON.stringify({
@@ -330,6 +333,11 @@ async function createPayment(origin: string | null, body: Record<string, unknown
         IsCardOwnerPhoneRequired: true,
         IsCardOwnerEmailRequired: true,
       },
+      AdvancedDefinition: {
+        MinNumOfPayments: 1,
+        MaxNumOfPayments: 1,
+        DefaultNumOfPayments: 1,
+      },
       Document: {
         DocumentTypeToCreate: "Auto",
         Name: customerName || "לקוח BuyTest",
@@ -414,7 +422,7 @@ async function completeStage(origin: string | null, body: Record<string, unknown
   const scopes: readonly string[] = PLANS[plan].scopes;
   if (!scopes.includes(stage)) return json(origin, { ok: false, error: "stage_not_purchased" }, 403);
   const progress = stageProgress(order.provider_payload);
-  if (stage === "report" && !progress.preInspectionCompleted && plan !== "report") {
+  if (stage === "report" && !progress.preInspectionCompleted && plan !== "report" && plan !== "report_consultation") {
     return json(origin, { ok: false, error: "previous_stage_required" }, 409);
   }
   const nextProgress: StageProgress = stage === "premium"
