@@ -2120,6 +2120,14 @@ async function startBalcarPayment(){
   if(button) button.disabled=true;
   if(message){message.classList.add('show');message.textContent='בודק שהדוח זמין לרכב הזה...';}
   try{
+    const previous=storedBuyTestPayment();
+    if(previous?.plan==='balcar'&&String(previous.plate)===vehiclePlate&&previous.orderId&&previous.clientSecret){
+      if(await restoreBuyTestAccess({requiredPlate:vehiclePlate,scroll:true})){
+        if(message) message.textContent='כבר קיים תשלום מאושר לרכב הזה. פותח את הדוח ללא חיוב נוסף.';
+        await loadPaidBalcarReport();
+        return;
+      }
+    }
     const eligibility=await callBuyTestBalcarService({action:'eligibility',plate:vehiclePlate,serviceId:BUYTEST_BALCAR_SERVICE_ID});
     if(eligibility?.requiresSellerDetails){
       const fields=document.getElementById('insuranceSellerFields');
@@ -2664,6 +2672,16 @@ async function startPayment(planKey='report'){
     showBuyTestAccessNotice('לפני התשלום יש להציג את נתוני הרכב ולוודא שמספר הרכב נכון.',true);
     document.getElementById('vehicleLookup')?.scrollIntoView({behavior:'smooth',block:'start'});
     return;
+  }
+  const previous=storedBuyTestPayment();
+  if(previous?.plan===selectedKey&&String(previous.plate)===plate&&previous.orderId&&previous.clientSecret){
+    buyTestPaymentStarting=true;
+    try{
+      if(await restoreBuyTestAccess({requiredPlate:selectedKey==='prebuy'?'':plate,scroll:true})){
+        showBuyTestAccessNotice('כבר קיים תשלום מאושר לשירות הזה. לא נוצר חיוב נוסף.');
+        return;
+      }
+    }finally{buyTestPaymentStarting=false;}
   }
   sessionStorage.setItem('buytestPendingPlan',selectedKey);
   buyTestPaymentStarting=true;
