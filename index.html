@@ -291,6 +291,22 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
 .imageModal button{background:#0b8f70;color:#fff;border:1px solid #08745b}
 .topSiteNav{max-width:1080px;margin:auto;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff;border-bottom:1px solid #d9e2e6}.topSiteNavBrand{font-size:22px;font-weight:950;color:#10242c;text-decoration:none}.topSiteNavBrand span{color:#0fa87e}.topSiteNavLinks{display:flex;gap:8px}.topSiteNavLinks a{color:#176f5a;text-decoration:none;font-weight:900;padding:9px 12px;border-radius:10px}.topSiteNavLinks a:hover{background:#e8f7f2}
 @media(max-width:520px){.topSiteNav{padding:9px 12px}.topSiteNavLinks a{padding:7px 8px;font-size:14px}}
+/* Landing: one clear start and two independent paid choices */
+.mktHero{padding:26px 0 54px;background:linear-gradient(160deg,#f2faf7 0%,#fff 55%,#f7fafc 100%)}
+.mktHeroGrid{max-width:980px}.mktBrandLogo{width:min(194px,46vw);margin-bottom:12px}
+.mktHero h1{max-width:850px;margin:4px 0 11px;font-size:clamp(33px,5vw,53px);line-height:1.12}
+.mktHeroSecondary{font-size:clamp(18px,2.6vw,23px);font-weight:650;line-height:1.5;color:#344e56}
+.mktLead{margin:0 0 16px;font-size:16px;color:#48616a}
+.credentials{display:flex;align-items:center;flex-wrap:wrap;gap:6px 13px;margin:17px 0 21px;padding:15px 19px;text-align:right;background:#fff;border:1px solid #c9e2d9;border-right:5px solid #0b8668;border-radius:17px;box-shadow:0 8px 26px rgba(14,63,56,.07);color:#17352d}
+.credentials:before{display:none}.credentialsKicker{padding:4px 9px;background:#e8f7f1;color:#075e48!important;font-size:11px!important}
+.credentials h2{margin:0;color:#17352d;font-size:18px}.credentialsName{font-size:16px;color:#075e48}.credentialsResume{flex-basis:100%;font-size:13px;line-height:1.5;color:#48616a;font-weight:650}
+.routeCards{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:0}.routeCard{display:flex;flex-direction:column;padding:19px;border:1px solid #dce8e6;box-shadow:0 9px 25px rgba(16,45,53,.06)}
+.routeCard.free{grid-column:1/-1;border:2px solid #9fd4bf;background:linear-gradient(110deg,#f0faf5,#fff)}
+.routeCard h3{margin:7px 0 5px;font-size:20px;color:#17352d}.routeCard p{font-size:14px;line-height:1.5}
+.routeCard.paid .mktBtn{width:100%;margin-top:auto;border:1px solid #b8d7cf;background:#fff;color:#075e48;cursor:pointer}
+.routeCard.paid .routePrice{background:#eef5f1}.landingFreeStart{grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px;margin-top:10px}.landingFreeStart input{height:54px}.landingFreeStart .mktBtn{width:auto;min-height:54px;white-space:nowrap}.landingFreeStart .landingFreeExplanation{grid-column:1/-1;font-size:13px}
+.appBackHome{display:inline-flex;align-items:center;margin:7px 0 4px;padding:9px 12px;border-radius:12px;background:#fff;color:#075e48;border:1px solid #c9e2d9;text-decoration:none;font-size:14px;font-weight:850}.manager-mode .appBackHome,.manager-entry .appBackHome{display:none}
+@media(max-width:700px){.mktHero{padding:19px 0 38px}.mktHero h1{font-size:clamp(31px,8vw,41px)}.credentials{gap:4px 9px;padding:13px}.credentials h2{font-size:16px}.credentialsName{font-size:14px}.credentialsResume{font-size:12px}.routeCards{grid-template-columns:1fr}.routeCard.free{grid-column:auto}.landingFreeStart{grid-template-columns:1fr}.landingFreeStart .mktBtn{width:100%;white-space:normal}.landingFreeStart .landingFreeExplanation{grid-column:auto}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 </style><meta name="buytest-build" content="buytest-v128-manager-customer-view">
 </head><body>
@@ -308,28 +324,31 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 /></noscript>
 
 <section id="marketingLanding">
-<nav class="topSiteNav" aria-label="ניווט ראשי"><a class="topSiteNavBrand" href="/"><span>Buy</span>Test</a><div class="topSiteNavLinks"><a href="/articles/">מאמרים ומדריכים</a><a href="#vehicleLookup">ייעוץ ובדיקת רכב</a></div></nav>
+<nav class="topSiteNav" aria-label="ניווט ראשי"><a class="topSiteNavBrand" href="/"><span>Buy</span>Test</a><div class="topSiteNavLinks"><a href="#serviceChoices">בחירת שירות</a><a href="/articles/">מדריכים</a></div></nav>
 <div class="mktHero">
 <div class="mktWrap mktHeroGrid">
 <div>
 <img class="mktBrandLogo" src="buytest-logo-2026.png" alt="BuyTest — קונה רכב? קודם בודקים!">
-<h1>ייעוץ ובדיקת רכב — <span>לפני ואחרי בדיקת המכון</span></h1>
-<h2 class="mktHeroSecondary">פענוח עבר ביטוחי וסיכומי בדיקות</h2>
-<p class="mktLead"><strong>התחלת בדיקה בחינם + הפקת עבר ביטוחי</strong></p>
+<h1>קיבלת דוח בדיקה. <span>אבל מה הוא באמת אומר על הרכב?</span></h1>
+<h2 class="mktHeroSecondary">לפני שמשלמים על רכב, כדאי להבין את הנתונים, את העבר הביטוחי ואת ההערות של הבוחן.</h2>
+<p class="mktLead">מתחילים בפרטי רכב ובשאלות למוכר בחינם. אחרי הבדיקה במכון אפשר להעלות את הדוח, לקבל פענוח מסודר ולהתייעץ אישית עם בוחן.</p>
 <section class="credentials" aria-label="הרזומה המקצועי של עמוס רוקח">
 <span class="credentialsKicker">המומחיות מאחורי BuyTest</span>
-<h2>מומחה לבדיקות קנייה מעל 15 שנה</h2>
+<h2>מעל 15 שנות ניסיון בבדיקות רכב לפני קנייה</h2>
 <strong class="credentialsName">עמוס רוקח</strong>
 <span class="credentialsResume">הנדסאי רכב · מנהל מוסך מוסמך · בוחן רישוי מלא · שמאי נזקי רכוש ורכב</span>
 </section>
-<div class="routeCards" aria-label="בחירת מסלול BuyTest">
+<div class="routeCards" id="serviceChoices" aria-label="בחירת מסלול BuyTest">
   <article class="routeCard free">
+    <span class="routePrice">בחינם</span><h3>עוד לפני המכון: מה אפשר לברר על הרכב?</h3>
     <div class="landingFreeStart">
-      <input id="plate" inputmode="numeric" maxlength="8" autocomplete="off" aria-label="מספר רכב" placeholder="הכנס מספר רכב" oninput="sanitizePlateInput(this);this.setCustomValidity('')" onkeydown="if(event.key==='Enter')startInsuranceAndFreeFlowFromLanding()">
-      <button class="mktBtn mktBtnPrimary" type="button" data-analytics-click="click_landing_free" onclick="startInsuranceAndFreeFlowFromLanding()">פתיחת פרטי הרכב מהמאגר</button>
-      <p class="landingFreeExplanation">מתחילים בפתיחת פרטי הרכב מהמאגר וממשיכים להפקת עבר ביטוחי.</p>
+      <input id="plate" inputmode="numeric" maxlength="8" autocomplete="off" aria-label="מספר רכב" placeholder="מה מספר הרכב?" oninput="sanitizePlateInput(this);this.setCustomValidity('')" onkeydown="if(event.key==='Enter')startFreeCheckFromLanding()">
+      <button class="mktBtn mktBtnPrimary" type="button" data-analytics-click="click_landing_free" onclick="startFreeCheckFromLanding()">הצגת נתוני הרכב בחינם ←</button>
+      <p class="landingFreeExplanation">נתוני רכב זמינים ממאגר משרד התחבורה וחמש שאלות למוכר. אין צורך לשלם כדי להתחיל.</p>
     </div>
   </article>
+  <article class="routeCard paid"><span class="routePrice">39 ₪ לרכב</span><h3>מה מופיע בעבר הביטוחי?</h3><p>הפקת דוח עבר ביטוחי ופענוח הנתונים שהתקבלו, לפני שמתקדמים בקנייה.</p><button class="mktBtn" type="button" data-analytics-click="click_insurance_history" onclick="startLandingPaidRoute('insurance')">להפקת עבר ביטוחי ←</button></article>
+  <article class="routeCard paid"><span class="routePrice">150 ₪ לרכב</span><h3>הדוח מהמכון לא ברור?</h3><p>מעלים את סיכום הבוחן, מקבלים פענוח וסיכום PDF, ואז התייעצות אישית בוואטסאפ.</p><button class="mktBtn" type="button" data-analytics-click="click_report_plan" onclick="startLandingPaidRoute('report')">לפענוח דוח והתייעצות ←</button></article>
 </div>
 </div>
 </div>
@@ -374,6 +393,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 </section>
 <div id="appShell">
 <main>
+<a class="appBackHome" href="#marketingLanding">← חזרה לבחירת השירותים</a>
 <section class="card managerOnly" id="managerPreviewBox" style="display:none;padding:14px">
   <div class="managerLoginForm">
     <label for="managerPinInput">קוד מנהל</label>
@@ -1038,6 +1058,21 @@ async function startInsuranceAndFreeFlowFromLanding(){
   await startFreeCheckFromLanding();
   if(!/^\d{7,8}$/.test(plate())) return;
   document.getElementById('insuranceStartSection')?.scrollIntoView({behavior:'smooth',block:'start'});
+}
+async function startLandingPaidRoute(route){
+  const input=document.getElementById('plate');
+  if(!/^\d{7,8}$/.test(plate())){
+    document.getElementById('serviceChoices')?.scrollIntoView({behavior:'smooth',block:'start'});
+    input?.setCustomValidity('כדי להמשיך יש להכניס מספר רכב בן 7 או 8 ספרות');
+    input?.reportValidity();
+    input?.focus({preventScroll:true});
+    return;
+  }
+  await startFreeCheckFromLanding();
+  if(document.getElementById('vehicleData')?.style.display!=='block') return;
+  const target=route==='report'?'insuranceReportConsultationButton':'balcarPlanButton';
+  document.getElementById(target)?.scrollIntoView({behavior:'smooth',block:'center'});
+  document.getElementById(target)?.focus({preventScroll:true});
 }
 function syncLandingConsultationButton(){
   const accepted=!!document.getElementById('landingConsultationLegalAccept')?.checked;
