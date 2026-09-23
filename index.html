@@ -910,6 +910,15 @@ function buyTestGoogleTrackFreeCompletedOnce(vehiclePlate){
     sessionStorage.setItem(storageKey,'1');
   }catch(error){console.warn('BuyTest Google Ads free-completed conversion skipped:',error)}
 }
+function trackBuyTestFreeCompletedOnce(vehiclePlate){
+  const normalizedPlate=String(vehiclePlate||'').replace(/\D/g,'');
+  if(!/^\d{7,8}$/.test(normalizedPlate)) return;
+  const key='buytest-free-completed-'+normalizedPlate;
+  try{if(sessionStorage.getItem(key)==='1') return;sessionStorage.setItem(key,'1')}catch(_error){}
+  void trackBuyTestEvent('free_completed');
+  buyTestMetaTrackCustom('FreeCheckCompleted',{content_name:'בדיקה עצמית לפני המכון'});
+  buyTestGoogleTrackFreeCompletedOnce(normalizedPlate);
+}
 function buyTestGoogleTrackCheckoutOnce(payment,plan){
   if(typeof window.gtag!=='function'||new URLSearchParams(location.search).has('manager')||document.body.classList.contains('manager-mode')) return;
   if(!payment?.orderId) return;
@@ -1129,6 +1138,7 @@ function setCustomerRoute(route){
 const preFlowTitles=['5 שאלות למוכר + אימות רישיון','פענוח והתייעצות'];
 function showPreFlowStep(index,{scroll=true}={}){
   const safe=Math.max(0,Math.min(preFlowTitles.length-1,Number(index)||0));
+  if(safe===1) trackBuyTestFreeCompletedOnce(plate());
   const progress=document.getElementById('preFlowProgress');
   progress?.classList.add('show');
   document.querySelectorAll('.preFlowScreen').forEach(section=>{
@@ -5467,9 +5477,7 @@ async function buildReport(){
   preReportText=data.text;
   reportText=[preReportText,afterReportText].filter(Boolean).join('\n\n');
   prepareReportPdf('pdfBtn');
-  void trackBuyTestEvent('free_completed');
-  buyTestMetaTrackCustom('FreeCheckCompleted',{content_name:'בדיקה עצמית לפני המכון'});
-  buyTestGoogleTrackFreeCompletedOnce(data.plate||document.getElementById('vPlate')?.textContent||document.getElementById('plate')?.value||'');
+  trackBuyTestFreeCompletedOnce(data.plate||document.getElementById('vPlate')?.textContent||document.getElementById('plate')?.value||'');
   await completeBuyTestStage('premium');
   report.scrollIntoView({behavior:'smooth',block:'start'});
 }
