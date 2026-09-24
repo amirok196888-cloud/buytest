@@ -168,5 +168,21 @@
       if (button) button.disabled = false;
     }
   };
+  const originalPaidReport = loadPaidBalcarReport;
+  loadPaidBalcarReport = async function (...args) {
+    const saved = activePackage();
+    if (!saved) return originalPaidReport(...args);
+    let details = {};
+    try { details = JSON.parse(localStorage.getItem(BUYTEST_INSURANCE_DETAILS_KEY) || '{}'); } catch (_) {}
+    if (String(details.plate || '') !== String(saved.plate)) details = {};
+    await loadPackageInsurance(saved, details);
+    return !!window.buytestBalcarReport;
+  };
+  const originalResume = resumePaidVehicleFlow;
+  resumePaidVehicleFlow = async function (...args) {
+    const result = await originalResume(...args);
+    if (result && activePackage() && !window.buytestBalcarReport) await loadPaidBalcarReport();
+    return result;
+  };
   syncPackageUI();
 })();
