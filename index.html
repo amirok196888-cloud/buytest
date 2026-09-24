@@ -162,6 +162,7 @@ body.plan-prebuy .prePurchaseConsultationBox{display:block}
 #externalSection,#selfSection{display:none!important}
 .routeCard.free{grid-column:1/-1}.compactCheckList{margin:0 0 16px;padding-right:24px;line-height:1.75}.compactCheckList li{margin:7px 0}.consultationOffer{margin-top:16px}
 .landingFreeStart{display:grid;grid-template-columns:1fr;gap:12px;margin-top:0}.landingFreeStart input{min-width:0;width:100%;height:52px;border:2px solid #9fcfc0;border-radius:14px;padding:0 16px;font-size:18px;font-weight:800;background:#fff;color:#17323c}.landingFreeStart input:focus{outline:3px solid rgba(15,168,126,.18);border-color:#0fa87e}.landingFreeStart .mktBtn{width:100%;border:0;cursor:pointer}.landingFreeStart .landingFreeExplanation{margin:0;color:#50666f;font-size:16px;line-height:1.55}
+.routeCards .routeCard.free{grid-column:auto}.routeCards .routeCard .mktBtn{width:100%;min-height:54px;margin-top:auto;cursor:pointer}.inspectionRoute[hidden]{display:none!important}.inspectionRoute{margin-top:16px;padding:20px;border:2px solid #a7d7c6;border-radius:19px;background:#f5fbf8;color:#17352d}.inspectionRoute h2{margin:8px 0;font-size:23px}.inspectionRoute p{margin:0 0 16px;line-height:1.55}.inspectionRoute .routeBack{border:0;background:transparent;color:#075e48;font-weight:800;cursor:pointer;padding:8px 0}.inspectionRoute .landingFreeStart{margin-top:12px}
 .routeCard.consultation{grid-column:1/-1;border-color:#128c7e;background:linear-gradient(135deg,#e8fff5,#f8fffc);box-shadow:0 12px 30px rgba(18,140,126,.2)}
 .routeCard.consultation h3{font-size:25px;color:#075e48}.routeCard.consultation p{font-size:17px;color:#173f37}
 .routeCardConsent{margin:0 0 12px;padding:11px 12px;border:1px solid #9fd8c7;border-radius:12px;background:#fff;color:#173f37;font-size:14px;line-height:1.45}.routeCardConsent label{display:flex;align-items:flex-start;gap:9px}.routeCardConsent input{width:20px;height:20px;flex:0 0 auto;margin-top:1px}.routeCardLegalLinks{display:flex;gap:8px;flex-wrap:wrap;margin:8px 29px 0 0}.routeCardLegalLinks button{padding:0;background:transparent;color:#075e48;text-decoration:underline;font-size:13px}.routeCard .mktBtn:disabled{opacity:.55;cursor:not-allowed;box-shadow:none}
@@ -334,9 +335,8 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 <div class="mktWrap mktHeroGrid">
 <div>
 <img class="mktBrandLogo" src="buytest-logo-2026.png" alt="BuyTest — קונה רכב? קודם בודקים!">
-<h1>קיבלת דוח בדיקה. <span>אבל מה הוא באמת אומר על הרכב?</span></h1>
-<h2 class="mktHeroSecondary">לפני שמשלמים על רכב, כדאי להבין את הנתונים, את העבר הביטוחי ואת ההערות של הבוחן.</h2>
-<p class="mktLead">מתחילים בפרטי רכב ובשאלות למוכר בחינם. אחרי הבדיקה במכון אפשר להעלות את הדוח, לקבל פענוח מסודר ולהתייעץ אישית עם בוחן.</p>
+<h1>עומד/ת לקנות רכב יד שנייה?</h1>
+<p class="mktHeroSecondary">אנחנו איתך בכל שלב בדרך — לפני שניגשים למכון, וגם אחרי שקיבלתם את הדוח.</p>
 <section class="credentials" aria-label="הרזומה המקצועי של עמוס רוקח">
 <span class="credentialsKicker">המומחיות מאחורי BuyTest</span>
 <h2>מעל 15 שנות ניסיון בבדיקות רכב לפני קנייה</h2>
@@ -345,16 +345,28 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 </section>
 <div class="routeCards" id="serviceChoices" aria-label="בחירת מסלול BuyTest">
   <article class="routeCard free">
-    <span class="routePrice">בחינם</span><h3>עוד לפני המכון: מה אפשר לברר על הרכב?</h3>
-    <div class="landingFreeStart">
+    <span class="routePrice">לפני המכון</span><h3>עדיין לא עשיתי בדיקה</h3><p>נתחיל בנתוני הרכב ובחמש שאלות למוכר. בהמשך אפשר להפיק דוח עבר ביטוחי.</p>
+    <button class="mktBtn mktBtnPrimary" type="button" aria-controls="beforeInspectionRoute" aria-expanded="false" data-analytics-click="click_before_route" onclick="openInspectionRoute('before')">לבדיקה לפני המכון ←</button>
+  </article>
+  <article class="routeCard paid"><span class="routePrice">אחרי המכון</span><h3>כבר יש לי דוח בדיקה</h3><p>מעלים את דוח המכון לפענוח ב־49 ₪. לאחר הפענוח אפשר לבחור בהתייעצות אישית.</p><button class="mktBtn" type="button" aria-controls="afterInspectionRoute" aria-expanded="false" data-analytics-click="click_after_route" onclick="openInspectionRoute('after')">לפענוח הדוח ←</button></article>
+</div>
+<section class="inspectionRoute" id="beforeInspectionRoute" hidden aria-label="מסלול לפני המכון">
+  <button class="routeBack" type="button" onclick="closeInspectionRoutes()">← חזרה לבחירת מסלול</button>
+  <h2>לפני המכון: מתחילים בחינם</h2><p>מכניסים מספר רכב, בודקים את הנתונים הזמינים ועוברים על חמש שאלות למוכר. אפשר להפיק דוח עבר ביטוחי בהמשך.</p>
+  <div class="landingFreeStart">
       <input id="plate" inputmode="numeric" maxlength="8" autocomplete="off" aria-label="מספר רכב" placeholder="מה מספר הרכב?" oninput="sanitizePlateInput(this);this.setCustomValidity('')" onkeydown="if(event.key==='Enter')startFreeCheckFromLanding()">
       <button class="mktBtn mktBtnPrimary" type="button" data-analytics-click="click_landing_free" onclick="startFreeCheckFromLanding()">הצגת נתוני הרכב בחינם ←</button>
       <p class="landingFreeExplanation">נתוני רכב זמינים ממאגר משרד התחבורה וחמש שאלות למוכר. אין צורך לשלם כדי להתחיל.</p>
-    </div>
-  </article>
-  <article class="routeCard paid"><span class="routePrice">39 ₪ לרכב</span><h3>מה מופיע בעבר הביטוחי?</h3><p>הפקת דוח עבר ביטוחי ופענוח הנתונים שהתקבלו, לפני שמתקדמים בקנייה.</p><button class="mktBtn" type="button" data-analytics-click="click_insurance_history" onclick="startLandingPaidRoute('insurance')">להפקת עבר ביטוחי ←</button></article>
-  <article class="routeCard paid"><span class="routePrice">49 ₪ לפענוח</span><h3>הדוח מהמכון לא ברור?</h3><p>מעלים את סיכום הבוחן ואת הבדיקה הממוחשבת, מקבלים פענוח אוטומטי וסיכום PDF. לאחר מכן אפשר לבחור בייעוץ אישי.</p><div class="reportChoiceActions"><button class="mktBtn" type="button" data-analytics-click="click_report_plan" onclick="startLandingPaidRoute('report')">פענוח דוח · 49 ₪ ←</button><button class="mktBtn secondary" type="button" data-analytics-click="click_consultation_plan" onclick="startLandingPaidRoute('consultation')">ייעוץ אישי · 100 ₪</button></div><p class="reportChoiceNote">הייעוץ נפתח לאחר השלמת הפענוח, בתשלום נפרד.</p></article>
-</div>
+  </div>
+</section>
+<section class="inspectionRoute" id="afterInspectionRoute" hidden aria-label="מסלול אחרי המכון">
+  <button class="routeBack" type="button" onclick="closeInspectionRoutes()">← חזרה לבחירת מסלול</button>
+  <h2>כבר יש לי דוח מכון</h2><p>מכניסים מספר רכב, משלמים 49 ₪ ומעלים את הדוח לפענוח. לאחר קבלת הפענוח אפשר לבחור בהתייעצות אישית ב־100 ₪.</p>
+  <div class="landingFreeStart">
+    <input id="afterPlate" inputmode="numeric" maxlength="8" autocomplete="off" aria-label="מספר רכב לאחר המכון" placeholder="מה מספר הרכב?" oninput="sanitizePlateInput(this);this.setCustomValidity('')" onkeydown="if(event.key==='Enter')startAfterInspectionRoute()">
+    <button class="mktBtn mktBtnPrimary" type="button" data-analytics-click="click_report_plan" onclick="startAfterInspectionRoute()">המשך לפענוח הדוח · 49 ₪ ←</button>
+  </div>
+</section>
 </div>
 </div>
 </div>
@@ -1049,6 +1061,38 @@ function syncVehicleLookupButton(){
   if(!button) return;
   button.disabled=!/^\d{7,8}$/.test(plate());
 }
+function openInspectionRoute(route){
+  const before=route==='before';
+  document.getElementById('beforeInspectionRoute').hidden=!before;
+  document.getElementById('afterInspectionRoute').hidden=before;
+  const buttons=document.querySelectorAll('#serviceChoices button[aria-controls]');
+  buttons.forEach(button=>button.setAttribute('aria-expanded',String(button.getAttribute('aria-controls')===(before?'beforeInspectionRoute':'afterInspectionRoute'))));
+  const panel=document.getElementById(before?'beforeInspectionRoute':'afterInspectionRoute');
+  panel.scrollIntoView({behavior:'smooth',block:'start'});
+  panel.querySelector('input')?.focus({preventScroll:true});
+}
+function closeInspectionRoutes(){
+  document.getElementById('beforeInspectionRoute').hidden=true;
+  document.getElementById('afterInspectionRoute').hidden=true;
+  document.querySelectorAll('#serviceChoices button[aria-controls]').forEach(button=>button.setAttribute('aria-expanded','false'));
+  document.getElementById('serviceChoices')?.scrollIntoView({behavior:'smooth',block:'start'});
+}
+async function startAfterInspectionRoute(){
+  const input=document.getElementById('afterPlate');
+  const value=String(input?.value||'').replace(/\D/g,'');
+  if(!/^\d{7,8}$/.test(value)){
+    input?.setCustomValidity('יש להכניס מספר רכב בן 7 או 8 ספרות');
+    input?.reportValidity();
+    input?.focus();
+    return;
+  }
+  document.getElementById('plate').value=value;
+  setCustomerRoute('report');
+  const results=document.getElementById('vehicleLookup');
+  if(results) results.style.display='block';
+  results?.scrollIntoView({behavior:'smooth',block:'start'});
+  await loadVehicle();
+}
 function chooseCustomerRoute(route){
   setCustomerRoute(route);
   document.getElementById('vehicleLookup')?.scrollIntoView({behavior:'smooth',block:'start'});
@@ -1098,7 +1142,7 @@ async function startLandingConsultationPayment(){
   await startPayment('prebuy');
 }
 function setCustomerRoute(route){
-  customerEntryRoute=route==='consultation'?route:'free';
+  customerEntryRoute=route==='report'||route==='consultation'?route:'free';
   document.body.classList.toggle('route-report',customerEntryRoute==='report');
   document.body.classList.toggle('route-consultation',customerEntryRoute==='consultation');
   const title=document.getElementById('vehicleLookupTitle');
