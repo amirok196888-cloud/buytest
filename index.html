@@ -3423,6 +3423,7 @@ const findingKnowledgeBase=[
   {id:'suspension',terms:['חופש במתלה','חופשים במתלים','נקישות במתלים','בולמי זעזועים','בולם זעזועים','תפוח הגה','תפוח פרונט','זרוע מתלה','תותבי מתלה'],category:'מתלים והיגוי',tag:'בטיחות',tone:'safety',meaning:'נרשם בלאי, חופש או תפקוד חריג באחד מרכיבי המתלה או ההיגוי.',question:'לבקש את שם הרכיב, הצד שבו נמצא הממצא וכיצד נקבע החופש או הבלאי.'},
   {id:'driveline',terms:['ציריה','צירייה','מפרק ציריה','מפרק צירייה','מיסב גלגל','לאגר גלגל'],category:'הנעה וגלגלים',tag:'מכני',tone:'clarify',meaning:'נרשם ממצא ברכיב שמעביר תנועה לגלגל או תומך בו. יש לזהות אם מדובר בחופש, רעש או נזק פיזי.',question:'לבקש מהבוחן לציין את הצד, סוג הממצא ותנאי הופעתו.'},
   {id:'tires',terms:['צמיגים שחוקים','צמיג שחוק','יובש בצמיגים','סדקים בצמיגים','צמיגים יבשים','שחיקה לא אחידה בצמיגים'],category:'צמיגים',tag:'בטיחות',tone:'safety',meaning:'נרשם בלאי, יובש, סדקים או שחיקה לא אחידה בצמיגים. יש לבדוק כל צמיג בנפרד ואת תאריך הייצור.',question:'לבקש עומק חריצים, תאריכי ייצור, מיקום הצמיגים והאם השחיקה עשויה להעיד על צורך בבדיקת כיוון או מתלים.'},
+  {id:'tire-wear-explicit',terms:['שחיקה בצמיגים','שחיקה בצמיג'],category:'צמיגים וחישוקים',tag:'משמעות נמוכה',tone:'clarify',classification:'actual_finding',reportSeverity:'low',meaning:'בדוח נרשמה שחיקה בצמיגים. לא ניתן לקבוע מהניסוח בלבד את עומק החריצים או אם נדרשת החלפה.',decision:'יש לבדוק את עומק החריצים, מיקום ומידת השחיקה ואת הצורך בטיפול בהתאם לבדיקה.'},
   {id:'tire-size',terms:['מידות צמיגים לא תואמות','מידת צמיג לא תואמת','צמיגים לא תואמים לרישיון'],category:'צמיגים ורישוי',tag:'התאמה',tone:'safety',meaning:'המידה שנמצאה אינה תואמת לפי הטופס לנתון שנבדק ברישיון או בין הגלגלים.',question:'להשוות לרישיון הרכב ולבקש מהבוחן לציין באילו גלגלים נמצאה אי־ההתאמה.'},
   {id:'warning-light',terms:['נורת אזהרה','נורות אזהרה','נורת מנוע','נורת תקלה'],category:'מערכות בקרה',tag:'דורש אבחון',tone:'safety',meaning:'נורת בקרה נשארה דולקת או נרשמה בזמן הבדיקה. הנורה מצביעה על צורך באבחון אך אינה מזהה לבדה את התקלה.',question:'לבקש את שם הנורה, מתי נדלקה וקודי התקלה שנקראו מהמחשב.'},
   {id:'airbag',terms:['כרית אוויר','כריות אוויר','מערכת כריות','srs'],category:'מערכות בטיחות',tag:'בטיחות',tone:'safety',meaning:'נרשם ממצא במערכת כריות האוויר או הקדם־מותחנים. נדרש פירוט של קוד התקלה והרכיב.',question:'לבקש את קוד התקלה המדויק והאם הנורה בלוח המחוונים דולקת.'},
@@ -4349,6 +4350,7 @@ function findKnowledgeRules(line,categoryHint=''){
   const n=normalizeFindingText(line);
   const matches=[];
   findingKnowledgeBase.forEach(rule=>{
+    if(rule.id==='tire-wear-explicit'&&/(?:ללא|אין|לא נמצאה|לא נראתה|לא קיימת)\s+שחיקה\s+בצמיג/.test(n)) return;
     if(rule.categoryHints?.length&&!rule.categoryHints.includes(categoryHint)) return;
     let longest='';
     rule.terms.forEach(term=>{
@@ -5537,6 +5539,13 @@ function prepareReportPdf(buttonId='pdfBtn'){
       if(!blob||blob.size<1000) throw new Error('invalid pdf');
       const fileName=`BuyTest-${isBalcar?'Insurance-History-':''}${plate()||'report'}.pdf`;
       btPreparedPdfFile=new File([blob],fileName,{type:'application/pdf'});
+      if(pdfBtn&&!document.getElementById(buttonId+'Download')){
+        const downloadBtn=document.createElement('button');
+        downloadBtn.id=buttonId+'Download';downloadBtn.type='button';downloadBtn.className='secondary full';
+        downloadBtn.textContent='הורדת הסיכום כ־PDF';
+        downloadBtn.addEventListener('click',()=>shareReportPdf(buttonId,true));
+        pdfBtn.insertAdjacentElement('afterend',downloadBtn);
+      }
       if(pdfBtn){pdfBtn.disabled=false;pdfBtn.textContent=isBalcar?'לחץ לשיתוף תקציר ה־PDF':buttonId==='finalPdfBtn'?'לחץ לשיתוף הסיכום המלא כ־PDF':'לחץ לשיתוף הסיכום כ־PDF';}
       return btPreparedPdfFile;
     }catch(e){
@@ -5921,7 +5930,7 @@ function downloadPdfFile(file){
   link.remove();
   setTimeout(()=>URL.revokeObjectURL(url),1500);
 }
-async function shareReportPdf(buttonId='pdfBtn'){
+async function shareReportPdf(buttonId='pdfBtn',downloadOnly=false){
   const btn=document.getElementById(buttonId);
   if(!reportText){buildReport();return}
   if(btPdfPreparing) await btPdfPreparing;
@@ -5930,7 +5939,7 @@ async function shareReportPdf(buttonId='pdfBtn'){
     return;
   }
   const file=btPreparedPdfFile;
-  if(navigator.share && (!navigator.canShare || navigator.canShare({files:[file]}))){
+  if(!downloadOnly && navigator.share && (!navigator.canShare || navigator.canShare({files:[file]}))){
     try{
       await navigator.share({files:[file],title:buttonId==='balcarPdfBtn'?'BuyTest - סיכום דוח עבר ביטוחי':'BuyTest - סיכום בדיקה'});
       return;

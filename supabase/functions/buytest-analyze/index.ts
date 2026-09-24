@@ -1,6 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
-const ALLOWED_ORIGIN = "https://amirok196888-cloud.github.io";
+const ALLOWED_ORIGIN = "https://buytest.co.il";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 const document = { getElementById(){ return null; } };
@@ -29,6 +29,7 @@ const findingKnowledgeBase=[
   {id:'rim-scuffs-report',terms:['שפשופים בחישוקים','שפשופים חישוקים'],patterns:[/שפשופ[א-ת]*.*חישוק/],category:'צמיגים וחישוקים',tag:'משמעות נמוכה',tone:'clarify',classification:'actual_finding',reportSeverity:'low',meaning:'נרשמו שפשופים בחישוקים.',decision:'זהו בדרך כלל ממצא קוסמטי, אך יש לוודא שאין עיקום, סדק או איבוד לחץ.'},
   {id:'front-lamps-damaged-report',terms:['פנס חזית פגומים','פנסי חזית פגומים','פנס חזית פגום','מיחקת פגומים'],patterns:[/פנס[י]?\s*חזית.*פגומ/,/מיחקת\s*פגומ/],category:'מערכת תאורה',tag:'משמעות נמוכה',tone:'clarify',classification:'actual_finding',reportSeverity:'low',meaning:'נרשם נזק בפנסי החזית.',decision:'יש לבדוק את פעולת הפנסים, התושבות והאטימה ולהביא בחשבון תיקון או החלפה.'},
   {id:'transmission-disc-wear-report',terms:['נקישות בלאי דיסקיות בתיבת הילוכים','בלאי דיסקיות בתיבת הילוכים'],patterns:[/(?:נקיש[א-ת]*\s*)?בלאי\s*דיסק[א-ת]*.*הילוכים/],category:'תיבת העברת הכוח',tag:'משמעות בינונית',tone:'clarify',classification:'actual_finding',reportSeverity:'medium',meaning:'נרשמו נקישות ובלאי בדיסקיות תיבת ההילוכים.',decision:'יש לבצע בדיקת תיבה ממוקדת ולהביא בחשבון תיקון אפשרי ועלות במערכת ההילוכים.'},
+  {id:'gearbox-driving-vibration-report',terms:['רעידות בנסיעה','רעידה בנסיעה','רעידות בתיבת הילוכים','רעידות בגיר'],patterns:[/רעיד[א-ת]*.*נסיעה/],categoryHints:['תיבת הילוכים','תיבת העברת הכוח'],category:'תיבת הילוכים',tag:'משמעות גבוהה',tone:'safety',classification:'actual_finding',reportSeverity:'high',meaning:'נרשמו רעידות בנסיעה תחת סעיף תיבת ההילוכים או מערכת העברת הכוח. זהו ממצא ממשי שיכול להיות קשור לתיבה או למכלולים נלווים, אך מקורו המדויק דורש אבחון.',decision:'זהו ממצא בעל משמעות גבוהה. יש לבצע בדיקה ממוקדת של תיבת ההילוכים ומערכת העברת הכוח, לזהות מתי הרעידות מופיעות ולהעריך את היקף הטיפול לפני קבלת החלטה.'},
   {id:'engine-gear-mounts-report',terms:['לבדוק תושבות מנוע וגיר','תושבות מנוע וגיר'],patterns:[/תושבות.*מנוע.*גיר/,/לבדוק\s*תושבות.*גיר/],category:'תיבת העברת הכוח',tag:'משמעות נמוכה',tone:'clarify',classification:'actual_finding',reportSeverity:'low',meaning:'נרשמה דרישה לבדוק את תושבות המנוע והגיר, לצד סימון של תושבת פגומה.',decision:'יש לזהות איזו תושבת פגומה ולהביא בחשבון החלפה.'},
   {id:'gearbox-mount-report',terms:['תושבת תיבת הילוכים פגומה','תושבת תיבת ההילוכים פגומה','תושבת גיר פגומה'],patterns:[/תושבת\s+(?:תיבת\s+ה?ילוכים|גיר)\s+פגומ/],category:'תיבת הילוכים',tag:'ליקוי נקודתי',tone:'clarify',classification:'actual_finding',reportSeverity:'low',suppresses:['gear-shift'],meaning:'נרשמה תושבת פגומה של תיבת ההילוכים. התושבת מחברת את התיבה למרכב ומבודדת תנועה ורעידות; הממצא אינו קובע שתיבת ההילוכים עצמה פגומה.',decision:'יש לבדוק ולהחליף את התושבת לפי הצורך ולהביא בחשבון את עלות הטיפול. אין לסווג את תיבת ההילוכים כלא תקינה על סמך ממצא זה בלבד.'},
   {id:'gearbox-software-update-report',terms:['לבדוק עידכון גירסה לגיר','לבדוק עדכון גרסה לגיר'],patterns:[/לבדוק.*(?:עידכון|עדכון).*גירס?ה.*גיר/],category:'תיבת העברת הכוח',tag:'בדיקת המשך',tone:'clarify',classification:'recommendation',meaning:'הדוח ממליץ לבדוק אם נדרש עדכון תוכנה לתיבת ההילוכים.',decision:'אין לספור זאת לבדה כתקלה מכנית; יש לבדוק במוסך לפי מספר השלדה אם קיים עדכון רלוונטי.'},
@@ -74,6 +75,7 @@ const findingKnowledgeBase=[
   {id:'suspension',terms:['חופש במתלה','חופשים במתלים','נקישות במתלים','בולמי זעזועים','בולם זעזועים','תפוח הגה','תפוח פרונט','זרוע מתלה','תותבי מתלה'],category:'מתלים והיגוי',tag:'בטיחות',tone:'safety',meaning:'נרשם בלאי, חופש או תפקוד חריג באחד מרכיבי המתלה או ההיגוי.',question:'לבקש את שם הרכיב, הצד שבו נמצא הממצא וכיצד נקבע החופש או הבלאי.'},
   {id:'driveline',terms:['ציריה','צירייה','מפרק ציריה','מפרק צירייה','מיסב גלגל','לאגר גלגל'],category:'הנעה וגלגלים',tag:'מכני',tone:'clarify',meaning:'נרשם ממצא ברכיב שמעביר תנועה לגלגל או תומך בו. יש לזהות אם מדובר בחופש, רעש או נזק פיזי.',question:'לבקש מהבוחן לציין את הצד, סוג הממצא ותנאי הופעתו.'},
   {id:'tires',terms:['צמיגים שחוקים','צמיג שחוק','יובש בצמיגים','סדקים בצמיגים','צמיגים יבשים','שחיקה לא אחידה בצמיגים'],category:'צמיגים',tag:'בטיחות',tone:'safety',meaning:'נרשם בלאי, יובש, סדקים או שחיקה לא אחידה בצמיגים. יש לבדוק כל צמיג בנפרד ואת תאריך הייצור.',question:'לבקש עומק חריצים, תאריכי ייצור, מיקום הצמיגים והאם השחיקה עשויה להעיד על צורך בבדיקת כיוון או מתלים.'},
+  {id:'tire-wear-explicit',terms:['שחיקה בצמיגים','שחיקה בצמיג'],category:'צמיגים וחישוקים',tag:'משמעות נמוכה',tone:'clarify',classification:'actual_finding',reportSeverity:'low',meaning:'בדוח נרשמה שחיקה בצמיגים. לא ניתן לקבוע מהניסוח בלבד את עומק החריצים או אם נדרשת החלפה.',decision:'יש לבדוק את עומק החריצים, מיקום ומידת השחיקה ואת הצורך בטיפול בהתאם לבדיקה.'},
   {id:'tire-size',terms:['מידות צמיגים לא תואמות','מידת צמיג לא תואמת','צמיגים לא תואמים לרישיון'],category:'צמיגים ורישוי',tag:'התאמה',tone:'safety',meaning:'המידה שנמצאה אינה תואמת לפי הטופס לנתון שנבדק ברישיון או בין הגלגלים.',question:'להשוות לרישיון הרכב ולבקש מהבוחן לציין באילו גלגלים נמצאה אי־ההתאמה.'},
   {id:'warning-light',terms:['נורת אזהרה','נורות אזהרה','נורת מנוע','נורת תקלה'],category:'מערכות בקרה',tag:'דורש אבחון',tone:'safety',meaning:'נורת בקרה נשארה דולקת או נרשמה בזמן הבדיקה. הנורה מצביעה על צורך באבחון אך אינה מזהה לבדה את התקלה.',question:'לבקש את שם הנורה, מתי נדלקה וקודי התקלה שנקראו מהמחשב.'},
   {id:'airbag',terms:['כרית אוויר','כריות אוויר','מערכת כריות','srs'],category:'מערכות בטיחות',tag:'בטיחות',tone:'safety',meaning:'נרשם ממצא במערכת כריות האוויר או הקדם־מותחנים. נדרש פירוט של קוד התקלה והרכיב.',question:'לבקש את קוד התקלה המדויק והאם הנורה בלוח המחוונים דולקת.'},
@@ -1417,6 +1419,7 @@ function findKnowledgeRules(line,categoryHint=''){
   const n=normalizeFindingText(line);
   const matches=[];
   findingKnowledgeBase.forEach(rule=>{
+    if(rule.id==='tire-wear-explicit'&&/(?:ללא|אין|לא נמצאה|לא נראתה|לא קיימת)\s+שחיקה\s+בצמיג/.test(n)) return;
     if(rule.categoryHints?.length&&!rule.categoryHints.includes(categoryHint)) return;
     let longest='';
     rule.terms.forEach(term=>{
@@ -2096,9 +2099,32 @@ async function serviceRequest(path,init={}){if(!SUPABASE_URL||!SERVICE_ROLE_KEY)
 async function privateConfig(name){const value=await serviceRequest('/rest/v1/rpc/buytest_get_private_config',{method:'POST',body:JSON.stringify({p_name:name})});return typeof value==='string'?value:''}
 async function orderById(id){const data=await serviceRequest('/rest/v1/buytest_orders?id=eq.'+encodeURIComponent(id)+'&select=id,plate,plan,status',{method:'GET'});return Array.isArray(data)?data[0]:null}
 async function verifyEntitlement(token){const parts=String(token||'').split('.');if(parts.length!==2)return null;let payload;try{payload=JSON.parse(b64urlText(parts[0]))}catch{return null}if(!payload?.oid||!payload?.plate||!Array.isArray(payload?.scopes)||Number(payload.exp)<Math.floor(Date.now()/1000))return null;const secret=await privateConfig('buytest_entitlement_hmac_secret');if(!secret)return null;const key=await crypto.subtle.importKey('raw',new TextEncoder().encode(secret),{name:'HMAC',hash:'SHA-256'},false,['verify']);const valid=await crypto.subtle.verify('HMAC',key,b64urlBytes(parts[1]),new TextEncoder().encode(parts[0]));if(!valid)return null;const order=await orderById(String(payload.oid));if(!order||order.status!=='paid'||order.plate!==String(payload.plate)||order.plan!==String(payload.plan))return null;return payload}
-async function isAdmin(pin){const expected=await privateConfig('buytest_manager_pin_hash');return Boolean(pin)&&Boolean(expected)&&await sha256(String(pin).trim())===expected}
+async function isAdmin(pin){
+  const expected=await privateConfig('buytest_manager_pin_hash');
+  if(!expected||!pin)return false;
+  const value=String(pin);
+  if(/^BTADM-[0-9a-f]{64}$/.test(value)){
+    const hash=await sha256(value);
+    const rows=await serviceRequest('/rest/v1/buytest_admin_sessions?token_hash=eq.'+hash+'&select=manager_pin_hash,expires_at',{method:'GET'});
+    return Array.isArray(rows)&&rows[0]?.manager_pin_hash===expected&&new Date(rows[0].expires_at).getTime()>Date.now();
+  }
+  return await sha256(value.trim())===expected;
+}
 async function overrides(){const data=await serviceRequest('/rest/v1/buytest_formula_overrides?active=eq.true&select=*',{method:'GET'});return Array.isArray(data)?data:[]}
-function applyServerOverrides(result,rows){if(!result?.findings?.length||!rows.length)return result;const bySource=new Map(rows.map(row=>[formulaOverrideKey(row.category,row.source_text),row]));return {...result,findings:result.findings.map(item=>{const source=item.sourceText||item.matchedTerm||'';const row=bySource.get(formulaOverrideKey(item.category,source));if(!row)return item;return {...item,classification:row.classification_type||item.classification,reportSeverity:row.report_severity==='none'?null:(row.report_severity||item.reportSeverity),tag:row.report_severity?(expertSeverityLabels[row.report_severity]||item.tag):item.tag,meaning:row.meaning||item.meaning,decision:row.decision||item.decision,question:row.question||item.question,managerEdited:true}})} }
+function serverOverrideForFinding(item,rows){
+  const itemId=String(item?.id||'');
+  const byIdentity=rows.find(row=>{
+    const sourceId=String(row.source_id||'');
+    if(row.source_kind==='formula') return itemId===('formula-'+sourceId);
+    if(row.source_kind==='observed') return itemId===('formula-alias-'+sourceId)||itemId===('alias-'+sourceId);
+    if(row.source_kind==='knowledge') return itemId===sourceId;
+    return false;
+  });
+  if(byIdentity) return byIdentity;
+  const source=item?.sourceText||item?.matchedTerm||'';
+  return rows.find(row=>formulaOverrideKey(row.category,row.source_text)===formulaOverrideKey(item?.category||'',source))||null;
+}
+function applyServerOverrides(result,rows){if(!result?.findings?.length||!rows.length)return result;return {...result,findings:result.findings.map(item=>{const row=serverOverrideForFinding(item,rows);if(!row)return item;return {...item,category:row.category||item.category,classification:row.classification_type||item.classification,reportSeverity:row.report_severity==='none'?null:(row.report_severity||item.reportSeverity),tag:row.report_severity?(expertSeverityLabels[row.report_severity]||item.tag):item.tag,meaning:row.meaning||item.meaning,decision:row.decision||item.decision,question:row.question||item.question,managerEdited:true}})} }
 function applyCustomRules(text,result,rows){const custom=rows.filter(row=>row.source_kind==='custom'&&row.active!==false);if(!custom.length)return result;const normalized=normalizeFindingText(text);const findings=[...(result?.findings||[])];for(const row of custom){const term=normalizeFindingText(row.source_text);if(term.length<3||!normalized.includes(term))continue;if(findings.some(item=>formulaOverrideKey(item.category,item.sourceText||item.matchedTerm||'')===formulaOverrideKey(row.category,row.source_text)))continue;findings.push({id:'custom-'+row.source_id,category:row.category,tag:expertSeverityLabels[row.report_severity]||formulaClassificationLabels[row.classification_type]||'סיווג מקצועי',tone:['safety','high'].includes(row.report_severity)?'safety':'clarify',classification:row.classification_type,reportSeverity:row.report_severity==='none'?null:row.report_severity,meaning:row.meaning||'נמצא ניסוח שהוגדר במאגר המקצועי.',decision:row.decision||'יש לברר את הממצא אצל בעל המקצוע המתאים.',question:row.question||'',sourceText:row.source_text,managerEdited:true})}return {...result,findings:orderFindingsLikeReport(findings.map(finalizeReportFinding).filter(Boolean))}}
 function sourceGroundedSummaryResult(result,text){
   const report=normalizeFindingText(text);
