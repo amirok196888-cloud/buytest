@@ -440,6 +440,13 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 </div></details><div id="rawlink" style="display:none"></div></div>
 </section>
 <section class="card freeAfterLookup" id="insuranceStartSection" style="display:none">
+  <div class="balcarOffer insuranceOffer" style="margin-bottom:18px;border-color:#90d6bf;background:#f3fbf8">
+    <h3>רוצה ליווי לכל הדרך?</h3>
+    <p>חבילה מלאה לרכב אחד — <strong>149 ₪</strong>: דוח עבר ביטוחי, פענוח דוח המכון והתייעצות אישית אחת עם הבוחן עמוס רוקח בוואטסאפ למשך 48 שעות.</p>
+    <button class="primary full" type="button" onclick="requestBuyTestPackage('single')">לפרטים ולרכישת החבילה בוואטסאפ ←</button>
+    <details style="margin-top:14px"><summary>בודקים יותר מרכב אחד? חבילה משתלמת ל־3 רכבים</summary><p style="margin:12px 0">עד שלושה רכבים ב־<strong>250 ₪</strong>: דוח עבר ביטוחי ופענוח דוח מכון לכל רכב, והתייעצות אישית אחת בסך הכול עם הבוחן עמוס רוקח בוואטסאפ למשך 48 שעות.</p><button class="secondary full" type="button" onclick="requestBuyTestPackage('three')">לפרטים ולרכישת חבילת 3 רכבים בוואטסאפ ←</button></details>
+    <p class="formNote">רכישת החבילות והפעלת השירותים נעשות כרגע בתיאום אישי עם עמוס. השירותים הבודדים זמינים לרכישה באתר.</p>
+  </div>
   <div class="balcarOffer insuranceOffer">
     <h3>הפקת עבר ביטוחי</h3>
     <div id="insuranceSellerFields" style="display:none;margin:12px 0;padding:12px;border:1px solid #edcd7a;border-radius:12px;background:#fffaf0">
@@ -680,6 +687,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 <section class="card paidOnly reportFeature" id="afterInspectionSection" style="display:none">
 <div class="caseLabel">אחרי המכון</div>
 <h2>פענוח דוח המכון והבדיקה הממוחשבת</h2>
+<div class="privacyStrip"><strong>מה עומד מאחורי הפענוח?</strong><br>הפענוח מבוסס על מאגר ידע מקצועי שעמוס רוקח בנה בעמל רב לאורך יותר מ־15 שנות ניסיון בבדיקות רכב. המערכת נעזרת במאגר כדי להסביר את הכתוב בדוח ולסמן נושאים שדורשים בירור; היא אינה מחליפה בדיקה במכון או התייעצות אישית עם עמוס.</div>
 <p class="sub">העלה את דף סיכום הבוחן, ובמידת הצורך גם את הבדיקה הממוחשבת.</p>
 
 <div class="inspectionHeaderGrid">
@@ -1487,6 +1495,14 @@ function openBuyTestWhatsApp(message){
 }
 function openGeneralBuyTestWhatsApp(){
   openBuyTestWhatsApp(['🔵 BuyTest | פנייה כללית','', 'שלום עמוס, הגעתי מאתר BuyTest וברצוני לקבל מידע.'].join('\n'));
+}
+function requestBuyTestPackage(kind){
+  const chosen=kind==='three'?'חבילת עד 3 רכבים ב־250 ₪ (דוח עבר ביטוחי ופענוח דוח מכון לכל רכב, והתייעצות אישית אחת)':'חבילה מלאה לרכב אחד ב־149 ₪ (דוח עבר ביטוחי, פענוח דוח המכון והתייעצות אישית אחת)';
+  const currentPlate=String(document.getElementById('vPlate')?.textContent||document.getElementById('plate')?.value||'').replace(/\D/g,'');
+  const lines=['שלום עמוס, אני מעוניין/ת לרכוש '+chosen+'.'];
+  if(/^\d{7,8}$/.test(currentPlate)) lines.push('מספר הרכב הראשון: '+currentPlate);
+  lines.push('אשמח לפרטי התשלום ולהפעלת החבילה.');
+  openBuyTestWhatsApp(lines.join('\n'));
 }
 function showClarificationOptions(){
   const box=document.getElementById('clarificationBox');
