@@ -85,11 +85,20 @@ async function paidBalcarOrder(body: Record<string, unknown>, plate: string) {
   const order = await orderById(orderId);
   if (!order || !(await hashesMatch(String(order.client_secret_hash || ""), await sha256(clientSecret)))) return null;
   const expiresAt = new Date(String(order.expires_at)).getTime();
-  if (String(order.status) !== "paid" || String(order.plan) !== "balcar" || cleanPlate(order.plate) !== plate || !Number.isFinite(expiresAt) || expiresAt <= Date.now()) return null;
+  const packageOrder = ["full149", "three250"].includes(String(order.plan));
+  const allowedPlate = packageOrder
+    ? Array.isArray(recordValue(order.provider_payload).packageVehicles) && (recordValue(order.provider_payload).packageVehicles as string[]).includes(plate)
+    : cleanPlate(order.plate) === plate;
+  if (String(order.status) !== "paid" || (!packageOrder && String(order.plan) !== "balcar") || !allowedPlate || !Number.isFinite(expiresAt) || expiresAt <= Date.now()) return null;
   return order;
 }
-async function rememberReport(order: Record<string, unknown>, reportId: unknown, externalRef: string) {
+async function rememberReport(order: Record<string, unknown>, plate: string, reportId: unknown, externalRef: string) {
   if (!reportId) return;
+  if (["full149", "three250"].includes(String(order.plan))) {
+    const { error } = await admin.rpc("buytest_package_save_insurance", { p_order_id: order.id, p_plate: plate, p_report_id: String(reportId), p_external_ref: externalRef });
+    if (error) console.warn("Unable to persist package Balcar report id", error.message);
+    return;
+  }
   const providerPayload = recordValue(order.provider_payload);
   const { error } = await admin.from("buytest_orders").update({
     provider_payload: { ...providerPayload, balcarReportId: String(reportId), balcarExternalRef: externalRef },
@@ -127,8 +136,9 @@ Deno.serve(async (req: Request) => {
       const providerPayload = recordValue(order.provider_payload);
       const ownershipDate = String(body.ownershipDate || providerPayload.insuranceOwnershipDate || "");
       const ownerIsraeliId = String(body.ownerIsraeliId || providerPayload.insuranceOwnerIsraeliId || "").replace(/\D/g, "");
-      const savedReportId = String(providerPayload.balcarReportId || "").trim();
-      const externalRef = String(providerPayload.balcarExternalRef || `buytest-balcar-${order.id}`).slice(0, 55);
+      const packageInsurance = recordValue(recordValue(providerPayload.packageInsuranceReports)[plate]);
+      const savedReportId = String(order.plan === "balcar" ? providerPayload.balcarReportId || "" : packageInsurance.reportId || "").trim();
+      const externalRef = String(order.plan === "balcar" ? providerPayload.balcarExternalRef || `buytest-balcar-${order.id}` : packageInsurance.externalRef || `buytest-balcar-${order.id}-${plate}`).slice(0, 55);
 
       if (savedReportId) {
         const result = await balcarRaw(`/reports/${encodeURIComponent(savedReportId)}`);
@@ -137,7 +147,7 @@ Deno.serve(async (req: Request) => {
 
       const existing = await balcarRaw(`/reports/by-ref?externalRef=${encodeURIComponent(externalRef)}`);
       if (existing.status >= 200 && existing.status < 300 && reportIdFrom(existing.data)) {
-        await rememberReport(order, reportIdFrom(existing.data), externalRef);
+        await rememberReport(order, plate, reportIdFrom(existing.data), externalRef);
         return json(origin, existing.data, existing.status);
       }
       if (action === "statusPaid") return json(origin, { error: { code: "report_not_created" } }, 404);
@@ -156,13 +166,13 @@ Deno.serve(async (req: Request) => {
         body: JSON.stringify(payload),
       });
       if (result.status >= 200 && result.status < 300) {
-        await rememberReport(order, reportIdFrom(result.data), externalRef);
+        await rememberReport(order, plate, reportIdFrom(result.data), externalRef);
         return json(origin, result.data, result.status);
       }
       if (result.status === 409) {
         const duplicate = await balcarRaw(`/reports/by-ref?externalRef=${encodeURIComponent(externalRef)}`);
         if (duplicate.status >= 200 && duplicate.status < 300) {
-          await rememberReport(order, reportIdFrom(duplicate.data), externalRef);
+          await rememberReport(order, plate, reportIdFrom(duplicate.data), externalRef);
           return json(origin, duplicate.data, duplicate.status);
         }
       }
