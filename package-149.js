@@ -43,10 +43,13 @@
   };
   function syncPackageUI() {
     const saved = activePackage();
+    const manager = document.body.classList.contains('manager-mode');
     panel.hidden = !!saved;
+    const packageButton = panel.querySelector('button');
+    if (packageButton) packageButton.textContent = manager ? 'פתיחת חבילת 149 ₪ ללא חיוב' : 'רכישת החבילה — 149 ₪';
     if (originalInsuranceButton) originalInsuranceButton.textContent = saved
       ? 'הפקת דוח העבר הביטוחי הכלול בחבילה'
-      : 'הפקת עבר ביטוחי — 39 ₪';
+      : manager ? 'תצוגת דוח עבר ביטוחי — ללא חיוב' : 'הפקת עבר ביטוחי — 39 ₪';
     let consult = false;
     if (saved?.accessToken) {
       try {
@@ -81,6 +84,8 @@
     if (document.body.classList.contains('manager-mode') && selected === PACKAGE) {
       applyPlanAccess(PACKAGE, {scroll: false, progress: {preInspectionCompleted: true, reportCompleted: false}});
       showInsuranceStart();
+      const insuranceStatus = document.getElementById('balcarOrderStatus');
+      if (insuranceStatus) insuranceStatus.textContent = 'מצב מנהל — לא הוזמן דוח מספק חיצוני ולא בוצע חיוב.';
       showBuyTestAccessNotice('מצב מנהל — חבילת 149 ₪ פתוחה לתצוגה ללא חיוב. הפקת דוח עבר ביטוחי מספק חיצוני אינה מבוצעת בתצוגה זו.');
       section.scrollIntoView({behavior: 'smooth', block: 'start'});
       return;
@@ -207,7 +212,11 @@
   const oldPreview = previewPlanAsManager;
   previewPlanAsManager = function (plan = 'all') {
     const result = oldPreview(plan);
-    if (plan === PACKAGE && document.body.classList.contains('manager-mode')) showInsuranceStart();
+    if (plan === PACKAGE && document.body.classList.contains('manager-mode')) {
+      showInsuranceStart();
+      const insuranceStatus = document.getElementById('balcarOrderStatus');
+      if (insuranceStatus) insuranceStatus.textContent = 'מצב מנהל — לא הוזמן דוח מספק חיצוני ולא בוצע חיוב.';
+    }
     return result;
   };
   const managerButtons = document.querySelector('#managerHub .managerHubGrid');
