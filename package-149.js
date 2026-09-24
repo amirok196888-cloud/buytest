@@ -78,6 +78,20 @@
   };
   const oldPayment = startPayment;
   startPayment = async function (selected = 'report') {
+    if (document.body.classList.contains('manager-mode') && selected === PACKAGE) {
+      applyPlanAccess(PACKAGE, {scroll: false, progress: {preInspectionCompleted: true, reportCompleted: false}});
+      showInsuranceStart();
+      showBuyTestAccessNotice('מצב מנהל — חבילת 149 ₪ פתוחה לתצוגה ללא חיוב. הפקת דוח עבר ביטוחי מספק חיצוני אינה מבוצעת בתצוגה זו.');
+      section.scrollIntoView({behavior: 'smooth', block: 'start'});
+      return;
+    }
+    if (document.body.classList.contains('manager-mode') && selected === 'consultation' && activeBuyTestPlan() === PACKAGE) {
+      setBuyTestStageProgress({preInspectionCompleted: true, reportCompleted: true});
+      document.body.classList.add('package149-consultation');
+      showClarificationOptions();
+      document.getElementById('clarificationBox')?.scrollIntoView({behavior: 'smooth', block: 'start'});
+      return;
+    }
     const saved = activePackage();
     if (saved && selected === 'report') {
       document.getElementById('afterInspectionSection')?.scrollIntoView({behavior: 'smooth', block: 'start'});
@@ -142,6 +156,12 @@
   }
   const oldInsurancePayment = startBalcarPayment;
   startBalcarPayment = async function (...args) {
+    if (document.body.classList.contains('manager-mode') && activeBuyTestPlan() === PACKAGE) {
+      const status = document.getElementById('balcarOrderStatus');
+      if (status) status.textContent = 'מצב מנהל — לא בוצעה הזמנה מספק הדוח ולא נגבה תשלום.';
+      showBuyTestAccessNotice('דוח עבר ביטוחי אמיתי מחייב רכב והזמנה מהספק. תצוגת חבילת 149 ₪ פתוחה ללא חיוב.');
+      return;
+    }
     const saved = activePackage();
     if (!saved) return oldInsurancePayment(...args);
     const message = document.getElementById('balcarEligibilityMsg');
@@ -184,5 +204,23 @@
     if (result && activePackage() && !window.buytestBalcarReport) await loadPaidBalcarReport();
     return result;
   };
+  const oldPreview = previewPlanAsManager;
+  previewPlanAsManager = function (plan = 'all') {
+    const result = oldPreview(plan);
+    if (plan === PACKAGE && document.body.classList.contains('manager-mode')) showInsuranceStart();
+    return result;
+  };
+  const managerButtons = document.querySelector('.managerPlanButtons');
+  if (managerButtons && !managerButtons.querySelector('[data-manager-plan="full149"]')) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.dataset.managerPlan = PACKAGE;
+    button.textContent = 'חבילת 149 ₪';
+    button.addEventListener('click', () => {
+      previewPlanAsManager(PACKAGE);
+      section.scrollIntoView({behavior: 'smooth', block: 'start'});
+    });
+    managerButtons.appendChild(button);
+  }
   syncPackageUI();
 })();
