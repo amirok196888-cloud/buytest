@@ -19,6 +19,8 @@ const PLANS = {
   consultation: { amountAgorot: 10000, title: "התייעצות אישית לאחר פענוח", scopes: ["consultation"] },
   prebuy: { amountAgorot: 7900, title: "ייעוץ לפני רכישה בוואטסאפ · ההתייעצות פתוחה ל־48 שעות", scopes: ["prebuy"] },
   bundle: { amountAgorot: 12000, title: "חבילת BuyTest המלאה", scopes: ["premium", "report", "consultation"] },
+  full149: { amountAgorot: 14900, title: "חבילה מלאה לרכב אחד", scopes: ["balcar", "report", "consultation"] },
+  three250: { amountAgorot: 25000, title: "חבילה לעד שלושה רכבים", scopes: ["balcar", "report", "consultation"] },
 } as const;
 type PlanKey = keyof typeof PLANS;
 type CardcomConfig = {
@@ -28,6 +30,16 @@ type CardcomConfig = {
   departmentId?: number;
 };
 type StageProgress = { preInspectionCompleted: boolean; reportCompleted: boolean };
+function isPackage(plan: unknown) { return plan === "full149" || plan === "three250"; }
+function packageProgress(order: Record<string, unknown>, plate: string): StageProgress {
+  const payload = recordValue(order.provider_payload);
+  return { preInspectionCompleted: true, reportCompleted: Array.isArray(payload.packageReportsCompleted) && payload.packageReportsCompleted.includes(plate) };
+}
+function packageConsultationActive(order: Record<string, unknown>, plate: string) {
+  const payload = recordValue(order.provider_payload);
+  const started = new Date(String(payload.packageConsultationStartedAt || "")).getTime();
+  return payload.packageConsultationPlate === plate && Number.isFinite(started) && Date.now() - started < 48 * 60 * 60 * 1000;
+}
 const TRAFFIC_SOURCES = new Set(["google", "meta", "direct", "other", "unknown"]);
 
 function responseHeaders(origin: string | null) {
@@ -150,6 +162,11 @@ async function orderById(id: string) {
   const data = await serviceRequest(`/rest/v1/buytest_orders?id=eq.${encodeURIComponent(id)}&select=*`, { method: "GET" });
   return Array.isArray(data) ? data[0] : null;
 }
+async function updatePackage(id: string, plate: string, action: string) {
+  return await serviceRequest("/rest/v1/rpc/buytest_package_update", {
+    method: "POST", body: JSON.stringify({ p_order_id: id, p_plate: plate, p_action: action }),
+  });
+}
 async function cardcomRequest(path: string, payload: Record<string, unknown>) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 15000);
@@ -218,22 +235,28 @@ async function refreshCardcomOrder(order: Record<string, unknown>, config: Cardc
   return await updateOrder(String(order.id), {
     status: "paid",
     paid_at: new Date().toISOString(),
-    expires_at: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
+    expires_at: new Date(Date.now() + (isPackage(order.plan) ? 90 * 24 : 48) * 60 * 60 * 1000).toISOString(),
     provider_payload: compactProviderPayload(result, order.provider_payload),
   }) || order;
 }
-async function signedEntitlement(order: Record<string, unknown>) {
+async function signedEntitlement(order: Record<string, unknown>, activePlate = String(order.plate)) {
   const signingKey = await privateConfig("buytest_entitlement_hmac_secret");
   if (!signingKey) throw new Error("entitlement_signing_unavailable");
   const plan = String(order.plan) as PlanKey;
   const progress = stageProgress(order.provider_payload);
-  const scopes = plan === "report_consultation"
+  const packageData = recordValue(order.provider_payload);
+  if (isPackage(plan) && !(Array.isArray(packageData.packageVehicles) && packageData.packageVehicles.includes(activePlate))) throw new Error("vehicle_not_registered");
+  const consultationStarted = new Date(String(packageData.packageConsultationStartedAt || "")).getTime();
+  const consultationActive = packageData.packageConsultationPlate === activePlate && Number.isFinite(consultationStarted) && Date.now() - consultationStarted < 48 * 60 * 60 * 1000;
+  const scopes = isPackage(plan)
+    ? ["balcar", "report", ...(consultationActive ? ["consultation"] : [])]
+    : plan === "report_consultation"
     ? ["report", ...(progress.reportCompleted ? ["consultation"] : [])]
     : plan === "bundle"
     ? ["premium", ...(progress.preInspectionCompleted ? ["report"] : []), ...(progress.reportCompleted ? ["consultation"] : [])]
     : [...PLANS[plan].scopes];
   const payload = base64Url(new TextEncoder().encode(JSON.stringify({
-    v: 1, oid: order.id, plate: order.plate, plan, scopes,
+    v: 1, oid: order.id, plate: activePlate, plan, scopes,
     exp: Math.floor(new Date(String(order.expires_at)).getTime() / 1000),
   })));
   const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(signingKey), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
@@ -272,6 +295,7 @@ async function createPayment(origin: string | null, body: Record<string, unknown
   if (!isPlan(planKey) || (planKey !== "prebuy" && !/^\d{7,8}$/.test(plate)) || !customerDetailsValid || body.acceptedTerms !== true) {
     return json(origin, { ok: false, error: "invalid_payment_request" }, 400);
   }
+  if (planKey === "three250") return json(origin, { ok: false, error: "package_unavailable" }, 503);
   const plan = PLANS[planKey];
   const productCode = `BUYTEST-${planKey.toUpperCase()}`;
   const productName = Array.from(`BuyTest · ${plan.title}`).slice(0, 50).join("");
@@ -399,7 +423,11 @@ async function paymentStatus(origin: string | null, body: Record<string, unknown
   const expired = Number.isFinite(expiresAt) && expiresAt <= Date.now();
   if (expired && !["paid", "expired"].includes(String(order.status))) order = await updateOrder(orderId, { status: "expired" }) || order;
   if (order.status === "paid" && !expired) {
-    return json(origin, { ok: true, status: "paid", plan: order.plan, plate: order.plate, expiresAt: order.expires_at, progress: stageProgress(order.provider_payload), accessToken: await signedEntitlement(order) });
+    if (isPackage(order.plan)) {
+      await updatePackage(orderId, String(order.plate), "register");
+      order = await orderById(orderId);
+    }
+    return json(origin, { ok: true, status: "paid", plan: order.plan, plate: order.plate, expiresAt: order.expires_at, progress: isPackage(order.plan) ? packageProgress(order, String(order.plate)) : stageProgress(order.provider_payload), consultationActive: isPackage(order.plan) && packageConsultationActive(order, String(order.plate)), accessToken: await signedEntitlement(order) });
   }
   return json(origin, { ok: true, status: expired ? "expired" : order.status, paymentUrl: expired ? null : order.payment_url });
 }
@@ -419,6 +447,13 @@ async function completeStage(origin: string | null, body: Record<string, unknown
     return json(origin, { ok: false, error: "paid_access_required" }, 403);
   }
   const plan = String(order.plan) as PlanKey;
+  if (isPackage(plan)) {
+    if (stage !== "report") return json(origin, { ok: false, error: "stage_not_purchased" }, 403);
+    const plate = cleanPlate(body.plate || order.plate);
+    await updatePackage(orderId, plate, "complete_report");
+    const updatedPackage = await orderById(orderId);
+  return json(origin, { ok: true, progress: packageProgress(updatedPackage, plate), consultationActive: packageConsultationActive(updatedPackage, plate), accessToken: await signedEntitlement(updatedPackage, plate) });
+  }
   const scopes: readonly string[] = PLANS[plan].scopes;
   if (!scopes.includes(stage)) return json(origin, { ok: false, error: "stage_not_purchased" }, 403);
   const progress = stageProgress(order.provider_payload);
@@ -431,6 +466,17 @@ async function completeStage(origin: string | null, body: Record<string, unknown
   const updated = await updateOrder(orderId, { provider_payload: progressPayload(order.provider_payload, nextProgress) });
   if (!updated) throw new Error("stage_update_failed");
   return json(origin, { ok: true, progress: nextProgress, accessToken: await signedEntitlement(updated) });
+}
+async function packageAction(origin: string | null, body: Record<string, unknown>, action: "register" | "claim_consultation") {
+  if (!origin || !ALLOWED_ORIGINS.has(origin)) return json(origin, { ok: false, error: "origin_not_allowed" }, 403);
+  const orderId = String(body.orderId || ""), clientToken = String(body.clientSecret || ""), plate = cleanPlate(body.plate);
+  if (!/^[0-9a-f-]{36}$/i.test(orderId) || clientToken.length < 30 || !/^\d{7,8}$/.test(plate)) return json(origin, { ok: false, error: "invalid_package_request" }, 400);
+  const order = await orderById(orderId);
+  if (!order || !(await hashesMatch(String(order.client_secret_hash || ""), await sha256(clientToken)))) return json(origin, { ok: false, error: "order_not_found" }, 404);
+  if (order.status !== "paid" || !isPackage(order.plan) || new Date(String(order.expires_at)).getTime() <= Date.now()) return json(origin, { ok: false, error: "paid_package_required" }, 403);
+  await updatePackage(orderId, plate, action);
+  const updated = await orderById(orderId);
+  return json(origin, { ok: true, status: "paid", plan: updated.plan, plate, expiresAt: updated.expires_at, progress: packageProgress(updated, plate), consultationActive: packageConsultationActive(updated, plate), accessToken: await signedEntitlement(updated, plate), vehicles: recordValue(updated.provider_payload).packageVehicles });
 }
 
 async function redeemPaidAccess(origin: string | null, body: Record<string, unknown>) {
@@ -471,6 +517,8 @@ Deno.serve(async (req: Request) => {
     if (action === "create") return await createPayment(origin, body);
     if (action === "status") return await paymentStatus(origin, body);
     if (action === "complete") return await completeStage(origin, body);
+    if (action === "registerPackageVehicle") return await packageAction(origin, body, "register");
+    if (action === "claimPackageConsultation") return await packageAction(origin, body, "claim_consultation");
     if (action === "redeem") return await redeemPaidAccess(origin, body);
     return json(origin, { ok: false, error: "unknown_action" }, 400);
   } catch (error) {
