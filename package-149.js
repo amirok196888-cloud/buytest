@@ -210,7 +210,7 @@
     if (plan === PACKAGE && document.body.classList.contains('manager-mode')) showInsuranceStart();
     return result;
   };
-  const managerButtons = document.querySelector('.managerPlanButtons');
+  const managerButtons = document.querySelector('#managerHub .managerHubGrid');
   if (managerButtons && !managerButtons.querySelector('[data-manager-plan="full149"]')) {
     const button = document.createElement('button');
     button.type = 'button';
