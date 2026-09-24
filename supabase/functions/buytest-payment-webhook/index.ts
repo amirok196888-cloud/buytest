@@ -106,7 +106,7 @@ Deno.serve(async (req: Request) => {
     await updateOrder(orderId, {
       status: "paid",
       paid_at: new Date().toISOString(),
-      expires_at: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
+      expires_at: new Date(Date.now() + (['full149', 'three250'].includes(String(order.plan)) ? 90 * 24 : 48) * 60 * 60 * 1000).toISOString(),
       provider_payload: compactProviderPayload(result, order.provider_payload),
     });
     return json({ ok: true });
