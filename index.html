@@ -448,7 +448,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
     <p class="formNote">רכישת החבילות והפעלת השירותים נעשות כרגע בתיאום אישי עם עמוס. השירותים הבודדים זמינים לרכישה באתר.</p>
   </div>
   <div class="balcarOffer insuranceOffer">
-    <h3>לפני שאתה משקיע עשרות אלפי שקלים — בדקת מה הרכב עבר?</h3>
+    <h3>לפני שאתה משקיע עשרות אלפי שקלים, תבדוק מה הרכב עבר</h3>
     <p>הפק דוח עבר ביטוחי וקבל פענוח של הנתונים. גם דוח ללא תביעות אינו מבטיח שהרכב לא נפגע ואינו מחליף בדיקה במכון.</p>
     <div id="insuranceSellerFields" style="display:none;margin:12px 0;padding:12px;border:1px solid #edcd7a;border-radius:12px;background:#fffaf0">
       <b>נדרשים פרטי הבעלות לצורך הפקת הדוח</b>
@@ -458,12 +458,9 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
     <button class="primary full" id="balcarPlanButton" type="button" data-analytics-click="click_insurance_history" onclick="startBalcarPayment()">הפקת עבר ביטוחי — 39 ₪</button>
     <div class="devMsg" id="balcarEligibilityMsg" role="status" aria-live="polite"></div>
   </div>
-  <div class="preFlowNav"><button class="secondary" type="button" onclick="showPreFlowStep(1)">כבר עשית בדיקה במכון? המשך לפענוח הדוח</button></div>
 </section>
 <section class="card freeAfterLookup" id="afterInsuranceChoices" style="display:none">
-  <h2>מה כדאי לשאול את המוכר לפני שמתקדמים?</h2>
-  <p>הנתונים שמצאת תואמים למה שסיפר לך? הכנו חמש שאלות לפי המידע הזמין על הרכב, כדי שתדע מה עוד כדאי לברר.</p>
-  <button class="primary full" id="continueFreeAfterInsurance" type="button" onclick="continueToFreeFlow()">הצגת חמש השאלות למוכר — בחינם</button>
+  <button class="primary full" id="continueFreeAfterInsurance" type="button" onclick="continueToFreeFlow()">לשאלות מתוך ניתוני המאגר לחץ כאן</button>
 </section>
 <div class="preFlowProgress freeAfterLookup" id="preFlowProgress" aria-live="polite"><strong id="preFlowProgressText">הבדיקה החינמית ברכב</strong><span id="preFlowProgressHint">מסיימים סעיף אחד — והסעיף הבא נפתח אוטומטית.</span></div>
 <section class="card freeAfterLookup preFlowScreen preVisitCard" id="preVisitSection" data-pre-step="0" style="display:none">
@@ -486,11 +483,9 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
     </div>
     <div class="preVisitToast" id="preVisitToast" role="status" aria-live="polite">השאלות הועתקו</div>
   </div>
-  <div class="licenseFlowPrompt" style="margin-top:20px">
-    <h3>הפרטים ברישיון תואמים לרכב ולמה שהמוכר סיפר לך?</h3>
-    <p>מספר הידיים, מקוריות הרכב וזהות הבעלים יכולים לשנות את התמונה. כדאי לבדוק אותם לפני שממשיכים.</p>
-    <button class="primary full" type="button" onclick="showLicenseFlow()">המשך לאימות רישיון — בחינם</button>
-  </div>
+</section>
+<section class="card freeAfterLookup" id="licenseFlowPrompt" style="display:none">
+  <button class="primary full" type="button" onclick="showLicenseFlow()">אתה יודע לקרוא את מה שהרישיון מסתיר?</button>
 </section>
 <section class="card" id="managerActiveNotice" style="display:none;border:2px solid #0ea67b;background:#e8f7f2;color:#075e48">
   <b>מצב מנהל פעיל</b>
@@ -655,23 +650,22 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
   <div style="margin-top:16px;padding:14px;border-radius:12px;background:#fff7e8;border:1px solid #f0cf8a;font-weight:700;">
     אם קיימת אי־התאמה בפרטי הבעלים, מספר השלדה, מספר המנוע או הקילומטראז׳ – יש לעצור ולברר את הסיבה לפני שממשיכים בבדיקה.
   </div>
-  <div class="preFlowNav"><button class="primary flowNext" type="button" data-analytics-click="click_license_next" onclick="continueToInsuranceFlow()">המשך לבדיקת העבר הביטוחי</button></div>
   </div>
 </details>
 
 <div id="purchaseBox" style="display:none"></div>
 <section class="card freeAfterLookup preFlowScreen" id="preSummarySection" data-pre-step="1" style="display:none">
 <div class="balcarOffer consultationOffer">
-  <h3>עשית בדיקה לרכב — ונשארת מול הבוחן בלי להבין מה המשמעות?</h3>
-  <p>העלה את סיכום הבוחן והבדיקה הממוחשבת וקבל פענוח אוטומטי וסיכום PDF. לאחר הפענוח אפשר לבחור בהתייעצות אישית עם הבוחן עמוס רוקח בוואטסאפ למשך 48 שעות.</p>
+  <h3>עשית בדיקה לרכב ואתה יושב בוהה בבוחן בלי להבין מה הוא אומר?</h3>
+  <p>תפענח אצלנו את הבדיקה.</p>
   <button class="primary full" id="insuranceReportConsultationButton" type="button" data-analytics-click="click_report_plan" onclick="startPayment('report')">פענוח הדוח — 49 ₪</button>
   <div style="margin-top:22px">
-    <h3>גם אחרי הפענוח נשארו לך שאלות?</h3>
-    <p>דבר איתי אישית. אני עמוס רוקח, בוחן רכב, ואעזור לך להבין את הממצאים. ההתייעצות בוואטסאפ פתוחה ל־48 שעות.</p>
+    <h3>ואם גם עכשיו אתה לא מבין — דבר איתי אישית</h3>
+    <p>עמוס רוקח · ההתייעצות בוואטסאפ פתוחה ל־48 שעות.</p>
     <button class="secondary full" id="insuranceConsultationButton" type="button" data-analytics-click="click_consultation_plan" onclick="startPayment('consultation')">התייעצות אישית עם עמוס רוקח — 100 ₪</button>
   </div>
 </div>
-<div class="preFlowNav"><button class="secondary" type="button" onclick="showPreFlowStep(0)">חזרה לשאלות ולאימות הרישיון</button></div>
+
 </section>
 
 <section class="card paidOnly balcarFeature" id="balcarReportSection" style="display:none">
@@ -1205,27 +1199,11 @@ function setCustomerRoute(route){
 }
 const preFlowTitles=['5 שאלות למוכר','פענוח דוח המכון והתייעצות אישית'];
 function showPreFlowStep(index,{scroll=true}={}){
-  const safe=Math.max(0,Math.min(preFlowTitles.length-1,Number(index)||0));
-
-  const progress=document.getElementById('preFlowProgress');
-  progress?.classList.add('show');
-  document.querySelectorAll('.preFlowScreen').forEach(section=>{
-    const step=Number(section.dataset.preStep);
-    const active=step===safe || (safe===1 && section.classList.contains('active'));
-    section.classList.toggle('active',active);
-    section.style.display=active?'block':'none';
-    section.classList.remove('checklistVisible','flowCurrent','flowComplete','flowLocked');
-    if(section.tagName==='DETAILS') section.open=active;
-    section.setAttribute('aria-disabled',active?'false':'true');
-  });
-  const text=document.getElementById('preFlowProgressText');
-  const hint=document.getElementById('preFlowProgressHint');
-  if(text) text.textContent=preFlowTitles[safe];
-  if(hint) hint.textContent=safe===1?'פענוח הדוח, ובהמשך התייעצות אישית עם עמוס רוקח.':'חמש שאלות המבוססות על נתוני הרכב; אחריהן ממשיכים לאימות הרישיון.';
-  if(scroll){
-    const target=document.querySelector(`.preFlowScreen[data-pre-step="${safe}"]`)||progress;
-    target?.scrollIntoView({behavior:'smooth',block:'start'});
-  }
+  const target=document.getElementById(Number(index)===1?'preSummarySection':'preVisitSection');
+  target.classList.add('active');
+  target.style.display='block';
+  target.setAttribute('aria-disabled','false');
+  if(scroll) target.scrollIntoView({behavior:'smooth',block:'start'});
 }
 document.addEventListener('click',event=>{
   const summary=event.target.closest('.checklistStep>summary');
@@ -1824,6 +1802,11 @@ function showInsuranceStart(){
 }
 function showFreeStart(){
   document.getElementById('afterInsuranceChoices').style.display='block';
+  document.getElementById('licenseFlowPrompt').style.display='block';
+  showInsuranceStart();
+  const report=document.getElementById('preSummarySection');
+  report.classList.add('active');
+  report.style.display='block';
 }
 function showLicenseFlow(){
   const license=document.getElementById('licenseMatchSection');
@@ -1840,11 +1823,12 @@ function continueToInsuranceFlow(){
 }
 function unlockFreeSections(){
   const progress=document.getElementById('preFlowProgress');
-  if(progress) progress.style.removeProperty('display');
-  document.querySelectorAll('.preFlowScreen').forEach(x=>x.style.removeProperty('display'));
+  if(progress) progress.style.display='none';
   const license=document.getElementById('licenseMatchSection');
   const questions=document.getElementById('preVisitSection');
-  if(license&&questions&&questions.nextElementSibling!==license) questions.insertAdjacentElement('afterend',license);
+  const prompt=document.getElementById('licenseFlowPrompt');
+  if(questions&&prompt) questions.insertAdjacentElement('afterend',prompt);
+  if(prompt&&license) prompt.insertAdjacentElement('afterend',license);
 }
 function continueToFreeFlow(){
   unlockFreeSections();
@@ -5993,7 +5977,9 @@ window.addEventListener('DOMContentLoaded',async()=>{
   const licenseMatchSection=document.getElementById('licenseMatchSection');
   const flowProgress=document.getElementById('preFlowProgress');
   if(flowProgress&&preVisitSection) flowProgress.insertAdjacentElement('afterend',preVisitSection);
-  if(preVisitSection&&licenseMatchSection) preVisitSection.insertAdjacentElement('afterend',licenseMatchSection);
+  const licensePrompt=document.getElementById('licenseFlowPrompt');
+  preVisitSection?.insertAdjacentElement('afterend',licensePrompt);
+  licensePrompt?.insertAdjacentElement('afterend',licenseMatchSection);
   const insuranceStart=document.getElementById('insuranceStartSection');
   licenseMatchSection?.insertAdjacentElement('afterend',insuranceStart);
   const insuranceReport=document.getElementById('balcarReportSection');
