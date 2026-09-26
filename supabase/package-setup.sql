@@ -4,7 +4,7 @@ alter table public.buytest_orders add constraint buytest_orders_plan_check
   check (plan = any(array['balcar','premium','report','consultation','prebuy','report_consultation','bundle','full149','three250']));
 alter table public.buytest_orders drop constraint if exists buytest_orders_amount_agorot_check;
 alter table public.buytest_orders add constraint buytest_orders_amount_agorot_check
-  check (amount_agorot = any(array[1500,3900,4900,7900,10000,12000,14900,15000,25000]));
+  check (amount_agorot = any(array[1500,3900,4900,7900,10000,12000,12900,14900,15000,25000]));
 
 create or replace function public.buytest_package_update(p_order_id uuid, p_plate text, p_action text)
 returns jsonb language plpgsql security invoker set search_path=public as $$
