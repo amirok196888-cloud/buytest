@@ -345,18 +345,18 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 </section>
 <div class="routeCards" id="serviceChoices" aria-label="בחירת מסלול BuyTest">
   <article class="routeCard free">
-    <span class="routePrice">לפני המכון</span><h3>עדיין לא עשיתי בדיקה</h3><p>נתחיל בנתוני הרכב ובחמש שאלות למוכר. בהמשך אפשר להפיק דוח עבר ביטוחי.</p>
-    <button class="mktBtn mktBtnPrimary" type="button" aria-controls="beforeInspectionRoute" aria-expanded="false" data-analytics-click="click_before_route" onclick="openInspectionRoute('before')">לבדיקה לפני המכון ←</button>
+    <span class="routePrice">לפני המכון</span><h3>מה מאגר משרד התחבורה אומר על הרכב שלך?</h3><p>כדי לדעת מה מאגר משרד התחבורה אומר על הרכב שלך — לחץ כאן לבדיקה בחינם.</p>
+    <button class="mktBtn mktBtnPrimary" type="button" aria-controls="beforeInspectionRoute" aria-expanded="false" data-analytics-click="click_before_route" onclick="openInspectionRoute('before')">לחץ כאן לבדיקה בחינם ←</button>
   </article>
   <article class="routeCard paid"><span class="routePrice">אחרי המכון</span><h3>כבר יש לי דוח בדיקה</h3><p>מעלים את דוח המכון לפענוח ב־49 ₪. לאחר הפענוח אפשר לבחור בהתייעצות אישית עם הבוחן עמוס רוקח.</p><button class="mktBtn" type="button" aria-controls="afterInspectionRoute" aria-expanded="false" data-analytics-click="click_after_route" onclick="openInspectionRoute('after')">לפענוח הדוח ←</button></article>
 </div>
 <section class="inspectionRoute" id="beforeInspectionRoute" hidden aria-label="מסלול לפני המכון">
   <button class="routeBack" type="button" onclick="closeInspectionRoutes()">← חזרה לבחירת מסלול</button>
-  <h2>לפני המכון: מתחילים בחינם</h2><p>מכניסים מספר רכב, בודקים את הנתונים הזמינים ועוברים על חמש שאלות למוכר. אפשר להפיק דוח עבר ביטוחי בהמשך.</p>
+  <h2>מה מספר הרכב שתרצה לבדוק?</h2><p>הזן מספר רכב ונציג לך את הנתונים הזמינים במאגר משרד התחבורה — בחינם.</p>
   <div class="landingFreeStart">
       <input id="plate" inputmode="numeric" maxlength="8" autocomplete="off" aria-label="מספר רכב" placeholder="מה מספר הרכב?" oninput="sanitizePlateInput(this);this.setCustomValidity('')" onkeydown="if(event.key==='Enter')startFreeCheckFromLanding()">
       <button class="mktBtn mktBtnPrimary" type="button" data-analytics-click="click_landing_free" onclick="startFreeCheckFromLanding()">הצגת נתוני הרכב בחינם ←</button>
-      <p class="landingFreeExplanation">נתוני רכב זמינים ממאגר משרד התחבורה וחמש שאלות למוכר. אין צורך לשלם כדי להתחיל.</p>
+      <p class="landingFreeExplanation">נתוני הרכב, 5 שאלות למוכר לפי הנתונים הזמינים ובדיקת פרטי הרישיון — בחינם.</p>
   </div>
 </section>
 <section class="inspectionRoute" id="afterInspectionRoute" hidden aria-label="מסלול אחרי המכון">
@@ -460,14 +460,14 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 </section>
 <section class="card freeAfterLookup" id="afterInsuranceChoices" style="display:none">
   <div style="display:grid;gap:10px">
-    <button class="primary full" id="continueFreeAfterInsurance" type="button" onclick="continueToFreeFlow()">5 שאלות למוכר + אימות רישיון — חינם</button>
+    <button class="primary full" id="continueFreeAfterInsurance" type="button" onclick="continueToFreeFlow()">מה כדאי לברר עם המוכר ולבדוק ברישיון? — בחינם</button>
     <div class="reportChoiceActions"><button class="primary" id="insuranceReportConsultationButton" type="button" data-analytics-click="click_report_plan" onclick="startPayment('report')">פענוח דוח המכון — 49 ₪</button><button class="secondary" id="insuranceConsultationButton" type="button" data-analytics-click="click_consultation_plan" onclick="startPayment('consultation')">התייעצות עם הבוחן עמוס רוקח — 100 ₪</button></div>
   </div>
 </section>
 <div class="preFlowProgress freeAfterLookup" id="preFlowProgress" aria-live="polite"><strong id="preFlowProgressText">הבדיקה החינמית ברכב</strong><span id="preFlowProgressHint">מסיימים סעיף אחד — והסעיף הבא נפתח אוטומטית.</span></div>
 <section class="card freeAfterLookup preFlowScreen preVisitCard" id="preVisitSection" data-pre-step="0" style="display:none">
   <span class="preVisitBadge">חדש · בחינם</span>
-  <h2>5 שאלות שכדאי לשאול את המוכר</h2>
+  <h2>ראית את נתוני הרכב — אבל מה כדאי לשאול את המוכר בעקבותיהם?</h2>
   <p class="preVisitLead" id="preVisitSubtitle">השאלות יותאמו לנתונים הזמינים לרכב שבחרת.</p>
   <details class="preVisitFactsDetails"><summary>הצגת פרטי הרכב שנמצאו</summary><div class="preVisitFacts">
     <div class="preVisitFact"><span>הרכב שנבדק</span><strong id="preVisitVehicle">—</strong></div>
@@ -478,7 +478,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
     <div class="preVisitFact wide"><span>חשוב להבין</span><strong id="preVisitNotice">הנתונים במאגר הציבורי עשויים להיות חלקיים ויש לאמת אותם מול רישיון הרכב והמוכר.</strong></div>
   </div></details>
   <div class="preVisitQuestions">
-    <h3>מה חשוב לשאול את המוכר</h3>
+    <h3>5 שאלות למוכר לפי נתוני הרכב</h3>
     <ol id="preVisitQuestionList"></ol>
     <div class="preVisitActions">
       <button class="primary" type="button" data-analytics-click="click_copy_questions" onclick="copyPreVisitQuestions(this)">לחץ להעתקת השאלות למוכר</button>
@@ -621,10 +621,10 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 </section>
 
 <details class="card freeAfterLookup preFlowScreen guidedSection" id="licenseMatchSection" data-pre-step="0" style="display:none;border:2px solid #0ea67b;" open>
-  <summary><span>התאמת רישיון הרכב לרכב ולמוכר</span></summary>
+  <summary><span>הפרטים ברישיון תואמים למה שהמוכר סיפר לך?</span></summary>
   <div class="stepContent">
   <p class="sub" style="font-weight:700;color:#17352d;">
-    זהו השלב הראשון והחשוב ביותר בבדיקה: לפני שבודקים את מצב הרכב, מוודאים שהרכב, הרישיון והמוכר תואמים זה לזה.
+    בוא נעבור על הפרטים ברישיון ונבדוק שהם תואמים לרכב ולדברי המוכר. כך תדע מה עוד צריך לברר לפני שמתקדמים.
   </p>
 
   <div style="margin:16px 0;text-align:center;">
