@@ -220,14 +220,14 @@
     return result;
   };
   const managerButtons = document.querySelector('#managerHub .managerHubGrid');
-  if (managerButtons && !managerButtons.querySelector('[data-manager-plan="full149"]')) {
+  if (managerButtons && !managerButtons.querySelector('[data-manager-plan="report_consultation"]')) {
     const button = document.createElement('button');
     button.type = 'button';
-    button.dataset.managerPlan = PACKAGE;
-    button.textContent = 'חבילת 149 ₪';
+    button.dataset.managerPlan = 'report_consultation';
+    button.textContent = 'חבילת 129 ₪';
     button.addEventListener('click', () => {
-      previewPlanAsManager(PACKAGE);
-      section.scrollIntoView({behavior: 'smooth', block: 'start'});
+      openAfterPage();
+      startPayment('report_consultation');
     });
     managerButtons.appendChild(button);
   }
