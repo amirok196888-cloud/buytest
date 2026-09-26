@@ -29,13 +29,8 @@
   if (!insurance) return;
   const originalInsuranceButton = document.getElementById('balcarPlanButton');
   originalInsuranceButton?.classList.remove('full');
-  const panel = document.createElement('div');
-  panel.id = 'package149Panel';
-  panel.className = 'balcarOffer insuranceOffer';
-  panel.innerHTML = `<h3>חבילה מלאה לרכב אחד — 149 ₪</h3>
-    <p>דוח עבר ביטוחי, פענוח דוח המכון והתייעצות אישית אחת עם הבוחן עמוס רוקח בוואטסאפ למשך 48 שעות. ניתן להשתמש בשירותי החבילה עד 90 יום ממועד הרכישה.</p>
-    <button class="primary" type="button" onclick="startPayment('full149')">רכישת החבילה — 149 ₪</button>`;
-  insurance.insertAdjacentElement('afterend', panel);
+  // Retired offer: retain fulfillment for existing paid orders, but never
+  // insert a purchase panel for new customers.
 
   const activePackage = () => {
     const saved = storedBuyTestPayment();
@@ -44,9 +39,6 @@
   function syncPackageUI() {
     const saved = activePackage();
     const manager = document.body.classList.contains('manager-mode');
-    panel.hidden = !!saved;
-    const packageButton = panel.querySelector('button');
-    if (packageButton) packageButton.textContent = manager ? 'פתיחת חבילת 149 ₪ ללא חיוב' : 'רכישת החבילה — 149 ₪';
     if (originalInsuranceButton) originalInsuranceButton.textContent = saved
       ? 'הפקת דוח העבר הביטוחי הכלול בחבילה'
       : manager ? 'תצוגת דוח עבר ביטוחי — ללא חיוב' : 'הפקת עבר ביטוחי — 39 ₪';
