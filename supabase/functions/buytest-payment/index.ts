@@ -15,7 +15,7 @@ const PLANS = {
   balcar: { amountAgorot: 3900, title: "דוח עבר ביטוחי לרכב", scopes: ["balcar"] },
   premium: { amountAgorot: 4900, title: "בדיקה עצמית לפני המכון", scopes: ["premium"] },
   report: { amountAgorot: 4900, title: "פענוח דוח המכון", scopes: ["report"] },
-  report_consultation: { amountAgorot: 15000, title: "פענוח דוח המכון והתייעצות עם בוחן", scopes: ["report", "consultation"] },
+  report_consultation: { amountAgorot: 12900, title: "פענוח דוח המכון והתייעצות עם בוחן", scopes: ["report", "consultation"] },
   consultation: { amountAgorot: 10000, title: "התייעצות אישית לאחר פענוח", scopes: ["consultation"] },
   prebuy: { amountAgorot: 7900, title: "ייעוץ לפני רכישה בוואטסאפ · ההתייעצות פתוחה ל־48 שעות", scopes: ["prebuy"] },
   bundle: { amountAgorot: 12000, title: "חבילת BuyTest המלאה", scopes: ["premium", "report", "consultation"] },
