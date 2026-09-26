@@ -315,7 +315,13 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 .reportChoiceActions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.reportChoiceActions button{width:100%;min-height:64px;margin:0;padding:12px 10px;font-size:18px;font-weight:900;line-height:1.3;white-space:normal}.reportChoiceActions .secondary{background:#fff;color:#075e48;border:1px solid #84cbb6}.reportChoiceNote{margin:8px 0 0;color:#50666f;font-size:13px}.postReportConsultation{display:none;margin-top:15px;padding:17px;border:1px solid #a5d7c7;border-radius:15px;background:#f1faf6}.postReportConsultation h3{margin:0 0 7px}.postReportConsultation p{margin:0 0 10px}.plan-report.report-complete .postReportConsultation{display:block}.postReportConsultation button,#consultationPlanButton{font-size:18px;font-weight:900}@media(max-width:560px){.reportChoiceActions{gap:7px}.reportChoiceActions button{font-size:16px;min-height:68px;padding:10px 6px}}
 </style><meta name="buytest-build" content="buytest-v129-split-report-consultation">
-</head><body>
+<style>
+body.after-page #marketingLanding,body.after-page #appShell{display:none!important}
+body.after-page #afterPage{display:block!important}
+#package149Panel{display:none!important}
+#afterPage input{width:100%;min-height:48px;margin:10px 0;padding:12px;font-size:18px}
+#afterPage .card{margin:18px 0}#afterPage button{min-height:48px}
+</style></head><body>
 <script>
 (function(){
   var params=new URLSearchParams(location.search);
@@ -348,11 +354,11 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
     <span class="routePrice">לפני המכון</span><h3>מה מאגר משרד התחבורה אומר על הרכב שלך?</h3><p>כדי לדעת מה מאגר משרד התחבורה אומר על הרכב שלך — לחץ כאן לבדיקה בחינם.</p>
     <button class="mktBtn mktBtnPrimary" type="button" aria-controls="beforeInspectionRoute" aria-expanded="false" data-analytics-click="click_before_route" onclick="openInspectionRoute('before')">לחץ כאן לבדיקה בחינם ←</button>
   </article>
-  <article class="routeCard paid"><span class="routePrice">אחרי המכון</span><h3>כבר יש לי דוח בדיקה</h3><p>מעלים את דוח המכון לפענוח ב־49 ₪. לאחר הפענוח אפשר לבחור בהתייעצות אישית עם הבוחן עמוס רוקח.</p><button class="mktBtn" type="button" aria-controls="afterInspectionRoute" aria-expanded="false" data-analytics-click="click_after_route" onclick="openInspectionRoute('after')">לפענוח הדוח ←</button></article>
+  <article class="routeCard paid"><span class="routePrice">אחרי המכון</span><h3>עשית בדיקה לרכב ואתה יושב בוהה בבוחן בלי להבין מה הוא אומר?</h3><p>תפענח אצלנו את הבדיקה.</p><button class="mktBtn" type="button" aria-controls="afterInspectionRoute" aria-expanded="false" data-analytics-click="click_after_route" onclick="openInspectionRoute('after')">לפיענוח לחץ כאן</button></article>
 </div>
 <section class="inspectionRoute" id="beforeInspectionRoute" hidden aria-label="מסלול לפני המכון">
   <button class="routeBack" type="button" onclick="closeInspectionRoutes()">← חזרה לבחירת מסלול</button>
-  <h2>מה מספר הרכב שתרצה לבדוק?</h2><p>הזן מספר רכב ונציג לך את הנתונים הזמינים במאגר משרד התחבורה — בחינם.</p>
+  <h2>עומד לקנות רכב — בטוח שאתה יודע מה צריך לבדוק?</h2><p>הזן מספר רכב ונציג לך את הנתונים הזמינים במאגר משרד התחבורה — בחינם.</p>
   <div class="landingFreeStart">
       <input id="plate" inputmode="numeric" maxlength="8" autocomplete="off" aria-label="מספר רכב" placeholder="מה מספר הרכב?" oninput="sanitizePlateInput(this);this.setCustomValidity('')" onkeydown="if(event.key==='Enter')startFreeCheckFromLanding()">
       <button class="mktBtn mktBtnPrimary" type="button" data-analytics-click="click_landing_free" onclick="startFreeCheckFromLanding()">הצגת נתוני הרכב בחינם ←</button>
@@ -401,12 +407,24 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 <details><summary>האם BuyTest מחליף בדיקה במכון?</summary><p>לא. השלב הראשון מארגן בדיקות בסיסיות ודגשים למכון; השלב השני מסביר את סיכום הבוחן. השירות אינו בודק את הרכב פיזית ואינו מאשר תקינות.</p></details>
 <details><summary>מה מקבלים בחינם?</summary><p>נתוני הרכב הזמינים ממאגרי משרד התחבורה, חמש שאלות מותאמות למוכר ואימות רישיון הרכב ניתנים בחינם. אחריהם אפשר לבחור בהפקת עבר ביטוחי, בפענוח דוח מכון ובהתייעצות אישית.</p></details>
 <details><summary>מה מקבלים בדוח עבר ביטוחי?</summary><p>לאחר הכנסת מספר הרכב אפשר לפתוח את פרטי הרכב מהמאגר ולהפיק דוח עבר ביטוחי, כולל פענוח הנתונים, קישור לדוח המקורי ותקציר PDF. המחיר הוא 39 ₪ ומוצג לפני המעבר לתשלום.</p></details>
-<details><summary>כמה עולים פענוח הדוח וההתייעצות?</summary><p>פענוח אוטומטי של סיכום הבוחן והבדיקה הממוחשבת, כולל סיכום PDF, עולה 49 ₪. אחרי השלמת הפענוח אפשר לבחור בהתייעצות אישית עם הבוחן עמוס רוקח בוואטסאפ ל־48 שעות, בתוספת 100 ₪. אין חובה לרכוש ייעוץ.</p></details>
+<details><summary>כמה עולים פענוח הדוח וההתייעצות?</summary><p>במסך אחרי המכון אפשר לבחור בפענוח בלבד או בפענוח עם התייעצות אישית. המחירים מוצגים שם לפני הרכישה.</p></details>
 <details><summary>מה קורה אם חסר מידע על הרכב?</summary><p>מאגרים ציבוריים אינם תמיד מלאים. כאשר נתון אינו זמין, BuyTest מציגה זאת במקום להמציא מידע, וממליצה לאמת פרטים מהותיים מול מסמכי הרכב והגורמים המתאימים.</p></details>
 <details><summary>האם BuyTest אומר אם לקנות את הרכב?</summary><p>לא. אין המלצת קנייה או אי־קנייה, אין הערכת שווי או עלות תיקון ואין קביעה לגבי ירידת ערך. BuyTest משקף משמעויות ושאלות לבירור בלבד; ההחלטה היא של המשתמש.</p></details>
 </div>
 </div></div>
 <div class="mktSection"><div class="mktWrap"><div class="mktFinal"><h2>קונה רכב יד שנייה?</h2><p>התחל בנתוני הרכב ופתח תיק אחד שממשיך איתך גם אחרי הבדיקה במכון.</p><a class="mktBtn mktBtnPrimary" data-analytics-click="click_vehicle_lookup" href="#appShell">לחץ להצגת נתוני הרכב</a></div></div></div>
+</section>
+<section id="afterPage" aria-label="אחרי המכון" style="display:none;max-width:840px;margin:0 auto;padding:20px">
+  <button class="secondary" type="button" onclick="closeAfterPage()">חזרה למסך הראשי</button>
+  <h1>עשית בדיקה לרכב ואתה יושב בוהה בבוחן בלי להבין מה הוא אומר?</h1>
+  <p>תפענח אצלנו את הבדיקה.</p>
+  <p><strong>הפענוח מבוסס על מאגר ידע מקצועי שנבנה מתוך יותר מ־15 שנות ניסיון של עמוס רוקח כבוחן רכב לפני קנייה.</strong></p>
+  <div class="card" id="afterPageVehicle">
+    <label for="afterPagePlate">מספר הרכב שבדוח</label>
+    <input id="afterPagePlate" inputmode="numeric" maxlength="8" placeholder="מספר רכב" oninput="sanitizePlateInput(this)">
+    <button class="primary" type="button" onclick="loadAfterPageVehicle()">אישור מספר הרכב</button>
+    <p id="afterPageVehicleStatus" role="status"></p>
+  </div>
 </section>
 <div id="appShell">
 <main>
@@ -656,11 +674,19 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 </details>
 
 <div id="purchaseBox" style="display:none"></div>
+<section class="card freeAfterLookup" id="afterPagePrompt" style="display:none">
+  <h2>עשית בדיקה לרכב ואתה יושב בוהה בבוחן בלי להבין מה הוא אומר?</h2>
+  <button class="primary full" type="button" onclick="openAfterPage()">לפיענוח לחץ כאן</button>
+</section>
 <section class="card freeAfterLookup preFlowScreen" id="preSummarySection" data-pre-step="1" style="display:none">
+<div class="balcarOffer" id="reportConsultation129">
+  <h2>פענוח + התייעצות אישית — 129 ₪</h2>
+  <p>פענוח דוח המכון והתייעצות אישית עם עמוס רוקח בוואטסאפ ל־48 שעות. לרכב אחד.</p>
+  <p><strong>חיסכון של 20 ₪ לעומת רכישה בנפרד.</strong> עבר ביטוחי אינו כלול.</p>
+  <button class="primary full" type="button" onclick="startPayment('report_consultation')">פענוח + התייעצות — 129 ₪</button>
+</div>
 <div class="balcarOffer consultationOffer">
-  <h3>עשית בדיקה לרכב ואתה יושב בוהה בבוחן בלי להבין מה הוא אומר?</h3>
-  <p>תפענח אצלנו את הבדיקה.</p>
-  <p><strong>הפענוח מבוסס על מאגר ידע מקצועי שנבנה מתוך יותר מ־15 שנות ניסיון של עמוס רוקח כבוחן רכב לפני קנייה.</strong></p>
+<h2>פענוח דוח המכון — 49 ₪</h2>
   <button class="primary full" id="insuranceReportConsultationButton" type="button" data-analytics-click="click_report_plan" onclick="startPayment('report')">פענוח הדוח — 49 ₪</button>
   <div style="margin-top:22px">
     <h3>ואם גם עכשיו אתה לא מבין — דבר איתי אישית</h3>
@@ -859,7 +885,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
     <div id="cancelText" class="legalPage" style="display:none">
       <h2>ביטול עסקה והחזרים</h2>
       <p>לבקשת ביטול או לבירור עסקה יש לפנות ל־buytest2026@gmail.com ולציין שם, תאריך הרכישה ומספר הרכב אם הייעוץ מתייחס לרכב מסוים. הבקשה תטופל בהתאם להוראות הדין, לסוג השירות ולשאלה אם השירות הדיגיטלי כבר החל או סופק. החזר שאושר יבוצע לאמצעי התשלום באמצעות Cardcom.</p>
-      <p>אימות רישיון הרכב וחמש השאלות למוכר ניתנים בחינם. הפקה ופענוח של דוח עבר ביטוחי עולים 39 ₪. פענוח אוטומטי של דוח המכון וסיכום PDF עולים 49 ₪ לרכב אחד. לאחר השלמת הפענוח ניתן לבחור בנפרד בהתייעצות אישית עם הבוחן עמוס רוקח בוואטסאפ ל־48 שעות, בתוספת 100 ₪. מפעיל השירות: עמוס רוקח, BuyTest. כתובת קשר: buytest2026@gmail.com.</p>
+      <p>אימות רישיון הרכב וחמש השאלות למוכר ניתנים בחינם. הפקה ופענוח של דוח עבר ביטוחי עולים 39 ₪. פענוח אוטומטי של דוח המכון וסיכום PDF עולים 49 ₪ לרכב אחד. פענוח והתייעצות אישית ברכישה יחד עולים 129 ₪, ללא עבר ביטוחי. לאחר השלמת הפענוח ניתן לבחור בנפרד בהתייעצות אישית עם הבוחן עמוס רוקח בוואטסאפ ל־48 שעות, בתוספת 100 ₪. מפעיל השירות: עמוס רוקח, BuyTest. כתובת קשר: buytest2026@gmail.com.</p>
     </div>
   </div>
 </div>
@@ -1078,7 +1104,29 @@ function syncVehicleLookupButton(){
   if(!button) return;
   button.disabled=!/^\d{7,8}$/.test(plate());
 }
+function openAfterPage(scroll=true){
+  document.body.classList.add('after-page');
+  const page=document.getElementById('afterPage');page.style.display='block';
+  const report=document.getElementById('preSummarySection');report.classList.add('active');report.style.display='block';
+  document.getElementById('afterPagePlate').value=plate();
+  if(scroll) window.scrollTo({top:0,behavior:'smooth'});
+}
+function closeAfterPage(scroll=true){
+  document.body.classList.remove('after-page');
+  document.getElementById('afterPage').style.display='none';
+  if(scroll) document.getElementById('serviceChoices')?.scrollIntoView({behavior:'smooth',block:'start'});
+}
+async function loadAfterPageVehicle(){
+  const input=document.getElementById('afterPagePlate'),value=input.value.replace(/\D/g,'');
+  if(!/^\d{7,8}$/.test(value)){input.setCustomValidity('יש להזין מספר רכב בן 7 או 8 ספרות');input.reportValidity();return;}
+  input.setCustomValidity('');document.getElementById('plate').value=value;
+  document.getElementById('afterPageVehicleStatus').textContent='טוען את נתוני הרכב...';
+  setCustomerRoute('free');await loadVehicle();openAfterPage(false);
+  document.getElementById('afterPageVehicleStatus').textContent=document.getElementById('statusMsg').textContent;
+}
 function openInspectionRoute(route){
+  if(route==='after'){openAfterPage();return;}
+  closeAfterPage(false);
   const before=route==='before';
   document.getElementById('beforeInspectionRoute').hidden=!before;
   document.getElementById('afterInspectionRoute').hidden=before;
@@ -1202,6 +1250,7 @@ function setCustomerRoute(route){
 }
 const preFlowTitles=['5 שאלות למוכר','פענוח דוח המכון והתייעצות אישית'];
 function showPreFlowStep(index,{scroll=true}={}){
+  if(Number(index)===1) openAfterPage(false);
   const target=document.getElementById(Number(index)===1?'preSummarySection':'preVisitSection');
   target.classList.add('active');
   target.style.display='block';
@@ -1807,9 +1856,7 @@ function showFreeStart(){
   document.getElementById('afterInsuranceChoices').style.display='block';
   document.getElementById('licenseFlowPrompt').style.display='block';
   showInsuranceStart();
-  const report=document.getElementById('preSummarySection');
-  report.classList.add('active');
-  report.style.display='block';
+  document.getElementById('afterPagePrompt').style.display='block';
 }
 function showLicenseFlow(){
   const license=document.getElementById('licenseMatchSection');
@@ -1843,7 +1890,7 @@ const buytestPlans={
   report:{name:'פענוח דוח המכון',price:49,scope:'פענוח סיכום הבוחן והבדיקה הממוחשבת, אם צורפה, וסיכום PDF'},
   consultation:{name:'התייעצות אישית לאחר פענוח',price:100,scope:'מעבר אישי על דוח אחד ורכב אחד בוואטסאפ למשך 48 שעות'},
   prebuy:{name:'ייעוץ לפני רכישה בוואטסאפ',price:79,scope:'ההתייעצות פתוחה למשך 48 שעות ממועד אישור התשלום'},
-  report_consultation:{name:'פענוח דוח המכון והתייעצות עם בוחן',price:150,scope:'פענוח סיכום הבוחן והבדיקה הממוחשבת, סיכום PDF והתייעצות אישית בוואטסאפ למשך 48 שעות'},
+  report_consultation:{name:'פענוח דוח המכון והתייעצות עם בוחן',price:129,scope:'פענוח סיכום הבוחן והבדיקה הממוחשבת, סיכום PDF והתייעצות אישית בוואטסאפ למשך 48 שעות'},
   bundle:{name:'חבילת BuyTest המלאה',price:120,scope:'בדיקה עצמית לפני המכון, פענוח אחרי המכון והתייעצות אישית לרכב אחד'}
 };
 const buytestPlanClasses=['plan-balcar','plan-premium','plan-report','plan-consultation','plan-prebuy','plan-report_consultation','plan-bundle'];
@@ -2728,6 +2775,8 @@ function previewPlanAsManager(planKey='all'){
 async function startPayment(planKey='report'){
   if(buyTestPaymentStarting) return;
   const selectedKey=Object.prototype.hasOwnProperty.call(buytestPlans,planKey)?planKey:'report';
+  if(selectedKey==='consultation'&&activeBuyTestPlan()==='report_consultation'&&buyTestStageProgress.reportCompleted){showClarificationOptions();document.getElementById('clarificationBox')?.scrollIntoView({behavior:'smooth',block:'start'});return;}
+  if(document.body.classList.contains('after-page')&&!/^\d{7,8}$/.test(document.getElementById('plate').value.replace(/\D/g,''))){document.getElementById('afterPagePlate').focus();document.getElementById('afterPageVehicleStatus').textContent='יש לאשר את מספר הרכב לפני התשלום.';return;}
   const plan=buytestPlans[selectedKey];
   if(document.body.classList.contains('manager-mode')){
     const progress=selectedKey==='consultation'
@@ -5988,7 +6037,8 @@ window.addEventListener('DOMContentLoaded',async()=>{
   licenseMatchSection?.insertAdjacentElement('afterend',insuranceStart);
   const insuranceReport=document.getElementById('balcarReportSection');
   insuranceStart?.insertAdjacentElement('afterend',insuranceReport);
-  insuranceReport?.insertAdjacentElement('afterend',document.getElementById('preSummarySection'));
+  insuranceReport?.insertAdjacentElement('afterend',document.getElementById('afterPagePrompt'));
+  document.getElementById('afterPage').appendChild(document.getElementById('preSummarySection'));
   const reportButton=document.getElementById('insuranceReportConsultationButton');
   reportButton?.insertAdjacentElement('afterend',document.getElementById('afterInspectionSection'));
   const consultationButton=document.getElementById('insuranceConsultationButton');
