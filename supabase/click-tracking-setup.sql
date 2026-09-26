@@ -1,0 +1,4 @@
+begin;
+alter table public.buytest_analytics_events drop constraint buytest_analytics_events_event_type_check;
+alter table public.buytest_analytics_events add constraint buytest_analytics_events_event_type_check check (event_type in ('page_view','blog_view','blog_to_site','free_started','free_completed','consultation_opened','click_before_route','click_after_route','click_insurance_history','click_report_consultation_plan','click_landing_consultation','click_landing_free','click_landing_report','click_vehicle_lookup','click_copy_questions','click_free_next','click_license_next','click_external_next','click_self_next','click_free_summary','click_pdf','click_balcar','click_balcar_pdf','click_report_plan','click_report_upload','click_analyze','click_report_pdf','click_prebuy_whatsapp','click_consultation_plan','click_post_report_whatsapp'));
+commit;
