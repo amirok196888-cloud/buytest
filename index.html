@@ -684,7 +684,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 <h2>פענוח דוח המכון — 49 ₪</h2>
   <button class="primary full" id="insuranceReportConsultationButton" type="button" data-analytics-click="click_report_plan" onclick="startPayment('report')">פענוח הדוח — 49 ₪</button>
   <div style="margin-top:22px">
-    <h3>ואם גם עכשיו אתה לא מבין — דבר איתי אישית</h3>
+    <h3>אם עדיין נשארו לך שאלות?</h3>
     <p>עמוס רוקח · ההתייעצות בוואטסאפ פתוחה ל־48 שעות.</p>
     <button class="secondary full" id="insuranceConsultationButton" type="button" data-analytics-click="click_consultation_plan" onclick="startPayment('consultation')">התייעצות אישית עם עמוס רוקח — 100 ₪</button>
   </div>
@@ -1102,6 +1102,7 @@ function btDossier(p=plate()){
 function btActivateVehicle(p){
   if(btDossierPlate===p)return;
   if(btDossierPlate){clearInspectionFile('summary');clearInspectionFile('computer');vehiclePhotoData=[];renderVehiclePhotos();}
+  for(const id of ['vPlate','vMaker','vModel','vYear','vOrigin','vColor','vVin','vEngine']){const field=document.getElementById(id);if(field)field.textContent=id==='vPlate'?p:'—';}
   btDossierPlate=p;
   loadedKm=null;interpretedReportKm=null;externalVehicleData={kmHistory:[]};
   latestSummaryResult=null;latestComputerResult=null;latestComputerIdentity=null;
@@ -1253,7 +1254,7 @@ function openAfterPage(scroll=true){
   const page=document.getElementById('afterPage');page.style.display='block';
   const report=document.getElementById('preSummarySection');report.classList.add('active');report.style.display='block';
   document.getElementById('afterPagePlate').value=plate();
-  if(scroll) window.scrollTo({top:0,behavior:'smooth'});
+  if(scroll) window.scrollTo({top:0,behavior:'instant'});
 }
 function closeAfterPage(scroll=true){
   document.body.classList.remove('after-page');
@@ -1501,7 +1502,7 @@ async function loadVehicle(){
   const vehicleData=document.getElementById('vehicleData');
   const offer=document.getElementById('fullCheckOffer');
   status.classList.add('show');
-  document.querySelectorAll('.freeAfterLookup').forEach(el=>{el.style.display='none';el.classList.remove('active','show');});
+  document.querySelectorAll('.freeAfterLookup').forEach(el=>{if(el.id==='preSummarySection'&&document.body.classList.contains('after-page'))return;el.style.display='none';el.classList.remove('active','show');});
   vehicleData.style.display='none';
   if(offer) offer.style.display='none';
   statusMsg.textContent='טוען נתונים ממאגרי משרד התחבורה...';
@@ -1691,7 +1692,7 @@ function openGeneralBuyTestWhatsApp(){
 }
 function requestBuyTestPackage(kind){
   const chosen=kind==='three'?'חבילת עד 3 רכבים ב־250 ₪ (דוח עבר ביטוחי ופענוח דוח מכון לכל רכב, והתייעצות אישית אחת)':'חבילה מלאה לרכב אחד ב־149 ₪ (דוח עבר ביטוחי, פענוח דוח המכון והתייעצות אישית אחת)';
-  const currentPlate=String(document.getElementById('vPlate')?.textContent||document.getElementById('plate')?.value||'').replace(/\D/g,'');
+  const currentPlate=String(document.getElementById('plate')?.value||'').replace(/\D/g,'');
   const lines=['שלום עמוס, אני מעוניין/ת לרכוש '+chosen+'.'];
   if(/^\d{7,8}$/.test(currentPlate)) lines.push('מספר הרכב הראשון: '+currentPlate);
   lines.push('אשמח לפרטי התשלום ולהפעלת החבילה.');
@@ -2120,6 +2121,8 @@ function showBuyTestAccessNotice(message,isError=false){
     const main=document.querySelector('#appShell main')||document.querySelector('main');
     if(main) main.prepend(notice); else document.body.prepend(notice);
   }
+  const noticeHost=document.body.classList.contains('after-page')?document.getElementById('afterPage'):document.querySelector('#appShell main');
+  if(noticeHost&&notice.parentElement!==noticeHost)noticeHost.prepend(notice);
   notice.style.background=isError?'#fff0f0':'#e8f7f2';
   notice.style.border='1px solid '+(isError?'#efb2b2':'#9dd9c7');
   notice.style.color=isError?'#8f2525':'#075e48';
@@ -2927,7 +2930,7 @@ async function startPayment(planKey='report'){
   if(buyTestPaymentStarting) return;
   const selectedKey=Object.prototype.hasOwnProperty.call(buytestPlans,planKey)?planKey:'report';
   if(selectedKey==='consultation'&&activeBuyTestPlan()==='report_consultation'&&buyTestStageProgress.reportCompleted){showClarificationOptions();document.getElementById('clarificationBox')?.scrollIntoView({behavior:'smooth',block:'start'});return;}
-  if(document.body.classList.contains('after-page')&&!document.body.classList.contains('manager-mode')&&!/^\d{7,8}$/.test(document.getElementById('plate').value.replace(/\D/g,''))){document.getElementById('afterPagePlate').focus();document.getElementById('afterPageVehicleStatus').textContent='יש לאשר את מספר הרכב לפני התשלום.';return;}
+  if(document.body.classList.contains('after-page')&&!document.body.classList.contains('manager-mode')&&(!/^\d{7,8}$/.test(document.getElementById('plate').value.replace(/\D/g,''))||document.getElementById('afterPagePlate').value.replace(/\D/g,'')!==document.getElementById('plate').value.replace(/\D/g,''))){document.getElementById('afterPagePlate').focus();document.getElementById('afterPageVehicleStatus').textContent='יש לאשר את מספר הרכב לפני התשלום.';return;}
   const plan=buytestPlans[selectedKey];
   if(document.body.classList.contains('manager-mode')){
     const progress=selectedKey==='consultation'
@@ -2941,14 +2944,14 @@ async function startPayment(planKey='report'){
   }
   if(selectedKey==='consultation'&&!buyTestStageProgress.reportCompleted){
     showBuyTestAccessNotice('ההתייעצות על הדוח נפתחת רק לאחר השלמת פענוח דוח המכון.',true);
-    document.getElementById('reportPlanCard')?.scrollIntoView({behavior:'smooth',block:'center'});
+    document.getElementById(document.body.classList.contains('after-page')?'buytestAccessNotice':'reportPlanCard')?.scrollIntoView({behavior:'smooth',block:'center'});
     return;
   }
   if(selectedKey==='bundle'&&activeBuyTestPlan()){
     showBuyTestAccessNotice('החבילה המלאה מיועדת לרכישה בתחילת המסלול. כעת אפשר להמשיך לשלב הבא לפי הסדר.',true);
     return;
   }
-  const plate=selectedKey==='prebuy'?'GENERAL':String(document.getElementById('vPlate')?.textContent||document.getElementById('plate')?.value||'').replace(/\D/g,'');
+  const plate=selectedKey==='prebuy'?'GENERAL':String(document.getElementById('plate')?.value||'').replace(/\D/g,'');
   if(selectedKey!=='prebuy'&&!/^\d{7,8}$/.test(plate)){
     showBuyTestAccessNotice('לפני התשלום יש להציג את נתוני הרכב ולוודא שמספר הרכב נכון.',true);
     document.getElementById('vehicleLookup')?.scrollIntoView({behavior:'smooth',block:'start'});
@@ -2982,7 +2985,7 @@ async function startPayment(planKey='report'){
 async function submitBuyTestPayment(){
   const planKey=sessionStorage.getItem('buytestPendingPlan')||'report';
   const plan=buytestPlans[planKey]||buytestPlans.report;
-  const plate=planKey==='prebuy'?'GENERAL':String(document.getElementById('vPlate')?.textContent||document.getElementById('plate')?.value||'').replace(/\D/g,'');
+  const plate=planKey==='prebuy'?'GENERAL':String(document.getElementById('plate')?.value||'').replace(/\D/g,'');
   const customerName=document.getElementById('paymentCustomerName').value.trim();
   const email=document.getElementById('paymentEmail').value.trim();
   const phone=document.getElementById('paymentPhone').value.trim();
