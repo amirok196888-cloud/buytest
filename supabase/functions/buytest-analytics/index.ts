@@ -12,6 +12,10 @@ const TRAFFIC_SOURCES = new Set(["google", "meta", "tiktok", "direct", "other", 
 const MILEAGE_SOURCES = new Set(["ministry_last_test", "inspection_report"]);
 const MILEAGE_DATE_BASES = new Set(["test_date", "captured_date"]);
 const CLICK_EVENT_TYPES = new Set([
+  "click_before_route",
+  "click_after_route",
+  "click_insurance_history",
+  "click_report_consultation_plan",
   "click_landing_consultation",
   "click_landing_free",
   "click_landing_report",
@@ -92,7 +96,23 @@ async function privateConfig(name: string) {
 
 async function isAdmin(pin: string) {
   const expected = await privateConfig("buytest_manager_pin_hash");
-  return Boolean(pin) && Boolean(expected) && await sha256(pin.trim()) === expected;
+  if (!expected || !pin) return false;
+  if (pin.startsWith("BTADM-") && /^BTADM-[0-9a-f]{64}$/.test(pin)) {
+    const tokenHash = await sha256(pin);
+    const rows = await serviceRequest("/rest/v1/buytest_admin_sessions?token_hash=eq." + tokenHash + "&select=manager_pin_hash,expires_at", { method: "GET" }) as Array<{manager_pin_hash: string; expires_at: string}>;
+    return Array.isArray(rows) && rows[0]?.manager_pin_hash === expected && new Date(rows[0].expires_at).getTime() > Date.now();
+  }
+  return await sha256(pin.trim()) === expected;
+}
+async function issueAdminSession(pin: string) {
+  const bytes = crypto.getRandomValues(new Uint8Array(32));
+  const token = "BTADM-" + Array.from(bytes, b => b.toString(16).padStart(2, "0")).join("");
+  const expiresAt = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString();
+  await serviceRequest("/rest/v1/buytest_admin_sessions", {
+    method: "POST",
+    body: JSON.stringify({token_hash: await sha256(token), manager_pin_hash: await privateConfig("buytest_manager_pin_hash"), expires_at: expiresAt})
+  });
+  return {token, expiresAt};
 }
 
 function cleanAttribution(body: Record<string, unknown>) {
@@ -301,7 +321,15 @@ Deno.serve(async (req: Request) => {
     if (body.action === "admin_auth") {
       const pin = String(req.headers.get("x-buytest-manager-pin") || body.adminPin || "");
       if (!await isAdmin(pin)) return json(origin, { ok: false, error: "admin_denied" }, 403);
-      return json(origin, { ok: true });
+      if (pin.startsWith("BTADM-")) return json(origin, { ok: true });
+      const session = await issueAdminSession(pin);
+      return json(origin, { ok: true, sessionToken: session.token, expiresAt: session.expiresAt });
+    }
+    if (body.action === "admin_logout") {
+      const token = String(req.headers.get("x-buytest-manager-pin") || "");
+      if (!token.startsWith("BTADM-") || !await isAdmin(token)) return json(origin, { ok: false, error: "admin_denied" }, 403);
+      await serviceRequest("/rest/v1/buytest_admin_sessions?token_hash=eq." + await sha256(token), {method: "DELETE"});
+      return json(origin, {ok: true});
     }
     if (body.action === "stats") {
       const pin = String(req.headers.get("x-buytest-manager-pin") || body.adminPin || "");
