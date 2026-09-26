@@ -2776,7 +2776,7 @@ async function startPayment(planKey='report'){
   if(buyTestPaymentStarting) return;
   const selectedKey=Object.prototype.hasOwnProperty.call(buytestPlans,planKey)?planKey:'report';
   if(selectedKey==='consultation'&&activeBuyTestPlan()==='report_consultation'&&buyTestStageProgress.reportCompleted){showClarificationOptions();document.getElementById('clarificationBox')?.scrollIntoView({behavior:'smooth',block:'start'});return;}
-  if(document.body.classList.contains('after-page')&&!/^\d{7,8}$/.test(document.getElementById('plate').value.replace(/\D/g,''))){document.getElementById('afterPagePlate').focus();document.getElementById('afterPageVehicleStatus').textContent='יש לאשר את מספר הרכב לפני התשלום.';return;}
+  if(document.body.classList.contains('after-page')&&!document.body.classList.contains('manager-mode')&&!/^\d{7,8}$/.test(document.getElementById('plate').value.replace(/\D/g,''))){document.getElementById('afterPagePlate').focus();document.getElementById('afterPageVehicleStatus').textContent='יש לאשר את מספר הרכב לפני התשלום.';return;}
   const plan=buytestPlans[selectedKey];
   if(document.body.classList.contains('manager-mode')){
     const progress=selectedKey==='consultation'
@@ -6109,7 +6109,7 @@ document.addEventListener('keydown',event=>{
   </section>
 </div>
 
-<script src="package-149.js?v=5"></script>
+<script src="package-149.js?v=6"></script>
 <script src="manager-session.js?v=1"></script>
 <!-- payment-dynamic-plan-v7 -->
 </body></html>
