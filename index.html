@@ -460,12 +460,13 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
   </div>
 </section>
 <section class="card freeAfterLookup" id="afterInsuranceChoices" style="display:none">
+  <h2>ראית את נתוני הרכב — אבל מה כדאי לשאול את המוכר בעקבותיהם?</h2>
   <button class="primary full" id="continueFreeAfterInsurance" type="button" onclick="continueToFreeFlow()">לשאלות מתוך ניתוני המאגר לחץ כאן</button>
 </section>
 <div class="preFlowProgress freeAfterLookup" id="preFlowProgress" aria-live="polite"><strong id="preFlowProgressText">הבדיקה החינמית ברכב</strong><span id="preFlowProgressHint">מסיימים סעיף אחד — והסעיף הבא נפתח אוטומטית.</span></div>
 <section class="card freeAfterLookup preFlowScreen preVisitCard" id="preVisitSection" data-pre-step="0" style="display:none">
   <span class="preVisitBadge">חדש · בחינם</span>
-  <h2>ראית את נתוני הרכב — אבל מה כדאי לשאול את המוכר בעקבותיהם?</h2>
+  <h2>5 שאלות למוכר לפי נתוני הרכב</h2>
   <p class="preVisitLead" id="preVisitSubtitle">השאלות יותאמו לנתונים הזמינים לרכב שבחרת.</p>
   <details class="preVisitFactsDetails"><summary>הצגת פרטי הרכב שנמצאו</summary><div class="preVisitFacts">
     <div class="preVisitFact"><span>הרכב שנבדק</span><strong id="preVisitVehicle">—</strong></div>
@@ -485,7 +486,8 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
   </div>
 </section>
 <section class="card freeAfterLookup" id="licenseFlowPrompt" style="display:none">
-  <button class="primary full" type="button" onclick="showLicenseFlow()">אתה יודע לקרוא את מה שהרישיון מסתיר?</button>
+  <h2>אתה יודע לקרוא את מה שהרישיון מסתיר?</h2>
+  <button class="primary full" type="button" onclick="showLicenseFlow()">לאימות רישיון הרכב לחץ כאן</button>
 </section>
 <section class="card" id="managerActiveNotice" style="display:none;border:2px solid #0ea67b;background:#e8f7f2;color:#075e48">
   <b>מצב מנהל פעיל</b>
@@ -622,7 +624,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 </section>
 
 <details class="card freeAfterLookup preFlowScreen guidedSection" id="licenseMatchSection" data-pre-step="license" style="display:none;border:2px solid #0ea67b;" open>
-  <summary><span>הפרטים ברישיון תואמים למה שהמוכר סיפר לך?</span></summary>
+  <summary><span>אימות רישיון הרכב</span></summary>
   <div class="stepContent">
   <p class="sub" style="font-weight:700;color:#17352d;">
     בוא נעבור על הפרטים ברישיון ונבדוק שהם תואמים לרכב ולדברי המוכר. כך תדע מה עוד צריך לברר לפני שמתקדמים.
@@ -1882,6 +1884,7 @@ function applyPlanAccess(planKey,{scroll=false,progress=buyTestStageProgress}={}
   if(!valid) return false;
   document.body.classList.remove(...buytestPlanClasses,'manager-all','stage-report-open','stage-consultation-open');
   document.body.classList.add('plan-'+planKey);
+  if(['report','report_consultation','consultation','full149','bundle'].includes(planKey)) showPreFlowStep(1,{scroll:false});
   setBuyTestStageProgress(progress);
   document.querySelectorAll('.paidOnly').forEach(section=>section.style.removeProperty('display'));
   showClarificationOptions();
@@ -5985,6 +5988,10 @@ window.addEventListener('DOMContentLoaded',async()=>{
   const insuranceReport=document.getElementById('balcarReportSection');
   insuranceStart?.insertAdjacentElement('afterend',insuranceReport);
   insuranceReport?.insertAdjacentElement('afterend',document.getElementById('preSummarySection'));
+  const reportButton=document.getElementById('insuranceReportConsultationButton');
+  reportButton?.insertAdjacentElement('afterend',document.getElementById('afterInspectionSection'));
+  const consultationButton=document.getElementById('insuranceConsultationButton');
+  consultationButton?.insertAdjacentElement('afterend',document.getElementById('clarificationBox'));
   const consultationOffer=document.querySelector('#preSummarySection .consultationOffer');
   const prePurchaseConsultationBox=document.getElementById('prePurchaseConsultationBox');
   if(consultationOffer&&prePurchaseConsultationBox) consultationOffer.insertAdjacentElement('afterend',prePurchaseConsultationBox);
