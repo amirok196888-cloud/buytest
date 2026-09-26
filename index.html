@@ -693,7 +693,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 <div class="balcarOffer" id="reportConsultation129">
   <h2>הצעה משתלמת</h2>
   <p>פענוח דוח המכון והתייעצות אישית עם עמוס רוקח בוואטסאפ ל־48 שעות. לרכב אחד.</p>
-  <button class="primary full" type="button" onclick="startPayment('report_consultation')">פענוח + התייעצות — 129 ₪</button>
+  <button class="primary full" type="button" data-analytics-click="click_report_consultation_plan" onclick="startPayment('report_consultation')">פענוח + התייעצות — 129 ₪</button>
 </div>
 </section>
 
@@ -2556,6 +2556,9 @@ async function trackBuyTestEvent(eventType){
   }catch(error){console.warn('BuyTest analytics event skipped:',error)}
 }
 const BUYTEST_CLICK_LABELS={
+  click_before_route:'בחירת המסלול לפני המכון',
+  click_after_route:'בחירת המסלול אחרי המכון',
+  click_report_consultation_plan:'פענוח והתייעצות — 129 ₪',
   click_landing_consultation:'ייעוץ אישי בוואטסאפ — דף פתיחה',
   click_landing_free:'התחלת השלב החינמי — דף פתיחה',
   click_landing_report:'פענוח דוח — דף פתיחה',
