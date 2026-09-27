@@ -322,7 +322,8 @@ body.after-page #afterPage{display:block!important}
 #package149Panel{display:none!important}
 #afterPage input{width:100%;min-height:48px;margin:10px 0;padding:12px;font-size:18px}
 #afterPage .card{margin:18px 0}#afterPage button{min-height:48px}
-</style></head><body>
+</style><link rel="stylesheet" href="vehicle-notes.css?v=1">
+</head><body>
 <script>
 (function(){
   var params=new URLSearchParams(location.search);
@@ -456,7 +457,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 <div class="box wide"><div class="label">היסטוריית בעלויות</div><div id="owners">—</div></div>
 <div class="box wide"><div class="label">קילומטראז׳ שדווח במבחן הרישוי האחרון</div><div id="kmHistory">ממתין לנתוני המאגר</div></div>
 
-</div></details><div id="rawlink" style="display:none"></div></div>
+</div></details><section id="vehicleAttention" hidden aria-label="נקודות לתשומת לב בבדיקת הרכב"></section><div id="rawlink" style="display:none"></div></div>
 </section>
 <section class="card freeAfterLookup" id="insuranceStartSection" style="display:none">
   <div class="balcarOffer insuranceOffer" style="margin-bottom:18px;border-color:#90d6bf;background:#f3fbf8">
@@ -897,6 +898,8 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@7.0.0/dist/tesseract.min.js" crossorigin="anonymous"></script>
 <script src="expert-calibration-v3.js"></script>
+<script src="vehicle-notes-core.js?v=1"></script>
+<script src="vehicle-notes.js?v=1"></script>
 <script>
 const VEHICLE_ID='56063a99-8a3e-4ff4-912e-5966c0279bad';
 function btBrandText(value){return String(value??'')}
@@ -1496,6 +1499,7 @@ async function loadVehicle(){
   }
   const p=plate();
   if(!/^\d{7,8}$/.test(p)){alert('יש להזין מספר רכב בן 7 או 8 ספרות');return}
+  window.BuyTestVehicleNotes?.clear();
   btActivateVehicle(p);
   const status=document.getElementById('status');
   const statusMsg=document.getElementById('statusMsg');
@@ -1549,6 +1553,7 @@ async function loadVehicle(){
   statusMsg.className='green';
   vehicleData.style.display='block';
   vehicleData.open=true;
+  void window.BuyTestVehicleNotes?.load({...ar,...vr},{endpoint:"https://tjxjxavxrmvbofvtnsaj.supabase.co/functions/v1/buytest-vehicle-notes",key:BUYTEST_SUPABASE_ANON_KEY});
   renderPreVisitQuestions(p,vr,owners,ar);
   if(customerEntryRoute==='free'&&!document.body.classList.contains('manager-mode')){
     void trackBuyTestEvent('free_started');
