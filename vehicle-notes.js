@@ -31,6 +31,7 @@ async function load(record,options){
   }catch{if(current===generation)local.replaceChildren(node('p','המידע מהמאגר אינו זמין כרגע. אפשר להמשיך בבדיקה.','vehicleNoteStatus'));}
  })();
  // Never send plates, VINs, owner identity or the raw ministry record upstream.
+ if(v.make==='Renault'&&v.model==='Megane'){online.append(node('p','מקור קריאות השירות האמריקאי אינו מכסה את המגאן הזאת. לבדיקת קריאות שירות בישראל יש לפנות ליבואן לפי מספר שלדה.','vehicleNoteStatus'));await localTask;return;}
  let model=v.model||(/^[a-z0-9 .-]+$/i.test(v.rawModel)?v.rawModel:'');
  if(v.model==='Ioniq')model=/חשמל/.test(v.fuel)&&!/(בנזין|היבריד)/.test(v.fuel)?'Ioniq Electric':/(בנזין|היבריד)/.test(v.fuel)?'Ioniq Hybrid':'';
  if(!v.make||!model){online.append(node('p','אין כרגע התאמה מספקת למקור האונליין עבור הגרסה הזאת.','vehicleNoteStatus'));await localTask;return;}
@@ -46,7 +47,7 @@ async function load(record,options){
   if(!data.items.length)details.append(node('p','לא הוחזרו קריאות שירות מהמקור הזה. אין בכך אישור לתקינות הרכב או להיעדר קריאות בישראל.'));
   for(const r of data.items){const item=node('details',null,'vehicleNote');item.append(node('summary','קריאת שירות '+r.id));item.append(node('p','מסמך המקור באנגלית:'));for(const key of ['component','summary','consequence','remedy']){const p=node('p',r[key]);p.dir='ltr';p.lang='en';item.append(p);}details.append(item);}
   const foot=node('p','מקור: NHTSA · נבדק: '+new Date(data.checkedAt).toLocaleString('he-IL'),'vehicleNoteMeta');source(foot,' מידע על המקור','https://www.nhtsa.gov/recalls');details.append(foot);online.append(details);
- }catch{if(current===generation)online.replaceChildren(node('p','בדיקת האונליין אינה זמינה כרגע. המידע המתועד שמוצג לעיל נשאר זמין ואפשר להמשיך.','vehicleNoteStatus'));}
+ }catch{if(current===generation)online.replaceChildren(node('p','בדיקת קריאות השירות באונליין לא הושלמה כרגע. אפשר להמשיך בבדיקה ולברר קריאות שירות אצל היבואן.','vehicleNoteStatus'));}
  finally{clearTimeout(timeout);await localTask;}
 }
 window.BuyTestVehicleNotes={load,clear};
