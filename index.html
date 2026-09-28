@@ -323,7 +323,11 @@ body.after-page #afterPage{display:block!important}
 #afterPage input{width:100%;min-height:48px;margin:10px 0;padding:12px;font-size:18px}
 #afterPage .card{margin:18px 0}#afterPage button{min-height:48px}
 </style><link rel="stylesheet" href="vehicle-notes.css?v=1">
-<link rel="stylesheet" href="opening-20260928.css?v=1"></head><body>
+<link rel="stylesheet" href="opening-20260928.css?v=1"><style id="compact-free-flow">
+#afterInsuranceChoices,#licenseFlowPrompt{padding:16px;margin:14px 0;border-radius:18px}
+#afterInsuranceChoices h2,#licenseFlowPrompt h2{font-size:19px;line-height:1.35;margin:0 0 10px}
+#afterInsuranceChoices button,#licenseFlowPrompt button{font-size:16px;line-height:1.3;min-height:44px;padding:10px 16px;border-radius:12px;box-shadow:none}
+</style></head><body>
 <script>
 (function(){
   var params=new URLSearchParams(location.search);
@@ -462,8 +466,8 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
   </div>
 </section>
 <section class="card freeAfterLookup" id="afterInsuranceChoices" style="display:none">
-  <h2>ראית את נתוני הרכב? עכשיו כדאי לדעת מה לשאול את המוכר.</h2>
-  <button class="primary full" id="continueFreeAfterInsurance" type="button" onclick="continueToFreeFlow()">לשאלות למוכר לפי נתוני הרכב ←</button>
+  <h2>מה כדאי לשאול את המוכר?</h2>
+  <button class="primary full" id="continueFreeAfterInsurance" type="button" onclick="continueToFreeFlow()">5 שאלות למוכר ←</button>
 </section>
 <div class="preFlowProgress freeAfterLookup" id="preFlowProgress" aria-live="polite"><strong id="preFlowProgressText">הבדיקה החינמית ברכב</strong><span id="preFlowProgressHint">מסיימים סעיף אחד — והסעיף הבא נפתח אוטומטית.</span></div>
 <section class="card freeAfterLookup preFlowScreen preVisitCard" id="preVisitSection" data-pre-step="0" style="display:none">
@@ -488,8 +492,8 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
   </div>
 </section>
 <section class="card freeAfterLookup" id="licenseFlowPrompt" style="display:none">
-  <h2>אתה יודע לקרוא את מה שהרישיון מסתיר?</h2>
-  <button class="primary full" type="button" onclick="showLicenseFlow()">לאימות רישיון הרכב לחץ כאן</button>
+  <h2>הרישיון תואם לנתוני הרכב?</h2>
+  <button class="primary full" type="button" onclick="showLicenseFlow()">אימות רישיון הרכב ←</button>
 </section>
 <section class="card" id="managerActiveNotice" style="display:none;border:2px solid #0ea67b;background:#e8f7f2;color:#075e48">
   <b>מצב מנהל פעיל</b>
@@ -659,10 +663,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 </details>
 
 <div id="purchaseBox" style="display:none"></div>
-<section class="card freeAfterLookup" id="afterPagePrompt" style="display:none">
-  <h2>עשית בדיקה לרכב ואתה יושב בוהה בבוחן בלי להבין מה הוא אומר?</h2>
-  <button class="primary full" type="button" onclick="openAfterPage()">לפיענוח לחץ כאן</button>
-</section>
+
 <section class="card freeAfterLookup preFlowScreen" id="preSummarySection" data-pre-step="1" style="display:none">
 <div class="balcarOffer consultationOffer">
 <h2>פענוח דוח המכון — בחינם</h2>
@@ -2005,7 +2006,6 @@ function showFreeStart(){
   document.getElementById('afterInsuranceChoices').style.display='block';
   document.getElementById('licenseFlowPrompt').style.display='block';
   showInsuranceStart();
-  document.getElementById('afterPagePrompt').style.display='block';
 }
 function showLicenseFlow(){
   void trackBuyTestFreeStage('free_license_opened');
@@ -6217,7 +6217,6 @@ window.addEventListener('DOMContentLoaded',async()=>{
   document.getElementById('vehicleLookup')?.insertAdjacentElement('afterend',insuranceStart);
   const insuranceReport=document.getElementById('balcarReportSection');
   insuranceStart?.insertAdjacentElement('afterend',insuranceReport);
-  licenseMatchSection?.insertAdjacentElement('afterend',document.getElementById('afterPagePrompt'));
   document.getElementById('afterPage').appendChild(document.getElementById('preSummarySection'));
   const reportButton=document.getElementById('insuranceReportConsultationButton');
   reportButton?.insertAdjacentElement('afterend',document.getElementById('afterInspectionSection'));
