@@ -44,6 +44,8 @@ const TRACK_EVENT_TYPES = new Set([
   "free_started",
   "free_completed",
   "consultation_opened",
+  "free_flow_opened", "free_plate_started", "free_lookup_submitted", "free_lookup_loaded",
+  "free_questions_opened", "free_license_opened", "free_flow_completed", "free_lookup_failed", "free_lookup_empty",
   ...CLICK_EVENT_TYPES,
 ]);
 
@@ -335,7 +337,7 @@ Deno.serve(async (req: Request) => {
       const pin = String(req.headers.get("x-buytest-manager-pin") || body.adminPin || "");
       if (!await isAdmin(pin)) return json(origin, { ok: false, error: "admin_denied" }, 403);
       const range = ['today', '7d', '30d', 'all'].includes(String(body.range)) ? String(body.range) : 'all';
-      const [stats, clicks, blog] = await Promise.all([
+      const [stats, clicks, blog, freeFunnel] = await Promise.all([
         serviceRequest("/rest/v1/rpc/buytest_analytics_summary", {
           method: "POST",
           body: JSON.stringify({ p_range: range }),
@@ -345,8 +347,11 @@ Deno.serve(async (req: Request) => {
           method: "POST",
           body: JSON.stringify({ p_range: range }),
         }),
+        serviceRequest("/rest/v1/rpc/buytest_free_funnel_summary", {
+          method: "POST", body: JSON.stringify({ p_range: range }),
+        }).catch(() => null),
       ]);
-      return json(origin, { ok: true, stats, clicks, blog });
+      return json(origin, { ok: true, stats, clicks, blog, freeFunnel });
     }
     if (body.action === "feedback_list") {
       const pin = String(req.headers.get("x-buytest-manager-pin") || body.adminPin || "");

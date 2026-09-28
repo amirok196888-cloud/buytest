@@ -1,0 +1,9 @@
+const test=require('node:test'),assert=require('node:assert/strict');
+const {createTracker}=require('../free-funnel.js');
+function setup(extra={}){const calls=[];let sessionId='session_initial_123456789';const opts={identity:()=>({visitorId:'visitor_test_123456789',sessionId}),send:async b=>{calls.push(b);},blocked:()=>false,vehicle:()=>null,attribution:()=>({trafficSource:'google'}),...extra};return {calls,track:createTracker(opts),newSession:()=>sessionId='session_changed_123456789'};}
+test('Repeated and concurrent typing is one stage per visit',async()=>{const h=setup();await Promise.all([h.track('free_plate_started'),h.track('free_plate_started')]);await h.track('free_plate_started');assert.deepEqual(h.calls.map(x=>x.eventType),['free_flow_opened','free_plate_started']);assert.ok(h.calls.every(x=>x.vehiclePlate===null&&x.pagePath==='/free-funnel/v1'));});
+test('A new analytics session is counted again',async()=>{const h=setup();await h.track('free_plate_started');h.newSession();await h.track('free_plate_started');assert.equal(h.calls.length,4);});
+test('Manager sessions are excluded',async()=>{const h=setup({blocked:()=>true});await h.track('free_license_opened');assert.equal(h.calls.length,0);});
+test('Failed event can retry on a later interaction',async()=>{let attempts=0;const h=setup({send:async()=>{if(++attempts===1)throw Error('offline');}});await h.track('free_flow_opened');await h.track('free_flow_opened');assert.equal(attempts,2);});
+test('Opening license counts the final stage without inferring questions opened',async()=>{const h=setup();await h.track('free_license_opened');assert.deepEqual(h.calls.map(x=>x.eventType),['free_flow_opened','free_license_opened']);});
+test('Unsupported event is not sent',async()=>{const h=setup();await h.track('unknown');assert.equal(h.calls.length,0);});

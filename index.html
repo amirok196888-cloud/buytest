@@ -558,6 +558,11 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
     <article class="analyticsMetric"><strong id="analyticsPaidEntries">—</strong><span>נכנסו לשירות בתשלום</span></article>
     <button class="analyticsMetric analyticsMetricButton" id="analyticsFeedbackMetric" type="button" onclick="openBuyTestFeedback()" aria-label="פתיחת התגובות החדשות"><strong id="analyticsNewFeedback">—</strong><span>תגובות חדשות</span></button>
   </div>
+  <h3 class="analyticsSourceTitle">איפה נעצרים בחלק החינמי?</h3>
+  <p class="analyticsNote">ביקור נספר פעם אחת בכל שלב, גם בלחיצות חוזרות ובבדיקת כמה רכבים. שאלות ואימות רישיון ניתנים לפתיחה בנפרד. כל שלב נספר ברגע פתיחתו. פתיחת אימות הרישיון היא הגעה לשלב האחרון בחינמי.</p>
+  <div class="analyticsSourceWrap"><table class="analyticsSourceTable" aria-label="התקדמות בחלק החינמי"><thead><tr><th scope="col">שלב</th><th scope="col">ביצעו את השלב</th><th scope="col">השלב המתקדם ביותר בביקור</th></tr></thead><tbody id="analyticsFreeFunnelRows"></tbody></table></div>
+  <p id="analyticsFreeFunnelNote" class="analyticsNote" role="status">טוען נתוני התקדמות…</p>
+  <p class="analyticsNote">השלב המתקדם ביותר אינו בהכרח נטישה: ייתכן שהגולש עדיין באתר או עבר לשירות בתשלום. הספירה היא לפי ביקורים, לא לפי אנשים מזוהים.</p>
   <h3 class="analyticsSourceTitle">כניסות לבלוג לפי כתבה</h3>
   <div class="analyticsSourceWrap">
     <table class="analyticsSourceTable" aria-label="כניסות לבלוג לפי כתבה">
@@ -900,6 +905,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 <script src="expert-calibration-v3.js"></script>
 <script src="vehicle-notes-core.js?v=1"></script>
 <script src="vehicle-notes.js?v=2"></script>
+<script src="free-funnel.js?v=1"></script>
 <script>
 const VEHICLE_ID='56063a99-8a3e-4ff4-912e-5966c0279bad';
 function btBrandText(value){return String(value??'')}
@@ -1276,6 +1282,7 @@ function openInspectionRoute(route){
   if(route==='after'){openAfterPage();return;}
   closeAfterPage(false);
   const before=route==='before';
+  if(before) void trackBuyTestFreeStage('free_flow_opened');
   document.getElementById('beforeInspectionRoute').hidden=!before;
   document.getElementById('afterInspectionRoute').hidden=before;
   const buttons=document.querySelectorAll('#serviceChoices button[aria-controls]');
@@ -1398,6 +1405,7 @@ function setCustomerRoute(route){
 }
 const preFlowTitles=['5 שאלות למוכר','פענוח דוח המכון והתייעצות אישית'];
 function showPreFlowStep(index,{scroll=true}={}){
+  if(Number(index)===0) void trackBuyTestFreeStage('free_questions_opened');
   if(Number(index)===1) openAfterPage(false);
   const target=document.getElementById(Number(index)===1?'preSummarySection':'preVisitSection');
   target.classList.add('active');
@@ -1499,6 +1507,7 @@ async function loadVehicle(){
   }
   const p=plate();
   if(!/^\d{7,8}$/.test(p)){alert('יש להזין מספר רכב בן 7 או 8 ספרות');return}
+  if(customerEntryRoute==='free'&&!document.body.classList.contains('after-page')) void trackBuyTestFreeStage('free_lookup_submitted');
   window.BuyTestVehicleNotes?.clear();
   btActivateVehicle(p);
   const status=document.getElementById('status');
@@ -1523,6 +1532,7 @@ async function loadVehicle(){
   const ar=activeResult.records[0]||null;
   const anySourceOk=vehicleResult.ok||ownersResult.ok||activeResult.ok;
   if(!vr&&!owners.length&&!ar){
+    if(customerEntryRoute==='free'&&!document.body.classList.contains('after-page')) void trackBuyTestFreeStage(anySourceOk?'free_lookup_empty':'free_lookup_failed');
     statusMsg.textContent=anySourceOk?'לא נמצאו נתונים לרכב הזה במאגרים הציבוריים.':'שירות הנתונים אינו זמין כרגע. אפשר לנסות שוב בעוד כמה דקות.';
     statusMsg.className='red';
     return;
@@ -1556,6 +1566,7 @@ async function loadVehicle(){
   void window.BuyTestVehicleNotes?.load({...ar,...vr},{endpoint:"https://tjxjxavxrmvbofvtnsaj.supabase.co/functions/v1/buytest-vehicle-notes",key:BUYTEST_SUPABASE_ANON_KEY});
   renderPreVisitQuestions(p,vr,owners,ar);
   if(customerEntryRoute==='free'&&!document.body.classList.contains('manager-mode')){
+    if(!document.body.classList.contains('after-page')) void trackBuyTestFreeStage('free_lookup_loaded');
     void trackBuyTestEvent('free_started');
     buyTestMetaTrackCustom('FreeCheckStarted',{content_name:'בדיקה עצמית לפני המכון'});
     buyTestGoogleTrackFreeStartedOnce(p);
@@ -2012,6 +2023,7 @@ function showFreeStart(){
   document.getElementById('afterPagePrompt').style.display='block';
 }
 function showLicenseFlow(){
+  void trackBuyTestFreeStage('free_license_opened');
   const license=document.getElementById('licenseMatchSection');
   license.classList.add('active');
   license.style.display='block';
@@ -2552,6 +2564,16 @@ async function saveBuyTestMileageObservations(observations){
   }catch(error){console.warn('BuyTest mileage observation skipped:',error)}
 }
 async function saveBuyTestMileageObservation(observation){return saveBuyTestMileageObservations([observation])}
+const trackBuyTestFreeStage=window.BuyTestFreeFunnel.createTracker({
+  identity:()=>buyTestAnalyticsIdentity(),
+  send:body=>callBuyTestAnalyticsService(body),
+  blocked:()=>new URLSearchParams(location.search).has('manager')||document.body.classList.contains('manager-mode'),
+  vehicle:()=>/^\d{7,8}$/.test(plate())?plate():null,
+  attribution:()=>buyTestTrafficAttribution()
+});
+document.getElementById('plate')?.addEventListener('input',event=>{
+  if(!document.getElementById('beforeInspectionRoute')?.hidden&&/\d/.test(event.target.value)) void trackBuyTestFreeStage('free_plate_started');
+});
 async function trackBuyTestEvent(eventType){
   if(new URLSearchParams(location.search).has('manager')||document.body.classList.contains('manager-mode')) return;
   try{
@@ -2645,6 +2667,7 @@ async function loadBuyTestAnalytics(range=buyTestAnalyticsRange){
     renderBuyTestSourceAnalytics(stats.sources);
     renderBuyTestClickAnalytics(data.clicks);
     renderBuyTestBlogAnalytics(blog);
+    window.BuyTestFreeFunnel.render(data.freeFunnel);
     if(status) status.textContent='עודכן '+new Date().toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});
   }catch(error){
     console.error('BuyTest analytics loading failed:',error);
