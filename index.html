@@ -356,7 +356,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
     <span class="routePrice">לפני המכון</span><h3>מה מאגר משרד התחבורה אומר על הרכב שלך?</h3><p>כדי לדעת מה מאגר משרד התחבורה אומר על הרכב שלך — לחץ כאן לבדיקה בחינם.</p>
     <button class="mktBtn mktBtnPrimary" type="button" aria-controls="beforeInspectionRoute" aria-expanded="false" data-analytics-click="click_before_route" onclick="openInspectionRoute('before')">לחץ כאן לבדיקה בחינם ←</button>
   </article>
-  <article class="routeCard paid"><span class="routePrice">אחרי המכון</span><h3>עשית בדיקה לרכב ואתה יושב בוהה בבוחן בלי להבין מה הוא אומר?</h3><p>תפענח אצלנו את הבדיקה.</p><button class="mktBtn" type="button" aria-controls="afterInspectionRoute" aria-expanded="false" data-analytics-click="click_after_route" onclick="openInspectionRoute('after')">לפיענוח לחץ כאן</button></article>
+  <article class="routeCard paid"><span class="routePrice">אחרי המכון</span><h3>עשית בדיקה לרכב ואתה יושב בוהה בבוחן בלי להבין מה הוא אומר?</h3><p>תפענח אצלנו את הבדיקה.</p><a class="mktBtn" href="#report" data-analytics-click="click_after_route" onclick="openAfterPage();return false">לפיענוח לחץ כאן</a></article>
 </div>
 <section class="inspectionRoute" id="beforeInspectionRoute" hidden aria-label="מסלול לפני המכון">
   <button class="routeBack" type="button" onclick="closeInspectionRoutes()">← חזרה לבחירת מסלול</button>
@@ -902,6 +902,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 <footer>© 2026 BuyTest · כל הזכויות שמורות · <a href="/articles/" style="color:inherit">מאמרים ומדריכים</a> · קונה רכב? קודם בודקים!</footer>
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@7.0.0/dist/tesseract.min.js" crossorigin="anonymous"></script>
+<script src="ai-referrals.js?v=1"></script>
 <script src="expert-calibration-v3.js"></script>
 <script src="vehicle-notes-core.js?v=1"></script>
 <script src="vehicle-notes.js?v=2"></script>
@@ -1259,6 +1260,7 @@ function syncVehicleLookupButton(){
 }
 function openAfterPage(scroll=true){
   if(/^\d{7,8}$/.test(plate())){const notes=collectPreInspection();if(notes.findings.length)btSaveSource('notes',{title:'נתונים ודגשים שהוזנו לפני המכון',text:notes.text,alerts:notes.findings.map(x=>'דיווח לקוח — '+x.title+': '+x.text)});}
+  if(location.hash!=='#report'&&!new URLSearchParams(location.hash.slice(1)).has('redeem')) history.replaceState(null,'',location.pathname+location.search+'#report');
   document.body.classList.add('after-page');
   const page=document.getElementById('afterPage');page.style.display='block';
   const report=document.getElementById('preSummarySection');report.classList.add('active');report.style.display='block';
@@ -1266,6 +1268,7 @@ function openAfterPage(scroll=true){
   if(scroll) window.scrollTo({top:0,behavior:'instant'});
 }
 function closeAfterPage(scroll=true){
+  if(location.hash==='#report') history.replaceState(null,'',location.pathname+location.search);
   document.body.classList.remove('after-page');
   document.getElementById('afterPage').style.display='none';
   if(scroll) document.getElementById('serviceChoices')?.scrollIntoView({behavior:'smooth',block:'start'});
@@ -2496,6 +2499,8 @@ function buyTestTrafficAttribution(){
     try{localStorage.setItem(BUYTEST_ATTRIBUTION_KEY,JSON.stringify(attribution))}catch(_error){}
     return attribution;
   }
+  const aiReferral=globalThis.BuyTestAIReferral?.capture(location.search,document.referrer);
+  if(aiReferral){try{localStorage.setItem(BUYTEST_ATTRIBUTION_KEY,JSON.stringify(aiReferral))}catch(_error){}return aiReferral;}
   if(savedValid) return saved;
   let referrerHost='';
   try{referrerHost=document.referrer?new URL(document.referrer).hostname.toLowerCase():''}catch(_error){}
@@ -2646,7 +2651,7 @@ function renderBuyTestClickAnalytics(rows){
     const source=String(item?.source||'unknown');
     const campaign=[item?.utmSource,item?.utmMedium,item?.utmCampaign].map(value=>String(value||'').trim()).filter(Boolean).join(' / ')||'—';
     const label=BUYTEST_CLICK_LABELS[String(item?.eventType||'')]||String(item?.eventType||'לחיצה');
-    return `<tr><td>${escapeHtml(BUYTEST_SOURCE_LABELS[source]||source)}</td><td>${escapeHtml(label)}</td><td>${number(item?.clicks)}</td><td dir="ltr">${escapeHtml(campaign)}</td></tr>`;
+    return `<tr><td>${escapeHtml(globalThis.BuyTestAIReferral?.label(item?.utmSource)||BUYTEST_SOURCE_LABELS[source]||source)}</td><td>${escapeHtml(label)}</td><td>${number(item?.clicks)}</td><td dir="ltr">${escapeHtml(campaign)}</td></tr>`;
   }).join('');
 }
 function renderBuyTestBlogAnalytics(blog){
@@ -6265,7 +6270,12 @@ window.addEventListener('DOMContentLoaded',async()=>{
   }
   syncVehicleLookupButton();
   updateBuyTestRoadmap();
+  if(!isManagerLink&&location.hash==='#report') openAfterPage(false);
   if(!isManagerLink) await runBuyTestAccessInitialization();
+});
+window.addEventListener('hashchange',()=>{
+  const params=new URLSearchParams(location.search);
+  if(location.hash==='#report'&&!params.has('manager')&&!params.has('admin')&&params.get('mode')!=='manager') openAfterPage();
 });
 window.addEventListener('pageshow',async event=>{
   buyTestPaymentStarting=false;

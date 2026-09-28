@@ -40,6 +40,11 @@
       try { localStorage.setItem(attributionKey, JSON.stringify(value)); } catch (_) {}
       return value;
     }
+    const aiReferral = globalThis.BuyTestAIReferral?.capture(location.search, document.referrer);
+    if (aiReferral) {
+      try { localStorage.setItem(attributionKey, JSON.stringify(aiReferral)); } catch (_) {}
+      return aiReferral;
+    }
     try {
       const saved = JSON.parse(localStorage.getItem(attributionKey) || 'null');
       if (saved && Date.now() - Number(saved.capturedAt || 0) < attributionMs) return saved;
