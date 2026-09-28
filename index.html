@@ -2303,7 +2303,7 @@ function insuranceSellerQuestions(data){
       questions.push(`בדוח נרשמה ירידת ערך של ${info.depreciation}%${event}. האם המחיר שאתה מבקש מביא אותה בחשבון, והאם אפשר לקבל את דוח השמאי?`);
     }
     // Inspect values, not key names: totalLoss:false must never create an allegation.
-    const values=Object.values(claim||{}).filter(value=>typeof value==='string').join(' ');
+    const values=Object.values(claim||{}).filter(value=>typeof value==='string'&&!/(?:לא|אין|ללא|not|no)\s+(?:הוגדר\s+)?(?:אובדן|total|constructive)/i.test(value)).join(' ');
     const explicitLoss=Object.entries(claim||{}).some(([key,value])=>/^(totalloss|constructiveloss|constructivetotalloss)$/i.test(key.replace(/[_ -]/g,''))&&(value===true||value===1||/^(true|yes|כן)$/i.test(String(value))));
     const lossType=/אובדן\s+להלכה|constructive.{0,8}(?:total.{0,4})?loss/i.test(values)?'אובדן להלכה':/אובדן\s+גמור|total.{0,4}loss/i.test(values)?'אובדן גמור':explicitLoss?'אובדן גמור או אובדן להלכה':'';
     if(lossType) questions.push(`בדוח מופיע שהרכב הוגדר ${lossType}${event}. האם ידעת על כך, ויש לך מסמכים על השיקום והבדיקות שבוצעו?`);
