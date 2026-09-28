@@ -468,7 +468,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
     <p class="formNote">רכישת החבילות והפעלת השירותים נעשות כרגע בתיאום אישי עם עמוס. השירותים הבודדים זמינים לרכישה באתר.</p>
   </div>
   <div class="balcarOffer insuranceOffer">
-    <h3>לפני שאתה משקיע עשרות אלפי שקלים, תבדוק מה הרכב עבר</h3>
+    <h3>עבר ביטוחי. עתיד בטוח.</h3>
     <p>הפק דוח עבר ביטוחי וקבל פענוח של הנתונים. גם דוח ללא תביעות אינו מבטיח שהרכב לא נפגע ואינו מחליף בדיקה במכון.</p>
     <div id="insuranceSellerFields" style="display:none;margin:12px 0;padding:12px;border:1px solid #edcd7a;border-radius:12px;background:#fffaf0">
       <b>נדרשים פרטי הבעלות לצורך הפקת הדוח</b>
@@ -480,13 +480,13 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
   </div>
 </section>
 <section class="card freeAfterLookup" id="afterInsuranceChoices" style="display:none">
-  <h2>ראית את נתוני הרכב — אבל מה כדאי לשאול את המוכר בעקבותיהם?</h2>
-  <button class="primary full" id="continueFreeAfterInsurance" type="button" onclick="continueToFreeFlow()">לשאלות מתוך ניתוני המאגר לחץ כאן</button>
+  <h2>ראית את נתוני הרכב? עכשיו כדאי לדעת מה לשאול את המוכר.</h2>
+  <button class="primary full" id="continueFreeAfterInsurance" type="button" onclick="continueToFreeFlow()">לשאלות למוכר לפי נתוני הרכב ←</button>
 </section>
 <div class="preFlowProgress freeAfterLookup" id="preFlowProgress" aria-live="polite"><strong id="preFlowProgressText">הבדיקה החינמית ברכב</strong><span id="preFlowProgressHint">מסיימים סעיף אחד — והסעיף הבא נפתח אוטומטית.</span></div>
 <section class="card freeAfterLookup preFlowScreen preVisitCard" id="preVisitSection" data-pre-step="0" style="display:none">
   <span class="preVisitBadge">חדש · בחינם</span>
-  <h2>5 שאלות למוכר לפי נתוני הרכב</h2>
+  <h2>שאלות למוכר לפי נתוני הרכב</h2>
   <p class="preVisitLead" id="preVisitSubtitle">השאלות יותאמו לנתונים הזמינים לרכב שבחרת.</p>
   <details class="preVisitFactsDetails"><summary>הצגת פרטי הרכב שנמצאו</summary><div class="preVisitFacts">
     <div class="preVisitFact"><span>הרכב שנבדק</span><strong id="preVisitVehicle">—</strong></div>
@@ -497,7 +497,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
     <div class="preVisitFact wide"><span>חשוב להבין</span><strong id="preVisitNotice">הנתונים במאגר הציבורי עשויים להיות חלקיים ויש לאמת אותם מול רישיון הרכב והמוכר.</strong></div>
   </div></details>
   <div class="preVisitQuestions">
-    <h3>5 שאלות למוכר לפי נתוני הרכב</h3>
+    <h3>שאלות למוכר לפי נתוני הרכב</h3>
     <ol id="preVisitQuestionList"></ol>
     <div class="preVisitActions">
       <button class="primary" type="button" data-analytics-click="click_copy_questions" onclick="copyPreVisitQuestions(this)">לחץ להעתקת השאלות למוכר</button>
@@ -1456,7 +1456,11 @@ function vehicleOriginality(vehicle,owners,active){
 }
 function preVisitFormatPlate(value){const digits=String(value||'').replace(/\D/g,'');return digits.length===8?`${digits.slice(0,3)}-${digits.slice(3,5)}-${digits.slice(5)}`:`${digits.slice(0,2)}-${digits.slice(2,5)}-${digits.slice(5)}`}
 let currentPreVisitQuestions=[];
+let basePreVisitQuestions=[];
+let sellerInsuranceData=null;
+let sellerQuestionsPlate='';
 function renderPreVisitQuestions(p,vehicle,owners,active){
+  if(sellerQuestionsPlate!==String(p)){sellerInsuranceData=null;sellerQuestionsPlate=String(p);}
   const ordered=[...(owners||[])].sort((a,b)=>preVisitOwnerDate(b)-preVisitOwnerDate(a));
   const latestOwner=ordered[0]||{};
   const maker=preVisitFirst(vehicle?.tozeret_nm,active?.tozeret_nm,active?.tozeret_eretz_nm);
@@ -1483,6 +1487,8 @@ function renderPreVisitQuestions(p,vehicle,owners,active){
     trim?`האם זו אכן רמת הגימור ${trim}, ואילו אביזרים מקוריים קיימים ברכב?`:'האם הדגם ורמת הגימור במודעה תואמים לרכב בפועל, ואילו אביזרים מקוריים קיימים?',
     'האם קיימת היסטוריית טיפולים מלאה, והאם המוכר מתחייב בבדיקה על מנוע, תיבת הילוכים ושלדה?'
   ];
+  basePreVisitQuestions=[...currentPreVisitQuestions];
+  if(sellerInsuranceData){applyInsuranceConclusionsToSellerQuestions(sellerInsuranceData);return;}
   const list=document.getElementById('preVisitQuestionList');
   list.replaceChildren(...currentPreVisitQuestions.map(question=>{const item=document.createElement('li');item.textContent=question;return item}));
 }
@@ -2283,36 +2289,37 @@ function insuranceProfessionalInterpretation(data){
   const caution='דוח עבר ביטוחי משקף רק אירועים שדווחו למאגר. גם כאשר הדוח נקי, אין לוותר על בדיקה מקצועית במכון.';
   return {title:`הערה מסכמת — רמת משמעות: ${level}`,text:explanation+' '+caution};
 }
-function applyInsuranceConclusionsToSellerQuestions(data){
-  if(!Array.isArray(currentPreVisitQuestions)||currentPreVisitQuestions.length!==5) return;
-  const claims=insuranceClaims(data).map(insuranceClaimInfo);
-  const relevant=claims.filter(item=>!/צד\s*[גג׳']|third.?party/i.test(item.type));
-  const considered=relevant.length?relevant:claims;
-  const totalLoss=considered.some(item=>item.totalLoss);
-  const maxDepreciation=Math.max(0,...considered.map(item=>item.depreciation||0));
-  const maxAmount=Math.max(0,...considered.map(item=>item.amount||0));
-  if(totalLoss){
-    currentPreVisitQuestions[3]='בדוח העבר הביטוחי מופיע אובדן גמור או אובדן להלכה. האם אפשר לקבל את דוח השמאי, חשבוניות ותיעוד מלא של הנזק והתיקון?';
-  }else if(maxDepreciation>0){
-    currentPreVisitQuestions[3]=`בדוח העבר הביטוחי מופיעה ירידת ערך של ${maxDepreciation}%. באיזה אזור הייתה הפגיעה, מה תוקן והאם אפשר לקבל את דוח השמאי ותיעוד התיקון?`;
-  }else if(maxAmount>0){
-    currentPreVisitQuestions[3]=`בדוח העבר הביטוחי מופיעה תביעה בסכום של כ־${fmtNum(maxAmount)} ₪. מה היה הנזק, אילו חלקים תוקנו או הוחלפו והאם קיים תיעוד?`;
-  }else if(claims.length===0){
-    currentPreVisitQuestions[3]='בדוח העבר הביטוחי לא נמצאו תביעות. האם היו תאונות או תיקונים פרטיים שלא הופעל בגינם הביטוח?';
-  }else{
-    currentPreVisitQuestions[3]='בדוח העבר הביטוחי מופיע מידע חלקי. האם היו תאונות או תיקוני מרכב, והאם אפשר לקבל דוח שמאי או תיעוד תיקון?';
+function insuranceSellerQuestions(data){
+  const questions=[];
+  for(const claim of insuranceClaims(data)){
+    const info=insuranceClaimInfo(claim);
+    if(/צד\s*[גג׳']|third.?party/i.test(info.type)) continue;
+    const date=info.date?String(info.date).slice(0,40):'';
+    const event=date?` באירוע מ־${date}`:'';
+    if(info.amount>0||date||info.type){
+      questions.push(`בדוח העבר הביטוחי מופיעה תביעה${event}${info.amount>0?` בסכום ${fmtNum(info.amount)} ₪`:''}. מה קרה, מה תוקן ברכב והאם יש תמונות או דוח שמאי?`);
+    }
+    if(info.depreciation>0){
+      questions.push(`בדוח נרשמה ירידת ערך של ${info.depreciation}%${event}. האם המחיר שאתה מבקש מביא אותה בחשבון, והאם אפשר לקבל את דוח השמאי?`);
+    }
+    // Inspect values, not key names: totalLoss:false must never create an allegation.
+    const values=Object.values(claim||{}).filter(value=>typeof value==='string').join(' ');
+    const explicitLoss=Object.entries(claim||{}).some(([key,value])=>/^(totalloss|constructiveloss|constructivetotalloss)$/i.test(key.replace(/[_ -]/g,''))&&(value===true||value===1||/^(true|yes|כן)$/i.test(String(value))));
+    const lossType=/אובדן\s+להלכה|constructive.{0,8}(?:total.{0,4})?loss/i.test(values)?'אובדן להלכה':/אובדן\s+גמור|total.{0,4}loss/i.test(values)?'אובדן גמור':explicitLoss?'אובדן גמור או אובדן להלכה':'';
+    if(lossType) questions.push(`בדוח מופיע שהרכב הוגדר ${lossType}${event}. האם ידעת על כך, ויש לך מסמכים על השיקום והבדיקות שבוצעו?`);
   }
-  const followUps=[];
-  if(insurancePlateChange(data)) followUps.push('מה הסיבה לשינוי במספר הרישוי שמופיע בדוח');
-  if(data?.findings?.recall) followUps.push('האם קריאת התיקון שמופיעה בדוח טופלה אצל היבואן');
-  if(data?.findings?.stolen) followUps.push('מה ידוע על רישום הגניבה שמופיע בדוח');
-  currentPreVisitQuestions[4]=followUps.length
-    ? `${followUps.join(', ')}? בנוסף, האם קיימת היסטוריית טיפולים מלאה והאם המוכר מתחייב בבדיקה על מנוע, תיבת הילוכים ושלדה?`
-    : 'האם קיימת היסטוריית טיפולים מלאה, והאם המוכר מתחייב בבדיקה על מנוע, תיבת הילוכים ושלדה?';
+  return [...new Set(questions)];
+}
+function applyInsuranceConclusionsToSellerQuestions(data){
+  const sourcePlate=String(data?.vehicle?.plate||data?.plate||plate()).replace(/\D/g,'');
+  if(sourcePlate!==String(plate())) return;
+  sellerInsuranceData=data;
+  if(sellerQuestionsPlate!==String(plate())) return;
+  currentPreVisitQuestions=[...insuranceSellerQuestions(data),...basePreVisitQuestions];
   const list=document.getElementById('preVisitQuestionList');
   if(list) list.replaceChildren(...currentPreVisitQuestions.map(question=>{const item=document.createElement('li');item.textContent=question;return item}));
   const subtitle=document.getElementById('preVisitSubtitle');
-  if(subtitle) subtitle.textContent='השאלות מבוססות על נתוני הרכב ועל המסקנות שהתקבלו מפענוח דוח העבר הביטוחי.';
+  if(subtitle) subtitle.textContent='השאלות מבוססות על נתוני המאגר ועל הממצאים המפורשים בדוח העבר הביטוחי.';
 }
 function renderPaidBalcarReport(data,sourcePlate=plate()){
   if(sourcePlate!==plate())return;
@@ -6227,10 +6234,10 @@ window.addEventListener('DOMContentLoaded',async()=>{
   preVisitSection?.insertAdjacentElement('afterend',licensePrompt);
   licensePrompt?.insertAdjacentElement('afterend',licenseMatchSection);
   const insuranceStart=document.getElementById('insuranceStartSection');
-  licenseMatchSection?.insertAdjacentElement('afterend',insuranceStart);
+  document.getElementById('vehicleLookup')?.insertAdjacentElement('afterend',insuranceStart);
   const insuranceReport=document.getElementById('balcarReportSection');
   insuranceStart?.insertAdjacentElement('afterend',insuranceReport);
-  insuranceReport?.insertAdjacentElement('afterend',document.getElementById('afterPagePrompt'));
+  licenseMatchSection?.insertAdjacentElement('afterend',document.getElementById('afterPagePrompt'));
   document.getElementById('afterPage').appendChild(document.getElementById('preSummarySection'));
   const reportButton=document.getElementById('insuranceReportConsultationButton');
   reportButton?.insertAdjacentElement('afterend',document.getElementById('afterInspectionSection'));
