@@ -16,8 +16,8 @@ const PLANS = {
   premium: { amountAgorot: 4900, title: "בדיקה עצמית לפני המכון", scopes: ["premium"] },
   report: { amountAgorot: 4900, title: "פענוח דוח המכון", scopes: ["report"] },
   report_consultation: { amountAgorot: 12900, title: "פענוח דוח המכון והתייעצות עם בוחן", scopes: ["report", "consultation"] },
-  consultation: { amountAgorot: 10000, title: "התייעצות אישית לאחר פענוח", scopes: ["consultation"] },
-  prebuy: { amountAgorot: 7900, title: "ייעוץ לפני רכישה בוואטסאפ · ההתייעצות פתוחה ל־48 שעות", scopes: ["prebuy"] },
+  consultation: { amountAgorot: 14900, title: "התייעצות אישית על דוח המכון", scopes: ["consultation"] },
+  prebuy: { amountAgorot: 14900, title: "ייעוץ לפני רכישה בוואטסאפ · ההתייעצות פתוחה ל־48 שעות", scopes: ["prebuy"] },
   bundle: { amountAgorot: 12000, title: "חבילת BuyTest המלאה", scopes: ["premium", "report", "consultation"] },
   full149: { amountAgorot: 14900, title: "חבילה מלאה לרכב אחד", scopes: ["balcar", "report", "consultation"] },
   three250: { amountAgorot: 25000, title: "חבילה לעד שלושה רכבים", scopes: ["balcar", "report", "consultation"] },
@@ -295,7 +295,7 @@ async function createPayment(origin: string | null, body: Record<string, unknown
   if (!isPlan(planKey) || (planKey !== "prebuy" && !/^\d{7,8}$/.test(plate)) || !customerDetailsValid || body.acceptedTerms !== true) {
     return json(origin, { ok: false, error: "invalid_payment_request" }, 400);
   }
-  if (planKey === "three250") return json(origin, { ok: false, error: "package_unavailable" }, 503);
+  if (["report", "report_consultation", "premium", "bundle", "full149", "three250"].includes(planKey)) return json(origin, { ok: false, error: "package_unavailable" }, 503);
   const plan = PLANS[planKey];
   const productCode = `BUYTEST-${planKey.toUpperCase()}`;
   const productName = Array.from(`BuyTest · ${plan.title}`).slice(0, 50).join("");
@@ -303,13 +303,11 @@ async function createPayment(origin: string | null, body: Record<string, unknown
   let priorOrderId = "";
   if (planKey === "consultation") {
     const priorOrder = await verifiedPriorOrder(body, plate);
-    if (!priorOrder || !isPlan(priorOrder.plan)) return json(origin, { ok: false, error: "previous_stage_required" }, 409);
-    const priorProgress = stageProgress(priorOrder.provider_payload);
-    const priorScopes: readonly string[] = PLANS[priorOrder.plan as PlanKey].scopes;
-    const allowed = priorScopes.includes("report") && priorProgress.reportCompleted;
-    if (!allowed) return json(origin, { ok: false, error: "previous_stage_required" }, 409);
-    inheritedProgress = priorProgress;
-    priorOrderId = String(priorOrder.id);
+    // Consultation can be purchased independently; verified prior work is optional.
+    if (priorOrder && isPlan(priorOrder.plan)) {
+      inheritedProgress = stageProgress(priorOrder.provider_payload);
+      priorOrderId = String(priorOrder.id);
+    }
   }
   const config = await cardcomConfig();
   if (!config.enabled) return json(origin, { ok: false, error: "payment_provider_transition", provider: "cardcom_pending" }, 503);
@@ -526,3 +524,4 @@ Deno.serve(async (req: Request) => {
     return json(origin, { ok: false, error: "payment_service_error" }, 500);
   }
 });
+
