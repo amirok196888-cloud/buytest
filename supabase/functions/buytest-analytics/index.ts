@@ -46,6 +46,17 @@ const TRACK_EVENT_TYPES = new Set([
   "consultation_opened",
   "free_flow_opened", "free_plate_started", "free_lookup_submitted", "free_lookup_loaded",
   "free_questions_opened", "free_license_opened", "free_flow_completed", "free_lookup_failed", "free_lookup_empty",
+  "report_opened",
+  "report_file_selected",
+  "report_read_ready",
+  "report_analyze_clicked",
+  "report_analysis_started",
+  "report_result_received",
+  "report_result_displayed",
+  "report_read_failed",
+  "report_validation_blocked",
+  "report_analysis_failed",
+  "report_result_discarded",
   ...CLICK_EVENT_TYPES,
 ]);
 
@@ -337,7 +348,7 @@ Deno.serve(async (req: Request) => {
       const pin = String(req.headers.get("x-buytest-manager-pin") || body.adminPin || "");
       if (!await isAdmin(pin)) return json(origin, { ok: false, error: "admin_denied" }, 403);
       const range = ['today', '7d', '30d', 'all'].includes(String(body.range)) ? String(body.range) : 'all';
-      const [stats, clicks, blog, freeFunnel] = await Promise.all([
+      const [stats, clicks, blog, freeFunnel, reportFunnel] = await Promise.all([
         serviceRequest("/rest/v1/rpc/buytest_analytics_summary", {
           method: "POST",
           body: JSON.stringify({ p_range: range }),
@@ -350,8 +361,11 @@ Deno.serve(async (req: Request) => {
         serviceRequest("/rest/v1/rpc/buytest_free_funnel_summary", {
           method: "POST", body: JSON.stringify({ p_range: range }),
         }).catch(() => null),
+        serviceRequest("/rest/v1/rpc/buytest_report_funnel_summary", {
+          method: "POST", body: JSON.stringify({ p_range: range }),
+        }).catch(() => null),
       ]);
-      return json(origin, { ok: true, stats, clicks, blog, freeFunnel });
+      return json(origin, { ok: true, stats, clicks, blog, freeFunnel, reportFunnel });
     }
     if (body.action === "feedback_list") {
       const pin = String(req.headers.get("x-buytest-manager-pin") || body.adminPin || "");

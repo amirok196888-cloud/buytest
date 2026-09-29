@@ -549,6 +549,10 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
   <div class="analyticsSourceWrap"><table class="analyticsSourceTable" aria-label="התקדמות בחלק החינמי"><thead><tr><th scope="col">שלב</th><th scope="col">ביצעו את השלב</th><th scope="col">השלב המתקדם ביותר בביקור</th></tr></thead><tbody id="analyticsFreeFunnelRows"></tbody></table></div>
   <p id="analyticsFreeFunnelNote" class="analyticsNote" role="status">טוען נתוני התקדמות…</p>
   <p class="analyticsNote">השלב המתקדם ביותר אינו בהכרח נטישה: ייתכן שהגולש עדיין באתר או עבר לשירות בתשלום. הספירה היא לפי ביקורים, לא לפי אנשים מזוהים.</p>
+  <h3 class="analyticsSourceTitle">פענוח דוח בדיקה — האם התקבלה תוצאה?</h3>
+  <p class="analyticsNote">כל שלב נספר פעם אחת בביקור, גם בניסיון חוזר או בפענוח כמה דוחות. ״התוצאה הוצגה״ מאשר הצגה באתר, לא שהלקוח קרא אותה או הוריד PDF. שלב שטרם הושלם אינו בהכרח נטישה.</p>
+  <div class="analyticsSourceWrap"><table class="analyticsSourceTable" aria-label="התקדמות פענוח דוח"><thead><tr><th>שלב</th><th>ביקורים שביצעו</th><th>השלב המתקדם ביותר</th></tr></thead><tbody id="analyticsReportFunnelRows"></tbody></table></div>
+  <p id="analyticsReportFunnelNote" class="analyticsNote" role="status">טוען נתוני פענוח…</p>
   <h3 class="analyticsSourceTitle">כניסות לבלוג לפי כתבה</h3>
   <div class="analyticsSourceWrap">
     <table class="analyticsSourceTable" aria-label="כניסות לבלוג לפי כתבה">
@@ -882,6 +886,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 <script src="vehicle-notes-core.js?v=1"></script>
 <script src="vehicle-notes.js?v=2"></script>
 <script src="free-funnel.js?v=1"></script>
+<script src="report-funnel.js?v=1"></script>
 <script>
 const VEHICLE_ID='56063a99-8a3e-4ff4-912e-5966c0279bad';
 function btBrandText(value){return String(value??'')}
@@ -1234,6 +1239,7 @@ function syncVehicleLookupButton(){
   button.disabled=!/^\d{7,8}$/.test(plate());
 }
 function openAfterPage(scroll=true){
+  void trackBuyTestReportStage('report_opened');
   if(/^\d{7,8}$/.test(plate())){const notes=collectPreInspection();if(notes.findings.length)btSaveSource('notes',{title:'נתונים ודגשים שהוזנו לפני המכון',text:notes.text,alerts:notes.findings.map(x=>'דיווח לקוח — '+x.title+': '+x.text)});}
   if(location.hash!=='#report'&&!new URLSearchParams(location.hash.slice(1)).has('redeem')) history.replaceState(null,'',location.pathname+location.search+'#report');
   document.body.classList.add('after-page');
@@ -2562,6 +2568,11 @@ const trackBuyTestFreeStage=window.BuyTestFreeFunnel.createTracker({
 document.getElementById('plate')?.addEventListener('input',event=>{
   if(!document.getElementById('beforeInspectionRoute')?.hidden&&/\d/.test(event.target.value)) void trackBuyTestFreeStage('free_plate_started');
 });
+const trackBuyTestReportStage=window.BuyTestReportFunnel.createTracker({
+  identity:()=>buyTestAnalyticsIdentity(),send:body=>callBuyTestAnalyticsService(body),
+  blocked:()=>{const q=new URLSearchParams(location.search);return q.has('manager')||q.has('admin')||q.get('mode')==='manager'||document.body.classList.contains('manager-mode')||Boolean(buyTestManagerPin);},
+  attribution:()=>buyTestTrafficAttribution()
+});
 async function trackBuyTestEvent(eventType){
   if(new URLSearchParams(location.search).has('manager')||document.body.classList.contains('manager-mode')) return;
   try{
@@ -2601,6 +2612,7 @@ function trackBuyTestClick(event){
   if(!target||target.disabled) return;
   const eventType=String(target.dataset.analyticsClick||'');
   if(eventType) void trackBuyTestEvent(eventType);
+  if(eventType==='click_analyze') void trackBuyTestReportStage('report_analyze_clicked');
 }
 document.addEventListener('click',trackBuyTestClick,true);
 const BUYTEST_SOURCE_LABELS={google:'Google',meta:'Facebook / Instagram',tiktok:'TikTok',direct:'כניסה ישירה',other:'מקורות אחרים',unknown:'לא ידוע (נתונים ישנים)'};
@@ -2656,6 +2668,7 @@ async function loadBuyTestAnalytics(range=buyTestAnalyticsRange){
     renderBuyTestClickAnalytics(data.clicks);
     renderBuyTestBlogAnalytics(blog);
     window.BuyTestFreeFunnel.render(data.freeFunnel);
+    window.BuyTestReportFunnel.render(data.reportFunnel);
     if(status) status.textContent='עודכן '+new Date().toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});
   }catch(error){
     console.error('BuyTest analytics loading failed:',error);
@@ -3484,12 +3497,15 @@ async function handleInspectionFile(input,kind){
   const textArea=document.getElementById(isSummary?'examinerSummaryText':'computerTestText');
   const review=document.getElementById(isSummary?'summaryReviewArea':'computerReviewArea');
   if(!file) return;
+  const reportContext=isSummary?trackBuyTestReportStage.capture():null;
+  if(isSummary) void trackBuyTestReportStage('report_file_selected',reportContext);
   inspectionOcrMeta[kind]=null;
   textArea.value='';
   if(review) review.style.display='none';
   if(selectedFiles.some(item=>item.size>25*1024*1024)||selectedFiles.reduce((sum,item)=>sum+item.size,0)>40*1024*1024){
     inspectionFiles[kind]=isSummary?null:[];
     input.value='';
+    if(isSummary) void trackBuyTestReportStage('report_read_failed',reportContext);
     state.classList.add('show');
     state.textContent='אחד הקבצים גדול מ־25MB או שסך הקבצים גדול מ־40MB. יש לבחור קבצים קטנים יותר.';
     return;
@@ -3497,6 +3513,7 @@ async function handleInspectionFile(input,kind){
   if(selectedFiles.some(item=>!(item.type.startsWith('image/')||item.type==='application/pdf'))){
     inspectionFiles[kind]=isSummary?null:[];
     input.value='';
+    if(isSummary) void trackBuyTestReportStage('report_read_failed',reportContext);
     state.classList.add('show');
     state.textContent='אפשר להעלות תמונה או PDF בלבד.';
     return;
@@ -3578,11 +3595,13 @@ async function handleInspectionFile(input,kind){
     if(!isSummary&&!quality?.ok&&computerOcrTextUsable(recognized)) quality={...quality,ok:true,limited:true};
     if(!quality?.ok) throw new Error('OCR_LOW_QUALITY');
     textArea.value=recognized;
+    if(isSummary) void trackBuyTestReportStage('report_read_ready',reportContext);
     inspectionOcrMeta[kind]={...quality,engine:selectedEngine,visionAttempted,tesseractAttempted,verification};
     state.innerHTML=ocrSuccessHtml(selectedEngine,quality.findings+quality.unknown,verification,{limited:Boolean(quality.limited),isComputer:!isSummary});
     if(isSummary) refreshInspectionHeader(reportKmForEngineWarranty(recognized));
     if(review) review.style.display='block';
   }catch(error){
+    if(isSummary) void trackBuyTestReportStage('report_read_failed',reportContext);
     console.warn('BuyTest document OCR unavailable:',error);
     textArea.value='';
     inspectionOcrMeta[kind]=null;
@@ -5629,20 +5648,23 @@ function inspectionRequesterAdvisoryHtml(advisory){
 }
 
 async function analyseInspectionReport(){
+  if(document.getElementById('analyseReportButton')?.disabled)return;
+  const reportContext=trackBuyTestReportStage.capture();
   const analysisPlate=plate();
+  let reportDisplayed=false;
   btActivateVehicle(analysisPlate);
   const ownerName=document.getElementById('inspectionOwnerName').value.trim();
   const ownership=document.getElementById('inspectionOwnership').checked;
   const summaryText=document.getElementById('examinerSummaryText').value.trim();
   const computerText=document.getElementById('computerTestText').value.trim();
-  if(!inspectionFiles.summary){alert('יש להעלות את קובץ סיכום הבוחן.');return;}
-  if(ownerName.length<2){alert('יש להזין את שם מזמין/ת בדיקת המכון.');return;}
-  if(!ownership){alert('יש לאשר שהדוח על שמך או שיש לך הרשאה מתאימה.');return;}
-  if(summaryText.length<5){alert('לא זוהה טקסט מסיכום הבוחן. יש לצלם מחדש, ישר וקרוב יותר, את אזור הסיכום.');return;}
+  if(!inspectionFiles.summary){void trackBuyTestReportStage('report_validation_blocked',reportContext);alert('יש להעלות את קובץ סיכום הבוחן.');return;}
+  if(ownerName.length<2){void trackBuyTestReportStage('report_validation_blocked',reportContext);alert('יש להזין את שם מזמין/ת בדיקת המכון.');return;}
+  if(!ownership){void trackBuyTestReportStage('report_validation_blocked',reportContext);alert('יש לאשר שהדוח על שמך או שיש לך הרשאה מתאימה.');return;}
+  if(summaryText.length<5){void trackBuyTestReportStage('report_validation_blocked',reportContext);alert('לא זוהה טקסט מסיכום הבוחן. יש לצלם מחדש, ישר וקרוב יותר, את אזור הסיכום.');return;}
   const hasComputerFiles=Array.isArray(inspectionFiles.computer)?inspectionFiles.computer.length>0:Boolean(inspectionFiles.computer);
-  if(hasComputerFiles&&!computerText){alert('הבדיקה הממוחשבת לא נקראה. יש לצלם את העמודים מחדש או להסיר את הקבצים.');return;}
-  if(!inspectionOcrMeta.summary?.ok){alert('הדוח לא נקרא ברמת דיוק שמאפשרת מסקנות. יש להעלות PDF מקורי או צילום קרוב יותר.');return;}
-  if(hasComputerFiles&&!inspectionOcrMeta.computer?.ok){alert('הבדיקה הממוחשבת לא נקראה ברמת דיוק מספקת. יש להעלות קבצים ברורים יותר או להסיר אותה.');return;}
+  if(hasComputerFiles&&!computerText){void trackBuyTestReportStage('report_validation_blocked',reportContext);alert('הבדיקה הממוחשבת לא נקראה. יש לצלם את העמודים מחדש או להסיר את הקבצים.');return;}
+  if(!inspectionOcrMeta.summary?.ok){void trackBuyTestReportStage('report_validation_blocked',reportContext);alert('הדוח לא נקרא ברמת דיוק שמאפשרת מסקנות. יש להעלות PDF מקורי או צילום קרוב יותר.');return;}
+  if(hasComputerFiles&&!inspectionOcrMeta.computer?.ok){void trackBuyTestReportStage('report_validation_blocked',reportContext);alert('הבדיקה הממוחשבת לא נקראה ברמת דיוק מספקת. יש להעלות קבצים ברורים יותר או להסיר אותה.');return;}
 
   const button=document.getElementById('analyseReportButton');
   const status=document.getElementById('analysisStatus');
@@ -5656,16 +5678,18 @@ async function analyseInspectionReport(){
     model:document.getElementById('vModel')?.textContent||'',
     vin:document.getElementById('vVin')?.textContent||''
   };
+  void trackBuyTestReportStage('report_analysis_started',reportContext);
   const data=await callBuyTestAnalyzeService({
     summaryText,
     computerText,
     expected,
     accessToken:buyTestManagerPin?'':(saved?.accessToken||'')
   });
-  if(plate()!==analysisPlate)return;
+  if(plate()!==analysisPlate){void trackBuyTestReportStage('report_result_discarded',reportContext);return;}
   const summaryResult=sanitizeSummaryResult(data.summary,summaryText);
   const computerResult=computerText?data.computer:{findings:[],unknown:[],codes:[],vehicleIdentity:null};
   if(!summaryResult||!Array.isArray(summaryResult.findings)||!computerResult||!Array.isArray(computerResult.findings)) throw new Error('invalid_analysis_response');
+  void trackBuyTestReportStage('report_result_received',reportContext);
   latestSummaryResult=summaryResult;
   latestComputerResult=computerText?computerResult:null;
   latestComputerIdentity=computerResult.vehicleIdentity||null;
@@ -5705,6 +5729,8 @@ async function analyseInspectionReport(){
   const box=document.getElementById('afterInterpretation');
   box.innerHTML=html;
   box.classList.add('show');
+  reportDisplayed=true;
+  void trackBuyTestReportStage('report_result_displayed',reportContext);
   setClarificationFindingOptions([
     ...summaryResult.findings.map(finalizeReportFinding).filter(Boolean),
     ...computerResult.findings.map(finalizeReportFinding).filter(Boolean)
@@ -5722,6 +5748,7 @@ async function analyseInspectionReport(){
   box.scrollIntoView({behavior:'smooth',block:'start'});
   if(status){status.textContent=stageUpdated?'✓ הפענוח הושלם. אפשר לשתף את הסיכום או לבחור בהתייעצות אישית.':'✓ הפענוח הושלם. אפשר לשתף את הסיכום; אפשרות ההתייעצות תתעדכן לאחר חידוש החיבור.';status.classList.add('show');status.classList.remove('error');}
   }catch(error){
+    if(!reportDisplayed) void trackBuyTestReportStage('report_analysis_failed',reportContext);
     if(error?.message==='vehicle_mismatch')btSaveSource('identity',{title:'אי־התאמה בשיוך דוח המכון',text:'דוח שאינו תואם לרכב לא צורף כממצא על הרכב.',alerts:['מספר הרכב בדוח המכון אינו תואם לרכב '+analysisPlate+'. יש לאמת את המספרים מול דוח המקור.']},analysisPlate);
     console.error('BuyTest secure analysis error:',error);
     const messages={
