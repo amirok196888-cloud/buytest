@@ -34,7 +34,7 @@
     document.body.classList.toggle('bt-checklist-access',hasChecklist());
     document.body.classList.toggle('bt-insurance-access',manager()||Boolean(receipt('balcar')));
     const paywall=document.getElementById('reportBundlePaywall');if(paywall)paywall.hidden=hasReport();
-    const button=document.getElementById('buyBundle39');if(button){button.textContent=hasChecklist()?'כניסה לצ׳קליסט':'פתיחת הצ׳קליסט — 39 ₪';button.hidden=false;}
+    const button=document.getElementById('buyBundle39');if(button){button.textContent=hasChecklist()?'כניסה לתהליך הבדיקה':'כניסה לתהליך הבדיקה — 39 ₪';button.hidden=false;}
     if(!hasChecklist())document.getElementById('vehicleChecklist').hidden=true;
   }
   async function unlock(intent='checklist'){
