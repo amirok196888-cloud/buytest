@@ -12,6 +12,7 @@ function cleanOcrText(text){return String(text||'').replace(/\r/g,'').replace(/[
 function diagnosticTableText(text){const cleaned=cleanOcrText(text);const marker=/הערות\s*כלליות|לחזור\s+לה\s*משך\s+בדיקה\s+לאחר\s+תיקון|יש\s+לברר\s+זמני\s+טיפולים/i;const match=marker.exec(cleaned);return match&&match.index>180?cleaned.slice(0,match.index).trim():cleaned}
 
 const findingKnowledgeBase=[
+  {id:'severe-accident-explicit',terms:['רכב לאחר תאונה קשה','לאחר תאונה קשה'],patterns:[/רכב\s*לאחר\s*תאונה\s*קשה/],category:'שלדת מרכב',tag:'משמעות גבוהה',tone:'safety',classification:'repair_history_or_evidence',reportSeverity:'high',meaning:'דוח המכון מציין במפורש שהרכב לאחר תאונה קשה.',decision:'זהו עבר תאונתי חמור לפי דוח המכון. לפני החלטה על רכישה יש לברר את היקף הפגיעה המבנית, איכות התיקונים, התאמת המרכב לנתוני היצרן וירידת הערך עם שמאי.'},
   {id:'engine-oil-sweat-report',terms:['סימני הזעה שמן מנוע','סימני הזעת שמן מנוע'],patterns:[/סימני\s*הזע[הת]?\s*שמן/],category:'מנוע',tag:'משמעות בינונית',tone:'clarify',classification:'actual_finding',reportSeverity:'medium',suppresses:['oil-sweat'],meaning:'נרשמו סימני הזעת שמן במנוע. זו לחות שמנונית, ויש להבדיל בינה לבין נזילה פעילה.',decision:'יש לאתר את מקור ההזעה ולבדוק אם היא קלה ויבשה או פעילה. יש להביא בחשבון טיפול באטימה לפי הממצאים.'},
   {id:'engine-internal-knocks-report',terms:['נקישות פנימיות','רעשים ונקישות פנימיות'],patterns:[/נקיש[א-ת]*\s*פנימ/],category:'מנוע',tag:'משמעות גבוהה',tone:'safety',classification:'actual_finding',reportSeverity:'high',meaning:'נרשמו נקישות פנימיות במנוע. זהו ממצא מכני ממשי, גם כאשר מקורו המדויק עדיין לא אובחן.',decision:'יש לבצע אבחון מנוע ממוקד ולהעריך את מקור הנקישות ואת עלות הטיפול לפני קבלת החלטה.'},
   {id:'cooling-corrosion-connections-report',terms:['קורוזיה וסימני נזילה בחיבורים','קורוזיה בחיבורים','קורוזיה וסימני'],patterns:[/קורוזיה.*(?:חיבור|וסימני)/],category:'מערכת הקירור',tag:'משמעות בינונית',tone:'clarify',classification:'actual_finding',reportSeverity:'medium',meaning:'נרשמה קורוזיה באזור חיבורי מערכת הקירור.',decision:'יש לבדוק את החיבורים, הצנרת ומקור סימני הרטיבות ולהביא בחשבון תיקון ודליפה אפשרית.'},
@@ -1678,20 +1679,44 @@ function interpretSummaryText(text){
     const lineSeverity=reportSeverityFromLine(line);
     if(lineSeverity){
       currentSeverity=lineSeverity;
-      if(chassisHint) currentCategory=chassisHint;
+      currentCategory=chassisHint||'שלדת מרכב';
     }
     const contentLine=stripReportScaffolding(line,lineCategory,lineSeverity);
     if(!contentLine||isReportStatusScaffolding(contentLine)||isExplicitlyNormal(contentLine)) return;
-    const candidateLines=[contentLine];
-    if(lines[index+1]) candidateLines.push(contentLine+' '+stripReportScaffolding(lines[index+1],reportCategoryFromLine(lines[index+1]),reportSeverityFromLine(lines[index+1])));
-    if(lines[index+1]&&lines[index+2]) candidateLines.push(contentLine+' '+stripReportScaffolding(lines[index+1],reportCategoryFromLine(lines[index+1]),reportSeverityFromLine(lines[index+1]))+' '+stripReportScaffolding(lines[index+2],reportCategoryFromLine(lines[index+2]),reportSeverityFromLine(lines[index+2])));
-    const rules=candidateLines.flatMap(candidate=>findKnowledgeRules(candidate,currentCategory));
+    let observedCandidate=contentLine;
+    let rules=findKnowledgeRules(contentLine,currentCategory);
+    if(!rules.length){
+      let continued=contentLine;
+      for(let offset=1;offset<=2;offset++){
+        const nextLine=lines[index+offset];
+        if(!nextLine||reportCategoryFromLine(nextLine)||reportSeverityFromLine(nextLine)) break;
+        const nextContent=stripReportScaffolding(nextLine,'',null);
+        if(!nextContent) break;
+        continued+=' '+nextContent;
+        const continuedRules=findKnowledgeRules(continued,currentCategory);
+        if(continuedRules.length){rules=continuedRules;observedCandidate=continued;break;}
+      }
+    }
+    const diagnosisSignal=/(תאונה|תיקונ|תיקון|פגיע|הלחמ|חיבור.*לא מקורי|עמוד|משקופ|נקיש|פגומ|זוויות.*היגוי|היגוי.*כיוון|ירידת ערך|הוחלפ|החלפ|לבדוק|סריקת מחשב|תקל|שחוק|רעש|צריכת שמן|חסר|לא מתקפל|שריט|מעיכ|פגמי|קרוע|שבור|נזיל|דליפ|חופש)/.test(normalizeFindingText(contentLine));
+    const fullCoverage=rules.some(rule=>normalizeFindingText(rule.sourceText||rule.matchedTerm||'')===normalizeFindingText(contentLine));
+    if(currentCategory&&(diagnosisSignal||currentSeverity==='high')&&!fullCoverage&&!isMetadataLine(contentLine)){
+      const severity=currentSeverity||rules.find(rule=>rule.category===currentCategory&&rule.reportSeverity)?.reportSeverity||null;
+      const sourceRule={id:'report-diagnosis-'+index,category:currentCategory,
+        sourceText:contentLine,observedText:contentLine,verbatimDiagnosis:true,
+        classification:'source_diagnosis',reportSeverity:severity,
+        tag:reportSeverityLabels[severity]||'אבחנה מהדוח — נדרש בירור',
+        tone:severity==='high'?'safety':'clarify',
+        meaning:'בדוח נרשם במפורש: „'+contentLine+'”.',
+        decision:severity==='high'?'הממצא נכלל במשמעות גבוהה בדוח המכון. יש לאמת את היקף הנזק ואיכות התיקון לפני החלטה על רכישה.':'יש לברר את האבחנה מול המכון או בעל מקצוע מתאים; אין להסיק רכיב או תקלה שלא נכתבו בדוח.'};
+      rules.push(sourceRule);
+    }
+    rules=rules.map(rule=>({...rule,observedText:rule.observedText||observedCandidate}));
     if(rules.length){
       rules.forEach(rule=>{
         const enriched=applyReportSeverity(rule,currentSeverity,currentCategory);
         const sourceKey=normalizeFindingText(enriched.sourceText||enriched.matchedTerm||enriched.meaning||'');
         const duplicateIndex=findings.findIndex(existing=>{
-          if(existing.id!==enriched.id) return false;
+          if(existing.id!==enriched.id||existing.reportSeverity!==enriched.reportSeverity) return false;
           const existingSource=normalizeFindingText(existing.sourceText||existing.matchedTerm||existing.meaning||'');
           return existingSource===sourceKey||existingSource.includes(sourceKey)||sourceKey.includes(existingSource);
         });
@@ -1701,7 +1726,7 @@ function interpretSummaryText(text){
           if(sourceKey.length>existingSource.length) findings[duplicateIndex]=enriched;
           return;
         }
-        const findingKey=[enriched.id,sourceKey].join('|');
+        const findingKey=[enriched.id,sourceKey,enriched.reportSeverity].join('|');
         if(!seen.has(findingKey)){findings.push(enriched);seen.add(findingKey);}
       });
     }else if(isPotentialUnknownFindingLine(contentLine)){
@@ -2160,4 +2185,3 @@ async function saveOverrides(bodies){if(!Array.isArray(bodies)||!bodies.length||
 async function deleteOverride(body){const sourceKind=String(body.source_kind||'');const sourceId=String(body.source_id||'');if(!['knowledge','formula','observed','custom'].includes(sourceKind)||!sourceId)throw new Error('invalid_override');await serviceRequest('/rest/v1/buytest_formula_overrides?source_kind=eq.'+encodeURIComponent(sourceKind)+'&source_id=eq.'+encodeURIComponent(sourceId),{method:'DELETE',headers:{Prefer:'return=minimal'}});return true}
 
 Deno.serve(async req=>{const origin=req.headers.get('origin');if(req.method==='OPTIONS'){if(origin!==ALLOWED_ORIGIN)return json(origin,{ok:false,error:'origin_not_allowed'},403);return new Response(null,{status:204,headers:cors(origin)})}if(req.method!=='POST')return json(origin,{ok:false,error:'method_not_allowed'},405);if(origin!==ALLOWED_ORIGIN)return json(origin,{ok:false,error:'origin_not_allowed'},403);let body;try{body=await req.json()}catch{return json(origin,{ok:false,error:'invalid_json'},400)}try{const admin=await isAdmin(req.headers.get('x-buytest-manager-pin')||body.adminPin);if(body.action==='adminCatalog'){if(!admin)return json(origin,{ok:false,error:'admin_denied'},403);return json(origin,{ok:true,rows:adminCatalog(),overrides:await overrides()})}if(body.action==='adminSaveOverride'){if(!admin)return json(origin,{ok:false,error:'admin_denied'},403);return json(origin,{ok:true,row:await saveOverride(body.row||{})})}if(body.action==='adminSaveOverrides'){if(!admin)return json(origin,{ok:false,error:'admin_denied'},403);return json(origin,{ok:true,rows:await saveOverrides(body.rows||[])})}if(body.action==='adminDeleteOverride'){if(!admin)return json(origin,{ok:false,error:'admin_denied'},403);await deleteOverride(body.row||{});return json(origin,{ok:true})}const entitlement=admin?{scopes:['report'],plate:String(body?.expected?.plate||'').replace(/\D/g,'')}:await verifyEntitlement(body.accessToken);if(!entitlement||!entitlement.scopes.includes('report'))return json(origin,{ok:false,error:'paid_report_required'},403);const summaryText=String(body.summaryText||'');const computerText=String(body.computerText||'');if(summaryText.length>250000||computerText.length>250000)return json(origin,{ok:false,error:'text_too_large'},413);if(summaryText.length<5&&!computerText)return json(origin,{ok:false,error:'missing_report_text'},400);const expected=body.expected&&typeof body.expected==='object'?body.expected:{};if(!admin&&String(entitlement.plate)!==String(expected.plate||'').replace(/\D/g,''))return json(origin,{ok:false,error:'vehicle_mismatch'},409);const rows=await overrides();const summary=summaryText?sourceGroundedSummaryResult(applyCustomRules(summaryText,applyServerOverrides(interpretSummaryText(summaryText),rows),rows),summaryText):null;const computer=computerText?applyServerOverrides(interpretComputerText(computerText,expected),rows):null;return json(origin,{ok:true,summary,computer})}catch(error){console.error('BuyTest analyzer error',error);return json(origin,{ok:false,error:error?.message==='invalid_override'?'invalid_override':'analysis_failed'},error?.message==='invalid_override'?400:500)}});
-

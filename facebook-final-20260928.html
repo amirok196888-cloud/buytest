@@ -183,6 +183,7 @@ body.plan-prebuy .prePurchaseConsultationBox{display:block}
 .preVisitAd{margin-top:14px;border:1px solid #cfe1dc;border-radius:14px;background:#fff;overflow:hidden}.preVisitAd summary{padding:14px 15px;cursor:pointer;font-weight:900;color:#075e48}.preVisitAdBody{padding:0 15px 15px}.preVisitUpload{display:block;padding:15px;border:2px dashed #acd0c5;border-radius:12px;background:#f8fcfb;text-align:center;color:#276556;font-weight:850;cursor:pointer}.preVisitUpload input{display:none}.preVisitAdImage{display:none;width:100%;max-height:330px;object-fit:contain;margin-top:10px;border-radius:12px;background:#edf2f3}.preVisitAdImage.show{display:block}.preVisitCompare{display:none;margin-top:10px}.preVisitCompare.show{display:grid;gap:7px}.preVisitCompare div{padding:10px 12px;border:1px solid #dce8e4;border-radius:11px;background:#fff}.preVisitCompare b{display:block}.preVisitCompare small{display:block;margin-top:2px;color:#60717a;line-height:1.45}
 @media(max-width:520px){.preVisitFacts,.preVisitActions{grid-template-columns:1fr}.preVisitFact.wide{grid-column:auto}}
 .btUnifiedSummary{margin:20px 0;text-align:right;overflow-wrap:anywhere}.btUnifiedSummary p{white-space:pre-line}.btCritical{color:#a40019!important;background:#fff0f2;border-right:6px solid #d00025;padding:16px;font-weight:800;line-height:1.7}
+.meaningConclusion{padding:12px 14px;margin:12px 0;border-radius:12px;border-right:5px solid}.meaningConclusion.high{background:#fff0ef;border-color:#b42318;color:#7a2019}.meaningConclusion.medium,.categorySummaryCard.medium{background:#fff3e7;border-color:#c65b08;color:#874006}.meaningConclusion.low{background:#fffbe5;border-color:#b78a00;color:#665100}.overallProfessionalConclusion .meaningConclusion h5{color:inherit;margin-top:0}
 </style><style>#appShell{display:block!important}
 /* BuyTest V20 – light commercial landing + improved value-first flow */
 :root{--bg:#f5f7f8;--card:#ffffff;--card2:#f8fafb;--line:#d9e2e6;--txt:#17242b;--muted:#60717a;--a:#0fa87e;--warn:#9b6b00;--bad:#bd3030}
@@ -3616,6 +3617,7 @@ async function handleInspectionFile(input,kind){
 }
 
 const findingKnowledgeBase=[
+  {id:'severe-accident-explicit',terms:['רכב לאחר תאונה קשה','לאחר תאונה קשה'],patterns:[/רכב\s*לאחר\s*תאונה\s*קשה/],category:'שלדת מרכב',tag:'משמעות גבוהה',tone:'safety',classification:'repair_history_or_evidence',reportSeverity:'high',meaning:'דוח המכון מציין במפורש שהרכב לאחר תאונה קשה.',decision:'זהו עבר תאונתי חמור לפי דוח המכון. לפני החלטה על רכישה יש לברר את היקף הפגיעה המבנית, איכות התיקונים, התאמת המרכב לנתוני היצרן וירידת הערך עם שמאי.'},
   {id:'engine-oil-sweat-report',terms:['סימני הזעה שמן מנוע','סימני הזעת שמן מנוע'],patterns:[/סימני\s*הזע[הת]?\s*שמן/],category:'מנוע',tag:'משמעות בינונית',tone:'clarify',classification:'actual_finding',reportSeverity:'medium',suppresses:['oil-sweat'],meaning:'נרשמו סימני הזעת שמן במנוע. זו לחות שמנונית, ויש להבדיל בינה לבין נזילה פעילה.',decision:'יש לאתר את מקור ההזעה ולבדוק אם היא קלה ויבשה או פעילה. יש להביא בחשבון טיפול באטימה לפי הממצאים.'},
   {id:'engine-internal-knocks-report',terms:['נקישות פנימיות','רעשים ונקישות פנימיות'],patterns:[/נקיש[א-ת]*\s*פנימ/],category:'מנוע',tag:'משמעות גבוהה',tone:'safety',classification:'actual_finding',reportSeverity:'high',meaning:'נרשמו נקישות פנימיות במנוע. זהו ממצא מכני ממשי, גם כאשר מקורו המדויק עדיין לא אובחן.',decision:'יש לבצע אבחון מנוע ממוקד ולהעריך את מקור הנקישות ואת עלות הטיפול לפני קבלת החלטה.'},
   {id:'cooling-corrosion-connections-report',terms:['קורוזיה וסימני נזילה בחיבורים','קורוזיה בחיבורים','קורוזיה וסימני'],patterns:[/קורוזיה.*(?:חיבור|וסימני)/],category:'מערכת הקירור',tag:'משמעות בינונית',tone:'clarify',classification:'actual_finding',reportSeverity:'medium',meaning:'נרשמה קורוזיה באזור חיבורי מערכת הקירור.',decision:'יש לבדוק את החיבורים, הצנרת ומקור סימני הרטיבות ולהביא בחשבון תיקון ודליפה אפשרית.'},
@@ -4868,7 +4870,7 @@ function interpretSummaryText(text){
     const lineSeverity=reportSeverityFromLine(line);
     if(lineSeverity){
       currentSeverity=lineSeverity;
-      if(chassisHint) currentCategory=chassisHint;
+      currentCategory=chassisHint||'שלדת מרכב';
     }
     const contentLine=stripReportScaffolding(line,lineCategory,lineSeverity);
     if(!contentLine||isReportStatusScaffolding(contentLine)||isExplicitlyNormal(contentLine)) return;
@@ -4886,13 +4888,26 @@ function interpretSummaryText(text){
         if(continuedRules.length){rules=continuedRules;observedCandidate=continued;break;}
       }
     }
-    rules=rules.map(rule=>({...rule,observedText:observedCandidate}));
+    const diagnosisSignal=/(תאונה|תיקונ|תיקון|פגיע|הלחמ|חיבור.*לא מקורי|עמוד|משקופ|נקיש|פגומ|זוויות.*היגוי|היגוי.*כיוון|ירידת ערך|הוחלפ|החלפ|לבדוק|סריקת מחשב|תקל|שחוק|רעש|צריכת שמן|חסר|לא מתקפל|שריט|מעיכ|פגמי|קרוע|שבור|נזיל|דליפ|חופש)/.test(normalizeFindingText(contentLine));
+    const fullCoverage=rules.some(rule=>normalizeFindingText(rule.sourceText||rule.matchedTerm||'')===normalizeFindingText(contentLine));
+    if(currentCategory&&(diagnosisSignal||currentSeverity==='high')&&!fullCoverage&&!isMetadataLine(contentLine)){
+      const severity=currentSeverity||rules.find(rule=>rule.category===currentCategory&&rule.reportSeverity)?.reportSeverity||null;
+      const sourceRule={id:'report-diagnosis-'+index,category:currentCategory,
+        sourceText:contentLine,observedText:contentLine,verbatimDiagnosis:true,
+        classification:'source_diagnosis',reportSeverity:severity,
+        tag:reportSeverityLabels[severity]||'אבחנה מהדוח — נדרש בירור',
+        tone:severity==='high'?'safety':'clarify',
+        meaning:'בדוח נרשם במפורש: „'+contentLine+'”.',
+        decision:severity==='high'?'הממצא נכלל במשמעות גבוהה בדוח המכון. יש לאמת את היקף הנזק ואיכות התיקון לפני החלטה על רכישה.':'יש לברר את האבחנה מול המכון או בעל מקצוע מתאים; אין להסיק רכיב או תקלה שלא נכתבו בדוח.'};
+      rules.push(sourceRule);
+    }
+    rules=rules.map(rule=>({...rule,observedText:rule.observedText||observedCandidate}));
     if(rules.length){
       rules.forEach(rule=>{
         const enriched=applyReportSeverity(rule,currentSeverity,currentCategory);
         const sourceKey=normalizeFindingText(enriched.sourceText||enriched.matchedTerm||enriched.meaning||'');
         const duplicateIndex=findings.findIndex(existing=>{
-          if(existing.id!==enriched.id) return false;
+          if(existing.id!==enriched.id||existing.reportSeverity!==enriched.reportSeverity) return false;
           const existingSource=normalizeFindingText(existing.sourceText||existing.matchedTerm||existing.meaning||'');
           return existingSource===sourceKey||existingSource.includes(sourceKey)||sourceKey.includes(existingSource);
         });
@@ -4902,7 +4917,7 @@ function interpretSummaryText(text){
           if(sourceKey.length>existingSource.length) findings[duplicateIndex]=enriched;
           return;
         }
-        const findingKey=[enriched.id,sourceKey].join('|');
+        const findingKey=[enriched.id,sourceKey,enriched.reportSeverity].join('|');
         if(!seen.has(findingKey)){findings.push(enriched);seen.add(findingKey);}
       });
     }else if(isPotentialUnknownFindingLine(contentLine)){
@@ -5311,7 +5326,7 @@ function meaningCardHtml(item){
   return `<div class="meaningCard ${item.tone||''}"><span class="meaningTag">${escapeHtml(item.tag||formulaClassificationLabels[item.classification]||'סיווג מקצועי')}</span><h4>${heading}</h4><p><b>מה זה אומר:</b> ${escapeHtml(meaning)}</p><p><b>${decisionLabel}</b> ${escapeHtml(decision)}</p>${context}${source}</div>`;
 }
 
-const compactSeverityRank={high:3,low:2,marginal:1,active:3,unresolved:2,historical:1};
+const compactSeverityRank={high:4,medium:3,review:2,low:2,marginal:1,active:3,unresolved:2,historical:1};
 const automatedInterpretationDisclaimer='טל״ח: בפענוח אוטומטי עלולות להתרחש טעויות זיהוי, תמלול, שיוך או פרשנות. במקרה של אי־התאמה, דוח המקור גובר. אין להסתמך על ממצא שאינו מופיע בדוח המקורי.';
 const professionalConclusionDisclaimer='הסיכום מבוסס רק על המסמכים והטקסט שהועלו למערכת ואינו בדיקה פיזית עצמאית של הרכב. הוא אינו קובע שהרכב תקין או בטוח, אינו הערכת שווי ואינו המלצה לבצע או להימנע מעסקה. יש לאמת את הממצאים מול דוח המקור ובעל מקצוע מתאים. '+automatedInterpretationDisclaimer;
 
@@ -5372,9 +5387,11 @@ function batteryFindingInfo(item){
 function summarySeverityBucket(item){
   const battery=batteryFindingInfo(item);
   if(battery) return battery.bucket;
+  if(item?.classification==='source_diagnosis'&&!item?.reportSeverity) return 'review';
   const severity=item?.reportSeverity||item?.dtcSeverity||'';
   if(severity==='high'||severity==='safety') return 'high';
-  if(['medium','low','minor'].includes(severity)) return 'low';
+  if(severity==='medium') return 'medium';
+  if(['low','minor'].includes(severity)) return 'low';
   if(['information','recommendation','limitation_or_disclaimer'].includes(item?.classification)||severity==='none') return 'marginal';
   if(item?.tone==='safety') return 'high';
   return 'low';
@@ -5456,7 +5473,7 @@ function computerStatusBucket(item){
 }
 
 function severityTag(bucket){
-  return {high:'משמעות גבוהה',low:'משמעות נמוכה',marginal:'משמעות שולית',active:'תקלות פעילות בזמן הסריקה',historical:'תקלות עבר — לידיעה',unresolved:'מצב התקלה לא הוכרע'}[bucket]||'סיכום';
+  return {high:'משמעות גבוהה',medium:'משמעות בינונית',review:'אבחנות לבירור',low:'משמעות נמוכה',marginal:'משמעות שולית',active:'תקלות פעילות בזמן הסריקה',historical:'תקלות עבר — לידיעה',unresolved:'מצב התקלה לא הוכרע'}[bucket]||'סיכום';
 }
 
 function groupDecision(category,bucket,items){
@@ -5470,6 +5487,8 @@ function groupDecision(category,bucket,items){
   if(bucket==='active') return 'הקודים מסומנים כתקלות פעילות בזמן הסריקה. יש לבצע אבחון ממוחשב, לברר ולתקן בהתאם לממצא המאומת.';
   if(bucket==='unresolved') return 'מצב הקודים לא הובהר בדוח. אין לקבוע אם הם פעילים או היסטוריים לפני אימות בסורק מתאים.';
   if(bucket==='marginal') return 'המידע מוצג לידיעה ואינו מהווה תקלה בפני עצמו, אלא אם נרשם לצדו ממצא נוסף.';
+  if(bucket==='review') return 'אבחנות אלה נשמרו כלשונן מהדוח. לא הוגדרה להן חומרה אוטומטית; יש להשלים בירור מול המכון או בעל מקצוע מתאים.';
+  if(bucket==='medium') return `הממצאים ב${category} דורשים בירור ממוקד וטיפול לפי הממצאים המאומתים.`;
   if(bucket==='high'){
     if(/מנוע/.test(category)) return 'נרשמו במנוע ממצאים בעלי משמעות גבוהה. יש להשלים אבחון מנוע ממוקד כדי לקבוע את מקורם ואת היקף הטיפול הנדרש.';
     if(/תיבת הילוכים/.test(category)) return 'נרשמו בתיבת ההילוכים ממצאים בעלי משמעות גבוהה. יש להשלים אבחון ממוקד של התיבה ומערכת העברת הכוח.';
@@ -5502,7 +5521,7 @@ function compactAnalysisGroups(result,isComputer=false){
     const communication=isComputer&&group.items.every(isCommunicationFinding);
     let bullets=communication
       ? [communicationGroupBullet(group.items,group.bucket)]
-      : compactUniqueTexts(group.items.map(item=>conciseFindingFact(item,isComputer)));
+      : compactUniqueTexts(group.items.filter(item=>isComputer||item.verbatimDiagnosis||!group.items.some(other=>other.verbatimDiagnosis&&normalizeFindingText(other.sourceText)===normalizeFindingText(item.observedText))).map(item=>conciseFindingFact(item,isComputer)));
     if(isComputer&&!communication&&group.bucket==='active') bullets=bullets.map(line=>`תקלה פעילה בזמן הסריקה: ${line}`);
     if(isComputer&&!communication&&group.bucket==='historical') bullets=bullets.map(line=>`תקלה היסטורית בזיכרון: ${line}`);
     return {
@@ -5562,22 +5581,21 @@ function corePurchaseSystemForFinding(item){
 }
 
 function professionalOverallConclusion(result,computerResult=null){
-  const highSystems=[...new Set((result?.findings||[])
-    .map(finalizeReportFinding).filter(Boolean)
-    .filter(item=>summarySeverityBucket(item)==='high')
-    .map(corePurchaseSystemForFinding).filter(Boolean))];
-  let highConclusion='';
-  if(highSystems.length){
-    highConclusion=`על פי הדוח שהתקבל, ${hebrewSystemList(highSystems)} נרשמו ממצאים בעלי משמעות גבוהה. ממצאים אלה עשויים להשפיע באופן מהותי על מצב הרכב ועל היקף הטיפול הנדרש. יש לברר את מקורם והיקפם לפני קבלת החלטה לגבי המשך התהליך.`;
-  }
-  const lowConclusion='על פי הדוח שהתקבל, נרשמו ממצאים בעלי משמעות נמוכה. השפעתם העיקרית היא על היקף הטיפול וההוצאה הצפויה. יש לבדוק את התיקונים הנדרשים ולהביאם בחשבון מבחינה כלכלית, אך הם אינם משנים לבדם את הערכת שלוש המערכות המרכזיות.';
-  return {highConclusion,lowConclusion,disclaimer:professionalConclusionDisclaimer};
+  const groups=compactAnalysisGroups(result,false);
+  const describe=bucket=>groups.filter(group=>group.severity===bucket)
+    .map(group=>group.category+': '+group.bullets.join('; ')).join('. ');
+  const highFacts=describe('high'),mediumFacts=describe('medium'),lowFacts=describe('low');
+  const highConclusion=highFacts?'על פי דוח המכון, נרשמו הממצאים הבאים במשמעות גבוהה: '+highFacts+'. יש לברר את היקף הנזק או התקלה, איכות התיקונים והשלכותיהם לפני החלטה על רכישה.':'';
+  const mediumConclusion=mediumFacts?'ממצאים במשמעות בינונית: '+mediumFacts+'. יש להשלים בירור מקצועי וטיפול לפי הממצאים המאומתים.':'';
+  const lowConclusion=lowFacts?'ממצאים במשמעות נמוכה: '+lowFacts+'. יש להביא בחשבון את היקף הטיפול וההוצאה. ממצאים אלה אינם מבטלים או מפחיתים את חומרת הממצאים במשמעות גבוהה.':'';
+  return {highConclusion,mediumConclusion,lowConclusion,disclaimer:professionalConclusionDisclaimer};
 }
 
 function professionalOverallConclusionHtml(result,computerResult=null){
   const conclusion=professionalOverallConclusion(result,computerResult);
-  const high=conclusion.highConclusion?`<h5>מסקנת משמעות גבוהה</h5><p>${escapeHtml(conclusion.highConclusion)}</p>`:'';
-  return `<section class="overallProfessionalConclusion"><h4>תמונה מקצועית מסכמת</h4>${high}<h5>מסקנת משמעות נמוכה</h5><p>${escapeHtml(conclusion.lowConclusion)}</p><span class="legalConclusion">${escapeHtml(conclusion.disclaimer)}</span></section>`;
+  const blocks=[['high','גבוהה',conclusion.highConclusion],['medium','בינונית',conclusion.mediumConclusion],['low','נמוכה',conclusion.lowConclusion]]
+    .filter(([, ,text])=>text).map(([severity,label,text])=>`<section class="meaningConclusion ${severity}"><h5>מסקנת משמעות ${label}</h5><p>${escapeHtml(text)}</p></section>`).join('');
+  return `<section class="overallProfessionalConclusion"><h4>תמונה מקצועית מסכמת</h4>${blocks}<span class="legalConclusion">${escapeHtml(conclusion.disclaimer)}</span></section>`;
 }
 
 function compactAnalysisHtml(result,isComputer=false){
@@ -5609,7 +5627,9 @@ function analysisTextBlock(title,result,computerResult=null){
     const conclusion=professionalOverallConclusion(result,computerResult);
     text+='תמונה מקצועית מסכמת\n';
     if(conclusion.highConclusion) text+=`מסקנת משמעות גבוהה\n• ${conclusion.highConclusion}\n`;
-    text+=`מסקנת משמעות נמוכה\n• ${conclusion.lowConclusion}\n• הבהרה: ${conclusion.disclaimer}\n`;
+    if(conclusion.mediumConclusion) text+=`מסקנת משמעות בינונית\n• ${conclusion.mediumConclusion}\n`;
+    if(conclusion.lowConclusion) text+=`מסקנת משמעות נמוכה\n• ${conclusion.lowConclusion}\n`;
+    text+=`הבהרה: ${conclusion.disclaimer}\n`;
   }
   if(!groups.length) text+='• לא זוהו ממצאים שניתן לסווג אוטומטית. יש להסתמך על דוח המקור ולברר כל ממצא מהותי עם בעל מקצוע.\n';
   return text.trim();
