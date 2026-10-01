@@ -315,7 +315,7 @@ button{min-height:44px;cursor:pointer}button:disabled{cursor:not-allowed;opacity
 @media(max-width:700px){.mktHero{padding:19px 0 38px}.mktHero h1{font-size:clamp(31px,8vw,41px)}.credentials{gap:4px 9px;padding:13px}.credentials h2{font-size:16px}.credentialsName{font-size:14px}.credentialsResume{font-size:12px}.routeCards{grid-template-columns:1fr}.routeCard.free{grid-column:auto}.landingFreeStart{grid-template-columns:1fr}.landingFreeStart .mktBtn{width:100%;white-space:normal}.landingFreeStart .landingFreeExplanation{grid-column:auto}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 .reportChoiceActions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.reportChoiceActions button{width:100%;min-height:64px;margin:0;padding:12px 10px;font-size:18px;font-weight:900;line-height:1.3;white-space:normal}.reportChoiceActions .secondary{background:#fff;color:#075e48;border:1px solid #84cbb6}.reportChoiceNote{margin:8px 0 0;color:#50666f;font-size:13px}.postReportConsultation{display:none;margin-top:15px;padding:17px;border:1px solid #a5d7c7;border-radius:15px;background:#f1faf6}.postReportConsultation h3{margin:0 0 7px}.postReportConsultation p{margin:0 0 10px}.plan-report.report-complete .postReportConsultation{display:block}.postReportConsultation button,#consultationPlanButton{font-size:18px;font-weight:900}@media(max-width:560px){.reportChoiceActions{gap:7px}.reportChoiceActions button{font-size:16px;min-height:68px;padding:10px 6px}}
-</style><meta name="buytest-build" content="buytest-v131-launch-bundle39-checklist">
+</style><meta name="buytest-build" content="buytest-v132-smooth-vehicle-flow">
 <style>
 body.after-page #marketingLanding,body.after-page #appShell{display:none!important}
 body.after-page #afterPage{display:block!important}
@@ -327,7 +327,7 @@ body.after-page #afterPage{display:block!important}
 .mktProfile .mktProfileName{font-size:26px;font-weight:900;margin:8px 0;color:#fff}
 @media(max-width:650px){.topSiteNav{flex-wrap:wrap}.topSiteNavLinks{flex-wrap:wrap;justify-content:center}}
 </style><link rel="stylesheet" href="vehicle-notes.css?v=1">
-<link rel="stylesheet" href="opening-20260928.css?v=1"><style id="compact-free-flow">
+<link rel="stylesheet" href="opening-20260928.css?v=2"><style id="compact-free-flow">
 #afterInsuranceChoices,#licenseFlowPrompt{padding:16px;margin:14px 0;border-radius:18px}
 #afterInsuranceChoices h2,#licenseFlowPrompt h2{font-size:19px;line-height:1.35;margin:0 0 10px}
 #afterInsuranceChoices button,#licenseFlowPrompt button{font-size:16px;line-height:1.3;min-height:44px;padding:10px 16px;border-radius:12px;box-shadow:none}
@@ -354,7 +354,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 <div class="btResume"><strong>עמוס רוקח</strong><span>15 שנות ניסיון בבדיקות קנייה</span><small>הנדסאי רכב · מנהל מוסך מוסמך · בוחן רישוי</small></div>
 <div class="btLaunchOffer"><strong>כל הבדיקה הדיגיטלית לרכב אחד — מחיר השקה 39 ₪</strong><span>צ׳קליסט מלא · עבר ביטוחי · פענוח דוח מכון · שני סיכומים</span><small>תשלום חד־פעמי · גישה ל־30 ימים · התייעצות אישית בנפרד</small></div>
 <div class="btServices" id="serviceChoices" aria-label="בחירת שירות">
-<button class="btService btVehicle" type="button" aria-controls="beforeInspectionRoute" aria-expanded="false" data-analytics-click="click_before_route" onclick="openInspectionRoute('before')"><span class="btSymbol" aria-hidden="true">⌕</span><span><strong>בדיקת רכב</strong><small>נתונים ותובנות · בחינם</small></span></button>
+<button class="btService btVehicle" type="button" aria-controls="beforeInspectionRoute" aria-expanded="false" data-analytics-click="click_before_route" onclick="openInspectionRoute('before')"><span><strong>קבלת נתוני הרכב בחינם</strong><small>נתונים ממאגר משרד התחבורה</small></span></button>
 <button class="btService btReport" type="button" data-analytics-click="click_after_route" onclick="openAfterPage()"><span class="btSymbol" aria-hidden="true">▤</span><span><strong>פענוח דוח</strong><small>כלול בחבילה · 39 ₪</small></span></button>
 <button class="btService btConsult" type="button" data-analytics-click="click_consultation_plan" onclick="openConsultationPage()"><span class="btSymbol" aria-hidden="true">☏</span><span><strong>התייעצות עם הבוחן</strong><small>ייעוץ אישי עם עמוס · 149 ₪</small></span><span aria-hidden="true">←</span></button>
 </div><button class="btTourButton" type="button" onclick="openBuyTestTour()">איך זה עובד? ▶</button>
@@ -364,7 +364,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
   <h2>עומד לקנות רכב — בטוח שאתה יודע מה צריך לבדוק?</h2><p>הזן מספר רכב ונציג לך את הנתונים הזמינים במאגר משרד התחבורה — בחינם.</p>
   <div class="landingFreeStart">
       <input id="plate" inputmode="numeric" maxlength="8" autocomplete="off" aria-label="מספר רכב" placeholder="מה מספר הרכב?" oninput="sanitizePlateInput(this);this.setCustomValidity('')" onkeydown="if(event.key==='Enter')startFreeCheckFromLanding()">
-      <button class="mktBtn mktBtnPrimary" type="button" data-analytics-click="click_landing_free" onclick="startFreeCheckFromLanding()">הצגת נתוני הרכב בחינם ←</button>
+      <button class="mktBtn mktBtnPrimary" type="button" data-analytics-click="click_landing_free" onclick="startFreeCheckFromLanding()">קבלת נתוני הרכב בחינם</button>
       <p class="landingFreeExplanation">נתוני הרכב בחינם. צ׳קליסט, עבר ביטוחי ופענוח דוח המכון כלולים בחבילה אחת לרכב — 39 ₪.</p>
   </div>
 </section>
@@ -475,7 +475,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
   <p class="bundleScope">צ׳קליסט מלא, עבר ביטוחי ופענוח דוח המכון — בתהליך אחד לרכב שלך.</p>
   <p class="sub bundleAccessCaption">תשלום חד־פעמי לרכב אחד · גישה ל־30 ימים.<br>התייעצות אישית אינה כלולה.</p>
   <button class="primary full" id="buyBundle39" type="button" onclick="BuyTestBundle.unlock('checklist')">כניסה למהלך הבדיקה — 39 ₪</button>
-  <p class="sub bundleFlowCaption">מתחילים בצ׳קליסט ובאימות הרישיון, ממשיכים לעבר ביטוחי ואז לפענוח דוח המכון ולסיכומים.</p>
+  <p class="sub bundleFlowCaption">אפשר להתחיל בצ׳קליסט, בעבר הביטוחי או בפענוח דוח המכון — ולחזור לכל חלק בכל שלב.</p>
   <p class="sub bundleOwnerCaption">להפקת העבר הביטוחי נדרשים תעודת זהות של הבעלים ותאריך תחילת הבעלות האחרונה, במדויק לפי הרישיון. אפשר להתחיל בצ׳קליסט ולהשלים אותם בהמשך.</p>
 </section>
 <section class="card freeAfterLookup" id="vehicleChecklist" hidden>
@@ -484,13 +484,26 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 <p id="checklistProgress" role="status"></p>
 <div id="checklistPrimarySteps"></div>
 <div id="restoredChecklistTopics"></div>
+<section class="photoBox checklistPhotos" aria-labelledby="checklistPhotosTitle">
+<h3 id="checklistPhotosTitle">תמונות הרכב · לבחירתך</h3>
+<p class="sub">אפשר לצרף עד 4 תמונות של הרכב או של נקודות שדורשות בירור. התמונות ייכללו בסיכום ה־PDF.</p>
+<button class="secondary full" type="button" onclick="document.getElementById('checklistVehiclePhotos').click()">צילום או בחירת תמונות</button>
+<input id="checklistVehiclePhotos" type="file" accept="image/*" multiple hidden onchange="addVehiclePhotos(this)">
+<div class="photoPreview" id="checklistPhotoPreview"></div>
+</section>
 <button class="primary full" type="button" onclick="BuyTestChecklist.summarize()">סיכום הצ׳קליסט</button>
+<div class="btNextActions" aria-label="בחירת החלק הבא">
+<p>לאן ממשיכים?</p>
+<button class="primary" type="button" onclick="BuyTestBundle.unlock('insurance')">עבר ביטוחי</button>
+<button class="secondary" type="button" onclick="BuyTestBundle.unlock('report')">פענוח דוח המכון</button>
+</div>
+<button class="secondary full" type="button" onclick="returnToVehicle()">חזרה לנתוני הרכב</button>
 <section id="checklistSummary" hidden>
 <h2>סיכום הצ׳קליסט והמידע הראשוני</h2>
 <p>נתוני הרישוי, התשובות והבדיקות שהזנת, השוואת הרישיון ועבר ביטוחי אם התקבל. הסיכום אינו קובע שהרכב תקין.</p>
 <div id="checklistSummaryContent"></div>
-<button class="secondary full" id="checklistPdfBtn" type="button" onclick="shareReportPdf('checklistPdfBtn')">שמירה או שיתוף סיכום הצ׳קליסט כ־PDF</button>
-<button class="primary full" type="button" style="margin-top:12px" onclick="BuyTestBundle.unlock('insurance')">המשך לעבר ביטוחי</button>
+<button class="secondary full" id="checklistPdfBtn" type="button" onclick="shareReportPdf('checklistPdfBtn')">שמירה או שיתוף סיכום הצ׳קליסט כ־PDF</button><div class="btNextActions btSummaryNextActions"><p>הסיכום מוכן. אפשר להמשיך לחלק הבא</p><button class="primary" type="button" onclick="BuyTestBundle.unlock('insurance')">עבר ביטוחי</button><button class="secondary" type="button" onclick="BuyTestBundle.unlock('report')">פענוח דוח המכון</button></div>
+
 </section>
 </section>
 <div class="preFlowProgress freeAfterLookup" id="preFlowProgress" aria-live="polite"><strong id="preFlowProgressText">הבדיקה החינמית ברכב</strong><span id="preFlowProgressHint">מסיימים סעיף אחד — והסעיף הבא נפתח אוטומטית.</span></div>
@@ -3189,7 +3202,12 @@ function addVehiclePhotos(input){
   if(selected.length>remaining) alert('אפשר לצרף עד ארבע תמונות. התמונות שמעבר למכסה לא נוספו.');
   input.value='';
 }
-function renderVehiclePhotos(){const b=document.getElementById('photoPreview');if(!b)return;b.innerHTML=vehiclePhotoData.map((x,i)=>`<div><img src="${x}"><button type="button" onclick="vehiclePhotoData.splice(${i},1);renderVehiclePhotos()">לחץ להסרת התמונה</button></div>`).join('')}
+function renderVehiclePhotos(){
+  for(const id of ['photoPreview','checklistPhotoPreview']){
+    const b=document.getElementById(id);if(!b)continue;
+    b.innerHTML=vehiclePhotoData.map((x,i)=>`<div><img src="${x}" alt="תמונת הרכב ${i+1}"><button type="button" onclick="vehiclePhotoData.splice(${i},1);renderVehiclePhotos()">הסרת התמונה</button></div>`).join('');
+  }
+}
 async function loadImageFile(file){
   const dataUrl=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(file)});
   return new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=reject;img.src=dataUrl});
@@ -5803,8 +5821,19 @@ function openLicenseImage(){
 }
 function closeLicenseImage(){document.getElementById('licenseImageModal').classList.remove('open')}
 function returnToVehicle(){
-  document.getElementById('vehicleLookup').scrollIntoView({behavior:'smooth',block:'start'});
-  setTimeout(()=>document.getElementById('plate').focus({preventScroll:true}),450);
+  closeAfterPage(false);
+  document.body.classList.remove('consultation-page');
+  document.getElementById('consultationPage').hidden=true;
+  document.body.dataset.bundleStep='lookup';
+  document.getElementById('vehicleLookup').style.display='block';
+  const data=document.getElementById('vehicleData');
+  if(btDossier().sources.registry){document.getElementById('status').classList.add('show');data.style.display='block';data.open=true;}
+  showFreeStart();
+  window.BuyTestBundle?.sync();
+  const target=document.getElementById('vehicleLookup');
+  target.setAttribute('tabindex','-1');
+  target.focus({preventScroll:true});
+  target.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
 }
 function toggleFinding(btn){const f=btn.closest('.check').querySelector('.finding');f.classList.toggle('open');btn.textContent=f.classList.contains('open')?'לחץ לסגירת הממצא':'לחץ לציון שיש ממצא'}
 function collectPreInspection(){
@@ -6353,6 +6382,6 @@ document.addEventListener('keydown',event=>{
 </div>
 
 <script src="package-149.js?v=7"></script>
-<script src="manager-session.js?v=1"></script><script src="opening-20260928.js?v=3"></script><script src="vehicle-checklist.js?v=4"></script><link rel="stylesheet" href="vehicle-checklist.css?v=2"><script src="bundle-39.js?v=5"></script><script src="insurance-interpretation.js?v=1"></script><script src="external-insurance.js?v=2"></script><link rel="stylesheet" href="bundle-39.css?v=5">
+<script src="manager-session.js?v=1"></script><script src="opening-20260928.js?v=3"></script><script src="vehicle-checklist.js?v=4"></script><link rel="stylesheet" href="vehicle-checklist.css?v=2"><script src="bundle-39.js?v=6"></script><script src="insurance-interpretation.js?v=1"></script><script src="external-insurance.js?v=3"></script><link rel="stylesheet" href="bundle-39.css?v=6">
 <!-- payment-dynamic-plan-v7 -->
 <section id="consultationPage" hidden><button class="secondary" type="button" onclick="closeConsultationPage()">→ חזרה למסך הפתיחה</button><h2 class="routeHeading">התייעצות עם הבוחן</h2><p>עמוס רוקח · 15 שנות ניסיון בבדיקות קנייה</p><div class="card" id="consultationPurchaseIntro"><h3>נשארו לכם שאלות על הרכב?</h3><p>ייעוץ אישי בוואטסאפ על הדוח, הממצאים והבירורים שכדאי להשלים לפני הקנייה. אפשר להתחיל גם בלי דוח.</p><strong class="btConsultPrice">149 ₪</strong><p>ההתייעצות פתוחה ל־48 שעות ממועד אישור התשלום, בשעות המענה המפורטות בתנאים.</p><button class="primary full" type="button" onclick="startPayment('prebuy')">להתייעצות אישית — 149 ₪</button></div></section><dialog id="buytestTour"><button class="secondary" type="button" onclick="closeBuyTestTour()">✕ סגירה</button><iframe title="איך BuyTest עובד" id="buytestTourFrame"></iframe></dialog></body></html>

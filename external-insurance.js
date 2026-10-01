@@ -2,10 +2,11 @@
   'use strict';
   let version=0,files=[];
   const quality=text=>({ok:String(text).trim().length>=40,score:String(text).length,findings:0,categories:0,unknown:0});
-  const allowed=()=>document.body.classList.contains('manager-mode')||Boolean(window.BuyTestBundle?.reportReceipt());
+  const allowed=()=>document.body.classList.contains('manager-mode')||Boolean(window.BuyTestBundle?.insuranceReceipt()||window.BuyTestBundle?.reportReceipt());
   function status(text){document.getElementById('externalInsuranceStatus').textContent=text;}
   function restore(){
     version++;files=[];
+    document.getElementById('externalInsuranceCorrection').hidden=true;
     const source=btDossier().sources.insuranceExternal;
     document.getElementById('externalInsuranceFile').value='';
     document.getElementById('externalInsuranceText').value=source?.rawText||'';
@@ -14,10 +15,11 @@
     const interpretation=source?BuyTestInsurance.interpret(source.rawText||''):null;
     document.getElementById('externalInsuranceResult').textContent=interpretation?.text||'';
     document.getElementById('externalInsuranceResult').hidden=!source;
+    document.getElementById('externalInsuranceNext').hidden=!source;
     status(source?'הפענוח שמור בסיכום לרכב הזה.':'');
   }
   async function read(input){
-    if(!allowed()){await BuyTestBundle.unlock('report');input.value='';return;}
+    if(!allowed()){await BuyTestBundle.unlock('insurance');input.value='';return;}
     const selected=Array.from(input.files||[]);if(!selected.length)return;
     const p=plate(),run=++version;
     files=[];
@@ -48,11 +50,11 @@
       document.getElementById('externalInsuranceText').value=parts.join('\n\n');
       save();
     }catch(error){
-      if(run===version&&p===plate())status(error.message==='PDF_TOO_LONG'?'ה־PDF ארוך מ־12 עמודים. פצל אותו לקבצים לפני ההעלאה.':'לא הצלחנו לקרוא את הדוח במלואו. נסה PDF מקורי או צילום ברור; אפשר גם להדביק למטה את הטקסט מהדוח.');
+      if(run===version&&p===plate()){document.getElementById('externalInsuranceCorrection').hidden=false;document.getElementById('externalInsuranceCorrection').open=true;status(error.message==='PDF_TOO_LONG'?'ה־PDF ארוך מ־12 עמודים. פצל אותו לקבצים לפני ההעלאה.':'לא הצלחנו לקרוא את הדוח במלואו. נסה PDF מקורי או צילום ברור; אפשר גם להדביק למטה את הטקסט מהדוח.');}
     }finally{if(worker)await worker.terminate();}
   }
   function save(){
-    if(!allowed()){void BuyTestBundle.unlock('report');return;}
+    if(!allowed()){void BuyTestBundle.unlock('insurance');return;}
     const p=plate(),text=document.getElementById('externalInsuranceText').value.trim();
     if(!/^\d{7,8}$/.test(p)){status('יש להזין מספר רכב.');return;}
     if(!quality(text).ok){status('יש להעלות דוח קריא או להדביק את תוכנו לפני השמירה.');return;}
@@ -64,6 +66,7 @@
     status(interpretation.status==='incomplete'?'הדוח נקרא, אך חסרים פרטי תביעות קריאים. העלה את טבלת התביעות והנזקים.':'✓ דוח העבר הביטוחי פוענח ושולב בסיכום לרכב '+p+'.');
     document.getElementById('externalInsuranceResult').textContent=interpretation.text;
     document.getElementById('externalInsuranceResult').hidden=false;
+    document.getElementById('externalInsuranceNext').hidden=false;
   }
   function remove(){
     if(!allowed())return;
@@ -72,15 +75,16 @@
     restore();btRefreshSummary();status('הדוח החיצוני הוסר מהסיכומים.');
   }
   window.addEventListener('DOMContentLoaded',()=>{
-    const panel=document.createElement('section');panel.id='externalInsurancePanel';
-    panel.innerHTML='<button type="button" class="primary full" id="externalInsuranceChoose" style="margin-top:12px">העלאת דוח עבר ביטוחי</button><p class="sub">יש לך דוח מגורם אחר? צרף PDF או צילום של טבלת התביעות והנזקים, כולל כותרות העמודות.</p><input type="file" id="externalInsuranceFile" accept="image/*,application/pdf" multiple hidden><p id="externalInsuranceStatus" role="status" aria-live="polite"></p><div class="info" id="externalInsuranceResult" hidden style="white-space:pre-line"></div><details><summary>בדיקת קריאת הדוח או תיקון הטקסט</summary><label for="externalInsuranceText">טקסט שנקרא מהדוח</label><textarea id="externalInsuranceText" class="reportInput" rows="8" style="color:#17352d;background:#fff"></textarea><p>הפענוח ישויך לרכב <b id="externalInsurancePlate"></b>.</p><button type="button" class="primary full" id="externalInsuranceSave">עדכון פענוח העבר הביטוחי</button><button type="button" class="secondary full" id="externalInsuranceRemove">הסרת הדוח החיצוני</button></details>';
-    document.getElementById('examinerSummaryFile').previousElementSibling.insertAdjacentElement('afterend',panel);
+    const panel=document.createElement('section');panel.id='externalInsurancePanel';panel.className='uploadPanel btExternalInsurance';
+    panel.innerHTML='<h3>כבר יש לך דוח עבר ביטוחי?</h3><button type="button" class="primary full" id="externalInsuranceChoose" style="margin-top:12px">העלאת דוח עבר ביטוחי</button><p class="sub">יש לך דוח מגורם אחר? צרף PDF או צילום של טבלת התביעות והנזקים, כולל כותרות העמודות.</p><input type="file" id="externalInsuranceFile" accept="image/*,application/pdf" multiple hidden><p id="externalInsuranceStatus" role="status" aria-live="polite"></p><div class="info" id="externalInsuranceResult" hidden style="white-space:pre-line"></div><details id="externalInsuranceCorrection" hidden><summary>השלמת פרטים מהדוח</summary><label for="externalInsuranceText">טקסט שנקרא מהדוח</label><textarea id="externalInsuranceText" class="reportInput" rows="8" style="color:#17352d;background:#fff"></textarea><p>הפענוח ישויך לרכב <b id="externalInsurancePlate"></b>.</p><button type="button" class="primary full" id="externalInsuranceSave">עדכון פענוח העבר הביטוחי</button><button type="button" class="secondary full" id="externalInsuranceRemove">הסרת הדוח החיצוני</button></details>';
+    document.getElementById('insuranceStartSection').appendChild(panel);
     document.getElementById('externalInsuranceChoose').onclick=()=>document.getElementById('externalInsuranceFile').click();
     document.getElementById('externalInsuranceFile').onchange=function(){void read(this);};
     document.getElementById('externalInsuranceSave').onclick=save;
     document.getElementById('externalInsuranceRemove').onclick=remove;
     const activate=btActivateVehicle;
     btActivateVehicle=function(p){const changed=p!==btDossierPlate;activate(p);if(changed)restore();};
+    const next=document.createElement('div');next.id='externalInsuranceNext';next.hidden=true;next.className='btNextActions';next.innerHTML='<p>אפשר להמשיך לדוח המכון</p><button class="primary full" type="button" onclick="BuyTestBundle.unlock(\'report\')">המשך לפענוח דוח המכון</button>';panel.appendChild(next);
     restore();
   });
 })();
