@@ -36,13 +36,7 @@
     const paywall=document.getElementById('reportBundlePaywall');if(paywall)paywall.hidden=hasReport();
     const button=document.getElementById('buyBundle39');if(button){button.textContent=hasChecklist()?'כניסה למהלך הבדיקה':'כניסה למהלך הבדיקה — 39 ₪';button.hidden=false;}
     if(!hasChecklist())document.getElementById('vehicleChecklist').hidden=true;
-    document.querySelectorAll('.btStageNav').forEach(nav=>{
-      nav.hidden=!hasChecklist();
-      nav.querySelectorAll('[data-stage]').forEach(button=>{
-        const current=button.dataset.stage===document.body.dataset.bundleStep;
-        button.setAttribute('aria-current',current?'step':'false');
-      });
-    });
+
   }
   async function unlock(intent='checklist'){
     if(!/^\d{7,8}$/.test(plate())){showBuyTestAccessNotice('יש להזין ולהציג מספר רכב לפני פתיחת החבילה.',true);return false;}
@@ -111,15 +105,6 @@
   openAfterPage=function(scroll=true){document.body.dataset.bundleStep='report';oldOpen(scroll);sync()};
   window.BuyTestBundle={navigate,hasReport,hasChecklist,unlock,sync,refreshStoredBundle,updateReceipt:value=>{cacheBundle(value);if(value?.plan==='balcar'&&String(value.plate)===plate())verifiedBundle=value;sync()},reportReceipt:()=>receipt('report'),insuranceReceipt:()=>receipt('balcar'),checklistReceipt:()=>receipt('premium')||receipt('report')||receipt('balcar')};
   window.addEventListener('DOMContentLoaded',()=>{
-    for(const id of ['vehicleChecklist','insuranceStartSection','afterInspectionSection','afterInsuranceChoices']){
-      const host=document.getElementById(id),nav=document.createElement('nav');
-      nav.className='btStageNav';nav.setAttribute('aria-label','חלקי הבדיקה לרכב');
-      for(const [step,label] of [['checklist','צ׳קליסט'],['insurance','עבר ביטוחי'],['report','פענוח דוח']]){
-        const button=document.createElement('button');button.type='button';button.dataset.stage=step;button.textContent=label;
-        button.addEventListener('click',()=>void unlock(step));nav.appendChild(button);
-      }
-      host.prepend(nav);
-    }
     const insurance=document.getElementById('insuranceStartSection'),back=document.createElement('button');
     back.type='button';back.className='secondary full';back.textContent='חזרה לנתוני הרכב';back.onclick=returnToVehicle;insurance.appendChild(back);
     document.body.dataset.bundleStep=document.body.classList.contains('after-page')?'report':'lookup';sync();});

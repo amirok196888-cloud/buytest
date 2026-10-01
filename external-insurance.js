@@ -15,7 +15,6 @@
     const interpretation=source?BuyTestInsurance.interpret(source.rawText||''):null;
     document.getElementById('externalInsuranceResult').textContent=interpretation?.text||'';
     document.getElementById('externalInsuranceResult').hidden=!source;
-    document.getElementById('externalInsuranceNext').hidden=!source;
     status(source?'הפענוח שמור בסיכום לרכב הזה.':'');
   }
   async function read(input){
@@ -66,7 +65,6 @@
     status(interpretation.status==='incomplete'?'הדוח נקרא, אך חסרים פרטי תביעות קריאים. העלה את טבלת התביעות והנזקים.':'✓ דוח העבר הביטוחי פוענח ושולב בסיכום לרכב '+p+'.');
     document.getElementById('externalInsuranceResult').textContent=interpretation.text;
     document.getElementById('externalInsuranceResult').hidden=false;
-    document.getElementById('externalInsuranceNext').hidden=false;
   }
   function remove(){
     if(!allowed())return;
@@ -77,14 +75,14 @@
   window.addEventListener('DOMContentLoaded',()=>{
     const panel=document.createElement('section');panel.id='externalInsurancePanel';panel.className='uploadPanel btExternalInsurance';
     panel.innerHTML='<h3>כבר יש לך דוח עבר ביטוחי?</h3><button type="button" class="primary full" id="externalInsuranceChoose" style="margin-top:12px">העלאת דוח עבר ביטוחי</button><p class="sub">יש לך דוח מגורם אחר? צרף PDF או צילום של טבלת התביעות והנזקים, כולל כותרות העמודות.</p><input type="file" id="externalInsuranceFile" accept="image/*,application/pdf" multiple hidden><p id="externalInsuranceStatus" role="status" aria-live="polite"></p><div class="info" id="externalInsuranceResult" hidden style="white-space:pre-line"></div><details id="externalInsuranceCorrection" hidden><summary>השלמת פרטים מהדוח</summary><label for="externalInsuranceText">טקסט שנקרא מהדוח</label><textarea id="externalInsuranceText" class="reportInput" rows="8" style="color:#17352d;background:#fff"></textarea><p>הפענוח ישויך לרכב <b id="externalInsurancePlate"></b>.</p><button type="button" class="primary full" id="externalInsuranceSave">עדכון פענוח העבר הביטוחי</button><button type="button" class="secondary full" id="externalInsuranceRemove">הסרת הדוח החיצוני</button></details>';
-    document.getElementById('insuranceStartSection').appendChild(panel);
+    document.querySelector('#afterInspectionSection .afterGrid').insertAdjacentElement('afterend',panel);
     document.getElementById('externalInsuranceChoose').onclick=()=>document.getElementById('externalInsuranceFile').click();
     document.getElementById('externalInsuranceFile').onchange=function(){void read(this);};
     document.getElementById('externalInsuranceSave').onclick=save;
     document.getElementById('externalInsuranceRemove').onclick=remove;
     const activate=btActivateVehicle;
     btActivateVehicle=function(p){const changed=p!==btDossierPlate;activate(p);if(changed)restore();};
-    const next=document.createElement('div');next.id='externalInsuranceNext';next.hidden=true;next.className='btNextActions';next.innerHTML='<p>אפשר להמשיך לדוח המכון</p><button class="primary full" type="button" onclick="BuyTestBundle.unlock(\'report\')">המשך לפענוח דוח המכון</button>';panel.appendChild(next);
+
     restore();
   });
 })();
