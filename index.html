@@ -4719,8 +4719,16 @@ function findKnowledgeRules(line,categoryHint=''){
   return unique;
 }
 
+// Normalize the Technotest system label without treating its name as a finding.
+function normalizeReportSystemLabel(value){
+  return normalizeFindingText(value).replace(
+    /מערכת הפליטה ו(?:מערכת|המערכת|מערכות) למניעת זיהום אוויר/g,
+    'מערכת הפליטה ומערכות למניעת זיהום אוויר'
+  );
+}
+
 function reportCategoryFromLine(line){
-  const n=normalizeFindingText(line).replace(/^\d+\s+/,'').trim();
+  const n=normalizeReportSystemLabel(line).replace(/^\d+\s+/,'').trim();
   const compact=n.replace(/\s/g,'');
   if(compact.includes('הערותכלליות')) return 'הערות כלליות';
   if(/שלדה\s*ומ?רכ[בג]/.test(n)) return 'שלדת מרכב';
@@ -4746,7 +4754,7 @@ function reportSeverityFromLine(line){
 }
 
 function stripReportScaffolding(line,category,severity){
-  let cleaned=normalizeFindingText(String(line||'').replace(/[✓✔☑×✕]/g,' '));
+  let cleaned=normalizeReportSystemLabel(String(line||'').replace(/[✓✔☑×✕]/g,' ')).replace(/^\d+\s+/,'').trim();
   if(category){
     const categoryText=normalizeFindingText(category);
     const withoutArticle=value=>value.replace(/^מערכת\s+ה/,'מערכת ');
