@@ -1,0 +1,8 @@
+#vehicleChecklist[hidden],#checklistSummary[hidden],#licenseFlowPrompt[hidden]{display:none!important}
+#vehicleChecklist{margin-top:16px}#vehicleChecklist .card{box-shadow:none;margin:14px 0;border:1px solid #d6e5df}
+.btChecklistTopic{margin:12px 0;border:1px solid #cbded5;border-radius:14px;background:#fff;padding:12px}
+.btChecklistTopic>summary{cursor:pointer;font-size:19px;font-weight:800;color:#164d40;padding:6px}
+.btChecklistItem{display:grid;grid-template-columns:minmax(0,1fr) 140px;gap:10px;padding:14px 0;border-bottom:1px solid #e3eae6}
+.btChecklistItem label{font-weight:700;line-height:1.6}.btChecklistItem select,.btChecklistItem textarea{font:inherit;padding:10px;border:1px solid #bdcec6;border-radius:10px;background:#fff;color:#18352d;width:100%;box-sizing:border-box}
+.btChecklistItem textarea{grid-column:1/-1;resize:vertical}#checklistSummaryContent{line-height:1.8;overflow-wrap:anywhere}
+@media(max-width:480px){.btChecklistItem{grid-template-columns:1fr}.btChecklistItem select{max-width:200px}.btChecklistItem textarea{grid-column:auto}}
