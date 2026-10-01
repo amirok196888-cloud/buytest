@@ -20,3 +20,12 @@ body[data-bundle-step="insurance"] #afterInsuranceChoices,
 body[data-bundle-step="report"] #afterInsuranceChoices{display:none!important}
 body[data-bundle-step="insurance"] #vehicleChecklist,
 body[data-bundle-step="report"] #vehicleChecklist{display:none!important}
+
+#afterInsuranceChoices{text-align:center}
+#afterInsuranceChoices h2{font-size:24px;line-height:1.4}
+#afterInsuranceChoices .bundleScope{margin:12px 0 20px;line-height:1.7}
+#afterInsuranceChoices #buyBundle39{display:block;width:100%;min-height:78px;padding:20px 16px;margin:20px auto 22px;font-size:23px;font-weight:800;line-height:1.4;border-radius:18px;box-shadow:0 8px 20px rgba(7,94,72,.18)}
+#afterInsuranceChoices .bundleFlowCaption{margin:0 0 16px;line-height:1.7;color:#314c45}
+#afterInsuranceChoices .bundleAccessCaption{font-size:15px;line-height:1.7}
+#afterInsuranceChoices .bundleOwnerCaption{margin-top:18px;padding-top:16px;border-top:1px solid #dbe7e1;font-size:15px;line-height:1.7}
+@media(max-width:420px){#afterInsuranceChoices #buyBundle39{font-size:21px}#afterInsuranceChoices h2{font-size:22px}}
