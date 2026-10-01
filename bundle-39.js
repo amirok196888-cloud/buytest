@@ -34,8 +34,7 @@
     document.body.classList.toggle('bt-checklist-access',hasChecklist());
     document.body.classList.toggle('bt-insurance-access',manager()||Boolean(receipt('balcar')));
     const paywall=document.getElementById('reportBundlePaywall');if(paywall)paywall.hidden=hasReport();
-    const button=document.getElementById('buyBundle39');if(button){button.textContent='פתיחת החבילה — 39 ₪';button.hidden=hasChecklist();}
-    for(const step of ['checklist','insurance','report']){const id=step==='checklist'?'continueFreeAfterInsurance':step==='insurance'?'bundleInsuranceStep':'bundleReportStep';const el=document.getElementById(id);if(el)el.setAttribute('aria-current',document.body.dataset.bundleStep===step?'step':'false');}
+    const button=document.getElementById('buyBundle39');if(button){button.textContent=hasChecklist()?'כניסה לצ׳קליסט':'פתיחת הצ׳קליסט — 39 ₪';button.hidden=false;}
     if(!hasChecklist())document.getElementById('vehicleChecklist').hidden=true;
   }
   async function unlock(intent='checklist'){
@@ -61,9 +60,15 @@
       document.getElementById('insuranceStartSection').scrollIntoView({behavior:'smooth',block:'start'});
     }else{
       BuyTestChecklist.open();
+      document.body.dataset.bundleStep='checklist';
     }
     sync();
   }
+  const oldRestoreChecklist=BuyTestChecklist.restore;
+  BuyTestChecklist.restore=function(p){
+    const result=oldRestoreChecklist(p);
+    document.body.dataset.bundleStep='lookup';sync();return result;
+  };
   const oldStart=startPayment;
   startPayment=async function(plan='report'){
     if(plan==='report'||plan==='premium')return unlock(plan==='report'?'report':'checklist');
