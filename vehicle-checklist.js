@@ -1,4 +1,4 @@
-/* Restored from ce49590 / 2d090b6: original questions, without sequential locks. */
+/* Topic-level review; questions are guidance and legacy notes are preserved. */
 (() => {
   const topics = [
     {id:'seller', title:'שאלות למוכר ליד הרכב', questions:[
@@ -28,47 +28,65 @@
       'אין עשן או נזילה בולטים לעין', 'מצב שמן המנוע אינו מציג סימן ברור לבוצה חריגה'
     ]}
   ];
-  const states = {unchecked:'לא בדקתי', checked:'נבדק', issue:'דורש בירור'};
+  const states = {unchecked:'טרם סומן', checked:'בדקתי', issue:'דורש בירור'};
   let activePlate = '';
   const root = () => document.getElementById('vehicleChecklist');
   const saved = () => btDossier().sources.checklist?.answers || {};
-  function item(key, question, seller=false) {
-    const row=document.createElement('div');row.className='btChecklistItem';row.dataset.key=key;row.dataset.question=question;
-    const answer=saved()[key]||{};
-    const title=document.createElement('label');title.htmlFor='bt-check-'+encodeURIComponent(key);title.textContent=question;
-    const select=document.createElement('select');select.id=title.htmlFor;select.setAttribute('aria-label','מצב הבדיקה: '+question);
-    Object.entries(states).forEach(([value,text])=>{const option=document.createElement('option');option.value=value;option.textContent=text;select.append(option)});
-    select.value=answer.state||'unchecked';select.addEventListener('change',capture);
-    const note=document.createElement('textarea');note.value=answer.note||'';note.rows=2;
-    note.setAttribute('aria-label',(seller?'תשובת המוכר: ':'הערות: ')+question);
-    note.placeholder=seller?'תשובת המוכר והנקודות לבירור':'ממצא או הערה (אפשר גם ללא סימון)';note.addEventListener('input',capture);
-    row.append(title,select,note);return row;
+  function topicAnswer(key, questions, legacyKeys){
+    const answers=saved();if(answers[key])return answers[key];
+    const legacy=legacyKeys.map((k,i)=>({...answers[k],question:questions[i]}));
+    const issues=legacy.some(x=>x.state==='issue');
+    const checked=legacy.length>0&&legacy.every(x=>x.state==='checked');
+    return {state:issues?'issue':checked?'checked':'unchecked',checked,
+      note:legacy.filter(x=>x.note||x.state==='issue').map(x=>x.question+': '+(x.note||'סומן לבירור ללא פירוט')).join('\n')};
+  }
+  function topicReview(key,title,questions,legacyKeys){
+    const row=document.createElement('div');row.className='btChecklistTopicReview';row.dataset.key=key;row.dataset.question=title;
+    const answer=topicAnswer(key,questions,legacyKeys);
+    const list=document.createElement('ul');list.className='btChecklistGuidance';
+    questions.forEach(question=>{const li=document.createElement('li');li.textContent=question;list.append(li);});
+    const actions=document.createElement('div');actions.className='btChecklistTopicActions';
+    const label=document.createElement('label');label.className='btTopicChecked';
+    const check=document.createElement('input');check.type='checkbox';check.checked=answer.checked??answer.state==='checked';check.setAttribute('aria-label','בדקתי: '+title);check.addEventListener('change',capture);
+    label.append(check,document.createTextNode('בדקתי'));
+    const button=document.createElement('button');button.type='button';button.className='secondary btTopicClarify';button.textContent='יש משהו לבירור';
+    const panel=document.createElement('div');panel.className='btTopicClarification';panel.id='bt-clarify-'+encodeURIComponent(key);
+    const noteLabel=document.createElement('label');noteLabel.htmlFor=panel.id+'-note';noteLabel.textContent='מה צריך לברר בנושא הזה?';
+    const note=document.createElement('textarea');note.id=noteLabel.htmlFor;note.value=answer.note||'';note.rows=3;note.placeholder='כתבו כאן מה דורש בירור';note.addEventListener('input',capture);
+    panel.append(noteLabel,note);panel.hidden=answer.state!=='issue'&&!answer.note;
+    button.setAttribute('aria-controls',panel.id);button.setAttribute('aria-expanded',String(!panel.hidden));
+    row.dataset.issue=String(answer.state==='issue');
+    button.addEventListener('click',()=>{panel.hidden=!panel.hidden;row.dataset.issue=String(!panel.hidden||Boolean(note.value.trim()));button.setAttribute('aria-expanded',String(!panel.hidden));if(!panel.hidden)note.focus();capture();});
+    actions.append(label,button);row.append(list,actions,panel);return row;
   }
   function renderQuestions(){
     const host=document.getElementById('preVisitQuestionList');if(!host)return;
-    host.replaceChildren(...currentPreVisitQuestions.map(question=>{
-      // Use question text as identity: insurance questions may be inserted before the original five.
-      const li=document.createElement('li');li.append(item('question:'+question,question,true));return li;
-    }));
+    const li=document.createElement('li');li.className='btRegistryTopic';
+    li.append(topicReview('topic:registry','שאלות למוכר לפי נתוני הרכב',currentPreVisitQuestions,currentPreVisitQuestions.map(q=>'question:'+q)));
+    host.replaceChildren(li);
   }
   function renderTopics(){
     const host=document.getElementById('restoredChecklistTopics');if(!host)return;
     host.replaceChildren(...topics.map(topic=>{
       const details=document.createElement('details');details.className='btChecklistTopic';
       const summary=document.createElement('summary');summary.textContent=topic.title;
-      details.append(summary,...topic.questions.map((q,i)=>item(topic.id+':'+i,q,topic.seller)));return details;
+      details.append(summary,topicReview('topic:'+topic.id,topic.title,topic.questions,topic.questions.map((q,i)=>topic.id+':'+i)));return details;
     }));
   }
   function capture(){
     if(activePlate!==plate()||!/^\d{7,8}$/.test(activePlate))return;
-    const answers={...saved()};
-    root().querySelectorAll('.btChecklistItem').forEach(row=>answers[row.dataset.key]={question:row.dataset.question,state:row.querySelector('select').value,note:row.querySelector('textarea').value.trim()});
-    const entries=Object.values(answers),done=entries.filter(x=>x.state!=='unchecked').length;
+    const answers={...saved()},entries=[];
+    root().querySelectorAll('.btChecklistTopicReview').forEach(row=>{
+      const checked=row.querySelector('input[type="checkbox"]').checked,note=row.querySelector('textarea').value.trim();
+      const entry={question:row.dataset.question,checked,state:note||row.dataset.issue==='true'?'issue':checked?'checked':'unchecked',note};
+      answers[row.dataset.key]=entry;entries.push(entry);
+    });
+    const done=entries.filter(x=>x.checked||x.state==='issue').length;
     const text=['דיווח הקונה ותשובות המוכר — אינם ממצאים מאומתים של מכון.',
       ...entries.map(x=>`${x.question} — ${states[x.state]||states.unchecked}${x.note?' · '+x.note:''}`)];
     btSaveSource('checklist',{title:'צ׳קליסט ליד הרכב — דיווח הקונה והמוכר',answers,text:text.join('\n'),
       alerts:entries.filter(x=>x.state==='issue').map(x=>'דיווח לקוח — '+x.question+': '+(x.note||'סומן לבירור ללא פירוט'))});
-    document.getElementById('checklistProgress').textContent=`נבדקו או סומנו לבירור ${done} מתוך ${entries.length} סעיפים. אפשר להפיק סיכום גם עם סעיפים שלא נבדקו.`;
+    document.getElementById('checklistProgress').textContent=`נבדקו או סומנו לבירור ${done} מתוך ${entries.length} נושאים. אפשר להפיק סיכום גם עם נושאים שלא סומנו.`;
     refresh();
   }
   function restore(p){
@@ -87,7 +105,7 @@
     // Close the previous vehicle's checklist and all expanded topics.
     root().hidden=true;
     document.getElementById('checklistSummary').hidden=true;
-    document.getElementById('checklistProgress').textContent='אפשר להשלים בדיקות או להפיק סיכום גם עם סעיפים שלא נבדקו.';
+    document.getElementById('checklistProgress').textContent='סמנו בדקתי לכל נושא. אם משהו דורש בירור, פתחו את שדה הבירור באותו נושא.';
   }
   function open(){
     if(window.BuyTestBundle&&!BuyTestBundle.hasChecklist()){void BuyTestBundle.unlock('checklist');return;}
