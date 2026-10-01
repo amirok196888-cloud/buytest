@@ -466,16 +466,19 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
       <div class="field" style="margin-top:10px"><label for="insuranceOwnershipDate">תאריך תחילת הבעלות</label><input id="insuranceOwnershipDate" type="date"></div>
       <div class="field" style="margin-top:10px"><label for="insuranceOwnerId">תעודת זהות של בעל הרכב</label><input id="insuranceOwnerId" inputmode="numeric" maxlength="9" autocomplete="off" placeholder="9 ספרות" oninput="this.value=this.value.replace(/\D/g,'').slice(0,9)"></div>
     </div>
-    <button class="primary full" id="balcarPlanButton" type="button" data-analytics-click="click_insurance_history" onclick="startBalcarPayment()">פתיחת החבילה כולל עבר ביטוחי — 39 ₪</button>
+    <button class="primary full" id="balcarPlanButton" type="button" data-analytics-click="click_insurance_history" onclick="startBalcarPayment()">הפקת דוח העבר הביטוחי הכלול בחבילה</button>
     <div class="devMsg" id="balcarEligibilityMsg" role="status" aria-live="polite"></div>
   </div>
 </section>
 <section class="card freeAfterLookup" id="afterInsuranceChoices" style="display:none">
   <h2>כל התהליך לרכב אחד — מחיר השקה 39 ₪</h2>
   <p class="bundleScope">צ׳קליסט מלא, שאלות למוכר ואימות רישיון, דוח עבר ביטוחי, פענוח דוח המכון ושני סיכומים. תשלום חד־פעמי לרכב אחד, גישה ל־30 ימים. התייעצות אישית אינה כלולה.</p>
-  <button class="primary full" id="buyBundle39" type="button" onclick="BuyTestBundle.unlock('checklist')">פתיחת כל החבילה לרכב — 39 ₪</button>
-  <button class="primary full" id="continueFreeAfterInsurance" type="button" onclick="continueToFreeFlow()">צ׳קליסט ליד הרכב — כלול בחבילה</button>
-  <button class="secondary full" type="button" style="margin-top:12px" onclick="showInsuranceStart();document.getElementById('insuranceStartSection').scrollIntoView({behavior:'smooth',block:'start'})">בדיקת עבר ביטוחי — כלול בחבילה</button>
+  <button class="primary full" id="buyBundle39" type="button" onclick="BuyTestBundle.unlock('checklist')">פתיחת החבילה — 39 ₪</button>
+  <nav class="btBundleSteps" aria-label="שלבי הבדיקה לרכב">
+    <button class="primary full" id="continueFreeAfterInsurance" type="button" onclick="BuyTestBundle.unlock('checklist')">1. צ׳קליסט ליד הרכב</button>
+    <button class="primary full" id="bundleInsuranceStep" type="button" onclick="BuyTestBundle.unlock('insurance')">2. עבר ביטוחי</button>
+    <button class="primary full" id="bundleReportStep" type="button" onclick="BuyTestBundle.unlock('report')">3. פענוח דוח המכון</button>
+  </nav>
 </section>
 <section class="card freeAfterLookup" id="vehicleChecklist" hidden>
 <h2>צ׳קליסט ליד הרכב</h2>
@@ -489,7 +492,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 <p>נתוני הרישוי, התשובות והבדיקות שהזנת, השוואת הרישיון ועבר ביטוחי אם התקבל. הסיכום אינו קובע שהרכב תקין.</p>
 <div id="checklistSummaryContent"></div>
 <button class="secondary full" id="checklistPdfBtn" type="button" onclick="shareReportPdf('checklistPdfBtn')">שמירה או שיתוף סיכום הצ׳קליסט כ־PDF</button>
-<button class="primary full" type="button" style="margin-top:12px" onclick="startPayment('report')">יש דוח מכון? לפענוח הכלול בחבילה וסיכום משולב</button>
+<button class="primary full" type="button" style="margin-top:12px" onclick="BuyTestBundle.unlock('insurance')">המשך לעבר ביטוחי</button>
 </section>
 </section>
 <div class="preFlowProgress freeAfterLookup" id="preFlowProgress" aria-live="polite"><strong id="preFlowProgressText">הבדיקה החינמית ברכב</strong><span id="preFlowProgressHint">מסיימים סעיף אחד — והסעיף הבא נפתח אוטומטית.</span></div>
@@ -729,7 +732,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
     <button class="primary" id="balcarPdfBtn" type="button" data-analytics-click="click_balcar_pdf" onclick="shareReportPdf('balcarPdfBtn')">לחץ לשיתוף תקציר ה־PDF</button>
   </div>
   <div class="info"><b>גבולות המידע:</b> השירות מציג רק נתונים שהתקבלו בדוח העבר הביטוחי. נתון חסר יוצג כ־„אין נתון” ולא כמידע תקין. הדוח אינו מחליף בדיקה במכון או בירור מול חברת הביטוח.</div>
-<div class="preFlowNav"><button class="secondary" type="button" onclick="unlockFreeSections();showPreFlowStep(1)">המשך לפענוח דוח המכון</button></div>
+<div class="preFlowNav"><button class="secondary" type="button" onclick="BuyTestBundle.unlock('report')">המשך לפענוח דוח המכון</button></div>
 </section>
 
 <section class="card paidOnly reportFeature" id="afterInspectionSection" style="display:none">
@@ -1605,7 +1608,7 @@ async function loadVehicle(){
   if(customerEntryRoute==='free')showFreeStart();
   const restored=await restoreBuyTestAccessWithRetry({requiredPlate:p,scroll:true});
   if(restored){
-    if(activeBuyTestPlan()==='balcar') await loadPaidBalcarReport();
+    if(activeBuyTestPlan()==='balcar')BuyTestBundle.sync();
     return;
   }
   if(customerEntryRoute==='free'){
@@ -2910,11 +2913,11 @@ async function resumePaidVehicleFlow(plateNumber){
   const shownPlate=String(document.getElementById('vPlate')?.textContent||'').replace(/\D/g,'');
   const vehicleData=document.getElementById('vehicleData');
   if(shownPlate===paidPlate&&vehicleData?.style.display!=='none'){
-    if(activeBuyTestPlan()==='balcar') await loadPaidBalcarReport();
+    if(activeBuyTestPlan()==='balcar')BuyTestBundle.sync();
     return true;
   }
   await loadVehicle();
-  if(activeBuyTestPlan()==='balcar'&&!window.buytestBalcarReport) await loadPaidBalcarReport();
+  if(activeBuyTestPlan()==='balcar')BuyTestBundle.sync();
   return true;
 }
 async function initializeBuyTestAccess(){
@@ -6367,6 +6370,6 @@ document.addEventListener('keydown',event=>{
 </div>
 
 <script src="package-149.js?v=7"></script>
-<script src="manager-session.js?v=1"></script><script src="opening-20260928.js?v=3"></script><script src="vehicle-checklist.js?v=2"></script><link rel="stylesheet" href="vehicle-checklist.css?v=1"><script src="bundle-39.js?v=1"></script><script src="insurance-interpretation.js?v=1"></script><script src="external-insurance.js?v=2"></script><link rel="stylesheet" href="bundle-39.css?v=2">
+<script src="manager-session.js?v=1"></script><script src="opening-20260928.js?v=3"></script><script src="vehicle-checklist.js?v=2"></script><link rel="stylesheet" href="vehicle-checklist.css?v=1"><script src="bundle-39.js?v=2"></script><script src="insurance-interpretation.js?v=1"></script><script src="external-insurance.js?v=2"></script><link rel="stylesheet" href="bundle-39.css?v=3">
 <!-- payment-dynamic-plan-v7 -->
 <section id="consultationPage" hidden><button class="secondary" type="button" onclick="closeConsultationPage()">→ חזרה למסך הפתיחה</button><h2 class="routeHeading">התייעצות עם הבוחן</h2><p>עמוס רוקח · 15 שנות ניסיון בבדיקות קנייה</p><div class="card" id="consultationPurchaseIntro"><h3>נשארו לכם שאלות על הרכב?</h3><p>ייעוץ אישי בוואטסאפ על הדוח, הממצאים והבירורים שכדאי להשלים לפני הקנייה. אפשר להתחיל גם בלי דוח.</p><strong class="btConsultPrice">149 ₪</strong><p>ההתייעצות פתוחה ל־48 שעות ממועד אישור התשלום, בשעות המענה המפורטות בתנאים.</p><button class="primary full" type="button" onclick="startPayment('prebuy')">להתייעצות אישית — 149 ₪</button></div></section><dialog id="buytestTour"><button class="secondary" type="button" onclick="closeBuyTestTour()">✕ סגירה</button><iframe title="איך BuyTest עובד" id="buytestTourFrame"></iframe></dialog></body></html>

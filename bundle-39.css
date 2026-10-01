@@ -5,3 +5,13 @@ body.bt-insurance-access .balcarFeature{display:block!important}
 .bundleLaunchPrice{font-size:30px;font-weight:900;color:#075e48}.bundleScope{line-height:1.8}
 
 .btLaunchOffer{display:grid;gap:6px;padding:15px 12px;margin:14px 0;border:1px solid #b7dbcc;border-radius:16px;background:#effaf4;color:#164736}.btLaunchOffer strong{font-size:21px}.btLaunchOffer span{font-size:14px}.btLaunchOffer small{font-size:12px;color:#496458}
+#buyBundle39[hidden]{display:none!important}
+.btBundleSteps{display:grid;gap:12px;margin-top:16px}
+body[data-bundle-step] #balcarReportSection,body[data-bundle-step] #insuranceStartSection,body[data-bundle-step] #afterInspectionSection{display:none!important}
+body[data-bundle-step="insurance"] #insuranceStartSection{display:block!important}
+body[data-bundle-step="insurance"].bt-insurance-access #balcarReportSection{display:block!important}
+body[data-bundle-step="report"].after-page.bt-report-access #afterInspectionSection{display:block!important}
+body[data-bundle-step="checklist"].bt-checklist-access #vehicleChecklist:not([hidden]){display:block!important}
+.btBundleSteps [aria-current="step"]{outline:3px solid #075e48;outline-offset:3px}
+#marketingLanding .btReport{display:none!important}
+#marketingLanding .btService:not(.btConsult):not(.btReport){grid-column:1/-1}

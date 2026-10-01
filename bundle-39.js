@@ -34,20 +34,35 @@
     document.body.classList.toggle('bt-checklist-access',hasChecklist());
     document.body.classList.toggle('bt-insurance-access',manager()||Boolean(receipt('balcar')));
     const paywall=document.getElementById('reportBundlePaywall');if(paywall)paywall.hidden=hasReport();
-    const button=document.getElementById('buyBundle39');if(button)button.textContent=hasChecklist()?'החבילה פתוחה לרכב הזה — המשך לבדיקה':'פתיחת כל החבילה לרכב — 39 ₪';
+    const button=document.getElementById('buyBundle39');if(button){button.textContent='פתיחת החבילה — 39 ₪';button.hidden=hasChecklist();}
+    for(const step of ['checklist','insurance','report']){const id=step==='checklist'?'continueFreeAfterInsurance':step==='insurance'?'bundleInsuranceStep':'bundleReportStep';const el=document.getElementById(id);if(el)el.setAttribute('aria-current',document.body.dataset.bundleStep===step?'step':'false');}
     if(!hasChecklist())document.getElementById('vehicleChecklist').hidden=true;
   }
   async function unlock(intent='checklist'){
     if(!/^\d{7,8}$/.test(plate())){showBuyTestAccessNotice('יש להזין ולהציג מספר רכב לפני פתיחת החבילה.',true);return false;}
+    if(intent==='report'?hasReport():hasChecklist()){navigate(intent);return true;}
     sessionStorage.setItem('buytestBundleIntent',intent);
     if(!manager())await restoreBuyTestAccess({requiredPlate:plate(),scroll:false});
     if(!manager())await refreshStoredBundle();
     sync();
     if(intent==='report'?hasReport():hasChecklist()){
-      if(intent==='report')openAfterPage();else {closeAfterPage(false);showFreeStart();BuyTestChecklist.open();}
+      navigate(intent);
       sessionStorage.removeItem('buytestBundleIntent');return true;
     }
-    await startBalcarPayment();return false;
+    await oldStart('balcar');return false;
+  }
+  function navigate(step='checklist'){
+    document.body.dataset.bundleStep=step;
+    document.body.classList.remove('consultation-page');document.getElementById('consultationPage').hidden=true;
+    if(step==='report'){openAfterPage();sync();return;}
+    closeAfterPage(false);showFreeStart();
+    if(step==='insurance'){
+      document.getElementById('vehicleChecklist').hidden=true;showInsuranceStart();
+      document.getElementById('insuranceStartSection').scrollIntoView({behavior:'smooth',block:'start'});
+    }else{
+      BuyTestChecklist.open();
+    }
+    sync();
   }
   const oldStart=startPayment;
   startPayment=async function(plan='report'){
@@ -63,8 +78,7 @@
     const intent=sessionStorage.getItem('buytestBundleIntent');
     if(plan==='balcar'&&hasChecklist()){
       showFreeStart();
-      if(intent==='report')openAfterPage(false);
-      else if(intent==='checklist')BuyTestChecklist.open();
+      navigate(intent||'checklist');
       if(intent)sessionStorage.removeItem('buytestBundleIntent');
     }
     return result;
@@ -72,8 +86,8 @@
   const oldLock=lockPurchasedPlan;
   lockPurchasedPlan=function(){oldLock();sync()};
   const oldOpen=openAfterPage;
-  openAfterPage=function(scroll=true){oldOpen(scroll);sync()};
-  window.BuyTestBundle={hasReport,hasChecklist,unlock,sync,refreshStoredBundle,updateReceipt:value=>{cacheBundle(value);if(value?.plan==='balcar'&&String(value.plate)===plate())verifiedBundle=value;sync()},reportReceipt:()=>receipt('report'),insuranceReceipt:()=>receipt('balcar'),checklistReceipt:()=>receipt('premium')||receipt('report')||receipt('balcar')};
-  window.addEventListener('DOMContentLoaded',sync);
+  openAfterPage=function(scroll=true){document.body.dataset.bundleStep='report';oldOpen(scroll);sync()};
+  window.BuyTestBundle={navigate,hasReport,hasChecklist,unlock,sync,refreshStoredBundle,updateReceipt:value=>{cacheBundle(value);if(value?.plan==='balcar'&&String(value.plate)===plate())verifiedBundle=value;sync()},reportReceipt:()=>receipt('report'),insuranceReceipt:()=>receipt('balcar'),checklistReceipt:()=>receipt('premium')||receipt('report')||receipt('balcar')};
+  window.addEventListener('DOMContentLoaded',()=>{document.body.dataset.bundleStep=document.body.classList.contains('after-page')?'report':'lookup';sync();});
   window.addEventListener('pageshow',sync);
 })();
