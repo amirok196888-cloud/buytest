@@ -995,19 +995,20 @@ function trackBuyTestFreeCompletedOnce(vehiclePlate){
   buyTestMetaTrackCustom('FreeCheckCompleted',{content_name:'בדיקה עצמית לפני המכון'});
   buyTestGoogleTrackFreeCompletedOnce(normalizedPlate);
 }
-function buyTestGoogleTrackCheckoutOnce(payment,plan){
+function buyTestGoogleTrackBundleClickOnce(vehiclePlate){
   if(typeof window.gtag!=='function'||new URLSearchParams(location.search).has('manager')||document.body.classList.contains('manager-mode')) return;
-  if(!payment?.orderId) return;
-  const storageKey=BUYTEST_GOOGLE_CHECKOUT_KEY_PREFIX+String(payment.orderId);
+  const normalizedPlate=String(vehiclePlate||'').replace(/\D/g,'');
+  if(!/^\d{7,8}$/.test(normalizedPlate)) return;
+  const storageKey='buytestGoogleBundle39ClickV1:'+normalizedPlate;
   try{if(sessionStorage.getItem(storageKey)==='1') return}catch(_error){}
   try{
     window.gtag('event','conversion',{
       send_to:'AW-18445003355/tGV9CLq8k_0cENvUodtE',
-      value:Number(plan?.price)||1,
+      value:0,
       currency:'ILS'
     });
     sessionStorage.setItem(storageKey,'1');
-  }catch(error){console.warn('BuyTest Google Ads checkout conversion skipped:',error)}
+  }catch(error){console.warn('BuyTest Google Ads bundle-click conversion skipped:',error)}
 }
 function buyTestMetaTrackPurchaseOnce(payment){
   const params=new URLSearchParams(location.search);
@@ -3064,7 +3065,6 @@ async function submitBuyTestPayment(){
     saveBuyTestPayment({orderId:payment.orderId,clientSecret:payment.clientSecret,plate:payment.plate,plan:payment.plan,customerName,email,phone,progress:normalizedStageProgress(payment.progress),createdAt:new Date().toISOString()});
     sessionStorage.setItem(BUYTEST_PAYMENT_RETURN_KEY,'1');
     buyTestMetaTrack('InitiateCheckout',{value:Number(plan.price)||49,currency:'ILS',content_name:plan.name,content_ids:[String(planKey)],content_type:'product'});
-    buyTestGoogleTrackCheckoutOnce(payment,plan);
     location.assign(payment.paymentUrl);
   }catch(error){
     console.error('BuyTest payment start failed:',error);
@@ -6353,6 +6353,6 @@ document.addEventListener('keydown',event=>{
 </div>
 
 <script src="package-149.js?v=7"></script>
-<script src="manager-session.js?v=1"></script><script src="opening-20260928.js?v=3"></script><script src="vehicle-checklist.js?v=4"></script><link rel="stylesheet" href="vehicle-checklist.css?v=2"><script src="bundle-39.js?v=4"></script><script src="insurance-interpretation.js?v=1"></script><script src="external-insurance.js?v=2"></script><link rel="stylesheet" href="bundle-39.css?v=5">
+<script src="manager-session.js?v=1"></script><script src="opening-20260928.js?v=3"></script><script src="vehicle-checklist.js?v=4"></script><link rel="stylesheet" href="vehicle-checklist.css?v=2"><script src="bundle-39.js?v=5"></script><script src="insurance-interpretation.js?v=1"></script><script src="external-insurance.js?v=2"></script><link rel="stylesheet" href="bundle-39.css?v=5">
 <!-- payment-dynamic-plan-v7 -->
 <section id="consultationPage" hidden><button class="secondary" type="button" onclick="closeConsultationPage()">→ חזרה למסך הפתיחה</button><h2 class="routeHeading">התייעצות עם הבוחן</h2><p>עמוס רוקח · 15 שנות ניסיון בבדיקות קנייה</p><div class="card" id="consultationPurchaseIntro"><h3>נשארו לכם שאלות על הרכב?</h3><p>ייעוץ אישי בוואטסאפ על הדוח, הממצאים והבירורים שכדאי להשלים לפני הקנייה. אפשר להתחיל גם בלי דוח.</p><strong class="btConsultPrice">149 ₪</strong><p>ההתייעצות פתוחה ל־48 שעות ממועד אישור התשלום, בשעות המענה המפורטות בתנאים.</p><button class="primary full" type="button" onclick="startPayment('prebuy')">להתייעצות אישית — 149 ₪</button></div></section><dialog id="buytestTour"><button class="secondary" type="button" onclick="closeBuyTestTour()">✕ סגירה</button><iframe title="איך BuyTest עובד" id="buytestTourFrame"></iframe></dialog></body></html>

@@ -48,6 +48,7 @@
       navigate(intent);
       sessionStorage.removeItem('buytestBundleIntent');return true;
     }
+    buyTestGoogleTrackBundleClickOnce(plate());
     await oldStart('balcar');return false;
   }
   function navigate(step='checklist'){
