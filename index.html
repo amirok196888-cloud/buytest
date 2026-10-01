@@ -461,10 +461,10 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
   <div class="balcarOffer insuranceOffer">
     <h3>עבר ביטוחי? עתיד בטוח!</h3>
     <p>הפק דוח עבר ביטוחי וקבל פענוח של הנתונים. גם דוח ללא תביעות אינו מבטיח שהרכב לא נפגע ואינו מחליף בדיקה במכון.</p>
-    <div id="insuranceSellerFields" style="display:none;margin:12px 0;padding:12px;border:1px solid #edcd7a;border-radius:12px;background:#fffaf0">
-      <b>נדרשים פרטי הבעלות לצורך הפקת הדוח</b>
+    <p class="info">הפקת העבר הביטוחי מחייבת תעודת זהות של הבעלים ותאריך תחילת הבעלות האחרונה, כפי שמופיעים ברישיון. בלי פרטים מלאים ותואמים לא ניתן להפיק את הדוח. יש לוודא את ההתאמה לרישיון; ניתן לתקן ולהשלים פרטים לאחר פתיחת החבילה.</p><div id="insuranceSellerFields" style="display:block;margin:12px 0;padding:12px;border:1px solid #edcd7a;border-radius:12px;background:#fffaf0">
+      <b>חובה להעתיק את הפרטים במדויק מרישיון הרכב</b>
       <div class="field" style="margin-top:10px"><label for="insuranceOwnershipDate">תאריך תחילת הבעלות</label><input id="insuranceOwnershipDate" type="date"></div>
-      <div class="field" style="margin-top:10px"><label for="insuranceOwnerId">תעודת זהות של בעל הרכב</label><input id="insuranceOwnerId" inputmode="numeric" maxlength="9" autocomplete="off" placeholder="9 ספרות" oninput="this.value=this.value.replace(/\D/g,'').slice(0,9)"></div>
+      <div class="field" style="margin-top:10px"><label for="insuranceOwnerId">תעודת זהות של בעל הרכב</label><input id="insuranceOwnerId" inputmode="numeric" maxlength="9" autocomplete="off" placeholder="9 ספרות, כולל אפסים בתחילת המספר" oninput="this.value=this.value.replace(/\D/g,'').slice(0,9)"></div>
     </div>
     <button class="primary full" id="balcarPlanButton" type="button" data-analytics-click="click_insurance_history" onclick="startBalcarPayment()">הפקת דוח העבר הביטוחי הכלול בחבילה</button>
     <div class="devMsg" id="balcarEligibilityMsg" role="status" aria-live="polite"></div>
@@ -473,6 +473,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 <section class="card freeAfterLookup" id="afterInsuranceChoices" style="display:none">
   <h2>כל התהליך לרכב אחד — מחיר השקה 39 ₪</h2>
   <p class="bundleScope">צ׳קליסט מלא, שאלות למוכר ואימות רישיון, דוח עבר ביטוחי, פענוח דוח המכון ושני סיכומים. תשלום חד־פעמי לרכב אחד, גישה ל־30 ימים. התייעצות אישית אינה כלולה.</p>
+  <p class="sub">להפקת העבר הביטוחי נדרשים תעודת זהות של הבעלים ותאריך תחילת הבעלות האחרונה, במדויק לפי הרישיון. אפשר להתחיל בצ׳קליסט ולהשלים אותם בהמשך.</p>
   <button class="primary full" id="buyBundle39" type="button" onclick="BuyTestBundle.unlock('checklist')">פתיחת החבילה — 39 ₪</button>
   <nav class="btBundleSteps" aria-label="שלבי הבדיקה לרכב">
     <button class="primary full" id="continueFreeAfterInsurance" type="button" onclick="BuyTestBundle.unlock('checklist')">1. צ׳קליסט ליד הרכב</button>
@@ -2387,12 +2388,21 @@ function renderPaidBalcarReport(data,sourcePlate=plate()){
   if(retry) retry.style.display='none';
   applyInsuranceConclusionsToSellerQuestions(data);
 }
+function buytestInsuranceDetailsError(ownershipDate,ownerIsraeliId){
+  if(!/^\d{9}$/.test(ownerIsraeliId)||/^0+$/.test(ownerIsraeliId))return 'יש להזין תעודת זהות תקינה של הבעלים: 9 ספרות, כולל אפסים בתחילת המספר.';
+  const sum=[...ownerIsraeliId].reduce((sum,x,i)=>{const n=Number(x)*(i%2+1);return sum+(n>9?n-9:n)},0);
+  if(sum%10)return 'תעודת הזהות אינה תקינה. יש להעתיק אותה מרישיון הרכב במדויק.';
+  const date=new Date(ownershipDate+'T00:00:00Z');
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(ownershipDate)||!Number.isFinite(date.getTime())||date.toISOString().slice(0,10)!==ownershipDate||ownershipDate<'1900-01-01'||ownershipDate>new Date().toISOString().slice(0,10))return 'יש להזין תאריך תחילת בעלות תקין, כפי שמופיע ברישיון הרכב.';
+  return '';
+}
 async function retryPaidBalcarWithDetails(){
   const ownershipDate=String(document.getElementById('paidRetryOwnershipDate')?.value||'');
   const ownerIsraeliId=String(document.getElementById('paidRetryOwnerId')?.value||'').replace(/\D/g,'');
   const message=document.getElementById('balcarPaidRetryMsg');
-  if(!/^\d{4}-\d{2}-\d{2}$/.test(ownershipDate)||!/^\d{9}$/.test(ownerIsraeliId)){
-    if(message){message.classList.add('show');message.textContent='יש למלא תאריך תחילת בעלות ותעודת זהות בת 9 ספרות.';}
+  const validation=buytestInsuranceDetailsError(ownershipDate,ownerIsraeliId);
+  if(validation){
+    if(message){message.classList.add('show');message.textContent=validation;}
     return;
   }
   const saved=storedBuyTestPayment();
@@ -2412,6 +2422,8 @@ async function loadPaidBalcarReport(){
       let insuranceDetails={};
       try{insuranceDetails=JSON.parse(localStorage.getItem(BUYTEST_INSURANCE_DETAILS_KEY)||'{}')}catch(_error){}
       if(String(insuranceDetails.plate||'')!==String(saved.plate||'')) insuranceDetails={};
+      const validation=buytestInsuranceDetailsError(insuranceDetails.ownershipDate||'',insuranceDetails.ownerIsraeliId||'');
+      if(validation){showInsuranceStart();if(status)status.textContent=validation;const retry=document.getElementById('balcarPaidRetry');if(retry)retry.style.display='block';return false;}
       let data=await callBuyTestBalcarService({action:'createPaid',plate:saved.plate,orderId:saved.orderId,clientSecret:saved.clientSecret,...insuranceDetails});
       for(let attempt=0;attempt<24&&data?.status!=='ready';attempt++){
         if(['failed','cancelled'].includes(String(data?.status))) throw new Error('report_failed');
@@ -2438,47 +2450,20 @@ async function loadPaidBalcarReport(){
   return balcarLoadPromise;
 }
 async function startBalcarPayment(){
-  if(window.BuyTestBundle&&!document.body.classList.contains('manager-mode')){await BuyTestBundle.refreshStoredBundle();if(BuyTestBundle.insuranceReceipt()){showInsuranceStart();await loadPaidBalcarReport();return;}}
   if(document.body.classList.contains('manager-mode')){
-    applyPlanAccess('balcar',{scroll:true});
-    const status=document.getElementById('balcarOrderStatus');
-    if(status){status.textContent='מצב מנהל — דוח העבר הביטוחי נפתח ללא הזמנה וללא חיוב.';status.classList.remove('error');}
-    return;
+    const status=document.getElementById('balcarOrderStatus');if(status)status.textContent='מצב מנהל — ללא הזמנה וללא חיוב.';return;
   }
-  const vehiclePlate=plate();
-  const button=document.getElementById('balcarPlanButton');
+  if(!window.BuyTestBundle?.insuranceReceipt()){await BuyTestBundle.unlock('insurance');return;}
+  const ownershipDate=String(document.getElementById('insuranceOwnershipDate')?.value||'');
+  const ownerIsraeliId=String(document.getElementById('insuranceOwnerId')?.value||'').replace(/\D/g,'');
   const message=document.getElementById('balcarEligibilityMsg');
-  if(!/^\d{7,8}$/.test(vehiclePlate)){showBuyTestAccessNotice('לפני הזמנת הדוח יש להציג את נתוני הרכב.',true);return;}
-  if(button) button.disabled=true;
-  if(message){message.classList.add('show');message.textContent='בודק שהדוח זמין לרכב הזה...';}
-  try{
-    const previous=storedBuyTestPayment();
-    if(previous?.plan==='balcar'&&String(previous.plate)===vehiclePlate&&previous.orderId&&previous.clientSecret){
-      if(await restoreBuyTestAccess({requiredPlate:vehiclePlate,scroll:true})){
-        if(message) message.textContent='כבר קיים תשלום מאושר לרכב הזה. פותח את הדוח ללא חיוב נוסף.';
-        await loadPaidBalcarReport();
-        return;
-      }
-    }
-    const eligibility=await callBuyTestBalcarService({action:'eligibility',plate:vehiclePlate,serviceId:BUYTEST_BALCAR_SERVICE_ID});
-    if(eligibility?.requiresSellerDetails){
-      const fields=document.getElementById('insuranceSellerFields');
-      const ownershipDate=String(document.getElementById('insuranceOwnershipDate')?.value||'');
-      const ownerIsraeliId=String(document.getElementById('insuranceOwnerId')?.value||'').replace(/\D/g,'');
-      if(fields?.style.display!=='block'||!/^\d{4}-\d{2}-\d{2}$/.test(ownershipDate)||!/^\d{9}$/.test(ownerIsraeliId)){
-        if(fields) fields.style.display='block';
-        if(message) message.textContent='לרכב זה נדרשים תאריך תחילת בעלות ותעודת זהות. מלא את שני השדות ולחץ שוב להמשך. לא בוצע חיוב.';
-        return;
-      }
-      localStorage.setItem(BUYTEST_INSURANCE_DETAILS_KEY,JSON.stringify({plate:vehiclePlate,ownershipDate,ownerIsraeliId}));
-    }
-    if(message) message.textContent='דוח העבר הביטוחי זמין. חבילת BuyTest המלאה לרכב עולה 39 ₪. מעביר לתשלום מאובטח...';
-    await startPayment('balcar');
-  }catch(error){
-    console.error('Insurance-history eligibility failed:',error);
-    if(message) message.textContent='לא ניתן לבדוק כרגע את זמינות הדוח. לא בוצע חיוב.';
-  }finally{if(button) button.disabled=false;}
+  const validation=buytestInsuranceDetailsError(ownershipDate,ownerIsraeliId);
+  if(validation){if(message){message.classList.add('show');message.textContent=validation;}return;}
+  localStorage.setItem(BUYTEST_INSURANCE_DETAILS_KEY,JSON.stringify({plate:plate(),ownershipDate,ownerIsraeliId}));
+  if(message){message.classList.add('show');message.textContent='הפרטים נשמרו. בודק את התאמתם מול ספק הדוח — ללא תשלום נוסף.';}
+  await loadPaidBalcarReport();
 }
+
 async function callBuyTestAnalyzeService(body){
   const headers={
     'Content-Type':'application/json',
@@ -3041,6 +3026,7 @@ async function startPayment(planKey='report'){
   sessionStorage.setItem('buytestPendingPlan',selectedKey);
   buyTestPaymentStarting=true;
   document.getElementById('paymentPlanSummary').textContent=plan.name+(selectedKey==='prebuy'?' · ללא חובה לבחור רכב':' · רכב '+plate)+' · '+plan.price+' ₪';
+  document.getElementById('paymentInsuranceRequirement').hidden=selectedKey!=='balcar';
   const overlay=document.getElementById('paymentOverlay');
   overlay.hidden=false;
   document.body.style.overflow='hidden';
@@ -6347,7 +6333,7 @@ document.addEventListener('keydown',event=>{
 <div class="paymentOverlay" id="paymentOverlay" hidden>
   <section class="paymentDialog" role="dialog" aria-modal="true" aria-labelledby="paymentDialogTitle">
     <h2 id="paymentDialogTitle">תשלום מאובטח</h2>
-    <p id="paymentPlanSummary"></p>
+    <p id="paymentPlanSummary"></p><p class="paymentSecureNote" id="paymentInsuranceRequirement" hidden>הפקת העבר הביטוחי דורשת תעודת זהות של הבעלים ותאריך תחילת הבעלות האחרונה, במדויק לפי הרישיון. פרטים חסרים או שאינם תואמים מונעים הפקה. התשלום פותח את החבילה; אפשר להשלים את הפרטים בשלב העבר הביטוחי.</p>
     <p class="paymentStatus" id="paymentStatus" role="status" aria-live="polite"></p>
     <div class="paymentUnavailable" id="paymentUnavailable" hidden>
       <p>מערכת התשלום אינה זמינה כרגע. לא בוצע חיוב ואפשר לנסות שוב בעוד מספר דקות.</p>

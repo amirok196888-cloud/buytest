@@ -111,6 +111,13 @@ function reportIdFrom(value: unknown) {
   return String(data.reportId || data.id || "").trim();
 }
 
+function validInsuranceDetails(date: string, id: string) {
+  if (!/^\d{9}$/.test(id) || /^0+$/.test(id)) return false;
+  const sum = [...id].reduce((sum, x, i) => { const n = Number(x) * (i % 2 + 1); return sum + (n > 9 ? n - 9 : n); }, 0);
+  const parsed = new Date(date + "T00:00:00Z");
+  return sum % 10 === 0 && /^\d{4}-\d{2}-\d{2}$/.test(date) && Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 10) === date && date >= "1900-01-01" && date <= new Date().toISOString().slice(0, 10);
+}
+
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get("origin");
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: responseHeaders(origin) });
@@ -152,6 +159,7 @@ Deno.serve(async (req: Request) => {
       }
       if (action === "statusPaid") return json(origin, { error: { code: "report_not_created" } }, 404);
 
+      if (!validInsuranceDetails(ownershipDate, ownerIsraeliId)) return json(origin, { error: { code: "seller_details_required" } }, 422);
       const eligibility = await balcarRaw(`/vehicles/${encodeURIComponent(plate)}/eligibility?serviceId=${BALCAR_SERVICE_ID}`);
       if (eligibility.status < 200 || eligibility.status >= 300) return json(origin, eligibility.data, eligibility.status);
       if (recordValue(eligibility.data).requiresSellerDetails === true && (!/^\d{4}-\d{2}-\d{2}$/.test(ownershipDate) || !/^\d{9}$/.test(ownerIsraeliId))) {
