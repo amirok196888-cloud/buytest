@@ -29,3 +29,20 @@ body[data-bundle-step="report"] #vehicleChecklist{display:none!important}
 #afterInsuranceChoices .bundleAccessCaption{font-size:15px;line-height:1.7}
 #afterInsuranceChoices .bundleOwnerCaption{margin-top:18px;padding-top:16px;border-top:1px solid #dbe7e1;font-size:15px;line-height:1.7}
 @media(max-width:420px){#afterInsuranceChoices #buyBundle39{font-size:21px}#afterInsuranceChoices h2{font-size:22px}}
+
+/* Independent stages, with consistent navigation and a clear next action. */
+.btStageNav{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 20px;padding-bottom:15px;border-bottom:1px solid #dce8e3}
+.btStageNav[hidden],#externalInsuranceNext[hidden]{display:none!important}
+#appShell .btStageNav button,#afterPage .btStageNav button{flex:1;min-height:46px;min-width:85px;margin:0;font-size:15px;background:#f4faf7;color:#075e48;border:1px solid #b9d9cc;box-shadow:none}
+#appShell .btStageNav button[aria-current="step"],#afterPage .btStageNav button[aria-current="step"]{background:#075e48;color:#fff;border-color:#075e48}
+.btNextActions{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0 18px;padding:16px;border:1px solid #c5e1d5;background:#f0faf5;border-radius:14px}
+.btNextActions p{flex-basis:100%;margin:0;color:#35574b;font-weight:700}
+.btNextActions button{flex:1;min-height:50px;margin:0!important}
+#externalInsurancePanel{margin:22px 0;padding:20px;border:1px solid #badccc;border-radius:16px;background:#fff}
+#externalInsurancePanel h3{margin:0 0 12px}
+#externalInsuranceCorrection[hidden]{display:none!important}
+.checklistPhotos{margin:20px 0;padding:16px;background:#f7faf8;border:1px solid #d4e4dc;border-radius:14px}
+.checklistPhotos h3{font-size:18px;margin:0 0 8px}
+#vehicleLookup,#vehicleChecklist,#insuranceStartSection,#afterInspectionSection{scroll-margin-top:18px}
+.btStageNav button:focus-visible,.btNextActions button:focus-visible{outline:3px solid #d49d30;outline-offset:3px}
+@media(max-width:420px){.btStageNav{gap:5px}.btStageNav button{padding:10px 6px!important}.btNextActions{padding:12px;gap:7px}}
