@@ -12,6 +12,7 @@ const TRAFFIC_SOURCES = new Set(["google", "meta", "tiktok", "direct", "other", 
 const MILEAGE_SOURCES = new Set(["ministry_last_test", "inspection_report"]);
 const MILEAGE_DATE_BASES = new Set(["test_date", "captured_date"]);
 const CLICK_EVENT_TYPES = new Set([
+  "click_bundle_entry",
   "click_before_route",
   "click_after_route",
   "click_insurance_history",
