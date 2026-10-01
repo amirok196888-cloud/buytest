@@ -17,3 +17,8 @@ test('explicit no-claims statement is qualified and third-party claims are disti
  assert.equal(interpret('לא נמצאו תביעות בתקופה שנבדקה').status,'explicit-clean');assert.match(interpret('לא נמצאו תביעות').text,/תיקון פרטי/);
  const third=interpret('תביעה לצד ג׳. סכום תביעה: 12000 ₪');assert.equal(third.events[0].thirdParty,true);assert.match(third.text,/אין להסיק ממנה לבדה מה היקף הנזק לרכב הנבדק/);
 });
+test('a claim with no depreciation still has its payout interpreted',()=>{
+ const result=interpret('תביעה בגין נזק לדלת. סכום תביעה: 4500 ₪; ללא ירידת ערך, לא הוגדר אובדן גמור');
+ assert.equal(result.events.length,1);assert.equal(result.events[0].amount,4500);assert.equal(result.events[0].totalLoss,false);assert.equal(result.alerts.length,0);
+ assert.match(result.text,/הסכום לבדו אינו קובע/);assert.equal(interpret('סכום תביעה: 0').events.length,0);
+});

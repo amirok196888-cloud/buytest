@@ -15,15 +15,15 @@
       if(header){inClaims=true;inCoverage=false;sectionSeen=true;}
       if(inCoverage&&!header)continue;
       if(/(?:לא\s+(?:נמצא[וה]?|נרשמ[וה]?|הוגשו)|אין|ללא)\s+(?:כל\s+)?תביעות|לא\s+(?:נמצא[וה]?|נרשמ[וה]?)\s+(?:אירועי\s+)?נזק/.test(line)){explicitClean=true;continue;}
-      if(!damage.test(line)||header||negative.test(line))continue;
+      if(!damage.test(line)||header)continue;
       // Header labels and coverage history alone are not evidence of an accident.
       if(/^(?:סוג\s*(?:נזק|תביעה)|תאריך\s*(?:נזק|תביעה)|סכום\s*(?:תביעה|פיצוי)|ירידת\s*ערך|אובדן\s*(?:גמור|להלכה))\s*[:?]?\s*$/.test(line))continue;
-      const positiveLoss=/(?:הוגדר|נקבע|סוג\s*(?:הנזק|נזק|התביעה|תביעה)\s*[:—-]|סטטוס\s*[:—-]|כן\s*[:—-]?)\s*(?:כ|ה)?(?:אובדן|אבדן)\s*(?:גמור|להלכה)|(?:אובדן|אבדן)\s*(?:גמור|להלכה)\s*[:—-]?\s*כן/.test(line);
+      const positiveLoss=!/(?:לא|אין|ללא)\s+(?:הוגדר\s+)?(?:אובדן|אבדן)/.test(line)&&/(?:הוגדר|נקבע|סוג\s*(?:הנזק|נזק|התביעה|תביעה)\s*[:—-]|סטטוס\s*[:—-]|כן\s*[:—-]?)\s*(?:כ|ה)?(?:אובדן|אבדן)\s*(?:גמור|להלכה)|(?:אובדן|אבדן)\s*(?:גמור|להלכה)\s*[:—-]?\s*כן/.test(line);
       const amountMatch=line.match(/(?:סכום\s*(?:התביעה|תביעה|הפיצוי|פיצוי|ששולם|נזק)|תביעה\s*בסך|תשלום|פיצוי)\s*[:—-]?\s*([\d,]+(?:\.\d{1,2})?)\s*(?:₪|ש[״"]?ח|שקל)?/);
       const reduction=line.match(/ירידת\s*ערך\s*[:—-]?\s*(\d+(?:\.\d+)?)\s*%/);
       const date=line.match(/\b\d{1,2}[/.\-]\d{1,2}[/.\-]\d{2,4}\b/);
-      const narrative=/(?:נזק\s+(?:ל|ב)|תאונה\s+(?:ב|מ|עם)|תוקנ|הוחלפ|פגיעה\s+(?:ב|ל)|ניזוק|תביעה\s+(?:בגין|על|בסך)|הצפה\s*(?:[:—-]|ברכב)|שריפה\s*(?:[:—-]|ברכב))/.test(line);
-      if(!positiveLoss&&!amountMatch&&!reduction&&!narrative)continue;
+      const narrative=!/^(?:לא|אין|ללא)\s+(?:נמצא[וה]?\s+|נרשמ[וה]?\s+)?(?:נזק|תאונ)/.test(line)&&/(?:נזק\s+(?:ל|ב)|תאונה\s+(?:ב|מ|עם)|תוקנ|הוחלפ|פגיעה\s+(?:ב|ל)|ניזוק|תביעה\s+(?:בגין|על|בסך)|הצפה\s*(?:[:—-]|ברכב)|שריפה\s*(?:[:—-]|ברכב))/.test(line);
+      if(!positiveLoss&&!(amountMatch&&Number(amountMatch[1].replace(/,/g,''))>0)&&!(reduction&&Number(reduction[1])>0)&&!narrative)continue;
       const amount=amountMatch?Number(amountMatch[1].replace(/,/g,'')):null;
       const depreciation=reduction?Number(reduction[1]):null;
       const thirdParty=/צד\s*ג[׳'’]?/.test(line);
