@@ -6,13 +6,6 @@
       'האם היו תאונות או תיקונים משמעותיים?',
       'האם המוכר מתחייב בבדיקה לגבי מנוע, גיר, שלדה ותאונות משמעותיות?'
     ], seller:true},
-    {id:'license', title:'בדיקת הרישיון מול הרכב והמוכר', questions:[
-      'תוקף רישיון הרכב (טסט)', 'תאריך תחילת הבעלות מול דברי המוכר',
-      'מספר הבעלים הקודמים והנוכחי', 'זהות המוכר והרשאתו למכור את הרכב',
-      'מקוריות הרכב — פרטי, חברה, השכרה או החכרה',
-      'התאמת מספר שלדה, מספר מנוע ומידות הצמיגים לרישיון',
-      'הקילומטראז׳ ברכב מול הקריאה האחרונה ברישיון או במאגר'
-    ]},
     {id:'external', title:'בדיקה חיצונית', questions:[
       'בדוק אם קיימים הבדלי גוון בצבע בין חלקי המרכב',
       'בדוק אם קיימים סימני פתיחה או פירוק בברגי מכסה המנוע ומכסה תא המטען',
@@ -81,12 +74,16 @@
       const entry={question:row.dataset.question,checked,state:note||row.dataset.issue==='true'?'issue':checked?'checked':'unchecked',note};
       answers[row.dataset.key]=entry;entries.push(entry);
     });
-    const done=entries.filter(x=>x.checked||x.state==='issue').length;
+    // Keep previously recorded license clarifications in the summary after removing the duplicate topic.
+    const licenseNotes=answers['topic:license']?[answers['topic:license']]:Object.entries(answers).filter(([key])=>/^license:\d+$/.test(key)).map(([,value])=>value);
+    const priorLicenseIssues=licenseNotes.filter(x=>x.note||x.state==='issue');
+    const done=entries.filter(x=>x.checked||x.state==='issue').length,total=entries.length;
+    entries.push(...priorLicenseIssues);
     const text=['דיווח הקונה ותשובות המוכר — אינם ממצאים מאומתים של מכון.',
       ...entries.map(x=>`${x.question} — ${states[x.state]||states.unchecked}${x.note?' · '+x.note:''}`)];
     btSaveSource('checklist',{title:'צ׳קליסט ליד הרכב — דיווח הקונה והמוכר',answers,text:text.join('\n'),
       alerts:entries.filter(x=>x.state==='issue').map(x=>'דיווח לקוח — '+x.question+': '+(x.note||'סומן לבירור ללא פירוט'))});
-    document.getElementById('checklistProgress').textContent=`נבדקו או סומנו לבירור ${done} מתוך ${entries.length} נושאים. אפשר להפיק סיכום גם עם נושאים שלא סומנו.`;
+    document.getElementById('checklistProgress').textContent=`נבדקו או סומנו לבירור ${done} מתוך ${total} נושאים. אפשר להפיק סיכום גם עם נושאים שלא סומנו.`;
     refresh();
   }
   function restore(p){
