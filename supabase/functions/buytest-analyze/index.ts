@@ -9,7 +9,7 @@ const externalVehicleData = { kmHistory: [] };
 
 function fmtNum(v){return(v===null||v===undefined||v==='')?'—':Number(v).toLocaleString('he-IL')}
 function cleanOcrText(text){return String(text||'').replace(/\r/g,'').replace(/[ \t]+\n/g,'\n').replace(/\n{3,}/g,'\n\n').trim()}
-function diagnosticTableText(text){const cleaned=cleanOcrText(text);const marker=/הערות\s*כלליות|לחזור\s+לה\s*משך\s+בדיקה\s+לאחר\s+תיקון|יש\s+לברר\s+זמני\s+טיפולים/i;const match=marker.exec(cleaned);return match&&match.index>180?cleaned.slice(0,match.index).trim():cleaned}
+function diagnosticTableText(text){const cleaned=cleanOcrText(text);const marker=/הערות\s*כלליות|לחזור\s+לה\s*משך\s+בדיקה\s+לאחר\s+תיקון|יש\s+לברר\s+זמני\s+טיפולים/i;const match=marker.exec(cleaned);return match&&(match.index>180||/^הערות\s*כלליות$/i.test(match[0]))?cleaned.slice(0,match.index).trim():cleaned}
 
 const findingKnowledgeBase=[
   {id:'engine-oil-sweat-report',terms:['סימני הזעה שמן מנוע','סימני הזעת שמן מנוע'],patterns:[/סימני\s*הזע[הת]?\s*שמן/],category:'מנוע',tag:'משמעות בינונית',tone:'clarify',classification:'actual_finding',reportSeverity:'medium',suppresses:['oil-sweat'],meaning:'נרשמו סימני הזעת שמן במנוע. זו לחות שמנונית, ויש להבדיל בינה לבין נזילה פעילה.',decision:'יש לאתר את מקור ההזעה ולבדוק אם היא קלה ויבשה או פעילה. יש להביא בחשבון טיפול באטימה לפי הממצאים.'},
@@ -1676,6 +1676,8 @@ function interpretSummaryText(text){
   let currentCategory='',currentSeverity=null,skipSection=false;
   const lines=reportLines(text);
   lines.forEach((line,index)=>{
+    // A general-notes footer cannot reopen a diagnostic system section.
+    if(skipSection) return;
     const lineCategory=reportCategoryFromLine(line);
     if(lineCategory){
       currentCategory=lineCategory;

@@ -54,6 +54,26 @@ const cases = [
     "name": "all system headings are labels only",
     "input": "1 מערכת דלק ✓\n2 מערכת הצתה ✓\n3 מערכת גידוש המנוע ✓\n4 מערכות הנעה ✓\n5 מערכת הטעינה ✓\n6 מערכת הפליטה ומערכות למניעת זיהום אוויר ✓\n7 מצמד ✓\n8 תיבת הילוכים ✓\n9 ציריות/גל הינע ✓\n10 מערכת מתלה קדמי ✓\n11 מערכת מתלה אחורי ✓\n12 מערכת הבלמים (ללא פירוק גלגלים) ✓\n13 צמיגים וחישוקים ✓\n14 מערכת תאורה ✓\n15 הערות כלליות ✓\n16 מנוע ✓\n17 מערכת הקירור ✓\n18 מערכת ההתנעה (כולל מצבר) ✓\n19 תיבת העברת הכוח ✓\n20 מערכת ההיגוי ✓\n21 שלדת מרכב ✓\n22 שלדה נפרדת ✓",
     "type": "empty"
+  },
+  {
+    "name": "short general notes stay outside diagnoses",
+    "input": "מנוע ✓\nהערות כלליות\nאין אחריות על תיבת הילוכים אוטומטית",
+    "type": "empty"
+  },
+  {
+    "name": "notes-only OCR does not create findings",
+    "input": "הערות כלליות\nאין אחריות על תיבת הילוכים אוטומטית",
+    "type": "empty"
+  },
+  {
+    "name": "split notes heading is excluded",
+    "input": "מנוע ✓\nהערות\nכלליות\nאין אחריות על תיבת הילוכים אוטומטית",
+    "type": "empty"
+  },
+  {
+    "name": "actual diagnosis before general notes is retained",
+    "input": "מערכת ההתנעה (כולל מצבר)\nמצבר חלש\nהערות כלליות\nאין אחריות על תיבת הילוכים אוטומטית",
+    "type": "battery"
   }
 ];
 for (const fixture of cases) {

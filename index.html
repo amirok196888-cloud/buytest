@@ -3494,7 +3494,7 @@ function diagnosticTableText(text){
   const cleaned=cleanOcrText(text);
   const marker=/הערות\s*כלליות|לחזור\s+לה\s*משך\s+בדיקה\s+לאחר\s+תיקון|יש\s+לברר\s+זמני\s+טיפולים/i;
   const match=marker.exec(cleaned);
-  return match&&match.index>180?cleaned.slice(0,match.index).trim():cleaned;
+  return match&&(match.index>180||/^הערות\s*כלליות$/i.test(match[0]))?cleaned.slice(0,match.index).trim():cleaned;
 }
 
 function clearInspectionFile(kind){
@@ -4893,6 +4893,8 @@ function interpretSummaryText(text){
   let currentCategory='',currentSeverity=null,skipSection=false;
   const lines=reportLines(text);
   lines.forEach((line,index)=>{
+    // A general-notes footer cannot reopen a diagnostic system section.
+    if(skipSection) return;
     const lineCategory=reportCategoryFromLine(line);
     if(lineCategory){
       currentCategory=lineCategory;
