@@ -474,7 +474,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
   <h2>בדיקות הרכב — שלב אחר שלב</h2>
   <p class="bundleScope">צ׳קליסט מלא, עבר ביטוחי ופענוח דוח המכון — בתהליך אחד לרכב שלך.</p>
   <p class="sub bundleAccessCaption">תשלום חד־פעמי לרכב אחד · גישה ל־30 ימים.<br>התייעצות אישית אינה כלולה.</p>
-  <button class="primary full" id="buyBundle39" type="button" onclick="BuyTestBundle.unlock('checklist')">כניסה למהלך הבדיקה — 39 ₪</button>
+  <button class="primary full" id="buyBundle39" type="button" data-analytics-click="click_bundle_entry" onclick="BuyTestBundle.unlock('checklist')">כניסה למהלך הבדיקה — 39 ₪</button>
   <p class="sub bundleFlowCaption">מתחילים בצ׳קליסט ובאימות הרישיון, ממשיכים לעבר ביטוחי ואז לפענוח דוח המכון ולסיכומים.</p>
   <p class="sub bundleOwnerCaption">להפקת העבר הביטוחי נדרשים תעודת זהות של הבעלים ותאריך תחילת הבעלות האחרונה, במדויק לפי הרישיון. אפשר להתחיל בצ׳קליסט ולהשלים אותם בהמשך.</p>
 </section>
@@ -2605,6 +2605,7 @@ async function trackBuyTestEvent(eventType){
   }catch(error){console.warn('BuyTest analytics event skipped:',error)}
 }
 const BUYTEST_CLICK_LABELS={
+  click_bundle_entry:'כניסה למהלך הבדיקה — חבילת רכב',
   click_before_route:'בחירת המסלול לפני המכון',
   click_after_route:'בחירת המסלול אחרי המכון',
   click_report_consultation_plan:'פענוח והתייעצות — 129 ₪',
@@ -2870,7 +2871,7 @@ async function restoreBuyTestAccess({requiredPlate='',onReturn=false,scroll=true
   }catch(error){
     buyTestLastPaymentStatus='';
     console.warn('BuyTest access check failed:',error);
-    if(onReturn) showBuyTestAccessNotice('התשלום התקבל, אך האישור עדיין מתעדכן. המתן רגע ורענן את הדף.',true);
+    if(onReturn) showBuyTestAccessNotice('לא ניתן לאמת כרגע את מצב התשלום. אין צורך לשלם שוב; המתן רגע ורענן את הדף.',true);
   }
   return false;
 }
