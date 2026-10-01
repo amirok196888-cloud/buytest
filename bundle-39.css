@@ -1,0 +1,7 @@
+body.after-page:not(.bt-report-access):not(.manager-mode) #afterInspectionSection{display:none!important}
+body.bt-report-access.after-page #afterInspectionSection,body.plan-balcar.bt-report-access .reportFeature{display:block!important}
+body.bt-insurance-access .balcarFeature{display:block!important}
+#reportBundlePaywall[hidden]{display:none!important}#reportBundlePaywall{border:2px solid #0e9570;border-radius:18px;padding:20px;margin:16px 0;background:#eefaf5}
+.bundleLaunchPrice{font-size:30px;font-weight:900;color:#075e48}.bundleScope{line-height:1.8}
+
+.btLaunchOffer{display:grid;gap:6px;padding:15px 12px;margin:14px 0;border:1px solid #b7dbcc;border-radius:16px;background:#effaf4;color:#164736}.btLaunchOffer strong{font-size:21px}.btLaunchOffer span{font-size:14px}.btLaunchOffer small{font-size:12px;color:#496458}

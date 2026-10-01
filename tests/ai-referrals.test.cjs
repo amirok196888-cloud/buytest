@@ -38,6 +38,7 @@ test('report navigation preserves query attribution and clears only its own hash
   const classes=new Set();const nodes={};
   const context={URLSearchParams,location:{hash:'',pathname:'/',search:'?utm_source=chatgpt.com'},plate:()=>'',document:{body:{classList:{add:x=>classes.add(x),remove:x=>classes.delete(x)}},getElementById:id=>nodes[id]||(nodes[id]={style:{},classList:{add(){}},scrollIntoView(){}})},window:{scrollTo(){}},history:{replaceState:(_,__,url)=>{context.lastUrl=url;context.location.hash=url.includes('#')?'#'+url.split('#')[1]:'';}}};
   vm.createContext(context);
+  context.trackBuyTestReportStage=()=>{};
   const start=html.indexOf('function openAfterPage('),end=html.indexOf('async function loadAfterPageVehicle',start);
   vm.runInContext(html.slice(start,end),context);
   context.openAfterPage(false);

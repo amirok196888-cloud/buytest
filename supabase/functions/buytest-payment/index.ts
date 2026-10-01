@@ -12,7 +12,7 @@ const CARDCOM_API_URL = "https://secure.cardcom.solutions/api/v11";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 const PLANS = {
-  balcar: { amountAgorot: 3900, title: "דוח עבר ביטוחי לרכב", scopes: ["balcar"] },
+  balcar: { amountAgorot: 3900, title: "חבילת BuyTest לרכב אחד", scopes: ["balcar", "premium", "report"] },
   premium: { amountAgorot: 4900, title: "בדיקה עצמית לפני המכון", scopes: ["premium"] },
   report: { amountAgorot: 4900, title: "פענוח דוח המכון", scopes: ["report"] },
   report_consultation: { amountAgorot: 12900, title: "פענוח דוח המכון והתייעצות עם בוחן", scopes: ["report", "consultation"] },
@@ -235,7 +235,7 @@ async function refreshCardcomOrder(order: Record<string, unknown>, config: Cardc
   return await updateOrder(String(order.id), {
     status: "paid",
     paid_at: new Date().toISOString(),
-    expires_at: new Date(Date.now() + (isPackage(order.plan) ? 90 * 24 : 48) * 60 * 60 * 1000).toISOString(),
+    expires_at: new Date(Date.now() + (isPackage(order.plan) ? 90 * 24 : order.plan === "balcar" ? 30 * 24 : 48) * 60 * 60 * 1000).toISOString(),
     provider_payload: compactProviderPayload(result, order.provider_payload),
   }) || order;
 }
@@ -455,7 +455,7 @@ async function completeStage(origin: string | null, body: Record<string, unknown
   const scopes: readonly string[] = PLANS[plan].scopes;
   if (!scopes.includes(stage)) return json(origin, { ok: false, error: "stage_not_purchased" }, 403);
   const progress = stageProgress(order.provider_payload);
-  if (stage === "report" && !progress.preInspectionCompleted && plan !== "report" && plan !== "report_consultation") {
+  if (stage === "report" && !progress.preInspectionCompleted && plan !== "report" && plan !== "report_consultation" && plan !== "balcar") {
     return json(origin, { ok: false, error: "previous_stage_required" }, 409);
   }
   const nextProgress: StageProgress = stage === "premium"

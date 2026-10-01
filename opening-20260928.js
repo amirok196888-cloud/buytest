@@ -5,6 +5,7 @@ function openBuyTestTour(){const modal=document.getElementById('buytestTour');do
 function closeBuyTestTour(){document.getElementById('buytestTour').close();document.getElementById('buytestTourFrame').removeAttribute('src');}
 let btLicenseImageUrl='',btLicenseReadVersion=0;
 async function readBuyTestLicense(input){
+ if(window.BuyTestBundle&&!BuyTestBundle.hasChecklist()){input.value='';await BuyTestBundle.unlock('checklist');return;}
  const file=input.files?.[0],version=++btLicenseReadVersion,status=document.getElementById('btLicenseStatus'),preview=document.getElementById('btLicensePreview');
  document.getElementById('btLicenseReview').hidden=true;document.getElementById('btLicenseResults').textContent='';preview.hidden=true;
  for(const id of ['btLicensePlate','btLicenseKm','btLicenseDate'])document.getElementById(id).value='';
@@ -17,15 +18,15 @@ async function readBuyTestLicense(input){
  try{
   const source=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(file)});
   const text=await googleVisionRecognize([source],null);
-  if(version!==btLicenseReadVersion)return;
+  if(version!==btLicenseReadVersion||vehicleAtUpload!==plate())return;
   // Only extract values adjacent to explicit labels; never treat an arbitrary number as mileage.
   const plateMatch=text.match(/(?:מספר\s*(?:ה?רכב|רישוי))[^\d\n]{0,12}(\d[\d -]{5,10}\d)/);
   const kmMatch=text.match(/(?:קילומטר[אא-ת׳'״"]*|קילומטראז[׳']?|ק[״"]מ)[^\d\n]{0,18}(\d[\d, ]{1,8}\d)/);
   if(plateMatch)document.getElementById('btLicensePlate').value=plateMatch[1].replace(/\D/g,'').slice(0,8);
   if(kmMatch)document.getElementById('btLicenseKm').value=kmMatch[1].replace(/\D/g,'');
   status.textContent='אשרו את המספרים מול הצילום והשלימו את תאריך המדידה. הזיהוי האוטומטי עלול לטעות.';
- }catch(error){if(version!==btLicenseReadVersion)return;status.textContent='לא הצלחנו לקרוא את התמונה. אפשר למלא את הפרטים מהצילום ולהשוות למאגר.';}
- if(version===btLicenseReadVersion)document.getElementById('btLicenseReview').hidden=false;
+ }catch(error){if(version!==btLicenseReadVersion||vehicleAtUpload!==plate())return;status.textContent='לא הצלחנו לקרוא את התמונה. אפשר למלא את הפרטים מהצילום ולהשוות למאגר.';}
+ if(version===btLicenseReadVersion&&vehicleAtUpload===plate())document.getElementById('btLicenseReview').hidden=false;
 }
 function buytestMileageComparison(licenseKm,licenseDate,registryKm,registryDate){
  if(licenseKm===''||registryKm===''||!Number.isFinite(Number(licenseKm))||!Number.isFinite(Number(registryKm)))return 'חסר נתון קילומטראז׳ להשוואה. אין אפשרות לקבוע התאמה.';
@@ -42,10 +43,19 @@ function compareBuyTestLicense(){
  if(current!==document.getElementById('btLicenseFile').dataset.vehicle){add('הרכב שנבחר השתנה. יש להעלות את הרישיון מחדש עבור הרכב הנוכחי.');return;}
  if(!/^\d{7,8}$/.test(lp)){add('יש להזין מספר רכב בן 7 או 8 ספרות כפי שמופיע ברישיון.');return;}
  add(lp===current?'מספר הרכב ברישיון תואם למספר שנבחר.':'צריך בירור: מספר הרכב ברישיון אינו תואם למספר שנבחר.');
- if(lp!==current)return;
+ if(lp!==current){
+  btSaveSource('license',{title:'השוואת הרישיון — פרטים שאושרו בידי המשתמש',licensePlate:lp,text:result.textContent,alerts:['מספר הרכב ברישיון אינו תואם לרכב שנבחר. יש לברר מול מסמך המקור.']});
+  return;
+ }
  const row=externalVehicleData?.kmHistory?.[0];
  add(buytestMileageComparison(document.getElementById('btLicenseKm').value,document.getElementById('btLicenseDate').value,row?.km??'',row?.date||''));
  add('זהות המוכר, מספר השלדה והמנוע והמצב הפיזי דורשים בדיקה מול המסמכים והרכב. צילום הרישיון לבדו אינו מאמת אותם.');
+ const km=document.getElementById('btLicenseKm').value,date=document.getElementById('btLicenseDate').value;
+ const comparison=buytestMileageComparison(km,date,row?.km??'',row?.date||'');
+ btSaveSource('license',{title:'השוואת הרישיון — פרטים שאושרו בידי המשתמש',licensePlate:lp,km,date,
+  text:[...result.children].map(el=>el.textContent).join('\n'),
+  mileage:km!==''&&Number.isFinite(Number(km))&&Number(km)>=0?[{km:Number(km),date,source:'רישיון — קריאה שאושרה בידי המשתמש'}]:[],
+  alerts:comparison.startsWith('צריך בירור')?[comparison]:[]});
 }
 // Paid return keeps its existing verified fulfillment; never grant paid access from free reporting.
 const btOriginalActivate=activatePurchasedPlan;

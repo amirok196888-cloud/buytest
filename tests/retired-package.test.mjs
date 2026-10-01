@@ -49,7 +49,7 @@ test('other purchase handlers and amounts remain unchanged', async () => {
   for (const plan of ['report', 'consultation', 'report_consultation', 'balcar']) await a.context.startPayment(plan);
   assert.deepEqual(a.payments, ['report', 'consultation', 'report_consultation', 'balcar']);
   const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
-  for (const [plan, price] of [['report',49], ['consultation',100], ['report_consultation',129], ['balcar',39]]) {
+  for (const [plan, price] of [['report',39], ['consultation',149], ['report_consultation',129], ['balcar',39]]) {
     assert.match(html, new RegExp(plan + ':\\{[^\\n]*price:' + price + '[,}]'));
   }
   assert.match(html, /package-149\.js\?v=7/);
