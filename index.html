@@ -3494,7 +3494,7 @@ function diagnosticTableText(text){
   const cleaned=cleanOcrText(text);
   const marker=/הערות\s*כלליות|לחזור\s+לה\s*משך\s+בדיקה\s+לאחר\s+תיקון|יש\s+לברר\s+זמני\s+טיפולים/i;
   const match=marker.exec(cleaned);
-  return match&&match.index>180?cleaned.slice(0,match.index).trim():cleaned;
+  return match&&(match.index>180||/^הערות\s*כלליות$/i.test(match[0]))?cleaned.slice(0,match.index).trim():cleaned;
 }
 
 function clearInspectionFile(kind){
@@ -4719,8 +4719,16 @@ function findKnowledgeRules(line,categoryHint=''){
   return unique;
 }
 
+// Normalize the Technotest system label without treating its name as a finding.
+function normalizeReportSystemLabel(value){
+  return normalizeFindingText(value).replace(
+    /מערכת הפליטה ו(?:מערכת|המערכת|מערכות) למניעת זיהום אוויר/g,
+    'מערכת הפליטה ומערכות למניעת זיהום אוויר'
+  );
+}
+
 function reportCategoryFromLine(line){
-  const n=normalizeFindingText(line).replace(/^\d+\s+/,'').trim();
+  const n=normalizeReportSystemLabel(line).replace(/^\d+\s+/,'').trim();
   const compact=n.replace(/\s/g,'');
   if(compact.includes('הערותכלליות')) return 'הערות כלליות';
   if(/שלדה\s*ומ?רכ[בג]/.test(n)) return 'שלדת מרכב';
@@ -4746,7 +4754,7 @@ function reportSeverityFromLine(line){
 }
 
 function stripReportScaffolding(line,category,severity){
-  let cleaned=normalizeFindingText(String(line||'').replace(/[✓✔☑×✕]/g,' '));
+  let cleaned=normalizeReportSystemLabel(String(line||'').replace(/[✓✔☑×✕]/g,' ')).replace(/^\d+\s+/,'').trim();
   if(category){
     const categoryText=normalizeFindingText(category);
     const withoutArticle=value=>value.replace(/^מערכת\s+ה/,'מערכת ');
@@ -4885,6 +4893,8 @@ function interpretSummaryText(text){
   let currentCategory='',currentSeverity=null,skipSection=false;
   const lines=reportLines(text);
   lines.forEach((line,index)=>{
+    // A general-notes footer cannot reopen a diagnostic system section.
+    if(skipSection) return;
     const lineCategory=reportCategoryFromLine(line);
     if(lineCategory){
       currentCategory=lineCategory;

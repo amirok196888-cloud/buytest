@@ -9,7 +9,7 @@ const externalVehicleData = { kmHistory: [] };
 
 function fmtNum(v){return(v===null||v===undefined||v==='')?'—':Number(v).toLocaleString('he-IL')}
 function cleanOcrText(text){return String(text||'').replace(/\r/g,'').replace(/[ \t]+\n/g,'\n').replace(/\n{3,}/g,'\n\n').trim()}
-function diagnosticTableText(text){const cleaned=cleanOcrText(text);const marker=/הערות\s*כלליות|לחזור\s+לה\s*משך\s+בדיקה\s+לאחר\s+תיקון|יש\s+לברר\s+זמני\s+טיפולים/i;const match=marker.exec(cleaned);return match&&match.index>180?cleaned.slice(0,match.index).trim():cleaned}
+function diagnosticTableText(text){const cleaned=cleanOcrText(text);const marker=/הערות\s*כלליות|לחזור\s+לה\s*משך\s+בדיקה\s+לאחר\s+תיקון|יש\s+לברר\s+זמני\s+טיפולים/i;const match=marker.exec(cleaned);return match&&(match.index>180||/^הערות\s*כלליות$/i.test(match[0]))?cleaned.slice(0,match.index).trim():cleaned}
 
 const findingKnowledgeBase=[
   {id:'engine-oil-sweat-report',terms:['סימני הזעה שמן מנוע','סימני הזעת שמן מנוע'],patterns:[/סימני\s*הזע[הת]?\s*שמן/],category:'מנוע',tag:'משמעות בינונית',tone:'clarify',classification:'actual_finding',reportSeverity:'medium',suppresses:['oil-sweat'],meaning:'נרשמו סימני הזעת שמן במנוע. זו לחות שמנונית, ויש להבדיל בינה לבין נזילה פעילה.',decision:'יש לאתר את מקור ההזעה ולבדוק אם היא קלה ויבשה או פעילה. יש להביא בחשבון טיפול באטימה לפי הממצאים.'},
@@ -1502,8 +1502,16 @@ function findKnowledgeRules(line,categoryHint=''){
   return unique;
 }
 
+// Normalize the Technotest system label without treating its name as a finding.
+function normalizeReportSystemLabel(value){
+  return normalizeFindingText(value).replace(
+    /מערכת הפליטה ו(?:מערכת|המערכת|מערכות) למניעת זיהום אוויר/g,
+    'מערכת הפליטה ומערכות למניעת זיהום אוויר'
+  );
+}
+
 function reportCategoryFromLine(line){
-  const n=normalizeFindingText(line).replace(/^\d+\s+/,'').trim();
+  const n=normalizeReportSystemLabel(line).replace(/^\d+\s+/,'').trim();
   const compact=n.replace(/\s/g,'');
   if(compact.includes('הערותכלליות')) return 'הערות כלליות';
   if(/שלדה\s*ומ?רכ[בג]/.test(n)) return 'שלדת מרכב';
@@ -1529,7 +1537,7 @@ function reportSeverityFromLine(line){
 }
 
 function stripReportScaffolding(line,category,severity){
-  let cleaned=normalizeFindingText(String(line||'').replace(/[✓✔☑×✕]/g,' '));
+  let cleaned=normalizeReportSystemLabel(String(line||'').replace(/[✓✔☑×✕]/g,' ')).replace(/^\d+\s+/,'').trim();
   if(category){
     const categoryText=normalizeFindingText(category);
     const withoutArticle=value=>value.replace(/^מערכת\s+ה/,'מערכת ');
@@ -1668,6 +1676,8 @@ function interpretSummaryText(text){
   let currentCategory='',currentSeverity=null,skipSection=false;
   const lines=reportLines(text);
   lines.forEach((line,index)=>{
+    // A general-notes footer cannot reopen a diagnostic system section.
+    if(skipSection) return;
     const lineCategory=reportCategoryFromLine(line);
     if(lineCategory){
       currentCategory=lineCategory;
@@ -1683,8 +1693,18 @@ function interpretSummaryText(text){
     const contentLine=stripReportScaffolding(line,lineCategory,lineSeverity);
     if(!contentLine||isReportStatusScaffolding(contentLine)||isExplicitlyNormal(contentLine)) return;
     const candidateLines=[contentLine];
-    if(lines[index+1]) candidateLines.push(contentLine+' '+stripReportScaffolding(lines[index+1],reportCategoryFromLine(lines[index+1]),reportSeverityFromLine(lines[index+1])));
-    if(lines[index+1]&&lines[index+2]) candidateLines.push(contentLine+' '+stripReportScaffolding(lines[index+1],reportCategoryFromLine(lines[index+1]),reportSeverityFromLine(lines[index+1]))+' '+stripReportScaffolding(lines[index+2],reportCategoryFromLine(lines[index+2]),reportSeverityFromLine(lines[index+2])));
+    // Join wrapped diagnoses only within their current system. A later system
+    // heading must never become evidence for the preceding diagnosis.
+    let joined=contentLine;
+    for(let offset=1;offset<=2&&lines[index+offset];offset++){
+      const nextLine=lines[index+offset];
+      const nextCategory=reportCategoryFromLine(nextLine);
+      if(nextCategory) break;
+      const nextContent=stripReportScaffolding(nextLine,'',reportSeverityFromLine(nextLine));
+      if(!nextContent||isReportStatusScaffolding(nextContent)||isExplicitlyNormal(nextContent)) break;
+      joined+=' '+nextContent;
+      candidateLines.push(joined);
+    }
     const rules=candidateLines.flatMap(candidate=>findKnowledgeRules(candidate,currentCategory));
     if(rules.length){
       rules.forEach(rule=>{
