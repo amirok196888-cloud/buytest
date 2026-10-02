@@ -2156,14 +2156,60 @@ function serverOverrideForFinding(item,rows){
     if(row.source_kind==='formula') return itemId===('formula-'+sourceId);
     if(row.source_kind==='observed') return itemId===('formula-alias-'+sourceId)||itemId===('alias-'+sourceId);
     if(row.source_kind==='knowledge') return itemId===sourceId;
+    if(row.source_kind==='custom') return itemId==='custom-'+sourceId||itemId==='formula-custom-'+sourceId;
     return false;
   });
   if(byIdentity) return byIdentity;
   const source=item?.sourceText||item?.matchedTerm||'';
-  return rows.find(row=>formulaOverrideKey(row.category,row.source_text)===formulaOverrideKey(item?.category||'',source))||null;
+  return rows.find(row=>{
+    if(formulaOverrideKey(row.category,row.source_text)===formulaOverrideKey(item?.category||'',source))return true;
+    const original=row.source_kind==='formula'?rawFormulaDatabase.find(entry=>entry.id===row.source_id):row.source_kind==='observed'?observedFormulaAliases.find(entry=>entry.id===row.source_id):null;
+    return original&&formulaOverrideKey(original.category,original.text)===formulaOverrideKey(item?.category||'',source);
+  })||null;
 }
-function applyServerOverrides(result,rows){if(!result?.findings?.length||!rows.length)return result;return {...result,findings:result.findings.map(item=>{const row=serverOverrideForFinding(item,rows);if(!row)return item;return {...item,category:row.category||item.category,classification:row.classification_type||item.classification,reportSeverity:row.report_severity==='none'?null:(row.report_severity||item.reportSeverity),tag:row.report_severity?(expertSeverityLabels[row.report_severity]||item.tag):item.tag,meaning:row.meaning||item.meaning,decision:row.decision||item.decision,question:row.question||item.question,managerEdited:true}})} }
-function applyCustomRules(text,result,rows){const custom=rows.filter(row=>row.source_kind==='custom'&&row.active!==false);if(!custom.length)return result;const normalized=normalizeFindingText(text);const findings=[...(result?.findings||[])];for(const row of custom){const term=normalizeFindingText(row.source_text);if(term.length<3||!normalized.includes(term))continue;if(findings.some(item=>formulaOverrideKey(item.category,item.sourceText||item.matchedTerm||'')===formulaOverrideKey(row.category,row.source_text)))continue;findings.push({id:'custom-'+row.source_id,category:row.category,tag:expertSeverityLabels[row.report_severity]||formulaClassificationLabels[row.classification_type]||'סיווג מקצועי',tone:['safety','high'].includes(row.report_severity)?'safety':'clarify',classification:row.classification_type,reportSeverity:row.report_severity==='none'?null:row.report_severity,meaning:row.meaning||'נמצא ניסוח שהוגדר במאגר המקצועי.',decision:row.decision||'יש לברר את הממצא אצל בעל המקצוע המתאים.',question:row.question||'',sourceText:row.source_text,managerEdited:true})}return {...result,findings:orderFindingsLikeReport(findings.map(finalizeReportFinding).filter(Boolean))}}
+function applyServerOverrides(result,rows){
+  if(!result?.findings?.length||!rows.length)return result;
+  return {...result,findings:result.findings.map(item=>{
+    const row=serverOverrideForFinding(item,rows);if(!row)return item;
+    return {...item,category:row.category||item.category,classification:row.classification_type||item.classification,
+      reportSeverity:row.report_severity||item.reportSeverity,tone:['high','safety'].includes(row.report_severity)?'safety':'clarify',
+      tag:row.report_severity?(expertSeverityLabels[row.report_severity]||item.tag):item.tag,
+      meaning:row.meaning||'',decision:row.decision||'',question:row.question||'',
+      managerMeaning:row.meaning||'',managerDecision:row.decision||'',managerQuestion:row.question||'',
+      diagnosisLabel:row.source_text,managerEdited:true};
+  })};
+}
+function overrideFindingId(row){
+  if(row.source_kind==='formula')return 'formula-'+row.source_id;
+  if(row.source_kind==='observed')return 'formula-alias-'+row.source_id;
+  if(row.source_kind==='knowledge')return row.source_id;
+  return 'custom-'+row.source_id;
+}
+function applyCustomRules(text,result,rows){
+  const catalogRows=rows.filter(row=>row.active!==false);
+  if(!catalogRows.length)return result;
+  // Match edited/new wording only in diagnostic clauses, never metadata or disclaimers.
+  const clauses=diagnosticTableText(text).split(/[\n,;]+/).map(line=>line.trim()).filter(Boolean);
+  let findings=[...(result?.findings||[])];
+  for(const row of catalogRows){
+    const term=normalizeFindingText(row.source_text);
+    if(term.length<3)continue;
+    const evidence=clauses.find(line=>!isMetadataLine(line)&&!isSeverityHeadingOnly(line)&&!isExplicitlyNormal(line)&&!formulaCategoryDefinitions.some(category=>normalizeFindingText(category.name)===normalizeFindingText(line))&&!isReportStatusScaffolding(normalizeFindingText(line))&&normalizeFindingText(line).includes(term)&&!/(?:ללא|אין|לא נרשם|לא נמצאו|לא נמצא)\s*(?:סימני|עדות ל)?\s*$/.test(normalizeFindingText(line).slice(0,normalizeFindingText(line).indexOf(term))));
+    if(!evidence)continue;
+    const id=overrideFindingId(row);
+    let existing=findings.find(item=>item.id===id||serverOverrideForFinding(item,[row]));
+    if(!existing){
+      existing={id,category:row.category,sourceText:row.source_text,observedText:evidence,
+        classification:row.classification_type,reportSeverity:row.report_severity,
+        tag:expertSeverityLabels[row.report_severity]||formulaClassificationLabels[row.classification_type]||'סיווג מקצועי',
+        tone:['safety','high'].includes(row.report_severity)?'safety':'clarify'};
+      // Replace exact duplicate aliases; preserve longer raw clauses with additional diagnoses.
+      findings=findings.filter(item=>normalizeFindingText(item.sourceText||item.matchedTerm||'')!==term);
+      findings.push(existing);
+    }
+  }
+  return applyServerOverrides({...result,findings:orderFindingsLikeReport(findings.map(finalizeReportFinding).filter(Boolean))},catalogRows);
+}
 function sourceGroundedSummaryResult(result,text){
   const report=normalizeFindingText(text);
   const findings=(result?.findings||[]).filter(item=>{
