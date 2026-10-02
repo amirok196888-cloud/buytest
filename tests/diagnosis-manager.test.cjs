@@ -72,3 +72,30 @@ test('none and low overrides cannot retain a stale red safety tone',()=>{
  assert.equal(c.compactAnalysisGroups(out)[0].severity,severity==='none'?'marginal':'low');
  }
 });
+test('each chassis severity group contains only that chassis and exactly that severity',()=>{
+ const h=harness(),all=h.c.formulaAdminRows();
+ for(const category of ['שלדת מרכב','שלדה נפרדת'])for(const severity of ['high','medium','low','minor','none']){
+  const group=all.filter(r=>h.c.formulaMatchesBrowse(r,{category,severity}));
+  assert.ok(group.every(r=>r.category===category&&h.c.formulaAdminSeverity(r)===severity));
+  if(['high','low','minor'].includes(severity))assert.ok(group.length>0,category+' '+severity);
+ }
+});
+test('adding inside every chassis severity preselects and saves that group, including empty groups',async()=>{
+ for(const category of ['שלדת מרכב','שלדה נפרדת'])for(const severity of ['high','medium','low','minor','none']){
+  const h=harness();h.c.openFormulaChassisGroup(category,severity);h.c.newFormulaEntry();
+  assert.equal(h.element('formulaCategory').value,category);assert.equal(h.element('formulaSeverity').value,severity);
+  h.element('formulaText').value='אבחנה חדשה בקבוצה שנבחרה';await h.c.saveCustomFormula();
+  assert.equal(h.saved[0].row.category,category);assert.equal(h.saved[0].row.report_severity,severity);
+  assert.doesNotThrow(()=>h.c.normalizedOverride(h.saved[0].row));
+  assert.ok(h.c.formulaMatchesBrowse(h.c.formulaAdminRows().find(r=>r.kind==='custom'),{category,severity}));
+ }
+});
+test('moving an existing chassis diagnosis to another severity updates its grouping label',async()=>{
+ const h=harness();h.run("globalThis.source=rawFormulaDatabase.find(r=>r.category==='שלדת מרכב'&&r.classification.severity==='high');");
+ h.c.editFormulaEntry('base',h.c.source.id);h.element('formulaSeverity').value='low';await h.c.saveCustomFormula();
+ assert.equal(h.saved[0].row.subgroup,'משמעות נמוכה');
+ const item=h.c.formulaAdminRows().find(r=>r.id===h.c.source.id);assert.ok(h.c.formulaMatchesBrowse(item,{category:'שלדת מרכב',severity:'low'}));assert.ok(!h.c.formulaMatchesBrowse(item,{category:'שלדת מרכב',severity:'high'}));
+});
+test('opening an original diagnosis preserves its group severity instead of substituting automatic calibration',()=>{
+ const h=harness();for(const item of h.c.formulaAdminRows().filter(r=>['שלדת מרכב','שלדה נפרדת'].includes(r.category))){h.c.editFormulaEntry(item.kind,item.id);assert.equal(h.element('formulaSeverity').value,item.severity,item.id);}
+});
