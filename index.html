@@ -4231,9 +4231,13 @@ function initFormulaAdmin(){
   refreshFormulaSubgroupOptions();renderFormulaAdminList();
 }
 
+function savedCalibrationMeaning(item){
+  return String(expertDecisionForFormula(item)?.note||'');
+}
+
 function formulaAdminRows(){
-  const base=rawFormulaDatabase.filter(isOperationalFormula).map(item=>({kind:'base',id:item.id,text:item.text,category:item.category,subgroup:item.subgroup||'',type:item.classification?.type||'context_dependent',severity:item.classification?.severity==='review'?'medium':(item.classification?.severity||'none'),meaning:item.meaning||'',decision:item.decision||'',question:item.question||'',procedure127:Boolean(item.procedure_127)}));
-  const observed=observedFormulaAliases.filter(isOperationalFormula).map(item=>({kind:'observed',id:item.id,text:item.text,category:item.category,subgroup:item.subgroup||'',type:item.classification_type||'context_dependent',severity:item.report_severity||'none',meaning:item.meaning||'',decision:item.decision||'',question:item.question||''}));
+  const base=rawFormulaDatabase.filter(isOperationalFormula).map(item=>({kind:'base',id:item.id,text:item.text,category:item.category,subgroup:item.subgroup||'',type:item.classification?.type||'context_dependent',severity:item.classification?.severity==='review'?'medium':(item.classification?.severity||'none'),meaning:item.meaning||savedCalibrationMeaning(item),decision:item.decision||'',question:item.question||'',procedure127:Boolean(item.procedure_127)}));
+  const observed=observedFormulaAliases.filter(isOperationalFormula).map(item=>({kind:'observed',id:item.id,text:item.text,category:item.category,subgroup:item.subgroup||'',type:item.classification_type||'context_dependent',severity:item.report_severity||'none',meaning:item.meaning||savedCalibrationMeaning(item),decision:item.decision||'',question:item.question||''}));
   const custom=loadCustomFormulas().filter(isOperationalFormula).map(item=>({kind:'custom',id:item.id,text:item.text,category:item.category,subgroup:item.subgroup||'',type:item.classification_type||'context_dependent',severity:item.report_severity||'none',meaning:item.meaning||'',decision:item.decision||'',question:item.question||''}));
   return [...custom,...(serverFormulaCatalog||[...observed,...base])].map(item=>{
     const override=formulaOverrideFor(item.category,item.text,item.kind,item.id);
