@@ -286,6 +286,7 @@ async function consultationUpgradeOrder(body: Record<string, unknown>, plate: st
 
 async function createPayment(origin: string | null, body: Record<string, unknown>) {
   if (!origin || !ALLOWED_ORIGINS.has(origin)) return json(origin, { ok: false, error: "origin_not_allowed" }, 403);
+  if (body.independentService !== true) return json(origin, { ok: false, error: "service_version_required" }, 409);
   const planKey = String(body.plan || "");
   const enteredPlate = cleanPlate(body.plate);
   const plate = enteredPlate;

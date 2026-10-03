@@ -3099,6 +3099,7 @@ async function submitBuyTestPayment(){
       if(String(insuranceDetails.plate||'')!==plate) insuranceDetails={};
     }
     const payment=await callBuyTestPaymentService({action:'create',plan:planKey,plate,customerName,email,phone,acceptedTerms:true,priorOrderId:prior?.orderId||'',priorClientSecret:prior?.clientSecret||'',...insuranceDetails,...attribution,independentService:true});
+    if(Number(payment.amountAgorot)!==Number(plan.price)*100)throw new Error('payment_price_mismatch');
     saveBuyTestPayment({orderId:payment.orderId,clientSecret:payment.clientSecret,plate:payment.plate,plan:payment.plan,customerName,email,phone,progress:normalizedStageProgress(payment.progress),createdAt:new Date().toISOString()});
     sessionStorage.setItem(BUYTEST_PAYMENT_RETURN_KEY,'1');
     buyTestMetaTrack('InitiateCheckout',{value:Number(plan.price)||49,currency:'ILS',content_name:plan.name,content_ids:[String(planKey)],content_type:'product'});
