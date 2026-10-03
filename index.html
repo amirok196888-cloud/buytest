@@ -3020,7 +3020,6 @@ function previewPlanAsManager(planKey='all'){
   if(status) status.textContent='תצוגת בדיקה: '+buytestPlans[planKey].name+' בלבד.';
 }
 async function startPayment(planKey='report'){
-  if(planKey==='report'){await BuyTestBundle.unlock('report');return;}
   if(planKey==='report_consultation')planKey='consultation';
   if(buyTestPaymentStarting) return;
   const selectedKey=Object.prototype.hasOwnProperty.call(buytestPlans,planKey)?planKey:'report';
