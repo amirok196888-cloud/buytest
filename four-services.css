@@ -22,3 +22,5 @@ body[data-service="consultation"].bt-advice-access #consultationPurchaseIntro{di
 #afterPage>button[hidden],#consultationPage>button[hidden]{display:none!important}
 
 .btFreeInquiry{margin-top:18px;padding-top:18px;border-top:1px solid #d9e2e6;text-align:center}.btFreeInquiry a{display:block;padding:13px 16px;border:1px solid #16865c;border-radius:12px;background:#eef8f2;color:#075e48;font-weight:700;text-decoration:none;line-height:1.5}.btFreeInquiry a:focus-visible{outline:3px solid #ffbd18;outline-offset:3px}.btFreeInquiry small{display:block;margin-top:7px;color:#52646b;font-size:14px}
+
+#serviceChoices .btHomeInquiry{grid-column:2;margin:0;padding:0;border:0;align-self:start}#serviceChoices .btHomeInquiry a{font-size:16px}#serviceChoices .btHomeInquiry small{font-size:13px}@media(max-width:420px){#serviceChoices .btHomeInquiry a{font-size:14px;padding:11px 9px}}
