@@ -2440,7 +2440,7 @@ async function retryPaidBalcarWithDetails(){
     if(message){message.classList.add('show');message.textContent=validation;}
     return;
   }
-  const saved=storedBuyTestPayment();
+  const saved=window.BuyTestBundle?.insuranceReceipt()||storedBuyTestPayment();
   localStorage.setItem(BUYTEST_INSURANCE_DETAILS_KEY,JSON.stringify({plate:String(saved?.plate||plate()),ownershipDate,ownerIsraeliId}));
   if(message){message.classList.add('show');message.textContent='בודק מחדש באמצעות התשלום שכבר אושר...';}
   await loadPaidBalcarReport();
@@ -2488,13 +2488,13 @@ async function startBalcarPayment(){
   if(document.body.classList.contains('manager-mode')){
     const status=document.getElementById('balcarOrderStatus');if(status)status.textContent='מצב מנהל — ללא הזמנה וללא חיוב.';return;
   }
-  if(!window.BuyTestBundle?.insuranceReceipt()){await BuyTestBundle.unlock('insurance');return;}
   const ownershipDate=String(document.getElementById('insuranceOwnershipDate')?.value||'');
   const ownerIsraeliId=String(document.getElementById('insuranceOwnerId')?.value||'').replace(/\D/g,'');
   const message=document.getElementById('balcarEligibilityMsg');
   const validation=buytestInsuranceDetailsError(ownershipDate,ownerIsraeliId);
   if(validation){if(message){message.classList.add('show');message.textContent=validation;}return;}
   localStorage.setItem(BUYTEST_INSURANCE_DETAILS_KEY,JSON.stringify({plate:plate(),ownershipDate,ownerIsraeliId}));
+  if(!window.BuyTestBundle?.insuranceReceipt()){await BuyTestBundle.unlock('insurance');return;}
   if(message){message.classList.add('show');message.textContent='הפרטים נשמרו. בודק את התאמתם מול ספק הדוח — ללא תשלום נוסף.';}
   await loadPaidBalcarReport();
 }

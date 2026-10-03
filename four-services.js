@@ -64,6 +64,7 @@
     document.querySelectorAll('.serviceHome,.appBackHome').forEach(link=>link.onclick=home);
     document.querySelector('#afterPage>button')?.setAttribute('hidden','');
     document.querySelector('#consultationPage>button')?.setAttribute('hidden','');
+    document.getElementById('consultationPage').append(document.getElementById('prePurchaseConsultationBox'));
     const notes=document.createElement('div');notes.className='field wide';notes.innerHTML='<label for="adviceNotes">הערות מהייעוץ לסיכום (רשות)</label><textarea id="adviceNotes" maxlength="4000" placeholder="אפשר לרשום כאן את הדברים שעלו בייעוץ"></textarea>';document.querySelector('#prePurchaseConsultationBox .consultationFormGrid').append(notes);
     for(const id of ['prebuyQuestion','prebuyAdLink','adviceNotes'])document.getElementById(id).addEventListener('input',captureAdvice);
     document.getElementById('prebuyVehiclePlate').readOnly=true;
