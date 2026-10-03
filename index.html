@@ -184,6 +184,8 @@ body.plan-prebuy .prePurchaseConsultationBox{display:block}
 @media(max-width:520px){.preVisitFacts,.preVisitActions{grid-template-columns:1fr}.preVisitFact.wide{grid-column:auto}}
 .btUnifiedSummary{margin:20px 0;text-align:right;overflow-wrap:anywhere}.btUnifiedSummary p{white-space:pre-line}.btCritical{color:#a40019!important;background:#fff0f2;border-right:6px solid #d00025;padding:16px;font-weight:800;line-height:1.7}
 .meaningConclusion{padding:12px 14px;margin:12px 0;border-radius:12px;border-right:5px solid}.meaningConclusion.high{background:#fff0ef;border-color:#b42318;color:#7a2019}.meaningConclusion.medium,.categorySummaryCard.medium{background:#fff3e7;border-color:#c65b08;color:#874006}.meaningConclusion.low{background:#fffbe5;border-color:#b78a00;color:#665100}.overallProfessionalConclusion .meaningConclusion h5{color:inherit;margin-top:0}
+
+.analyticsArticleTable{min-width:0;table-layout:fixed}.analyticsArticleTable th,.analyticsArticleTable td{white-space:normal;overflow-wrap:anywhere;padding:10px 7px}.analyticsArticleTable th:first-child,.analyticsArticleTable td:first-child{position:static;width:60%;font-weight:700}.analyticsArticleTable th:not(:first-child),.analyticsArticleTable td:not(:first-child){width:20%}.analyticsArticleTable td:not(:first-child){font-size:18px;font-weight:900;color:#075e48}
 </style><style>#appShell{display:block!important}
 /* BuyTest V20 – light commercial landing + improved value-first flow */
 :root{--bg:#f5f7f8;--card:#ffffff;--card2:#f8fafb;--line:#d9e2e6;--txt:#17242b;--muted:#60717a;--a:#0fa87e;--warn:#9b6b00;--bad:#bd3030}
@@ -612,6 +614,14 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
     <article class="analyticsMetric"><strong id="analyticsPaidEntries">—</strong><span>נכנסו לשירות בתשלום</span></article>
     <button class="analyticsMetric analyticsMetricButton" id="analyticsFeedbackMetric" type="button" onclick="openBuyTestFeedback()" aria-label="פתיחת התגובות החדשות"><strong id="analyticsNewFeedback">—</strong><span>תגובות חדשות</span></button>
   </div>
+  <h3 class="analyticsSourceTitle">כניסות לכל מאמר</h3>
+  <p class="analyticsNote">הכניסות שנמדדו לכל מאמר בטווח שנבחר. ביקור חוזר עשוי להיספר שוב.</p>
+  <div class="analyticsSourceWrap">
+    <table class="analyticsSourceTable analyticsArticleTable" aria-label="כניסות לבלוג לפי כתבה">
+      <thead><tr><th scope="col">כתבה</th><th scope="col">כניסות</th><th scope="col">עברו לאתר</th></tr></thead>
+      <tbody id="analyticsBlogArticleRows"><tr><td>טוען…</td><td>—</td><td>—</td></tr></tbody>
+    </table>
+  </div>
   <h3 class="analyticsSourceTitle">איפה נעצרים בחלק החינמי?</h3>
   <p class="analyticsNote">ביקור נספר פעם אחת בכל שלב, גם בלחיצות חוזרות ובבדיקת כמה רכבים. שאלות ואימות רישיון ניתנים לפתיחה בנפרד. כל שלב נספר ברגע פתיחתו. פתיחת אימות הרישיון היא הגעה לשלב האחרון בחינמי.</p>
   <div class="analyticsSourceWrap"><table class="analyticsSourceTable" aria-label="התקדמות בחלק החינמי"><thead><tr><th scope="col">שלב</th><th scope="col">ביצעו את השלב</th><th scope="col">השלב המתקדם ביותר בביקור</th></tr></thead><tbody id="analyticsFreeFunnelRows"></tbody></table></div>
@@ -621,13 +631,6 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
   <p class="analyticsNote">כל שלב נספר פעם אחת בביקור, גם בניסיון חוזר או בפענוח כמה דוחות. ״התוצאה הוצגה״ מאשר הצגה באתר, לא שהלקוח קרא אותה או הוריד PDF. שלב שטרם הושלם אינו בהכרח נטישה.</p>
   <div class="analyticsSourceWrap"><table class="analyticsSourceTable" aria-label="התקדמות פענוח דוח"><thead><tr><th>שלב</th><th>ביקורים שביצעו</th><th>השלב המתקדם ביותר</th></tr></thead><tbody id="analyticsReportFunnelRows"></tbody></table></div>
   <p id="analyticsReportFunnelNote" class="analyticsNote" role="status">טוען נתוני פענוח…</p>
-  <h3 class="analyticsSourceTitle">כניסות לבלוג לפי כתבה</h3>
-  <div class="analyticsSourceWrap">
-    <table class="analyticsSourceTable" aria-label="כניסות לבלוג לפי כתבה">
-      <thead><tr><th scope="col">כתבה</th><th scope="col">קוראים</th><th scope="col">עברו לאתר</th></tr></thead>
-      <tbody id="analyticsBlogArticleRows"><tr><td>טוען…</td><td>—</td><td>—</td></tr></tbody>
-    </table>
-  </div>
   <h3 class="analyticsSourceTitle">מקורות הכניסה לבלוג</h3>
   <div class="analyticsSourceWrap">
     <table class="analyticsSourceTable" aria-label="מקורות הכניסה לבלוג">
