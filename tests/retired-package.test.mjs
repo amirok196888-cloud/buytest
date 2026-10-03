@@ -44,12 +44,12 @@ test('existing 149 buyer can still access the included report without another ch
   assert.deepEqual(a.payments, []);
   assert.deepEqual(a.scrolled, ['afterInspectionSection']);
 });
-test('other purchase handlers and amounts remain unchanged', async () => {
+test('other purchase handlers retain their independent service prices', async () => {
   const a = app();
   for (const plan of ['report', 'consultation', 'report_consultation', 'balcar']) await a.context.startPayment(plan);
   assert.deepEqual(a.payments, ['report', 'consultation', 'report_consultation', 'balcar']);
   const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
-  for (const [plan, price] of [['report',39], ['consultation',149], ['report_consultation',129], ['balcar',39]]) {
+  for (const [plan, price] of [['report',29], ['consultation',79], ['report_consultation',129], ['balcar',15]]) {
     assert.match(html, new RegExp(plan + ':\\{[^\\n]*price:' + price + '[,}]'));
   }
   assert.match(html, /package-149\.js\?v=7/);
