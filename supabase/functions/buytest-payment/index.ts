@@ -12,12 +12,12 @@ const CARDCOM_API_URL = "https://secure.cardcom.solutions/api/v11";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 const PLANS = {
-  balcar: { amountAgorot: 3900, title: "חבילת BuyTest לרכב אחד", scopes: ["balcar", "premium", "report"] },
+  balcar: { amountAgorot: 1500, title: "עבר ביטוחי ופענוח", scopes: ["balcar"] },
   premium: { amountAgorot: 4900, title: "בדיקה עצמית לפני המכון", scopes: ["premium"] },
-  report: { amountAgorot: 4900, title: "פענוח דוח המכון", scopes: ["report"] },
+  report: { amountAgorot: 2900, title: "פענוח דוח המכון", scopes: ["report"] },
   report_consultation: { amountAgorot: 12900, title: "פענוח דוח המכון והתייעצות עם בוחן", scopes: ["report", "consultation"] },
-  consultation: { amountAgorot: 14900, title: "התייעצות אישית על דוח המכון", scopes: ["consultation"] },
-  prebuy: { amountAgorot: 14900, title: "ייעוץ לפני רכישה בוואטסאפ · ההתייעצות פתוחה ל־48 שעות", scopes: ["prebuy"] },
+  consultation: { amountAgorot: 7900, title: "התייעצות אישית על דוח המכון", scopes: ["consultation"] },
+  prebuy: { amountAgorot: 7900, title: "ייעוץ אישי בוואטסאפ למשך 48 שעות", scopes: ["prebuy"] },
   bundle: { amountAgorot: 12000, title: "חבילת BuyTest המלאה", scopes: ["premium", "report", "consultation"] },
   full149: { amountAgorot: 14900, title: "חבילה מלאה לרכב אחד", scopes: ["balcar", "report", "consultation"] },
   three250: { amountAgorot: 25000, title: "חבילה לעד שלושה רכבים", scopes: ["balcar", "report", "consultation"] },
@@ -235,7 +235,7 @@ async function refreshCardcomOrder(order: Record<string, unknown>, config: Cardc
   return await updateOrder(String(order.id), {
     status: "paid",
     paid_at: new Date().toISOString(),
-    expires_at: new Date(Date.now() + (isPackage(order.plan) ? 90 * 24 : order.plan === "balcar" ? 30 * 24 : 48) * 60 * 60 * 1000).toISOString(),
+    expires_at: recordValue(order.provider_payload).remoteConsultation === true && recordValue(order.provider_payload).independentService !== true ? "9999-12-31T23:59:59.000Z" : new Date(Date.now() + (isPackage(order.plan) ? 90 * 24 : (order.plan === "balcar") ? 30 * 24 : 48) * 60 * 60 * 1000).toISOString(),
     provider_payload: compactProviderPayload(result, order.provider_payload),
   }) || order;
 }
@@ -254,6 +254,10 @@ async function signedEntitlement(order: Record<string, unknown>, activePlate = S
     ? ["report", ...(progress.reportCompleted ? ["consultation"] : [])]
     : plan === "bundle"
     ? ["premium", ...(progress.preInspectionCompleted ? ["report"] : []), ...(progress.reportCompleted ? ["consultation"] : [])]
+    : plan === "balcar" && Number(order.amount_agorot) === 3900
+    ? ["balcar", "premium", "report"]
+    : plan === "prebuy" && packageData.remoteConsultation === true && packageData.independentService !== true
+    ? ["prebuy", "consultation", "balcar", "premium", "report"]
     : [...PLANS[plan].scopes];
   const payload = base64Url(new TextEncoder().encode(JSON.stringify({
     v: 1, oid: order.id, plate: activePlate, plan, scopes,
@@ -264,22 +268,27 @@ async function signedEntitlement(order: Record<string, unknown>, activePlate = S
   return `${payload}.${base64Url(new Uint8Array(signature))}`;
 }
 
-async function verifiedPriorOrder(body: Record<string, unknown>, plate: string) {
+async function verifiedPriorOrder(body: Record<string, unknown>, plate: string, allowExpired = false) {
   const orderId = String(body.priorOrderId || "");
   const clientToken = String(body.priorClientSecret || "");
   if (!/^[0-9a-f-]{36}$/i.test(orderId) || clientToken.length < 30) return null;
   const order = await orderById(orderId);
   if (!order || !(await hashesMatch(String(order.client_secret_hash || ""), await sha256(clientToken)))) return null;
   const expiresAt = new Date(String(order.expires_at)).getTime();
-  if (String(order.status) !== "paid" || String(order.plate) !== plate || !Number.isFinite(expiresAt) || expiresAt <= Date.now()) return null;
+  if (String(order.status) !== "paid" || String(order.plate) !== plate || !Number.isFinite(expiresAt) || (!allowExpired && expiresAt <= Date.now())) return null;
   return order;
+}
+
+async function consultationUpgradeOrder(body: Record<string, unknown>, plate: string) {
+  const order = await verifiedPriorOrder(body, plate, true);
+  return order?.plan === "balcar" && Number(order.amount_agorot) === 3900 ? order : null;
 }
 
 async function createPayment(origin: string | null, body: Record<string, unknown>) {
   if (!origin || !ALLOWED_ORIGINS.has(origin)) return json(origin, { ok: false, error: "origin_not_allowed" }, 403);
   const planKey = String(body.plan || "");
   const enteredPlate = cleanPlate(body.plate);
-  const plate = planKey === "prebuy" ? (enteredPlate || "GENERAL") : enteredPlate;
+  const plate = enteredPlate;
   const directCheckout = body.directCheckout === true;
   const customerName = cleanText(body.customerName, 50);
   const email = cleanEmail(body.email);
@@ -292,15 +301,23 @@ async function createPayment(origin: string | null, body: Record<string, unknown
     ? String(body.ownershipDate) : null;
   const insuranceOwnerIsraeliId = planKey === "balcar" ? String(body.ownerIsraeliId || "").replace(/\D/g, "") : "";
   const customerDetailsValid = directCheckout || (validEmail(email) && customerName.length >= 2 && /^05\d{8}$/.test(phone));
-  if (!isPlan(planKey) || (planKey !== "prebuy" && !/^\d{7,8}$/.test(plate)) || !customerDetailsValid || body.acceptedTerms !== true) {
+  if (!isPlan(planKey) || !/^\d{7,8}$/.test(plate) || !customerDetailsValid || body.acceptedTerms !== true) {
     return json(origin, { ok: false, error: "invalid_payment_request" }, 400);
   }
-  if (["report", "report_consultation", "premium", "bundle", "full149", "three250"].includes(planKey)) return json(origin, { ok: false, error: "package_unavailable" }, 503);
+  if (["report_consultation", "premium", "bundle", "full149", "three250"].includes(planKey)) return json(origin, { ok: false, error: "package_unavailable" }, 503);
+  const upgrade = planKey === "prebuy" && body.upgradeFromBundle === true;
+  const priorBundle = upgrade ? await consultationUpgradeOrder(body, plate) : null;
+  if (upgrade && !priorBundle) return json(origin, { ok: false, error: "invalid_upgrade" }, 409);
+  const amountAgorot = upgrade ? 11000 : PLANS[planKey].amountAgorot;
   const plan = PLANS[planKey];
   const productCode = `BUYTEST-${planKey.toUpperCase()}`;
   const productName = Array.from(`BuyTest · ${plan.title}`).slice(0, 50).join("");
   let inheritedProgress: StageProgress = { preInspectionCompleted: false, reportCompleted: false };
   let priorOrderId = "";
+  if (priorBundle) {
+    inheritedProgress = stageProgress(priorBundle.provider_payload);
+    priorOrderId = String(priorBundle.id);
+  }
   if (planKey === "consultation") {
     const priorOrder = await verifiedPriorOrder(body, plate);
     // Consultation can be purchased independently; verified prior work is optional.
@@ -318,7 +335,7 @@ async function createPayment(origin: string | null, body: Record<string, unknown
     client_secret_hash: await sha256(clientSecret),
     plate,
     plan: planKey,
-    amount_agorot: plan.amountAgorot,
+    amount_agorot: amountAgorot,
     status: "pending",
     traffic_source: trafficSource,
     utm_source: utmSource,
@@ -326,13 +343,19 @@ async function createPayment(origin: string | null, body: Record<string, unknown
     utm_campaign: utmCampaign,
     expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
     provider_payload: {
-      provider: "cardcom", stage: "creating", progress: inheritedProgress, priorOrderId: priorOrderId || null,
-      insuranceOwnershipDate,
-      insuranceOwnerIsraeliId: /^\d{9}$/.test(insuranceOwnerIsraeliId) ? insuranceOwnerIsraeliId : null,
+      provider: "cardcom", stage: "creating", progress: inheritedProgress, priorOrderId: priorOrderId || null, remoteConsultation: false, independentService: true,
+      ...(priorBundle ? {
+        balcarReportId: recordValue(priorBundle.provider_payload).balcarReportId || null,
+        balcarExternalRef: recordValue(priorBundle.provider_payload).balcarExternalRef || `buytest-balcar-${priorBundle.id}`,
+      } : {}),
+      insuranceOwnershipDate: priorBundle ? recordValue(priorBundle.provider_payload).insuranceOwnershipDate || null : insuranceOwnershipDate,
+      insuranceOwnerIsraeliId: priorBundle ? recordValue(priorBundle.provider_payload).insuranceOwnerIsraeliId || null : /^\d{9}$/.test(insuranceOwnerIsraeliId) ? insuranceOwnerIsraeliId : null,
     },
   });
   if (!order) throw new Error("order_creation_failed");
-  const returnBase = `${SITE_URL}?buytest_payment=return&order=${encodeURIComponent(orderId)}`;
+  const service = planKey === "balcar" ? "insurance" : planKey === "report" ? "report" : "consultation";
+  const checkoutReturnUrl = `${PRIMARY_ORIGIN}/?service=${service}`;
+  const returnBase = `${checkoutReturnUrl}&buytest_payment=return&order=${encodeURIComponent(orderId)}`;
   let cardcomResult: Record<string, unknown>;
   try {
     cardcomResult = await cardcomRequest("/LowProfile/Create", {
@@ -340,10 +363,10 @@ async function createPayment(origin: string | null, body: Record<string, unknown
       ApiName: config.apiName,
       Operation: "ChargeOnly",
       ReturnValue: orderId,
-      Amount: plan.amountAgorot / 100,
+      Amount: amountAgorot / 100,
       SuccessRedirectUrl: returnBase,
-      FailedRedirectUrl: `${SITE_URL}?buytest_payment=failed&order=${encodeURIComponent(orderId)}`,
-      CancelRedirectUrl: `${SITE_URL}?buytest_payment=cancelled&order=${encodeURIComponent(orderId)}`,
+      FailedRedirectUrl: `${checkoutReturnUrl}&buytest_payment=failed&order=${encodeURIComponent(orderId)}`,
+      CancelRedirectUrl: `${checkoutReturnUrl}&buytest_payment=cancelled&order=${encodeURIComponent(orderId)}`,
       WebHookUrl: WEBHOOK_URL,
       ProductName: productName,
       Language: "he",
@@ -372,8 +395,8 @@ async function createPayment(origin: string | null, body: Record<string, unknown
           ProductID: productCode,
           Description: `${productName} · רכב ${plate}`,
           Quantity: 1,
-          UnitCost: plan.amountAgorot / 100,
-          TotalLineCost: plan.amountAgorot / 100,
+          UnitCost: amountAgorot / 100,
+          TotalLineCost: amountAgorot / 100,
           IsVatFree: false,
         }],
         ExternalId: orderId,
@@ -401,7 +424,7 @@ async function createPayment(origin: string | null, body: Record<string, unknown
     provider_transaction_id: lowProfileId,
     provider_payload: progressPayload(order.provider_payload, inheritedProgress, { provider: "cardcom", stage: "payment_ready", responseCode: 0, lowProfileId }),
   });
-  return json(origin, { ok: true, orderId, clientSecret, plate, plan: planKey, progress: inheritedProgress, paymentUrl });
+  return json(origin, { ok: true, orderId, clientSecret, plate, plan: planKey, progress: inheritedProgress, amountAgorot, paymentUrl });
 }
 
 async function paymentStatus(origin: string | null, body: Record<string, unknown>) {
@@ -452,7 +475,7 @@ async function completeStage(origin: string | null, body: Record<string, unknown
     const updatedPackage = await orderById(orderId);
   return json(origin, { ok: true, progress: packageProgress(updatedPackage, plate), consultationActive: packageConsultationActive(updatedPackage, plate), accessToken: await signedEntitlement(updatedPackage, plate) });
   }
-  const scopes: readonly string[] = PLANS[plan].scopes;
+  const scopes: readonly string[] = plan === "balcar" && Number(order.amount_agorot) === 3900 ? ["balcar", "premium", "report"] : PLANS[plan].scopes;
   if (!scopes.includes(stage)) return json(origin, { ok: false, error: "stage_not_purchased" }, 403);
   const progress = stageProgress(order.provider_payload);
   if (stage === "report" && !progress.preInspectionCompleted && plan !== "report" && plan !== "report_consultation" && plan !== "balcar") {
@@ -512,6 +535,13 @@ Deno.serve(async (req: Request) => {
         return json(origin, { ok: false, error: reason, serverEnvironmentConfigured: Boolean(SUPABASE_URL && SERVICE_ROLE_KEY) }, 503);
       }
     }
+    if (action === "quoteConsultation") {
+      if (!origin || !ALLOWED_ORIGINS.has(origin)) return json(origin, {ok:false,error:"origin_not_allowed"},403);
+      const plate = cleanPlate(body.plate);
+      if (!/^\d{7,8}$/.test(plate)) return json(origin,{ok:false,error:"invalid_plate"},400);
+      const eligible = Boolean(await consultationUpgradeOrder(body,plate));
+      return json(origin,{ok:true,amountAgorot:eligible?11000:14900,upgradeFromBundle:eligible});
+    }
     if (action === "create") return await createPayment(origin, body);
     if (action === "status") return await paymentStatus(origin, body);
     if (action === "complete") return await completeStage(origin, body);
@@ -524,4 +554,3 @@ Deno.serve(async (req: Request) => {
     return json(origin, { ok: false, error: "payment_service_error" }, 500);
   }
 });
-

@@ -1,0 +1,22 @@
+/* Two columns in RTL at every width, in the requested service order. */
+#marketingLanding #serviceChoices{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));direction:rtl;gap:14px;justify-items:stretch}
+#marketingLanding #serviceChoices .btService{display:flex!important;grid-column:auto!important;width:100%;aspect-ratio:1;min-height:0;flex-direction:column;justify-content:center;text-align:center;text-decoration:none;padding:18px!important;border-radius:18px!important;gap:8px}
+#serviceChoices .btService strong{font-size:clamp(18px,4vw,25px);line-height:1.4}
+#serviceChoices .btService small{font-size:22px;color:#075e48;font-weight:900}
+body[data-service="home"]:not(.manager-mode) #appShell,body[data-service="home"] #afterPage{display:none!important}
+body[data-service]:not([data-service="home"]) #marketingLanding{display:none!important}
+body[data-service="insurance"] #appShell,body[data-service="checklist"] #appShell{display:block!important}
+body[data-service] #afterInsuranceChoices,body[data-service] .btStageNav,body[data-service] .btNextActions,body[data-service] #postReportConsultation,body[data-service] #insuranceConsultationButton,body[data-service] .appBackHome,body[data-service] .consultationLocked{display:none!important}
+body[data-service="insurance"] #vehicleChecklist{display:none!important}
+body[data-service="checklist"] #insuranceStartSection,body[data-service="checklist"] #balcarReportSection{display:none!important}
+body[data-service="report"] #externalInsurancePanel{display:none!important}
+#independentServiceHeader{margin:15px 0 24px}#independentServiceHeader h1{font-size:clamp(25px,5vw,34px);line-height:1.4}
+.serviceHome{display:inline-block;text-decoration:none;padding:12px 16px;background:#edf8f3;color:#075e48;border-radius:12px}
+#serviceSummaryContent{line-height:1.7;white-space:pre-line}#serviceSummary[hidden]{display:none!important}
+#vehicleLookup .landingFreeStart{margin:12px 0}#vehicleLookup #plate{width:100%}
+#consultationPage input{width:100%;padding:12px;margin:10px 0;font-size:18px}
+@media(max-width:420px){#marketingLanding #serviceChoices{gap:9px}#marketingLanding #serviceChoices .btService{padding:10px!important}#serviceChoices .btService strong{font-size:18px}#serviceChoices .btService small{font-size:20px}}
+
+body[data-service="consultation"].bt-advice-access #prePurchaseConsultationBox{display:block!important}
+body[data-service="consultation"].bt-advice-access #consultationPurchaseIntro{display:none!important}
+#afterPage>button[hidden],#consultationPage>button[hidden]{display:none!important}
