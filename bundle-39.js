@@ -44,13 +44,14 @@
   const oldStart=startPayment;
   async function unlock(intent='checklist'){
     if(!/^\d{7,8}$/.test(plate())){showBuyTestAccessNotice('יש להזין מספר רכב בן 7 או 8 ספרות.',true);return false;}
-    if(intent==='checklist'){navigate(intent);return true;}
+    if(intent==='checklist'||intent==='insurance'){navigate(intent);return true;}
     await refreshStoredBundle();
     if(intent==='report'?hasReport():Boolean(receipt('balcar'))){navigate(intent);return true;}
     return oldStart(intent==='report'?'report':'balcar');
   }
   function navigate(step){if(window.BuyTestServices)BuyTestServices.render(step);}
   startPayment=async function(plan='report'){
+    if(plan==='balcar'){showBuyTestAccessNotice('הפקת דוחות חדשים אינה זמינה כרגע. ניתן להעלות דוח קיים לפענוח.',true);return false;}
     if(plan==='premium')return unlock('checklist');
     if(plan==='report')return unlock('report');
     return oldStart(plan);
