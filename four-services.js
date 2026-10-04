@@ -1,6 +1,6 @@
 /* Four independent entry pages. Only home navigation; one dossier per vehicle. */
 (() => {
-  const services={insurance:{title:'עבר ביטוחי ופענוח — 15 ₪'},checklist:{title:'צ׳קליסט לפני קנייה — חינם'},report:{title:'פענוח דוח מכון — 29 ₪'},consultation:{title:'ייעוץ אישי עם עמוס — 79 ₪'}};
+  const services={insurance:{title:'פענוח עבר ביטוחי — חינם'},checklist:{title:'צ׳קליסט לפני קנייה — חינם'},report:{title:'פענוח דוח מכון — חינם'},consultation:{title:'ייעוץ אישי עם עמוס — 99 ₪'}};
   let current='';
   const readRoute=()=>new URLSearchParams(location.search).get('service')|| (location.hash==='#report'?'report':'');
   function updateSummary(){
@@ -70,7 +70,7 @@
     document.getElementById('prebuyVehiclePlate').readOnly=true;
     document.getElementById('prebuyVehiclePlate').value=plate();
     document.getElementById('prebuyVehiclePlate').previousElementSibling.textContent='מספר הרכב שנבחר';
-    document.querySelector('#insuranceStartSection h3').textContent='עבר ביטוחי ופענוח — 15 ₪';
+    document.querySelector('#insuranceStartSection h3').textContent='פענוח עבר ביטוחי — חינם';
     document.querySelectorAll('.returnBtn').forEach(button=>{button.textContent='חזרה לדף הראשי';button.onclick=home;});
     const insuranceText=document.querySelector('#insuranceStartSection .info');insuranceText.textContent=insuranceText.textContent.replace('החבילה','שירות העבר הביטוחי');
     render();
