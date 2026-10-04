@@ -2,7 +2,7 @@
   'use strict';
   let version=0,files=[];
   const quality=text=>({ok:String(text).trim().length>=40,score:String(text).length,findings:0,categories:0,unknown:0});
-  const allowed=()=>document.body.classList.contains('manager-mode')||Boolean(window.BuyTestBundle?.insuranceReceipt()||window.BuyTestBundle?.reportReceipt());
+  const allowed=()=>/^\d{7,8}$/.test(plate());
   function status(text){document.getElementById('externalInsuranceStatus').textContent=text;}
   function restore(){
     version++;files=[];
@@ -18,7 +18,7 @@
     status(source?'הפענוח שמור בסיכום לרכב הזה.':'');
   }
   async function read(input){
-    if(!allowed()){await BuyTestBundle.unlock('insurance');input.value='';return;}
+    if(!allowed()){status('יש להזין מספר רכב בן 7 או 8 ספרות לפני העלאת הדוח.');input.value='';return;}
     const selected=Array.from(input.files||[]);if(!selected.length)return;
     const p=plate(),run=++version;
     files=[];
@@ -53,7 +53,7 @@
     }finally{if(worker)await worker.terminate();}
   }
   function save(){
-    if(!allowed()){void BuyTestBundle.unlock('insurance');return;}
+    if(!allowed()){status('יש להזין מספר רכב בן 7 או 8 ספרות לפני הפענוח.');return;}
     const p=plate(),text=document.getElementById('externalInsuranceText').value.trim();
     if(!/^\d{7,8}$/.test(p)){status('יש להזין מספר רכב.');return;}
     if(!quality(text).ok){status('יש להעלות דוח קריא או להדביק את תוכנו לפני השמירה.');return;}
