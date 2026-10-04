@@ -383,10 +383,10 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 </section>
 <div class="btLaunchOffer"><strong>בחרו את השירות שמתאים לכם</strong><span>כל שירות בנפרד · המידע נשמר לפי מספר הרכב לסיכום משותף</span></div>
 <div class="btServices" id="serviceChoices" aria-label="בחירת שירות">
-<a class="btService btInsurance" href="?service=insurance"><strong>פענוח עבר ביטוחי</strong><small>חינם</small></a>
-<a class="btService btChecklist" href="?service=checklist"><strong>צ׳קליסט לפני קנייה</strong><small>חינם</small></a>
-<a class="btService btReport" href="?service=report"><strong>פענוח דוח מכון</strong><small>חינם</small></a>
-<a class="btService btConsult" href="?service=consultation"><strong>ייעוץ אישי עם עמוס</strong><small>99 ₪</small></a>
+<a class="btService btInsurance" href="?service=insurance&v=20261004"><strong>פענוח עבר ביטוחי</strong><small>חינם</small></a>
+<a class="btService btChecklist" href="?service=checklist&v=20261004"><strong>צ׳קליסט לפני קנייה</strong><small>חינם</small></a>
+<a class="btService btReport" href="?service=report&v=20261004"><strong>פענוח דוח מכון</strong><small>חינם</small></a>
+<a class="btService btConsult" href="?service=consultation&v=20261004"><strong>ייעוץ אישי עם עמוס</strong><small>99 ₪</small></a>
 <div class="btFreeInquiry btHomeInquiry"><a id="consultationFreeInquiry" href="https://wa.me/972552997673?text=%D7%A9%D7%9C%D7%95%D7%9D%20%D7%A2%D7%9E%D7%95%D7%A1%2C%20%D7%94%D7%92%D7%A2%D7%AA%D7%99%20%D7%9E%D6%BEBuyTest%20%D7%95%D7%99%D7%A9%20%D7%9C%D7%99%20%D7%A9%D7%90%D7%9C%D7%94%20%D7%A2%D7%9C%20%D7%A9%D7%99%D7%A8%D7%95%D7%AA%20%D7%94%D7%99%D7%99%D7%A2%D7%95%D7%A5%20%D7%9C%D7%A4%D7%A0%D7%99%20%D7%A7%D7%A0%D7%99%D7%99%D7%AA%20%D7%A8%D7%9B%D7%91." target="_blank" rel="noopener noreferrer">יש שאלה על השירות? שלחו לי הודעה בוואטסאפ</a><small>בירור ראשוני ללא עלות</small></div>
 </div><button class="btTourButton" type="button" onclick="openBuyTestTour()">איך זה עובד? ▶</button>
 </div>
@@ -401,10 +401,10 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 </section>
 <section class="inspectionRoute" id="afterInspectionRoute" hidden aria-label="מסלול אחרי המכון">
   <button class="routeBack" type="button" onclick="closeInspectionRoutes()">← חזרה לבחירת מסלול</button>
-  <h2>כבר יש לי דוח מכון</h2><p>מכניסים מספר רכב ופותחים חבילה ב־39 ₪ הכוללת פענוח דוח, עבר ביטוחי וצ׳קליסט. לאחר קבלת הפענוח אפשר לבחור בהתייעצות אישית עם הבוחן עמוס רוקח ב־99 ₪.</p>
+  <h2>כבר יש לי דוח מכון</h2><p>הזינו מספר רכב והעלו את הדוח לקבלת פענוח בחינם. לאחר הפענוח אפשר לבחור בהתייעצות אישית עם הבוחן עמוס רוקח ב־99 ₪.</p>
   <div class="landingFreeStart">
     <input id="afterPlate" inputmode="numeric" maxlength="8" autocomplete="off" aria-label="מספר רכב לאחר המכון" placeholder="מה מספר הרכב?" oninput="sanitizePlateInput(this);this.setCustomValidity('')" onkeydown="if(event.key==='Enter')startAfterInspectionRoute()">
-    <button class="mktBtn mktBtnPrimary" type="button" data-analytics-click="click_report_plan" onclick="startAfterInspectionRoute()">המשך לחבילה הכוללת פענוח · 39 ₪ ←</button>
+    <button class="mktBtn mktBtnPrimary" type="button" data-analytics-click="click_report_plan" onclick="startAfterInspectionRoute()">המשך לפענוח הדוח בחינם ←</button>
   </div>
 </section>
 </div>
@@ -504,8 +504,8 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 <section class="card freeAfterLookup" id="afterInsuranceChoices" style="display:none">
   <h2>בדיקות הרכב — שלב אחר שלב</h2>
   <p class="bundleScope">צ׳קליסט מלא, עבר ביטוחי ופענוח דוח המכון — בתהליך אחד לרכב שלך.</p>
-  <p class="sub bundleAccessCaption">תשלום חד־פעמי לרכב אחד · גישה ל־30 ימים.<br>התייעצות אישית אינה כלולה.</p>
-  <button class="primary full" id="buyBundle39" type="button" onclick="BuyTestBundle.unlock('checklist')">כניסה למהלך הבדיקה — 39 ₪</button>
+  <p class="sub bundleAccessCaption">השימוש בשירותים הדיגיטליים בחינם. התייעצות אישית אינה כלולה.</p>
+  <button class="primary full" id="buyBundle39" type="button" onclick="BuyTestBundle.unlock('checklist')">כניסה למהלך הבדיקה — חינם</button>
   <p class="sub bundleFlowCaption">הכניסה פותחת את הצ׳קליסט. בתחתיתו אפשר לבחור בעבר ביטוחי או בפענוח דוח המכון, בלי צורך להשלים את הצ׳קליסט.</p>
   <p class="sub bundleOwnerCaption">להפקת העבר הביטוחי נדרשים תעודת זהות של הבעלים ותאריך תחילת הבעלות האחרונה, במדויק לפי הרישיון. אפשר להתחיל בצ׳קליסט ולהשלים אותם בהמשך.</p>
 </section>
@@ -1465,9 +1465,9 @@ function setCustomerRoute(route){
   const lookupButton=document.getElementById('vehicleLookupButton');
   if(customerEntryRoute==='report'){
     if(title) title.textContent='פענוח דוח לאחר בדיקה במכון';
-    if(lead) lead.textContent='הקלידו את מספר הרכב. לאחר אישור מספר הרכב פותחים חבילה ב־39 ₪ ומעלים את הדוח לפענוח.';
-    if(context){context.classList.add('show');context.innerHTML='<strong>המסלול שבחרת: חבילה הכוללת פענוח — 39 ₪</strong><span>מספר רכב ← תשלום אחד של 39 ₪ ← העלאת הדוח ופענוח</span>';}
-    if(lookupButton) lookupButton.textContent='אישור הרכב והמשך לחבילה — 39 ₪';
+    if(lead) lead.textContent='הקלידו את מספר הרכב כדי לפתוח את פענוח דוח המכון בחינם.';
+    if(context){context.classList.add('show');context.innerHTML='<strong>המסלול שבחרת: פענוח דוח מכון — חינם</strong><span>מספר רכב ← העלאת הדוח ← פענוח בחינם</span>'; }
+    if(lookupButton) lookupButton.textContent='אישור הרכב והמשך לפענוח בחינם';
   }else if(customerEntryRoute==='consultation'){
     if(title) title.textContent='ייעוץ אישי לפני רכישת רכב';
     if(lead) lead.textContent='לא צריך לבחור רכב מסוים. קראו את ההבהרה, אשרו את התנאים והמשיכו לתשלום מאובטח בסך 99 ₪.';
@@ -2178,7 +2178,7 @@ function updateBuyTestRoadmap(){
   document.body.classList.toggle('stage-consultation-open',plan==='bundle'&&progress.reportCompleted);
   if(progress.reportCompleted) setRoadmapCard('report','completed','✓ הפענוח הושלם','הפענוח הושלם',true);
   else if(plan==='report'||plan==='report_consultation'||plan==='bundle') setRoadmapCard('report','current','הפענוח פתוח לרכב הזה','לחץ להמשך להעלאת הדוח',true);
-  else setRoadmapCard('report','current','מוכן לפתיחה לרכב שנבחר','פתיחת החבילה כולל פענוח — 39 ₪',false);
+  else setRoadmapCard('report','current','מוכן לפתיחה לרכב שנבחר','פתיחת פענוח דוח המכון — חינם',false);
   const consultationButton=document.getElementById('consultationPlanButton');
   if(consultationButton) consultationButton.disabled=plan==='consultation'||plan==='report_consultation'||(plan==='bundle'&&progress.reportCompleted);
 }
