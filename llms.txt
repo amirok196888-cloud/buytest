@@ -1,0 +1,17 @@
+# BuyTest
+
+> BuyTest is a Hebrew-language vehicle information and used-car report explanation service operated by Amos Rokach.
+
+## About
+BuyTest helps prospective used-car buyers review available vehicle information, prepare questions before a vehicle inspection, and understand text from an inspection report. It does not physically inspect vehicles, certify safety, estimate repair costs or recommend whether to buy a vehicle.
+
+## Main pages
+- [Home](https://buytest.co.il/): Vehicle information and BuyTest services.
+- [About](https://buytest.co.il/about/): About BuyTest and Amos Rokach.
+- [Contact](https://buytest.co.il/contact/): Contact by email or WhatsApp.
+- [Articles](https://buytest.co.il/articles/): Used-car buying and inspection guides.
+- [Terms of use](https://buytest.co.il/terms/): Service terms and limitations.
+- [Privacy policy](https://buytest.co.il/privacy/): Data handling and privacy information.
+
+## Content guidance
+BuyTest explanations are based on user-provided vehicle data and inspection-report text. They are informational and should be checked against the original documents and qualified professionals. The service is not affiliated with inspection institutes.
