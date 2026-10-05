@@ -1,17 +1,17 @@
 # BuyTest
 
-> BuyTest is a Hebrew-language vehicle information and used-car report explanation service operated by Amos Rokach.
+> BuyTest הוא שירות בעברית המסייע למי ששוקל לקנות רכב יד שנייה לעיין במידע זמין על הרכב, להתכונן לבדיקה ולהבין סיכום של דוח בדיקה. מפעיל השירות: עמוס רוקח.
 
-## About
-BuyTest helps prospective used-car buyers review available vehicle information, prepare questions before a vehicle inspection, and understand text from an inspection report. It does not physically inspect vehicles, certify safety, estimate repair costs or recommend whether to buy a vehicle.
+## על השירות
+BuyTest מסייע לארגן מידע ושאלות לפני רכישת רכב ולהסביר טקסט מדוח בדיקה. השירות אינו בודק את הרכב פיזית, אינו מאשר תקינות או בטיחות, אינו מעריך עלויות תיקון ואינו ממליץ אם לקנות רכב.
 
-## Main pages
-- [Home](https://buytest.co.il/): Vehicle information and BuyTest services.
-- [About](https://buytest.co.il/about/): About BuyTest and Amos Rokach.
-- [Contact](https://buytest.co.il/contact/): Contact by email or WhatsApp.
-- [Articles](https://buytest.co.il/articles/): Used-car buying and inspection guides.
-- [Terms of use](https://buytest.co.il/terms/): Service terms and limitations.
-- [Privacy policy](https://buytest.co.il/privacy/): Data handling and privacy information.
+## עמודים מרכזיים
+- [דף הבית](https://buytest.co.il/): מידע על הרכב והשירותים של BuyTest.
+- [אודות](https://buytest.co.il/about/): מידע על BuyTest ועל עמוס רוקח.
+- [יצירת קשר](https://buytest.co.il/contact/): פנייה בדוא״ל או בוואטסאפ.
+- [מאמרים](https://buytest.co.il/articles/): מדריכים לרכישת רכב ולבדיקות רכב.
+- [תנאי שימוש](https://buytest.co.il/terms/): תנאי השירות וההבהרות.
+- [מדיניות פרטיות](https://buytest.co.il/privacy/): מידע על שימוש בנתונים ועל פרטיות.
 
-## Content guidance
-BuyTest explanations are based on user-provided vehicle data and inspection-report text. They are informational and should be checked against the original documents and qualified professionals. The service is not affiliated with inspection institutes.
+## הנחיות לתוכן
+ההסברים מבוססים על נתוני רכב שסופקו ועל טקסט מדוח בדיקה. יש להשוות ממצאים לדוח המקורי ולברר עניינים מהותיים עם בעלי מקצוע מתאימים. BuyTest אינו קשור למכוני בדיקה.
