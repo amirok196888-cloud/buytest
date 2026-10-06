@@ -61,7 +61,7 @@ test('bulk category move preserves each meaning and uses stable identity on repe
  const h=harness();h.run("globalThis.selected=rawFormulaDatabase.filter(r=>r.category==='מנוע').slice(0,2);");
  for(const item of h.c.selected)h.c.toggleFormulaAdminSelection('base',item.id,true);
  h.element('formulaBulkCategory').value='מערכת ההיגוי';await h.c.assignSelectedFormulaSubgroup();
- assert.equal(h.saved[0].rows.length,2);assert.ok(h.saved[0].rows.every(r=>r.category==='מערכת ההיגוי'&&r.meaning===''));
+ assert.equal(h.saved[0].rows.length,2);assert.ok(h.saved[0].rows.every(r=>r.category==='מערכת ההיגוי'&&r.meaning===h.c.savedCalibrationMeaning({id:r.source_id,text:r.source_text})));
  for(const item of h.c.selected)h.c.toggleFormulaAdminSelection('base',item.id,true);
  h.element('formulaBulkCategory').value='צמיגים וחישוקים';await h.c.assignSelectedFormulaSubgroup();
  assert.equal(h.c.loadFormulaOverrides().length,2);assert.ok(h.c.loadFormulaOverrides().every(r=>r.category==='צמיגים וחישוקים'));
@@ -99,3 +99,17 @@ test('moving an existing chassis diagnosis to another severity updates its group
 test('opening an original diagnosis preserves its group severity instead of substituting automatic calibration',()=>{
  const h=harness();for(const item of h.c.formulaAdminRows().filter(r=>['שלדת מרכב','שלדה נפרדת'].includes(r.category))){h.c.editFormulaEntry(item.kind,item.id);assert.equal(h.element('formulaSeverity').value,item.severity,item.id);}
 });
+
+ test('previously written notes appear in the manager and every saved override wins, including intentionally blank fields',()=>{
+ const h=harness();
+ const original=h.c.adminCatalog().find(r=>r.source_id==='technotest-248');
+ assert.ok(original);
+ const candidate=h.c.adminCatalog().find(r=>r.meaning&&r.source_kind==='formula');assert.ok(candidate);
+ const base=h.c.formulaAdminRows().find(r=>r.id===candidate.source_id&&r.kind==='base');assert.ok(base.meaning);
+ const today={id:'today',source_kind:'formula',source_id:base.id,category:'מערכת ההיגוי',text:'נוסח מתוקן היום',subgroup:'קבוצה שהוגדרה היום',classification_type:'information',report_severity:'minor',meaning:'',decision:'הנחיה מהיום',question:''};
+ h.c.saveFormulaOverrideRows([today]);
+ const preserved=h.c.formulaAdminRows().find(r=>r.id===base.id&&r.kind==='base');
+ for(const field of ['category','text','subgroup','meaning','decision','question'])assert.equal(preserved[field],today[field]);
+ assert.equal(preserved.severity,'minor');assert.equal(preserved.type,'information');
+ h.c.editFormulaEntry('base',base.id);assert.equal(h.element('formulaMeaning').value,'');assert.equal(h.element('formulaDecision').value,today.decision);
+ });
