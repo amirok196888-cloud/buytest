@@ -1278,7 +1278,7 @@ function btInsuranceCrossSourceAlerts(dossier){
   const constructiveLosses=losses.filter(claim=>String(claim.damage||'').includes('להלכה'));
   const insured=claims.filter(claim=>claim.party==='נזק לרכב המבוטח');
   const large=insured.filter(claim=>(claim.amounts||[]).some(value=>Number(String(value).replace(/[₪,\s]/g,''))>=30000));
-  const depreciation=insured.filter(claim=>parseFloat(String(claim.depreciationRate||'').replace(',','.'))>0);
+  const depreciation=claims.filter(claim=>parseFloat(String(claim.depreciationRate||'').replace(',','.'))>0);
   if(!losses.length&&!large.length&&!depreciation.length)return [];
   const lowFindings=(inspection.summary&&inspection.summary.findings||[]).filter(item=>{
     const text=[item.title,item.meaning,item.category].filter(Boolean).join(' ');
@@ -1299,13 +1299,13 @@ function btInsuranceCrossSourceAlerts(dossier){
   const facts=[];
   if(losses.length)facts.push('רישום '+losses.map(detail).filter(Boolean).join('; '));
   if(large.length)facts.push('תביעת הרכב המבוטח בסכום של 30,000 ₪ ומעלה: '+large.map(detail).filter(Boolean).join('; '));
-  if(depreciation.length)facts.push('נרשמה ירידת ערך בתביעת הרכב המבוטח: '+depreciation.map(claim=>detail(claim)+(claim.depreciationRate?' · ירידת ערך '+claim.depreciationRate:'')).filter(Boolean).join('; '));
+  if(depreciation.length)facts.push('נרשמה ירידת ערך בשורה המסווגת '+depreciation.map(claim=>(claim.party==='נזק לרכב המבוטח'?'רכב מבוטח':claim.party==='תביעת צד ג׳'?'צד ג׳':'סוג התביעה לא נקרא')+' — '+detail(claim)+(claim.depreciationRate?' · ירידת ערך '+claim.depreciationRate:'')).filter(Boolean).join('; '));
   const comparison=lowInReport
     ?' בדוח המכון מופיע ממצא מרכב/תיקון מרכב שסווג במשמעות נמוכה או שולית.'
     :' דוח המכון אינו מסביר או שולל את משמעות רישומי העבר הביטוחי.';
   const primary=constructiveLosses.length?'אובדן להלכה':losses.length?'אובדן/אובדן גמור':'תביעה משמעותית או ירידת ערך';
   return ['ממצא חריג המחייב התייחסות ובדיקה חוזרת: בעבר הביטוחי מופיע '+primary+'. '+facts.join('. ')+'.'+comparison+
-    ' אין להסיק מהמידע בלבד מה היה מקור הנזק — למשל, ייתכן נזק הצפה — אך גם אין להסתפק בדירוג הנמוך בטופס. יש לבדוק מחדש את המרכב והשלדה ולוודא שלא הוחמץ ממצא במשמעות גבוהה. יש להשוות לדוח השמאי, לתמונות ולמסמכי התיקון, ולוודא שבוחן המכון התייחס במפורש לירידת הערך ושממצאי המרכב בדוח תואמים לאירועים הביטוחיים. ברישום אובדן להלכה יש לבדוק מסמכי שיקום והשבה לכביש ולוודא אם נדרש הליך ותעודת בדיקה לפי תקנה 309, בהתאם לסוג הנזק. סכומי תביעה כפי שנקראו אינם מוכיחים לבדם אילו חלקים ניזוקו או מה תוקן.'];
+    ' אין להסיק מהמידע בלבד מה היה מקור הנזק — למשל, ייתכן נזק הצפה — אך גם אין להסתפק בדירוג הנמוך בטופס. יש לבדוק מחדש את המרכב והשלדה ולוודא שלא הוחמץ ממצא במשמעות גבוהה. יש להשוות לדוח השמאי, לתמונות ולמסמכי התיקון, ולוודא שבוחן המכון התייחס במפורש לכל ירידת ערך ושממצאי המרכב בדוח תואמים לאירועים הביטוחיים. יש לוודא גם אם שורת ירידת הערך מתייחסת לרכב המבוטח או לצד ג׳, ולא לייחס אותה לרכב הנבדק לפני אימות. ברישום אובדן להלכה יש לבדוק מסמכי שיקום והשבה לכביש ולוודא אם נדרש הליך ותעודת בדיקה לפי תקנה 309, בהתאם לסוג הנזק. סכומי תביעה כפי שנקראו אינם מוכיחים לבדם אילו חלקים ניזוקו או מה תוקן.'];
 }
 function btSummaryAlerts(dossier=btDossier()){
   const sources=dossier.sources,alerts=[];
