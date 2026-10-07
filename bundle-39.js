@@ -31,7 +31,7 @@
     }));sync();return true;
   }
   const manager=()=>document.body.classList.contains('manager-mode');
-  const hasReport=()=>manager()||Boolean(receipt('report'));
+  const hasReport=()=>manager()||activeBuyTestPlan()==='report'||Boolean(receipt('report'));
   const hasChecklist=()=>true;
   function sync(){
     document.body.classList.toggle('bt-report-access',hasReport());
@@ -47,7 +47,7 @@
     if(intent==='checklist'||intent==='insurance'){navigate(intent);return true;}
     await refreshStoredBundle();
     if(intent==='report'?hasReport():Boolean(receipt('balcar'))){navigate(intent);return true;}
-    return oldStart(intent==='report'?'report':'balcar');
+    const result=await oldStart(intent==='report'?'report':'balcar');sync();return result;
   }
   function navigate(step){if(window.BuyTestServices)BuyTestServices.render(step);}
   startPayment=async function(plan='report'){
