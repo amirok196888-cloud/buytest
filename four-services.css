@@ -9,7 +9,7 @@ body[data-service="insurance"] #appShell,body[data-service="checklist"] #appShel
 body[data-service] #afterInsuranceChoices,body[data-service] .btStageNav,body[data-service] .btNextActions,body[data-service] #postReportConsultation,body[data-service] #insuranceConsultationButton,body[data-service] .appBackHome,body[data-service] .consultationLocked{display:none!important}
 body[data-service="insurance"] #vehicleChecklist{display:none!important}
 body[data-service="checklist"] #insuranceStartSection,body[data-service="checklist"] #balcarReportSection{display:none!important}
-body[data-service="report"] #externalInsurancePanel{display:none!important}
+
 #independentServiceHeader{margin:15px 0 24px}#independentServiceHeader h1{font-size:clamp(25px,5vw,34px);line-height:1.4}
 .serviceHome{display:inline-block;text-decoration:none;padding:12px 16px;background:#edf8f3;color:#075e48;border-radius:12px}
 #serviceSummaryContent{line-height:1.7;white-space:pre-line}#serviceSummary[hidden]{display:none!important}
