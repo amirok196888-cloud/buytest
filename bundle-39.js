@@ -45,6 +45,7 @@
   async function unlock(intent='checklist'){
     if(!/^\d{7,8}$/.test(plate())){showBuyTestAccessNotice('יש להזין מספר רכב בן 7 או 8 ספרות.',true);return false;}
     if(intent==='checklist'||intent==='insurance'){navigate(intent);return true;}
+    if(intent==='report'&&document.body.classList.contains('after-page'))closeAfterPage(false);
     await refreshStoredBundle();
     if(intent==='report'?hasReport():Boolean(receipt('balcar'))){navigate(intent);return true;}
     return oldStart(intent==='report'?'report':'balcar');
