@@ -1267,9 +1267,50 @@ function btExplicitInsuranceAlerts(data){
   }
   walk(data);return [...new Set(alerts)];
 }
+function btInsuranceCrossSourceAlerts(dossier){
+  const insurance=dossier.sources&&dossier.sources.insuranceExternal;
+  const inspection=dossier.sources&&dossier.sources.inspection;
+  if(!insurance||!insurance.rawText||!inspection||!window.BuyTestInsurance)return [];
+  const result=BuyTestInsurance.interpret(insurance.rawText);
+  if(result.plate&&dossier.plate&&String(result.plate)!==String(dossier.plate))return [];
+  const claims=Array.isArray(result.claims)?result.claims:[];
+  const losses=claims.filter(claim=>String(claim.damage||'').includes('אובדן'));
+  const constructiveLosses=losses.filter(claim=>String(claim.damage||'').includes('להלכה'));
+  const insured=claims.filter(claim=>claim.party==='נזק לרכב המבוטח');
+  const large=insured.filter(claim=>(claim.amounts||[]).some(value=>Number(String(value).replace(/[₪,\s]/g,''))>=30000));
+  const depreciation=insured.filter(claim=>parseFloat(String(claim.depreciationRate||'').replace(',','.'))>0);
+  if(!losses.length&&!large.length&&!depreciation.length)return [];
+  const lowFindings=(inspection.summary&&inspection.summary.findings||[]).filter(item=>{
+    const text=[item.title,item.meaning,item.category].filter(Boolean).join(' ');
+    const severity=String(item.severity||'').toLowerCase();
+    return severity==='low'||severity==='marginal'||text.includes('משמעות נמוכה')||text.includes('משמעות שולית');
+  });
+  const inspectionText=String(inspection.text||'');
+  const lowInReport=lowFindings.length>0||inspectionText.includes('משמעות נמוכה')||inspectionText.includes('משמעות שולית');
+  const detail=claim=>{
+    const parts=[];
+    if(claim.date)parts.push('תאריך '+claim.date);
+    if(claim.claimNumber)parts.push('תביעה '+claim.claimNumber);
+    if(claim.damage&&claim.damage!=='סוג הנזק לא נקרא')parts.push(claim.damage);
+    const amounts=(claim.amounts||[]).filter(Boolean);
+    if(amounts.length)parts.push('סכומים שנקראו '+amounts.map(value=>'₪'+value).join(' ו־'));
+    return parts.join(' · ');
+  };
+  const facts=[];
+  if(losses.length)facts.push('רישום '+losses.map(detail).filter(Boolean).join('; '));
+  if(large.length)facts.push('תביעת הרכב המבוטח בסכום של 30,000 ₪ ומעלה: '+large.map(detail).filter(Boolean).join('; '));
+  if(depreciation.length)facts.push('נרשמה ירידת ערך בתביעת הרכב המבוטח: '+depreciation.map(claim=>detail(claim)+(claim.depreciationRate?' · ירידת ערך '+claim.depreciationRate:'')).filter(Boolean).join('; '));
+  const comparison=lowInReport
+    ?' בדוח המכון מופיע ממצא מרכב/תיקון מרכב שסווג במשמעות נמוכה או שולית.'
+    :' דוח המכון אינו מסביר או שולל את משמעות רישומי העבר הביטוחי.';
+  const primary=constructiveLosses.length?'אובדן להלכה':losses.length?'אובדן/אובדן גמור':'תביעה משמעותית או ירידת ערך';
+  return ['ממצא חריג המחייב התייחסות ובדיקה חוזרת: בעבר הביטוחי מופיע '+primary+'. '+facts.join('. ')+'.'+comparison+
+    ' אין להסיק מהמידע בלבד מה היה מקור הנזק — למשל, ייתכן נזק הצפה — אך גם אין להסתפק בדירוג הנמוך בטופס. יש לבדוק מחדש את המרכב והשלדה ולוודא שלא הוחמץ ממצא במשמעות גבוהה. יש להשוות לדוח השמאי, לתמונות ולמסמכי התיקון, ולוודא שבוחן המכון התייחס במפורש לירידת הערך ושממצאי המרכב בדוח תואמים לאירועים הביטוחיים. ברישום אובדן להלכה יש לבדוק מסמכי שיקום והשבה לכביש ולוודא אם נדרש הליך ותעודת בדיקה לפי תקנה 309, בהתאם לסוג הנזק. סכומי תביעה כפי שנקראו אינם מוכיחים לבדם אילו חלקים ניזוקו או מה תוקן.'];
+}
 function btSummaryAlerts(dossier=btDossier()){
   const sources=dossier.sources,alerts=[];
   for(const source of Object.values(sources))alerts.push(...(source.alerts||[]));
+  alerts.push(...btInsuranceCrossSourceAlerts(dossier));
   const observations=Object.values(sources).flatMap(s=>s.mileage||[]).filter(o=>btMileage(o.km)!==null&&!(o.source==='דוח המכון'&&btMileage(o.km)===0)).map(o=>({...o,km:btMileage(o.km),time:btDate(o.date)}));
   const seen=new Set();
   for(let i=0;i<observations.length;i++)for(let j=i+1;j<observations.length;j++){
@@ -1277,8 +1318,8 @@ function btSummaryAlerts(dossier=btDossier()){
     const both=a.time!==null&&b.time!==null;
     if(both&&a.time!==b.time&&((a.time<b.time&&a.km<b.km)||(b.time<a.time&&b.km<a.km)))continue;
     const title=both&&a.time!==b.time?'ירידה בקילומטראז׳ בין רישומים מתוארכים':'פער בין נתוני הקילומטראז׳ — נדרש בירור';
-    const detail=o=>`${o.source}: ${fmtNum(o.km)} ק״מ${o.date?' ('+o.date+')':' (ללא תאריך מדידה)'}`;
-    const text=`${title}. ${detail(a)}; ${detail(b)}. יש לאמת מול המקורות; אין בכך לבדו הוכחה לשינוי מד האוץ.`;
+    const detail=o=>String(o.source)+': '+fmtNum(o.km)+' ק״מ'+(o.date?' ('+o.date+')':' (ללא תאריך מדידה)');
+    const text=title+'. '+detail(a)+'; '+detail(b)+'. יש לאמת מול המקורות; אין בכך לבדו הוכחה לשינוי מד האוץ.';
     if(!seen.has(text)){seen.add(text);alerts.push(text);}
   }
   return [...new Set(alerts)];
