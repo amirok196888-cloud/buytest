@@ -39,7 +39,7 @@
     document.body.classList.toggle('bt-advice-access',manager()||Boolean(receipt('prebuy')||receipt('consultation')));
     document.body.classList.toggle('bt-insurance-access',manager()||Boolean(receipt('balcar')));
     const paywall=document.getElementById('reportBundlePaywall');if(paywall)paywall.hidden=hasReport();
-    const button=document.getElementById('balcarPlanButton');if(button)button.textContent=receipt('balcar')?'הצגת דוח העבר הביטוחי שנרכש':'פענוח עבר ביטוחי — חינם';
+    const button=document.getElementById('balcarPlanButton');if(button)button.textContent='יש לי קובץ דוח — להעלאה ולפענוח';
   }
   const oldStart=startPayment;
   async function unlock(intent='checklist'){

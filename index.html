@@ -405,10 +405,10 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 </style>
 <dialog id="balcarChoiceDialog" aria-labelledby="balcarChoiceTitle" style="width:min(720px,calc(100% - 28px));max-width:720px;border:0;border-radius:20px;padding:24px;background:#fff;color:#17323c;box-shadow:0 18px 55px #0005">
   <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-    <h2 id="balcarChoiceTitle" style="margin:0">פענוח דוח בלקאר</h2>
+    <h2 id="balcarChoiceTitle" style="margin:0">פענוח דוח עבר ביטוחי</h2>
     <button type="button" class="secondary" onclick="document.getElementById('balcarChoiceDialog').close()">סגירה</button>
   </div>
-  <p class="sub" style="color:#50666f;margin:8px 0 0">בחר את הדרך המתאימה:</p>
+  <p class="sub" style="color:#50666f;margin:8px 0 0">אם עדיין אין לך דוח, הפק אותו בעצמך. אחרי ההורדה חזור לכאן והעלה את הקובץ.</p>
   <div id="balcarChoiceGrid">
     <article>
       <span class="balcarChoiceNumber">1</span>
@@ -418,9 +418,9 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
     </article>
     <article>
       <span class="balcarChoiceNumber">2</span>
-      <h3>יש לך דוח בלקאר?</h3>
-      <p>העלה קובץ PDF או תמונה, או הדבק קישור שיתוף לדוח בלקאר. אין צורך להזין פרטי רכב.</p>
-      <a href="?service=balcar">העלאה או הדבקת קישור לפענוח</a>
+      <h3>הדוח כבר ירד לטלפון?</h3>
+      <p>בחר קובץ PDF או תמונה שהורדת. BuyTest תקרא את הקובץ, תפענח את הנתונים ותציג סיכום.</p>
+      <a href="?service=insurance">העלאת קובץ לפענוח</a>
     </article>
   </div>
 </dialog>
@@ -477,7 +477,7 @@ document.getElementById('balcarChoiceDialog')?.addEventListener('click',event=>{
 <div class="mktFaq">
 <details><summary>האם BuyTest מחליף בדיקה במכון?</summary><p>לא. השלב הראשון מארגן בדיקות בסיסיות ודגשים למכון; השלב השני מסביר את סיכום הבוחן. השירות אינו בודק את הרכב פיזית ואינו מאשר תקינות.</p></details>
 <details><summary>מה מקבלים בחינם?</summary><p>נתוני הרכב הזמינים ממאגר משרד התחבורה מוצגים בחינם. גם הצ׳קליסט חינם. פענוח עבר ביטוחי ופענוח דוח מכון — בחינם; ייעוץ אישי — 99 ₪.</p></details>
-<details><summary>מה מקבלים בדוח עבר ביטוחי?</summary><p>לאחר הכנסת מספר הרכב אפשר לפתוח את פרטי הרכב מהמאגר ולהפיק דוח עבר ביטוחי, כולל פענוח הנתונים, קישור לדוח המקורי ותקציר PDF. הדוח והפענוח ניתנים בחינם לרכב אחד.</p></details>
+<details><summary>איך מפענחים דוח עבר ביטוחי?</summary><p>מפיקים את הדוח בעצמכם ומורידים אותו לטלפון. מעלים את הקובץ ל‑BuyTest; האתר קורא את הקובץ, מפענח את הנתונים ומציג סיכום. BuyTest אינה מתחברת לבלק״ר.</p></details>
 <details><summary>כמה עולים פענוח הדוח וההתייעצות?</summary><p>הצ׳קליסט, פענוח עבר ביטוחי ופענוח דוח מכון ניתנים בחינם. ייעוץ אישי עולה 99 ₪.</p></details>
 <details><summary>מה קורה אם חסר מידע על הרכב?</summary><p>מאגרים ציבוריים אינם תמיד מלאים. כאשר נתון אינו זמין, BuyTest מציגה זאת במקום להמציא מידע, וממליצה לאמת פרטים מהותיים מול מסמכי הרכב והגורמים המתאימים.</p></details>
 <details><summary>האם BuyTest אומר אם לקנות את הרכב?</summary><p>לא. אין המלצת קנייה או אי־קנייה, אין הערכת שווי או עלות תיקון ואין קביעה לגבי ירידת ערך. BuyTest משקף משמעויות ושאלות לבירור בלבד; ההחלטה היא של המשתמש.</p></details>
@@ -530,28 +530,16 @@ document.getElementById('balcarChoiceDialog')?.addEventListener('click',event=>{
 </section>
 <section class="card freeAfterLookup" id="insuranceStartSection" style="display:none">
   <div class="balcarOffer insuranceOffer">
-    <h3>שלב 2: עבר ביטוחי</h3>
-    <p>הפק דוח עבר ביטוחי וקבל פענוח של הנתונים. גם דוח ללא תביעות אינו מבטיח שהרכב לא נפגע ואינו מחליף בדיקה במכון.</p>
-    <p class="info">הפקת העבר הביטוחי מחייבת תעודת זהות של הבעלים ותאריך תחילת הבעלות האחרונה, כפי שמופיעים ברישיון. בלי פרטים מלאים ותואמים לא ניתן להפיק את הדוח. יש לוודא את ההתאמה לרישיון; ניתן לתקן ולהשלים פרטים לאחר פתיחת שירות העבר הביטוחי.</p><div id="insuranceSellerFields" style="display:block;margin:12px 0;padding:12px;border:1px solid #edcd7a;border-radius:12px;background:#fffaf0">
-      <b>חובה להעתיק את הפרטים במדויק מרישיון הרכב</b>
-      <div class="field" style="margin-top:10px"><label for="insuranceOwnershipDate">תאריך תחילת הבעלות</label><input id="insuranceOwnershipDate" type="date"></div>
-      <div class="field" style="margin-top:10px"><label for="insuranceOwnerId">תעודת זהות של בעל הרכב</label><input id="insuranceOwnerId" inputmode="numeric" maxlength="9" autocomplete="off" placeholder="9 ספרות, כולל אפסים בתחילת המספר" oninput="this.value=this.value.replace(/\D/g,'').slice(0,9)"></div>
-    </div>
-    <button class="primary full" id="balcarPlanButton" type="button" data-analytics-click="click_insurance_history" onclick="startBalcarPayment()">הפקת דוח העבר הביטוחי הכלול בחבילה</button>
-    <div class="devMsg" id="balcarEligibilityMsg" role="status" aria-live="polite"></div>
+    <h3>פענוח דוח עבר ביטוחי</h3>
+    <p>הפק את הדוח בעצמך, הורד אותו לטלפון והעלה כאן את הקובץ. BuyTest תקרא את הקובץ ותפיק סיכום לפענוח.</p>
+    <p class="info">BuyTest אינה מפיקה את הדוח ואינה מתחברת לבלק״ר. יש להעלות PDF או תמונה של הדוח שהורדת.</p>
+    <button class="primary full" id="balcarPlanButton" type="button" data-analytics-click="click_insurance_history" onclick="showBalcarUpload()">יש לי קובץ דוח — להעלאה ולפענוח</button>
   </div>
 </section>
 <section class="card" id="balcarUploadPage" style="display:none">
-  <h2>פענוח דוח בלקאר</h2>
-  <p class="sub">הדבק קישור שיתוף או העלה PDF או תמונה ברורה של דוח בלקאר. אין צורך במספר רכב או בפרטים נוספים.</p>
-  <div class="uploadPanel btExternalInsurance" id="balcarSharedReportPanel" style="margin:14px 0;padding:16px;border:1px solid #b8ddd0;border-radius:14px;background:#f4fbf7">
-    <h3>הדבקת קישור לדוח בלקאר</h3>
-    <label for="balcarSharedReportLink">קישור השיתוף המלא</label>
-    <input id="balcarSharedReportLink" type="url" inputmode="url" dir="ltr" autocomplete="url" placeholder="https://balcar.co.il/CarReport/…">
-    <button type="button" class="primary full" id="balcarSharedReportLoad" style="margin-top:10px" onclick="loadBalcarSharedReportStandalone()">פענוח הקישור</button>
-    <p id="balcarSharedReportStatus" role="status" aria-live="polite"></p>
-    <div id="balcarSharedReportResult" class="info" style="display:none;white-space:pre-line"></div>
-  </div>
+  <h2>העלאת קובץ לפענוח עבר ביטוחי</h2>
+  <p class="sub">בחר את הקובץ שהורדת לטלפון. BuyTest מפענחת את הקובץ ומוסיפה את הסיכום לרכב שנבחר.</p>
+  <div id="externalInsuranceMount"></div>
 </section>
 <section class="card freeAfterLookup" id="afterInsuranceChoices" style="display:none">
   <h2>בדיקות הרכב — שלב אחר שלב</h2>
@@ -824,25 +812,9 @@ document.getElementById('balcarChoiceDialog')?.addEventListener('click',event=>{
 </section>
 
 <section class="card paidOnly balcarFeature" id="balcarReportSection" style="display:none">
-  <div class="caseLabel">דוח עבר ביטוחי</div>
-  <h2>דוח עבר ביטוחי לרכב</h2>
-  <p class="sub">הדוח מוזמן אוטומטית עבור מספר הרכב ששולם. אין צורך בקוד פתיחה.</p>
-  <div class="balcarStatus" id="balcarOrderStatus" role="status" aria-live="polite">ממתין לאישור התשלום...</div>
-  <div id="balcarPaidRetry" style="display:none;margin:12px 0;padding:14px;border:1px solid #edcd7a;border-radius:14px;background:#fffaf0">
-    <b>התשלום כבר אושר — אין לשלם שוב</b>
-    <p class="sub" style="margin:6px 0 10px">הזן שוב את פרטי הבעלות כדי לנסות להפיק את הדוח באמצעות התשלום הקיים.</p>
-    <div class="field"><label for="paidRetryOwnershipDate">תאריך תחילת הבעלות</label><input id="paidRetryOwnershipDate" type="date"></div>
-    <div class="field" style="margin-top:9px"><label for="paidRetryOwnerId">תעודת זהות של בעל הרכב</label><input id="paidRetryOwnerId" inputmode="numeric" maxlength="9" autocomplete="off" placeholder="9 ספרות" oninput="this.value=this.value.replace(/\D/g,'').slice(0,9)"></div>
-    <button class="primary full" type="button" style="margin-top:10px" onclick="retryPaidBalcarWithDetails()">בדיקה מחדש ללא תשלום נוסף</button>
-    <div class="devMsg" id="balcarPaidRetryMsg" role="status" aria-live="polite"></div>
-  </div>
-  <div class="balcarSummaryGrid" id="balcarSummaryGrid"></div>
-  <div class="balcarReportActions" id="balcarReportActions" style="display:none">
-    <a id="balcarOriginalReport" href="#" target="_blank" rel="noopener">פתיחת דוח העבר הביטוחי המקורי</a>
-    <button class="primary" id="balcarPdfBtn" type="button" data-analytics-click="click_balcar_pdf" onclick="shareReportPdf('balcarPdfBtn')">לחץ לשיתוף תקציר ה־PDF</button>
-  </div>
-  <div class="info"><b>גבולות המידע:</b> השירות מציג רק נתונים שהתקבלו בדוח העבר הביטוחי. נתון חסר יוצג כ־„אין נתון” ולא כמידע תקין. הדוח אינו מחליף בדיקה במכון או בירור מול חברת הביטוח.</div>
-<div class="preFlowNav"><button class="secondary" type="button" onclick="BuyTestBundle.unlock('report')">המשך לפענוח דוח המכון</button></div>
+  <h2>העלאת קובץ דוח עבר ביטוחי</h2>
+  <p class="sub">הפק את הדוח בעצמך והעלה את הקובץ ל‑BuyTest לפענוח.</p>
+  <button type="button" class="primary full" onclick="showBalcarUpload()">בחירת קובץ לפענוח</button>
 </section>
 
 <section class="card paidOnly reportFeature" id="afterInspectionSection" style="display:none">
@@ -1046,9 +1018,6 @@ const BUYTEST_SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOi
 const BUYTEST_PAYMENT_ENDPOINT='https://tjxjxavxrmvbofvtnsaj.supabase.co/functions/v1/buytest-payment';
 const BUYTEST_ANALYZE_ENDPOINT='https://tjxjxavxrmvbofvtnsaj.supabase.co/functions/v1/buytest-analyze';
 const BUYTEST_ANALYTICS_ENDPOINT='https://tjxjxavxrmvbofvtnsaj.supabase.co/functions/v1/buytest-analytics';
-const BUYTEST_BALCAR_ENDPOINT='https://tjxjxavxrmvbofvtnsaj.supabase.co/functions/v1/balcar';
-const BUYTEST_BALCAR_SERVICE_ID=206;
-const BUYTEST_INSURANCE_DETAILS_KEY='buytestInsuranceDetailsV1';
 const BUYTEST_PAYMENT_STORAGE_KEY='buytestPaymentAccessV1';
 const BUYTEST_PAYMENT_RETURN_KEY='buytestPaymentReturnPendingV1';
 const BUYTEST_ANALYTICS_VISITOR_KEY='buytestAnalyticsVisitorV1';
@@ -1360,14 +1329,6 @@ function btCaptureRegistry(vr,owners,ar,p){
   owners.forEach(o=>lines.push('רשומת בעלות: '+[o.baalut||o.baalut_nm, o.baalut_dt||o.baalut_date].filter(Boolean).join(' · ')));
   const mileage=[...externalVehicleData.kmHistory];mileage.forEach(o=>lines.push(`קילומטראז׳: ${fmtNum(o.km)} ק״מ · ${o.date||'ללא תאריך'}`));
   btSaveSource('registry',{title:'נתוני מאגר הרישוי והבעלויות',text:lines.join('\n'),mileage},p);
-}
-function btCaptureInsurance(data,p=plate()){
-  const returned=String(data?.vehicle?.plate||data?.plate||'').replace(/\D/g,'');
-  if(returned&&returned!==p){btSaveSource('identity',{title:'אי־התאמה בשיוך מסמך',text:'דוח העבר הביטוחי לא צורף כמידע על הרכב.',alerts:[`מספר הרכב בדוח העבר הביטוחי (${returned}) אינו תואם לרכב ${p}. יש לבדוק את דוח המקור.`]},p);return false;}
-  const details={vehicle:data.vehicle||{},findings:data.findings||{},claims:insuranceClaims(data),insuranceHistory:data.insuranceHistory||{},report:data.report||{},totalLoss:data.totalLoss,constructiveTotalLoss:data.constructiveTotalLoss,stolen:data.stolen,plateChange:data.plateChange,previousPlate:data.previousPlate};
-  const text=balcarSummaryText;
-  const mileage=balcarMileageHistory(data).filter(o=>o.source!=='מאגר רישוי').map(o=>({...o,source:'עבר ביטוחי'}));
-  btSaveSource('insurance',{title:'עבר ביטוחי',text,mileage,alerts:btExplicitInsuranceAlerts(details)},p);return true;
 }
 function btCaptureInspection(owner,summary,computer,text){
   const advisory=inspectionRequesterAdvisory(owner),alerts=[];
@@ -2167,7 +2128,13 @@ function closeLegal(){document.getElementById('legalModal').classList.remove('op
 function showInsuranceStart(){
   const insuranceStart=document.getElementById('insuranceStartSection');
   if(insuranceStart) insuranceStart.style.display='block';
-
+}
+function showBalcarUpload(){
+  const page=document.getElementById('balcarUploadPage');
+  if(!page)return;
+  page.style.display='block';
+  page.scrollIntoView({behavior:'smooth',block:'start'});
+  document.getElementById('externalInsuranceChoose')?.focus({preventScroll:true});
 }
 function showFreeStart(){
   document.getElementById('afterInsuranceChoices').style.display='block';
@@ -2251,7 +2218,7 @@ function applyPlanAccess(planKey,{scroll=false,progress=buyTestStageProgress}={}
   if(scroll){
     if(planKey==='premium'){unlockFreeSections();showPreFlowStep(0);}
     else{
-      const target=planKey==='balcar'?document.getElementById('balcarReportSection'):planKey==='bundle'?(buyTestStageProgress.reportCompleted?document.getElementById('clarificationBox'):buyTestStageProgress.preInspectionCompleted?document.getElementById('afterInspectionSection'):document.getElementById('licenseMatchSection')):(planKey==='report'||planKey==='report_consultation')?document.getElementById('afterInspectionSection'):planKey==='prebuy'?document.getElementById('prePurchaseConsultationBox'):document.getElementById('clarificationBox');
+      const target=planKey==='balcar'?document.getElementById('balcarUploadPage'):planKey==='bundle'?(buyTestStageProgress.reportCompleted?document.getElementById('clarificationBox'):buyTestStageProgress.preInspectionCompleted?document.getElementById('afterInspectionSection'):document.getElementById('licenseMatchSection')):(planKey==='report'||planKey==='report_consultation')?document.getElementById('afterInspectionSection'):planKey==='prebuy'?document.getElementById('prePurchaseConsultationBox'):document.getElementById('clarificationBox');
       target?.scrollIntoView({behavior:'smooth',block:'start'});
     }
   }
@@ -2302,285 +2269,6 @@ async function callBuyTestPaymentService(body){
   if(!response.ok||!data.ok) throw new Error(data.error||('HTTP '+response.status));
   return data;
 }
-async function callBuyTestBalcarService(body){
-  const response=await fetch(BUYTEST_BALCAR_ENDPOINT,{
-    method:'POST',
-    headers:{'Content-Type':'application/json','apikey':BUYTEST_SUPABASE_ANON_KEY,'Authorization':'Bearer '+BUYTEST_SUPABASE_ANON_KEY},
-    body:JSON.stringify(body)
-  });
-  const data=await response.json().catch(()=>({}));
-  if(!response.ok){
-    const error=new Error(data?.error?.code||data?.error?.message||data?.message||('HTTP '+response.status));
-    error.status=response.status;
-    throw error;
-  }
-  return data;
-}
-function balcarFindingValue(value){
-  if(value===true||value==='found'||value==='yes'||value===1) return true;
-  if(value===false||value==='clean'||value==='no'||value===0) return false;
-  return null;
-}
-function safeBalcarReportUrl(value){
-  try{
-    const url=new URL(String(value||''));
-    return url.protocol==='https:'&&(url.hostname==='balcar.co.il'||url.hostname.endsWith('.balcar.co.il'))?url.toString():'';
-  }catch(_error){return ''}
-}
-function balcarMileageHistory(data){
-  const vehicle=data?.vehicle||{};
-  const sources=[data?.mileageHistory,data?.kmHistory,data?.odometerHistory,vehicle?.mileageHistory,vehicle?.kmHistory].filter(Array.isArray);
-  const values=sources.flat().map(item=>({
-    km:btMileage(item?.km??item?.mileage??item?.odometer??item?.value),
-    date:String(item?.date??item?.testDate??item?.reportedAt??item?.year??''),
-    source:String(item?.source??'דוח עבר ביטוחי')
-  })).filter(item=>item.km!==null&&Number.isFinite(item.km)&&item.km>=0);
-  if(btMileage(vehicle?.mileage)!==null) values.push({km:Number(vehicle.mileage),date:String(vehicle.lastTestDate||''),source:'דוח עבר ביטוחי'});
-  (externalVehicleData.kmHistory||[]).forEach(item=>{if(Number.isFinite(Number(item?.km))) values.push({km:Number(item.km),date:String(item.date||''),source:String(item.source||'מאגר רישוי')})});
-  const unique=[];
-  const seen=new Set();
-  values.forEach(item=>{const key=`${item.date}|${item.km}`;if(!seen.has(key)){seen.add(key);unique.push(item)}});
-  return unique.sort((a,b)=>{
-    const left=Date.parse(a.date),right=Date.parse(b.date);
-    if(Number.isFinite(left)&&Number.isFinite(right)) return left-right;
-    return 0;
-  });
-}
-function balcarMileageResult(history){
-  for(let index=1;index<history.length;index++){
-    const previous=history[index-1],current=history[index];
-    if(btDate(previous.date)!==null&&btDate(current.date)!==null&&btDate(current.date)>btDate(previous.date)&&current.km<previous.km) return {tone:'alert',text:`נמצאה ירידה מ־${fmtNum(previous.km)} ק״מ ל־${fmtNum(current.km)} ק״מ${current.date?' בתאריך '+fmtDate(current.date):''}. נדרש בירור.`};
-  }
-  if(history.length>=2) return {tone:'good',text:`נמצאו ${history.length} רשומות. יש להשוות את הערכים והתאריכים בסיכום המאוחד. הרשומה האחרונה ברשימה: ${fmtNum(history.at(-1).km)} ק״מ.`};
-  if(history.length===1) return {tone:'unknown',text:`התקבלה רשומה אחת: ${fmtNum(history[0].km)} ק״מ. אין מספיק היסטוריה לבדיקת רצף.`};
-  return {tone:'unknown',text:'אין נתוני קילומטראז׳ בדוח שהתקבל.'};
-}
-function balcarStatusItem(title,value,foundText,cleanText){
-  const normalized=balcarFindingValue(value);
-  if(normalized===true) return {title,tone:'alert',text:foundText};
-  if(normalized===false) return {title,tone:'good',text:cleanText};
-  return {title,tone:'unknown',text:'אין נתון בדוח שהתקבל.'};
-}
-function insuranceFirstValue(object,patterns){
-  if(!object||typeof object!=='object') return undefined;
-  for(const [key,value] of Object.entries(object)){
-    const normalized=String(key).toLowerCase().replace(/[\s_\-]/g,'');
-    if(patterns.some(pattern=>normalized.includes(pattern))) return value;
-  }
-}
-function insuranceNumber(value){
-  if(typeof value==='number'&&Number.isFinite(value)) return value;
-  const parsed=Number(String(value??'').replace(/[^0-9.\-]/g,''));
-  return Number.isFinite(parsed)?parsed:null;
-}
-function insuranceClaims(data){
-  const direct=[data?.claims,data?.insuranceClaims,data?.claimHistory,data?.insuranceHistory?.claims,data?.report?.claims,data?.data?.claims].find(Array.isArray);
-  if(direct) return direct;
-  const found=[],seen=new Set();
-  function visit(value,depth=0){
-    if(!value||depth>5||typeof value!=='object'||seen.has(value)) return;
-    seen.add(value);
-    if(Array.isArray(value)){
-      const looksLikeClaims=value.some(item=>item&&typeof item==='object'&&insuranceFirstValue(item,['claim','תביעה','damage','נזק'])!==undefined);
-      if(looksLikeClaims) value.forEach(item=>found.push(item));
-      else value.forEach(item=>visit(item,depth+1));
-      return;
-    }
-    Object.values(value).forEach(item=>visit(item,depth+1));
-  }
-  visit(data);
-  return found;
-}
-function insuranceClaimInfo(claim){
-  const amount=insuranceNumber(insuranceFirstValue(claim,['amountpaid','paidamount','claimamount','compensation','totalamount','סכום']));
-  const depreciation=insuranceNumber(insuranceFirstValue(claim,['depreciation','valuereduction','lossvalue','ירידתערך']));
-  const date=insuranceFirstValue(claim,['eventdate','damagedate','claimdate','תאריךנזק','date']);
-  const type=String(insuranceFirstValue(claim,['claimtype','damagetype','eventtype','סוגתביעה','סוגנזק','type'])||'');
-  const status=String(insuranceFirstValue(claim,['claimstatus','status','מצבתביעה'])||'');
-  const text=JSON.stringify(claim).toLowerCase();
-  return {amount,depreciation,date,type,status,totalLoss:/אובדן.{0,12}(?:להלכה|גמור)|total.{0,8}loss|constructive.{0,8}loss/.test(text)};
-}
-function insurancePlateChange(data){
-  return /החלפ.{0,10}מספר|שינוי.{0,10}מספר|previousplate|formerplate|platechange|oldlicense/.test(JSON.stringify(data).toLowerCase());
-}
-function insuranceProfessionalInterpretation(data){
-  const claims=insuranceClaims(data).map(insuranceClaimInfo);
-  const ownClaims=claims.filter(item=>!/צד\s*[גג׳']|third.?party/i.test(item.type));
-  const relevant=ownClaims.length?ownClaims:claims;
-  const totalLoss=relevant.some(item=>item.totalLoss);
-  const maxDepreciation=Math.max(0,...relevant.map(item=>item.depreciation||0));
-  const maxAmount=Math.max(0,...relevant.map(item=>item.amount||0));
-  const amountText=maxAmount?` בסכום של כ־${fmtNum(maxAmount)} ₪`:'';
-  let level='מידע חלקי — נדרשת בדיקה';
-  let explanation='לא התקבלו די נתונים מובנים כדי לקבוע את משמעות התביעות. יש לעיין בדוח המקורי ולבצע בדיקה במכון.';
-  if(totalLoss){
-    level='גבוהה מאוד';
-    explanation=`הרכב הוגדר בעבר כאובדן גמור או כאובדן להלכה${amountText}. מדובר באירוע בעל משמעות גבוהה מאוד. גם אם לא נראית פגיעה בשלדה, ייתכנו נזקים משמעותיים למרכב, למערכות הבטיחות, לכריות האוויר, למכלולים מכניים או חשמליים, או נזקי מים. יש לבצע בדיקה יסודית ולדרוש את דוח השמאי ותיעוד התיקון.`;
-  }else if(maxDepreciation>0){
-    level=maxDepreciation>=5?'בינונית עד גבוהה':'בינונית';
-    explanation=`בדוח מופיעה תביעה${amountText}, שבגינה נקבעה ירידת ערך של ${maxDepreciation}%. ירידת הערך מעידה על פגיעה בעלת משמעות מסחרית ולא רק על תיקון קוסמטי פשוט. יש לבדוק את אזור הפגיעה, המרכב, קצות השלדה, מערכות הבטיחות ואיכות התיקון, ולבקש את דוח השמאי.`;
-  }else if(maxAmount>0){
-    level=maxAmount>=30000?'בינונית — עד לבירור מהות התיקון':'נמוכה עד בינונית — בכפוף לבדיקה';
-    explanation=`בדוח מופיעה תביעה${amountText}, ללא ירידת ערך וללא אינדיקציה לאובדן להלכה או לאובדן גמור. הנתונים עשויים להתאים לתיקוני פחחות וצבע או להחלפת חלקי מרכב חיצוניים, אך מהסכום בלבד אי־אפשר לקבוע אילו חלקים נפגעו. יש לבדוק במכון את המרכב, השלדה ואיכות התיקונים.`;
-  }else if(claims.length===0){
-    level='לא נמצאו תביעות בדוח';
-    explanation='לא נמצאו תביעות במידע שהתקבל. זהו נתון חיובי, אך עבר ביטוחי נקי אינו הוכחה שהרכב לא עבר תאונה: תיקון פרטי או אירוע שלא דווח לחברת הביטוח לא יופיעו בדוח.';
-  }
-  if(insurancePlateChange(data)) explanation+=' בדוח זוהה גם שינוי במספר הרישוי; יש לברר את הסיבה ולבדוק אם חל שינוי בסיווג או בשימוש הרכב.';
-  const caution='דוח עבר ביטוחי משקף רק אירועים שדווחו למאגר. גם כאשר הדוח נקי, אין לוותר על בדיקה מקצועית במכון.';
-  return {title:`הערה מסכמת — רמת משמעות: ${level}`,text:explanation+' '+caution};
-}
-function insuranceSellerQuestions(data){
-  const questions=[];
-  for(const claim of insuranceClaims(data)){
-    const info=insuranceClaimInfo(claim);
-    if(/צד\s*[גג׳']|third.?party/i.test(info.type)) continue;
-    const date=info.date?String(info.date).slice(0,40):'';
-    const event=date?` באירוע מ־${date}`:'';
-    if(info.amount>0||date||info.type){
-      questions.push(`בדוח העבר הביטוחי מופיעה תביעה${event}${info.amount>0?` בסכום ${fmtNum(info.amount)} ₪`:''}. מה קרה, מה תוקן ברכב והאם יש תמונות או דוח שמאי?`);
-    }
-    if(info.depreciation>0){
-      questions.push(`בדוח נרשמה ירידת ערך של ${info.depreciation}%${event}. האם המחיר שאתה מבקש מביא אותה בחשבון, והאם אפשר לקבל את דוח השמאי?`);
-    }
-    // Inspect values, not key names: totalLoss:false must never create an allegation.
-    const values=Object.values(claim||{}).filter(value=>typeof value==='string'&&!/(?:לא|אין|ללא|not|no)\s+(?:הוגדר\s+)?(?:אובדן|total|constructive)/i.test(value)).join(' ');
-    const explicitLoss=Object.entries(claim||{}).some(([key,value])=>/^(totalloss|constructiveloss|constructivetotalloss)$/i.test(key.replace(/[_ -]/g,''))&&(value===true||value===1||/^(true|yes|כן)$/i.test(String(value))));
-    const lossType=/אובדן\s+להלכה|constructive.{0,8}(?:total.{0,4})?loss/i.test(values)?'אובדן להלכה':/אובדן\s+גמור|total.{0,4}loss/i.test(values)?'אובדן גמור':explicitLoss?'אובדן גמור או אובדן להלכה':'';
-    if(lossType) questions.push(`בדוח מופיע שהרכב הוגדר ${lossType}${event}. האם ידעת על כך, ויש לך מסמכים על השיקום והבדיקות שבוצעו?`);
-  }
-  return [...new Set(questions)];
-}
-function applyInsuranceConclusionsToSellerQuestions(data){
-  const sourcePlate=String(data?.vehicle?.plate||data?.plate||plate()).replace(/\D/g,'');
-  if(sourcePlate!==String(plate())) return;
-  sellerInsuranceData=data;
-  if(sellerQuestionsPlate!==String(plate())) return;
-  currentPreVisitQuestions=[...insuranceSellerQuestions(data),...basePreVisitQuestions];
-  const list=document.getElementById('preVisitQuestionList');
-  if(window.BuyTestChecklist) BuyTestChecklist.renderQuestions();
-  else if(list) list.replaceChildren(...currentPreVisitQuestions.map(question=>{const item=document.createElement('li');item.textContent=question;return item}));
-  const subtitle=document.getElementById('preVisitSubtitle');
-  if(subtitle) subtitle.textContent='השאלות מבוססות על נתוני המאגר ועל הממצאים המפורשים בדוח העבר הביטוחי.';
-}
-function renderPaidBalcarReport(data,sourcePlate=plate()){
-  if(sourcePlate!==plate())return;
-  const returnedPlate=String(data?.vehicle?.plate||data?.plate||'').replace(/\D/g,'');
-  if(returnedPlate&&returnedPlate!==sourcePlate){btCaptureInsurance(data,sourcePlate);return;}
-  const vehicle=data?.vehicle||{},findings=data?.findings||{},pricing=data?.pricing||{};
-  const history=balcarMileageHistory(data);
-  const mileage=balcarMileageResult(history);
-  const interpretation=insuranceProfessionalInterpretation(data);
-  const items=[
-    {title:'הרכב',tone:'unknown',text:[vehicle.manufacturer,vehicle.model,vehicle.year].filter(Boolean).join(' · ')||'פרטי הדגם לא התקבלו בדוח.'},
-    {title:'בעלות ומקוריות',tone:'unknown',text:[vehicle.currentOwnershipName,vehicle.originality,vehicle.hand!=null?'יד '+vehicle.hand:null].filter(Boolean).join(' · ')||'אין נתון בדוח שהתקבל.'},
-    balcarStatusItem('בדיקת גניבה',findings.stolen,'בדוח מופיע רישום גניבה הדורש בירור לפני המשך.','לא נמצא רישום גניבה במקור שנבדק.'),
-    balcarStatusItem('קריאת תיקון',findings.recall,'נמצאה קריאת תיקון; יש לבדוק מול היבואן אם טופלה.','לא נמצאה קריאת תיקון במקור שנבדק.'),
-    {title:'היסטוריית קילומטראז׳',tone:mileage.tone,text:mileage.text},
-    {title:'תוקף רישוי',tone:vehicle.testValidUntil?'good':'unknown',text:vehicle.testValidUntil?`תוקף הרישוי בדוח: ${fmtDate(vehicle.testValidUntil)}.`:'אין נתון בדוח שהתקבל.'},
-    {title:'טווח שווי שהתקבל',tone:'unknown',text:pricing.min!=null&&pricing.max!=null?`${fmtNum(pricing.min)}–${fmtNum(pricing.max)} ₪`:'אין נתון בדוח שהתקבל.'},
-    {title:interpretation.title,tone:'interpretation',text:interpretation.text}
-  ];
-  const visibleItems=items.filter(item=>item.title==='בדיקת גניבה'?balcarFindingValue(findings.stolen)===true:item.title==='קריאת תיקון'?balcarFindingValue(findings.recall)===true:item.tone==='interpretation'?insuranceClaims(data).length>0:true).filter(item=>!/^אין נתון|^אין מספיק|^פרטי הדגם לא התקבלו/.test(item.text));
-  const grid=document.getElementById('balcarSummaryGrid');
-  if(grid) grid.innerHTML=visibleItems.map(item=>`<article class="balcarSummaryItem ${item.tone}"><strong>${escapeHtml(item.title)}</strong><span>${escapeHtml(item.text)}</span></article>`).join('');
-  const reportUrl=safeBalcarReportUrl(data?.webReportUrl);
-  const original=document.getElementById('balcarOriginalReport');
-  if(original){original.style.display=reportUrl?'flex':'none';if(reportUrl) original.href=reportUrl;}
-  const actions=document.getElementById('balcarReportActions');
-  if(actions) actions.style.display='grid';
-  const identity=[vehicle.manufacturer,vehicle.model,vehicle.year].filter(Boolean).join(' · ')||'לא התקבל';
-  balcarSummaryText=[
-    'סיכום דוח עבר ביטוחי',
-    `מספר רכב: ${plate()||'לא צוין'}`,
-    `פרטי הרכב: ${identity}`,
-    ...visibleItems.slice(1).map(item=>`${item.title}: ${item.text}`),
-    'הסיכום משקף רק את הנתונים שהתקבלו בדוח. דוח נקי אינו שולל תאונה או תיקון שלא דווחו לביטוח ואינו מחליף בדיקה מקצועית במכון.'
-  ].join('\n');
-  btCaptureInsurance(data,sourcePlate);
-  prepareReportPdf('balcarPdfBtn');
-  const status=document.getElementById('balcarOrderStatus');
-  if(status){status.textContent='✓ הדוח מוכן. אפשר לפתוח את דוח העבר הביטוחי המקורי או לשתף את תקציר ה־PDF.';status.classList.remove('error');}
-  const retry=document.getElementById('balcarPaidRetry');
-  if(retry) retry.style.display='none';
-  applyInsuranceConclusionsToSellerQuestions(data);
-}
-function buytestInsuranceDetailsError(ownershipDate,ownerIsraeliId){
-  if(!/^\d{9}$/.test(ownerIsraeliId)||/^0+$/.test(ownerIsraeliId))return 'יש להזין תעודת זהות תקינה של הבעלים: 9 ספרות, כולל אפסים בתחילת המספר.';
-  const sum=[...ownerIsraeliId].reduce((sum,x,i)=>{const n=Number(x)*(i%2+1);return sum+(n>9?n-9:n)},0);
-  if(sum%10)return 'תעודת הזהות אינה תקינה. יש להעתיק אותה מרישיון הרכב במדויק.';
-  const date=new Date(ownershipDate+'T00:00:00Z');
-  if(!/^\d{4}-\d{2}-\d{2}$/.test(ownershipDate)||!Number.isFinite(date.getTime())||date.toISOString().slice(0,10)!==ownershipDate||ownershipDate<'1900-01-01'||ownershipDate>new Date().toISOString().slice(0,10))return 'יש להזין תאריך תחילת בעלות תקין, כפי שמופיע ברישיון הרכב.';
-  return '';
-}
-async function retryPaidBalcarWithDetails(){
-  const ownershipDate=String(document.getElementById('paidRetryOwnershipDate')?.value||'');
-  const ownerIsraeliId=String(document.getElementById('paidRetryOwnerId')?.value||'').replace(/\D/g,'');
-  const message=document.getElementById('balcarPaidRetryMsg');
-  const validation=buytestInsuranceDetailsError(ownershipDate,ownerIsraeliId);
-  if(validation){
-    if(message){message.classList.add('show');message.textContent=validation;}
-    return;
-  }
-  const saved=window.BuyTestBundle?.insuranceReceipt()||storedBuyTestPayment();
-  localStorage.setItem(BUYTEST_INSURANCE_DETAILS_KEY,JSON.stringify({plate:String(saved?.plate||plate()),ownershipDate,ownerIsraeliId}));
-  if(message){message.classList.add('show');message.textContent='בודק מחדש באמצעות התשלום שכבר אושר...';}
-  await loadPaidBalcarReport();
-}
-let balcarLoadPromise=null;
-async function loadPaidBalcarReport(){
-  if(balcarLoadPromise) return balcarLoadPromise;
-  balcarLoadPromise=(async()=>{
-    const saved=window.BuyTestBundle?.insuranceReceipt()||storedBuyTestPayment();
-    const status=document.getElementById('balcarOrderStatus');
-    if(!saved?.orderId||!saved?.clientSecret||saved.plan!=='balcar') return false;
-    if(status){status.textContent='התשלום אושר. מזמין כעת את דוח העבר הביטוחי אוטומטית...';status.classList.remove('error');}
-    try{
-      let insuranceDetails={};
-      try{insuranceDetails=JSON.parse(localStorage.getItem(BUYTEST_INSURANCE_DETAILS_KEY)||'{}')}catch(_error){}
-      if(String(insuranceDetails.plate||'')!==String(saved.plate||'')) insuranceDetails={};
-      const validation=buytestInsuranceDetailsError(insuranceDetails.ownershipDate||'',insuranceDetails.ownerIsraeliId||'');
-      if(validation){showInsuranceStart();if(status)status.textContent=validation;const retry=document.getElementById('balcarPaidRetry');if(retry)retry.style.display='block';return false;}
-      let data=await callBuyTestBalcarService({action:'createPaid',plate:saved.plate,orderId:saved.orderId,clientSecret:saved.clientSecret,...insuranceDetails});
-      for(let attempt=0;attempt<24&&data?.status!=='ready';attempt++){
-        if(['failed','cancelled'].includes(String(data?.status))) throw new Error('report_failed');
-        if(status) status.textContent=`דוח העבר הביטוחי בהכנה... ${Math.max(5,(attempt+1)*5)} שניות`;
-        await new Promise(resolve=>setTimeout(resolve,5000));
-        data=await callBuyTestBalcarService({action:'statusPaid',plate:saved.plate,orderId:saved.orderId,clientSecret:saved.clientSecret});
-      }
-      if(data?.status!=='ready'){
-        if(status) status.innerHTML='הדוח עדיין בהכנה. <button type="button" onclick="loadPaidBalcarReport()">לחץ לבדיקה מחדש</button>';
-        return false;
-      }
-      if(plate()!==String(saved.plate))return false;
-      window.buytestBalcarReport=data;
-      renderPaidBalcarReport(data,String(saved.plate));
-      return true;
-    }catch(error){
-      console.error('BuyTest insurance-history order failed:',error);
-      if(status){status.textContent=error?.message==='seller_details_required'?'נדרשים פרטי בעלים נוספים להפקת הדוח. לא תתבצע הזמנה נוספת; יש לפנות אלינו להשלמה או לזיכוי.':'לא ניתן להשלים כרגע את דוח העבר הביטוחי. אם התשלום אושר, אין לשלם שוב; אפשר ללחוץ בדיקה מחדש בעוד מספר דקות.';status.classList.add('error');}
-      const retry=document.getElementById('balcarPaidRetry');
-      if(retry) retry.style.display='block';
-      return false;
-    }
-  })().finally(()=>{balcarLoadPromise=null});
-  return balcarLoadPromise;
-}
-async function startBalcarPayment(){
-  if(document.body.classList.contains('manager-mode')){
-    const status=document.getElementById('balcarOrderStatus');if(status)status.textContent='מצב מנהל — ללא הזמנה וללא חיוב.';return;
-  }
-  const ownershipDate=String(document.getElementById('insuranceOwnershipDate')?.value||'');
-  const ownerIsraeliId=String(document.getElementById('insuranceOwnerId')?.value||'').replace(/\D/g,'');
-  const message=document.getElementById('balcarEligibilityMsg');
-  const validation=buytestInsuranceDetailsError(ownershipDate,ownerIsraeliId);
-  if(validation){if(message){message.classList.add('show');message.textContent=validation;}return;}
-  localStorage.setItem(BUYTEST_INSURANCE_DETAILS_KEY,JSON.stringify({plate:plate(),ownershipDate,ownerIsraeliId}));
-  if(!window.BuyTestBundle?.insuranceReceipt()){await BuyTestBundle.unlock('insurance');return;}
-  if(message){message.classList.add('show');message.textContent='הפרטים נשמרו. בודק את התאמתם מול ספק הדוח — ללא תשלום נוסף.';}
-  await loadPaidBalcarReport();
-}
-
 async function callBuyTestAnalyzeService(body){
   const headers={
     'Content-Type':'application/json',
@@ -3180,12 +2868,7 @@ async function submitBuyTestPayment(){
   try{
     const prior=storedBuyTestPayment();
     const attribution=buyTestTrafficAttribution();
-    let insuranceDetails={};
-    if(planKey==='balcar'){
-      try{insuranceDetails=JSON.parse(localStorage.getItem(BUYTEST_INSURANCE_DETAILS_KEY)||'{}')}catch(_error){}
-      if(String(insuranceDetails.plate||'')!==plate) insuranceDetails={};
-    }
-    const payment=await callBuyTestPaymentService({action:'create',plan:planKey,plate,customerName,email,phone,acceptedTerms:true,priorOrderId:prior?.orderId||'',priorClientSecret:prior?.clientSecret||'',...insuranceDetails,...attribution,independentService:true});
+    const payment=await callBuyTestPaymentService({action:'create',plan:planKey,plate,customerName,email,phone,acceptedTerms:true,priorOrderId:prior?.orderId||'',priorClientSecret:prior?.clientSecret||'',...attribution,independentService:true});
     if(Number(payment.amountAgorot)!==Number(plan.price)*100)throw new Error('payment_price_mismatch');
     saveBuyTestPayment({orderId:payment.orderId,clientSecret:payment.clientSecret,plate:payment.plate,plan:payment.plan,customerName,email,phone,progress:normalizedStageProgress(payment.progress),createdAt:new Date().toISOString()});
     sessionStorage.setItem(BUYTEST_PAYMENT_RETURN_KEY,'1');
@@ -6595,27 +6278,7 @@ document.addEventListener('keydown',event=>{
 </div>
 
 <script src="package-149.js?v=7"></script>
-<script src="manager-session.js?v=1"></script><script src="opening-20260928.js?v=3"></script><script src="vehicle-checklist.js?v=4"></script><link rel="stylesheet" href="vehicle-checklist.css?v=2"><script src="bundle-39.js?v=10"></script><script src="insurance-interpretation.js?v=1"></script><script src="external-insurance.js?v=12"></script><script>
-window.loadBalcarSharedReportStandalone=async function(){
-  const input=document.getElementById('balcarSharedReportLink'),button=document.getElementById('balcarSharedReportLoad'),status=document.getElementById('balcarSharedReportStatus'),result=document.getElementById('balcarSharedReportResult');
-  const setStatus=text=>{if(status)status.textContent=text};
-  let reportId='';
-  try{const url=new URL(String(input?.value||'').trim());if(url.protocol==='https:'&&url.hostname==='balcar.co.il'){const match=url.pathname.match(/^\/CarReport\/([0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})\/?$/i);if(match)reportId=match[1]}}catch(_){}
-  if(!reportId){setStatus('הדבק קישור שיתוף מלא לדוח בלקאר בפורמט https://balcar.co.il/CarReport/…');return}
-  button.disabled=true;result.style.display='none';setStatus('מנסה לקרוא את דוח בלקאר…');
-  try{
-    const data=await callBuyTestBalcarService({action:'status',reportId});
-    if(!data||typeof data!=='object'||Array.isArray(data))throw new Error('invalid_report');
-    const vehicle=data.vehicle||{},history=balcarMileageResult(balcarMileageHistory(data)),interpretation=insuranceProfessionalInterpretation(data);
-    const identity=[vehicle.manufacturer,vehicle.model,vehicle.year].filter(Boolean).join(' · ')||'פרטי הרכב לא התקבלו';
-    result.textContent=['פענוח דוח בלקאר','פרטי רכב: '+identity,'היסטוריית קילומטראז׳: '+history.text,interpretation.title,interpretation.text,'יש לאמת פרטים מול דוח המקור. פענוח זה אינו מחליף בדיקה מקצועית במכון.'].join('\n');
-    result.style.display='block';setStatus('✓ הדוח נטען והפענוח מוצג כאן.');
-  }catch(error){
-    console.error('BuyTest Balcar shared-link import failed:',error);
-    setStatus(error?.status===401?'הקישור נקלט, אבל שרת בלקאר דחה גישה לדוח (401). אפשר לנסות להעלות PDF או תמונה של הדוח.':error?.message==='invalid_report'?'הקישור לא החזיר נתוני דוח קריאים. בדוק שהועתק הקישור המלא.':'לא הצלחתי לטעון את הדוח מהקישור. אפשר לנסות להעלות PDF או תמונה של הדוח.');
-  }finally{button.disabled=false}
-};
-</script><script>window.loadBalcarSharedReport=async function(){const p=String(plate()||'').replace(/\D/g,'');const input=document.getElementById('balcarSharedReportLink'),button=document.getElementById('balcarSharedReportLoad'),status=document.getElementById('balcarSharedReportStatus');const setStatus=text=>{if(status)status.textContent=text};if(!/^\d{7,8}$/.test(p)){setStatus('יש להזין ולאשר תחילה מספר רכב בן 7 או 8 ספרות.');return}let reportId='';try{const url=new URL(String(input?.value||'').trim());if(url.protocol==='https:'&&url.hostname==='balcar.co.il'){const match=url.pathname.match(/^\/CarReport\/([0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})\/?$/i);if(match)reportId=match[1]}}catch(_){}if(!reportId){setStatus('הדבק קישור שיתוף מלא לדוח בלקאר, בפורמט https://balcar.co.il/CarReport/…');return}button.disabled=true;setStatus('מתחבר לדוח בלקאר ומושך את הנתונים…');try{const data=await callBuyTestBalcarService({action:'status',reportId});if(!data||typeof data!=='object'||Array.isArray(data))throw new Error('invalid_report');const reportPlate=String(data?.vehicle?.plate||data?.plate||'').replace(/\D/g,'');if(reportPlate&&reportPlate!==p)throw new Error('plate_mismatch');if(!data.webReportUrl)data.webReportUrl=input.value.trim();window.buytestBalcarReport=data;renderPaidBalcarReport(data,p);setStatus('✓ דוח בלקאר נטען ופוענח. הסיכום נשמר לרכב '+p+'.')}catch(error){console.error('BuyTest Balcar shared-link import failed:',error);setStatus(error?.status===401?'הקישור נקלט, אבל שרת בלקאר דחה גישה לדוח (401). אפשר להמשיך עם העלאת PDF או צילום ברור של הדוח.':error?.message==='plate_mismatch'?'מספר הרכב בדוח אינו תואם לרכב שנבחר. לא שמרתי את הדוח.':error?.message==='invalid_report'?'הקישור לא החזיר נתוני דוח קריאים. בדוק שהקישור המלא הועתק ונסה שוב.':'לא הצלחתי לטעון את הדוח מהקישור. ייתכן שהקישור אינו תקף או שהדוח אינו זמין.')}finally{button.disabled=false}};</script><link rel="stylesheet" href="bundle-39.css?v=7">
+<script src="manager-session.js?v=1"></script><script src="opening-20260928.js?v=3"></script><script src="vehicle-checklist.js?v=4"></script><link rel="stylesheet" href="vehicle-checklist.css?v=2"><script src="bundle-39.js?v=10"></script><script src="insurance-interpretation.js?v=1"></script><script src="external-insurance.js?v=13"></script><link rel="stylesheet" href="bundle-39.css?v=7">
 <!-- payment-dynamic-plan-v7 -->
 <section id="consultationPage" hidden><button class="secondary" type="button" onclick="closeConsultationPage()">→ חזרה למסך הפתיחה</button><h2 class="routeHeading">התייעצות עם הבוחן</h2><p>עמוס רוקח · 15 שנות ניסיון בבדיקות קנייה</p><div class="card" id="consultationPurchaseIntro"><h3>נשארו לכם שאלות על הרכב?</h3><p>ייעוץ אישי בוואטסאפ על הדוח, הממצאים והבירורים שכדאי להשלים לפני הקנייה. אפשר להתחיל גם בלי דוח.</p><strong class="btConsultPrice">99 ₪</strong><p>ההתייעצות פתוחה ל־48 שעות ממועד אישור התשלום, בשעות המענה המפורטות בתנאים.</p><button class="primary full" type="button" onclick="startPayment('prebuy')">להתייעצות אישית — 99 ₪</button></div></section><dialog id="buytestTour"><button class="secondary" type="button" onclick="closeBuyTestTour()">✕ סגירה</button><iframe title="איך BuyTest עובד" id="buytestTourFrame"></iframe></dialog><script src="four-services.js?v=3"></script><link rel="stylesheet" href="four-services.css?v=4"><style>html.manager-link body.manager-entry[data-service="home"] #appShell{display:block!important}</style>
 </body></html>
