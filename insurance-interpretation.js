@@ -34,8 +34,9 @@
     const plate=plateMatch?plateMatch[1].replace(/\D/g,''):null;
     const coverage=/פרטי\s*(?:הכיסוי|הביטוח)|סכום\s*ביטוח|תוספת\s*ביטוח|תקופת\s*(?:הכיסוי|הביטוח)|פרטי\s*הפוליסה/u;
     const claimsHeader=/(?:פירוט|פרטי|היסטוריית|ריכוז|סיכום|טבלת?)\s*[-—:׳'’]*\s*(?:תביעות|נזקים|תאונות)|(?:תביעות|נזקים|תאונות)\s*(?:ביטוחיות|שדווחו)?/u;
-    const cleanPatterns=/(?:לא\s+(?:נמצאו?|נרשמו?|הוגשו)\s+(?:כל\s+)?תביעות|אין\s+(?:כל\s+)?תביעות|ללא\s+תביעות|לא\s+(?:נמצא|נרשם)\s+(?:אירועי\s+)?נזק)/u;
+    const cleanPatterns=/(?:לא\s+(?:נמצאו?|נרשמו?|הוגשו|דווחו?|מופיעות?)\s+(?:כל\s+)?תביעות|אין\s+(?:כל\s+)?תביעות|ללא\s+תביעות|לא\s+(?:נמצא|נרשם|דווח)\s+(?:אירועי\s+)?נזק|לא\s+קיימות\s+תביעות)/u;
     const damageTerms=/(?:תאונ[הות]?|נזק(?:ים)?|תביע[הות]?|פגיע[הות]?|תוקנ|הוחלפ|הצפ[ה]|שריפ[ה]|שלדה)/u;
+    const registrationChangeRE=/(?:שינוי|החלפ[הת]|עודכ[ןנ])[^\n]{0,40}(?:מספר\s*(?:רישוי|רכב)|לוחית)|(?:מספר\s*(?:רישוי|רכב)|לוחית)[^\n]{0,40}(?:קודם|ישן|הוחלף|שונה)/u;
     const amountRE=/(?:סכום\s*(?:התביעה|תביעה|הפיצוי|פיצוי|ששולם|נזק)|תביעה\s*בסך|תשלום|פיצוי)\s*[:：—-]?\s*(?:₪|ש[״"]?ח|שקל)?\s*([\d,]+(?:\.\d{1,2})?)/u;
     const depRE=/ירידת\s*ערך\s*[:：—-]?\s*(\d+(?:\.\d+)?)\s*%?/u;
     const dateRE=/\b\d{1,2}[/.\-]\d{1,2}[/.\-]\d{2,4}\b/u;
@@ -48,13 +49,14 @@
       if(cleanPatterns.test(line)){explicitClean=true;continue;}
       if(inCoverage)continue;
       const totalLoss=/(?:אובדן|אבדן)\s*(?:גמור|להלכה)/u.test(line)&&!/(?:לא|אין|ללא)\s+(?:הוגדר\s+)?(?:אובדן|אבדן)/u.test(line);
+      const registrationChange=registrationChangeRE.test(line);
       const theft=/(?:גניב[הות]?|ניסיון\s+גניבה|פריצה)/u.test(line)&&!/(?:(?:לא|אין|ללא)\s+(?:(?:נמצאה?|דווחה?|הייתה?)\s+)?(?:אירוע\s+)?(?:גניב[הות]?|פריצה))/u.test(line);
       const dep=line.match(depRE);
       const amount=line.match(amountRE);
       const date=line.match(dateRE);
       const hasDamage=damageTerms.test(line);
       const descriptive=/(?:נזק\s+(?:ל|ב)|תאונה\s+(?:ב|מ|עם)|תוקנ|הוחלפ|פגיעה\s+(?:ב|ל)|ניזוק|תביעה\s+(?:בגין|על|בסך)|הצפה|שריפה)/u.test(line);
-      const informative=totalLoss||theft||(dep&&Number(dep[1])>0)||(amount&&Number(amount[1].replace(/,/g,''))>0)||descriptive||(date&&hasDamage);
+      const informative=totalLoss||theft||registrationChange||(dep&&Number(dep[1])>0)||(amount&&Number(amount[1].replace(/,/g,''))>0)||descriptive||(date&&hasDamage);
       if(!informative)continue;
       const source=line.length>350?line.slice(0,350)+'…':line;
       const current=records[records.length-1];
@@ -73,7 +75,7 @@
       const depreciation=source.match(depRE);
       const date=source.match(dateRE);
       const thirdParty=/צד\s*ג[׳'’]?/u.test(source);
-      events.push({source,date:date?.[0]||'',amount:amount?Number(amount[1].replace(/,/g,'')):null,depreciation:depreciation?Number(depreciation[1]):null,totalLoss:/(?:אובדן|אבדן)\s*(?:גמור|להלכה)/u.test(source),theft:/(?:גניב[הות]?|פריצה)/u.test(source),thirdParty});
+      events.push({source,date:date?.[0]||'',amount:amount?Number(amount[1].replace(/,/g,'')):null,depreciation:depreciation?Number(depreciation[1]):null,totalLoss:/(?:אובדן|אבדן)\s*(?:גמור|להלכה)/u.test(source),theft:/(?:גניב[הות]?|פריצה)/u.test(source),registrationChange:registrationChangeRE.test(source),thirdParty});
     }
     const output=['פענוח עבר ביטוחי — ממצאים שנקראו מהקובץ'];
     output.push('מספר רכב בדוח: '+(plate&&/^\d{7,8}$/.test(plate)?plate:'לא זוהה בטקסט שנקרא'));
@@ -86,7 +88,8 @@
         if(event.depreciation>0)labels.push('ירידת ערך '+event.depreciation+'%');
         if(event.totalLoss)labels.push('אובדן להלכה/גמור');
         if(event.theft)labels.push('גניבה/פריצה');
-        if(event.thirdParty)labels.push('צד ג׳');
+        if(event.thirdParty)labels.push('תביעת צד ג׳');
+        if(event.registrationChange)labels.push('שינוי במספר הרישוי');
         output.push('• '+(labels.length?labels.join(' · '):'ממצא ביטוחי')+' — '+event.source);
       }
       if(categories.totalLoss.length)alerts.push('הדוח מציין אובדן להלכה או אובדן גמור. יש לקבל דוח שמאי, מסמכי שיקום ולבדוק את הרכב במכון.');
