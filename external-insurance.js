@@ -4,42 +4,6 @@
   const quality=text=>({ok:String(text).trim().length>=40,score:String(text).length,findings:0,categories:0,unknown:0});
   const allowed=()=>/^\d{7,8}$/.test(plate());
   function status(text){document.getElementById('externalInsuranceStatus').textContent=text;}
-  function linkStatus(text){document.getElementById('balcarSharedReportStatus').textContent=text;}
-  function reportIdFromLink(value){
-    try{
-      const url=new URL(String(value||'').trim());
-      if(url.protocol!=='https:'||url.hostname!=='balcar.co.il')return '';
-      const match=url.pathname.match(/^\/CarReport\/([0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})\/?$/i);
-      return match?match[1]:'';
-    }catch(_){return '';}
-  }
-  async function readBalcarLink(){
-    const p=plate(),input=document.getElementById('balcarSharedReportLink'),button=document.getElementById('balcarSharedReportLoad');
-    if(!allowed()){linkStatus('יש להזין ולאשר תחילה מספר רכב בן 7 או 8 ספרות.');return;}
-    const link=String(input?.value||'').trim(),reportId=reportIdFromLink(link);
-    if(!reportId){linkStatus('הדבק קישור שיתוף מלא לדוח בלקאר, בפורמט https://balcar.co.il/CarReport/…');return;}
-    button.disabled=true;
-    try{
-      linkStatus('מתחבר לדוח בלקאר ומושך את הנתונים…');
-      const data=await callBuyTestBalcarService({action:'status',reportId});
-      if(!data||typeof data!=='object'||Array.isArray(data))throw new Error('invalid_report');
-      const reportPlate=String(data?.vehicle?.plate||data?.plate||'').replace(/\D/g,'');
-      if(reportPlate&&reportPlate!==p)throw new Error('plate_mismatch');
-      if(!data.webReportUrl)data.webReportUrl=link;
-      window.buytestBalcarReport=data;
-      renderPaidBalcarReport(data,p);
-      linkStatus('✓ דוח בלקאר נטען ופוענח. הסיכום נשמר לרכב '+p+'.');
-    }catch(error){
-      console.error('BuyTest Balcar shared-link import failed:',error);
-      const message=error?.message==='plate_mismatch'
-        ?'מספר הרכב בדוח אינו תואם לרכב שנבחר. לא שמרתי את הדוח.'
-        :error?.message==='invalid_report'
-          ?'הקישור לא החזיר נתוני דוח קריאים. בדוק שהקישור המלא הועתק ונסה שוב.'
-          :'לא הצלחתי לטעון את הדוח מהקישור. ייתכן שהקישור אינו תקף או שהדוח אינו זמין.';
-      linkStatus(message);
-    }finally{button.disabled=false;}
-  }
-  window.loadBalcarSharedReport=readBalcarLink;
   function restore(){
     version++;files=[];
     document.getElementById('externalInsuranceCorrection').hidden=true;
@@ -55,6 +19,7 @@
   }
   async function read(input){
     const selected=Array.from(input.files||[]);if(!selected.length)return;
+    input.value='';
     const p=plate(),run=++version;
     files=[];
     document.getElementById('externalInsuranceText').value='';
@@ -62,13 +27,12 @@
     if(selected.some(f=>!(f.type.startsWith('image/')||f.type==='application/pdf'))){status('אפשר להעלות PDF או תמונה בלבד.');return;}
     let worker;
     try{
-      status('קורא את דוח בלקאר...');
+      status('קורא את קובץ הדוח במכשיר...');
       const parts=[];
       for(const file of selected){
         const prepared=file.type==='application/pdf'?await pdfForDocumentOcr(file,quality,12,true):{sources:await imageForDocumentOcr(file)};
         let text=prepared.text||'';
         if(!text&&prepared.sources?.length){
-          if(googleVisionReady())try{text=await googleVisionRecognize(prepared.sources);}catch(_){}
           if(!quality(text).ok){
             if(!window.Tesseract)throw new Error('OCR_UNAVAILABLE');
             worker=worker||await Tesseract.createWorker('heb+eng');
@@ -95,8 +59,8 @@
     const labelled=Array.from(text.matchAll(/(?:מספר\s*(?:רכב|רישוי)|מס[׳'״"]?\s*רכב|license\s*plate)\s*[:\-]?\s*([\d\- ]{7,12})/gi)).map(m=>m[1].replace(/\D/g,'')).filter(x=>/^\d{7,8}$/.test(x));
     if(p&&labelled.some(x=>x!==p)){status('נמצא בטקסט מספר רכב אחר. בדוק את דוח המקור ואת זיהוי הטקסט לפני השמירה.');return;}
     const interpretation=BuyTestInsurance.interpret(text);
-    if(p)btSaveSource('insuranceExternal',{title:'פענוח דוח בלקאר — קובץ שהלקוח העלה',rawText:text,files:[...files],text:interpretation.text,alerts:interpretation.alerts,mileage:[],interpretationVersion:2});
-    status(interpretation.status==='incomplete'?'הדוח נקרא, אך חסרים פרטי תביעות קריאים. העלה את טבלת התביעות והנזקים.':p?'✓ דוח העבר הביטוחי פוענח ושולב בסיכום לרכב '+p+'.':'✓ דוח בלקאר פוענח. התוצאה מוצגת כאן.');
+    if(p)btSaveSource('insuranceExternal',{title:'פענוח דוח העבר הביטוחי — קובץ שהלקוח העלה',rawText:text,files:[...files],text:interpretation.text,alerts:interpretation.alerts,mileage:[],interpretationVersion:2});
+    status(interpretation.status==='incomplete'?'הדוח נקרא, אך חסרים פרטי תביעות קריאים. העלה את טבלת התביעות והנזקים.':p?'✓ דוח העבר הביטוחי פוענח ושולב בסיכום לרכב '+p+'.':'✓ דוח העבר הביטוחי פוענח. התוצאה מוצגת כאן.');
     document.getElementById('externalInsuranceResult').textContent=interpretation.text;
     document.getElementById('externalInsuranceResult').hidden=false;
   }
@@ -104,12 +68,13 @@
     if(!allowed())return;
     const dossier=btDossier();delete dossier.sources.insuranceExternal;
     try{localStorage.setItem('buytest-dossier-v1:'+plate(),JSON.stringify(dossier));}catch(_){dossier.storageFailed=true;}
-    restore();btRefreshSummary();status('הדוח החיצוני הוסר מהסיכומים.');
+    restore();btRefreshSummary();status('דוח העבר הביטוחי הוסר מהסיכומים.');
   }
   window.addEventListener('DOMContentLoaded',()=>{
     const panel=document.createElement('section');panel.id='externalInsurancePanel';panel.className='uploadPanel btExternalInsurance';
-    panel.innerHTML='<h3>העלאת קובץ דוח בלקאר</h3><button type="button" class="primary full" id="externalInsuranceChoose" style="margin-top:12px">בחירת PDF או תמונה</button><p class="sub">העלה PDF או צילום ברור של דוח בלקאר.</p><input type="file" id="externalInsuranceFile" accept="image/*,application/pdf" multiple hidden><p id="externalInsuranceStatus" role="status" aria-live="polite"></p><div class="info" id="externalInsuranceResult" hidden style="white-space:pre-line"></div><details id="externalInsuranceCorrection" hidden><summary>השלמת פרטים מהדוח</summary><label for="externalInsuranceText">טקסט שנקרא מהדוח</label><textarea id="externalInsuranceText" class="reportInput" rows="8" style="color:#17352d;background:#fff"></textarea><p>מספר רכב אינו חובה. אם אושר מספר רכב, הפענוח יצורף לסיכום שלו.</p><button type="button" class="primary full" id="externalInsuranceSave">עדכון פענוח דוח בלקאר</button><button type="button" class="secondary full" id="externalInsuranceRemove">הסרת הדוח החיצוני</button></details>';
-    document.getElementById('balcarSharedReportPanel')?.insertAdjacentElement('afterend',panel);
+    panel.innerHTML='<h3>העלאת קובץ דוח עבר ביטוחי</h3><button type="button" class="primary full" id="externalInsuranceChoose" style="margin-top:12px">בחירת קובץ מהטלפון</button><p class="sub">הורד את הדוח לטלפון, בחר את קובץ ה‑PDF או התמונה, ו‑BuyTest תפענח אותו כאן. הקובץ נקרא במכשיר ואינו נשלח לבלק״ר.</p><input type="file" id="externalInsuranceFile" accept="image/*,application/pdf" multiple hidden><p id="externalInsuranceStatus" role="status" aria-live="polite"></p><div class="info" id="externalInsuranceResult" hidden style="white-space:pre-line"></div><details id="externalInsuranceCorrection" hidden><summary>השלמת פרטים מהדוח</summary><label for="externalInsuranceText">טקסט שנקרא מהדוח</label><textarea id="externalInsuranceText" class="reportInput" rows="8" style="color:#17352d;background:#fff"></textarea><p>מספר רכב אינו חובה. אם אושר מספר רכב, הפענוח יצורף לסיכום שלו.</p><button type="button" class="primary full" id="externalInsuranceSave">עדכון פענוח דוח העבר הביטוחי</button><button type="button" class="secondary full" id="externalInsuranceRemove">הסרת דוח העבר הביטוחי</button></details>';
+    const mount=document.getElementById('externalInsuranceMount');
+    if(mount) mount.append(panel);
     document.getElementById('externalInsuranceChoose').onclick=()=>document.getElementById('externalInsuranceFile').click();
     document.getElementById('externalInsuranceFile').onchange=function(){void read(this);};
     document.getElementById('externalInsuranceSave').onclick=save;
