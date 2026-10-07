@@ -186,6 +186,9 @@ body.plan-prebuy .prePurchaseConsultationBox{display:block}
 .meaningConclusion{padding:12px 14px;margin:12px 0;border-radius:12px;border-right:5px solid}.meaningConclusion.high{background:#fff0ef;border-color:#b42318;color:#7a2019}.meaningConclusion.medium,.categorySummaryCard.medium{background:#fff3e7;border-color:#c65b08;color:#874006}.meaningConclusion.low{background:#fffbe5;border-color:#b78a00;color:#665100}.overallProfessionalConclusion .meaningConclusion h5{color:inherit;margin-top:0}
 
 #managerAnalyticsPanel .analyticsArticleTable{min-width:0;table-layout:fixed}#managerAnalyticsPanel .analyticsArticleTable th,#managerAnalyticsPanel .analyticsArticleTable td{white-space:normal;overflow-wrap:anywhere;padding:10px 7px}#managerAnalyticsPanel .analyticsArticleTable th:first-child,#managerAnalyticsPanel .analyticsArticleTable td:first-child{position:static;width:60%;font-weight:700}#managerAnalyticsPanel .analyticsArticleTable th:not(:first-child),#managerAnalyticsPanel .analyticsArticleTable td:not(:first-child){width:20%}#managerAnalyticsPanel .analyticsArticleTable td:not(:first-child){font-size:18px;font-weight:900;color:#075e48}
+
+/* Compact, source-labelled exceptions; the institute analysis stays in its system cards. */
+.btCrossSourceSummary{margin:18px 0;padding:16px;border:2px solid #d7e5e1;border-radius:16px;background:#f8fbfa}.btCrossSourceSummary>h4{margin:0 0 10px;color:#17352d;font-size:20px}.btSourceFinding{margin:9px 0;padding:12px 14px;border:1px solid #e4c37d;border-right:5px solid #d99a17;border-radius:12px;background:#fffaf0;line-height:1.6}.btSourceFinding strong{display:block;margin-bottom:3px;color:#694b00}.btSourceFinding p{margin:0;color:#3c4548}
 </style><style>#appShell{display:block!important}
 /* BuyTest V20 – light commercial landing + improved value-first flow */
 :root{--bg:#f5f7f8;--card:#ffffff;--card2:#f8fafb;--line:#d9e2e6;--txt:#17242b;--muted:#60717a;--a:#0fa87e;--warn:#9b6b00;--bad:#bd3030}
@@ -1394,16 +1397,51 @@ function btUnifiedEntries({preliminary=false}={}){
   });
   return entries;
 }
+function btFinalExceptionalFindings(dossier=btDossier()){
+  const items=[];
+  const add=(title,source,text)=>{const value=String(text||'').trim();if(value)items.push({title,source,text:value});};
+  const external=dossier.sources?.insuranceExternal;
+  const inspection=dossier.sources?.inspection;
+  const crossAlerts=btInsuranceCrossSourceAlerts(dossier);
+  if(external?.rawText&&window.BuyTestInsurance){
+    const parsed=BuyTestInsurance.interpret(external.rawText);
+    for(const alert of parsed.alerts||[]){
+      const coveredByComparison=crossAlerts.length&&/(?:אובדן|אבדן|ירידת ערך|(?:30|40|50|60)[,. ]?000)/.test(alert);
+      if(!coveredByComparison)add('ממצא חריג בעבר הביטוחי','דוח עבר ביטוחי שהועלה',alert);
+    }
+  }else for(const alert of external?.alerts||[]){
+    const coveredByComparison=crossAlerts.length&&/(?:אובדן|אבדן|ירידת ערך|(?:30|40|50|60)[,. ]?000)/.test(alert);
+    if(!coveredByComparison)add('ממצא חריג בעבר הביטוחי','דוח עבר ביטוחי שהועלה',alert);
+  }
+  for(const alert of dossier.sources?.checklist?.alerts||[])add('נקודה לבירור מהצ׳קליסט','צ׳קליסט הקונה',alert);
+  for(const alert of dossier.sources?.identity?.alerts||[])add('אי־התאמה בשיוך מסמך','בדיקת פרטי הרכב',alert);
+  for(const alert of crossAlerts){
+    const first=String(alert).split(/(?<=\.)\s/)[0];
+    const comparison=alert.includes('בדוח המכון מופיע ממצא')
+      ?'בדוח המכון נרשם ממצא מרכב במשמעות נמוכה או שולית.'
+      :'דוח המכון אינו שולל את משמעות הרישום בעבר הביטוחי.';
+    const followup='יש לבדוק מחדש את התאמת ממצאי המכון לדוח השמאי ולתיעוד התיקון. באובדן להלכה יש לוודא מסמכי שיקום ובדיקת תקנה 309, ככל שנדרשת לפי סוג הנזק.';
+    add('ממצא חריג — נדרשת התאמה בין הדוחות','דוח עבר ביטוחי שהועלה + דוח המכון',[first,comparison,followup].join(' '));
+  }
+  for(const alert of btSummaryAlerts(dossier))if(/קילומטראז׳|קילומטר/.test(alert))add('פער בין מקורות','השוואת נתוני קילומטראז׳',alert);
+  const unique=new Map();
+  for(const item of items){const key=item.source+'|'+item.title+'|'+item.text;if(!unique.has(key))unique.set(key,item);}
+  return [...unique.values()];
+}
 function btRefreshSummary(){
   const dossier=btDossier();if(!Object.keys(dossier.sources).length)return;
   const entries=btUnifiedEntries();reportText=entries.map(e=>e.text).join('\n');
-  for(const id of ['afterInterpretation','report']){
-    const host=document.getElementById(id);if(!host)continue;
-    let box=host.querySelector('.btUnifiedSummary');if(!box){box=document.createElement('section');box.className='btUnifiedSummary';host.prepend(box);}
-    const displayEntries=id==='afterInterpretation'&&host.querySelector('.inspectionIdentity')?entries.slice(0,entries.findIndex(e=>e.text==='פענוח דוח המכון והבדיקה הממוחשבת')<0?entries.length:entries.findIndex(e=>e.text==='פענוח דוח המכון והבדיקה הממוחשבת')):entries;
-    box.innerHTML=displayEntries.map(e=>e.heading?`<h3${e.alert?' class="btCritical"':''}>${escapeHtml(e.text)}</h3>`:`<p${e.alert?' class="btCritical" role="note"':''}>${escapeHtml(e.text)}</p>`).join('');
+  const host=document.getElementById('afterInterpretation');
+  if(host){
+    host.querySelector('.btUnifiedSummary')?.remove();
+    let box=host.querySelector('.btCrossSourceSummary');
+    const highlights=btFinalExceptionalFindings(dossier);
+    if(highlights.length){
+      if(!box){box=document.createElement('section');box.className='btCrossSourceSummary';host.append(box);}
+      box.innerHTML='<h4>דגשים חריגים ממקורות נוספים</h4>'+highlights.map(item=>`<article class="btSourceFinding"><strong>${escapeHtml(item.title)} · מקור: ${escapeHtml(item.source)}</strong><p>${escapeHtml(item.text)}</p></article>`).join('');
+    }else box?.remove();
   }
-  if(dossier.sources.inspection)document.getElementById('afterInterpretation')?.classList.add('show');
+  document.getElementById('report')?.querySelector('.btUnifiedSummary')?.remove();
   btPreparedPdfFile=null;
   window.BuyTestChecklist?.refresh();
 }
@@ -5979,9 +6017,51 @@ function btPdfTextEntries(text){
   }));
 }
 
+function btPdfAnalysisCards(result,isComputer=false){
+  const groups=compactAnalysisGroups(result,isComputer);
+  if(!groups.length)return [{text:'לא זוהו ממצאים שניתן לסווג אוטומטית. יש לבדוק מול דוח המקור.',alert:true}];
+  return groups.map(group=>{
+    const bullets=[...(group.bullets||[])];
+    (group.details||[]).forEach(item=>{
+      bullets.push(item.fact);
+      if(item.meaning)bullets.push('משמעות מקצועית: '+item.meaning);
+      if(item.decision)bullets.push('המשך בירור: '+item.decision);
+      if(item.question)bullets.push('מה לברר: '+item.question);
+    });
+    if(group.decision)bullets.push('משמעות מקצועית: '+group.decision);
+    return {card:{title:group.category,tag:group.tag||'ממצא',severity:group.severity||group.tone,bullets}};
+  });
+}
+function btPdfProfessionalCards(summary,computer){
+  if(!summary)return [];
+  const conclusion=professionalOverallConclusion(summary,computer);
+  return [
+    ['high','מסקנת משמעות גבוהה',conclusion.highConclusion],
+    ['medium','מסקנת משמעות בינונית',conclusion.mediumConclusion],
+    ['low','מסקנת משמעות נמוכה',conclusion.lowConclusion]
+  ].filter(([,title,text])=>Boolean(text)).map(([severity,title,text])=>({card:{title,tag:'תמונה מקצועית מסכמת',severity,bullets:[text]}}));
+}
+function btPdfExceptionCards(dossier=btDossier()){
+  return btFinalExceptionalFindings(dossier).map(item=>({card:{title:item.title,tag:'מקור: '+item.source,severity:'high',bullets:[item.text]}}));
+}
+function btPdfTextEntries(text){
+  return String(text||'').replace(/\r/g,'').split('\n').map(line=>line.trim()).filter(Boolean).map(line=>({
+    text:line,
+    heading:!line.startsWith('•')&&/^(ממצאים|מסקנ(?:ה|ת|ות)|תקלות|קודים|הקשר|אימות|פירוש|פענוח|נתוני|מנוע|מערכת|תיבת|שלדה|חשמל|צמיגים|מיזוג|תקשורת|בדיקה|הערות|תמונה מקצועית|ניסוחים)/.test(line)
+  }));
+}
 function btMeasurePdfEntries(ctx,entries,width,scale=1){
   let height=0;
   for(const entry of entries){
+    if(entry.card){
+      const padding=18,titleSize=Math.round(25*scale),bodySize=Math.round(19*scale),innerWidth=width-padding*2;
+      ctx.font=`700 ${titleSize}px Arial, sans-serif`;
+      const titleLines=btWrapRtl(ctx,entry.card.title,innerWidth-140);
+      ctx.font=`400 ${bodySize}px Arial, sans-serif`;
+      const bodyLines=(entry.card.bullets||[]).flatMap(line=>btWrapRtl(ctx,'• '+line,innerWidth-10));
+      height+=padding*2+titleLines.length*Math.round(titleSize*1.32)+8+bodyLines.length*Math.round(bodySize*1.42)+12;
+      continue;
+    }
     const size=Math.round((entry.heading?29:23)*scale);
     ctx.font=`${entry.heading||entry.alert?'700':'400'} ${size}px Arial, sans-serif`;
     const lines=btWrapRtl(ctx,entry.text,width);
@@ -6036,20 +6116,40 @@ function btPaginatePdfEntries(ctx,entries,width,firstCapacity,continuationCapaci
 function btDrawPdfEntries(ctx,entries,startY,endY,width,margin){
   const available=Math.max(100,endY-startY);
   const natural=btMeasurePdfEntries(ctx,entries,width,1);
-  const scale=Math.min(1,Math.max(.75,available/Math.max(1,natural)));
+  const scale=Math.min(1,Math.max(.72,available/Math.max(1,natural)));
   let y=startY;
   for(const entry of entries){
+    if(entry.card){
+      const padding=18,innerWidth=width-padding*2,titleSize=Math.round(25*scale),bodySize=Math.round(19*scale);
+      ctx.font=`700 ${titleSize}px Arial, sans-serif`;
+      const titleLines=btWrapRtl(ctx,entry.card.title,innerWidth-140);
+      ctx.font=`400 ${bodySize}px Arial, sans-serif`;
+      const bodyLines=(entry.card.bullets||[]).flatMap(line=>btWrapRtl(ctx,'• '+line,innerWidth-10));
+      const titleH=titleLines.length*Math.round(titleSize*1.32),bodyH=bodyLines.length*Math.round(bodySize*1.42);
+      const cardH=padding*2+titleH+8+bodyH+12;
+      const tone=String(entry.card.severity||'').toLowerCase();
+      const palette=/(high|active|critical|severe|safety)/.test(tone)?['#fff4f2','#c9362b','#8f231d']:/medium|clarify/.test(tone)?['#fff8e9','#d59a17','#744b00']:/low|marginal|historical/.test(tone)?['#f7fafc','#8aa4b5','#3e5664']:['#f1faf6','#9bcdbd','#17352d'];
+      ctx.fillStyle=palette[0];ctx.strokeStyle=palette[1];ctx.lineWidth=2;
+      if(ctx.roundRect){ctx.beginPath();ctx.roundRect(margin,y,width,cardH,15);ctx.fill();ctx.stroke();}
+      else{ctx.fillRect(margin,y,width,cardH);ctx.strokeRect(margin,y,width,cardH);}
+      let cy=y+padding;ctx.direction='rtl';ctx.textAlign='right';ctx.fillStyle='#17352d';
+      ctx.font=`700 ${titleSize}px Arial, sans-serif`;
+      for(const line of titleLines){ctx.fillText(line,1240-margin-padding,cy);cy+=Math.round(titleSize*1.32);}
+      ctx.textAlign='left';ctx.font=`700 ${Math.round(16*scale)}px Arial, sans-serif`;ctx.fillStyle=palette[2];
+      ctx.fillText(String(entry.card.tag||''),margin+padding, y+padding+Math.round(4*scale));
+      cy+=8;ctx.textAlign='right';ctx.font=`400 ${bodySize}px Arial, sans-serif`;ctx.fillStyle='#182126';
+      for(const line of bodyLines){ctx.fillText(line,1240-margin-padding,cy);cy+=Math.round(bodySize*1.42);}
+      y+=cardH+12;continue;
+    }
     const size=Math.max(entry.heading?17:15,Math.round((entry.heading?29:23)*scale));
     ctx.font=`${entry.heading||entry.alert?'700':'400'} ${size}px Arial, sans-serif`;
-    ctx.fillStyle=({high:'#b42318',medium:'#a44705',low:'#806000'}[entry.conclusionSeverity])||(entry.alert?'#b00020':entry.heading?'#075e48':'#182126');
-    const lines=btWrapRtl(ctx,entry.text,width);
-    const lineHeight=Math.round(size*1.42);
+    ctx.fillStyle=entry.alert?'#b00020':entry.heading?'#075e48':'#182126';
+    const lines=btWrapRtl(ctx,entry.text,width),lineHeight=Math.round(size*1.42);
     for(const line of lines){ctx.fillText(line,1240-margin,y);y+=lineHeight;}
     y+=entry.heading?13:8;
   }
   return y;
 }
-
 async function btBuildThreePageAfterReportPdf(){
   const W=1240,H=1754,margin=82,contentWidth=W-margin*2;
   const canvases=[];
@@ -6088,7 +6188,14 @@ async function btBuildThreePageAfterReportPdf(){
     ctx.font='700 16px Arial, sans-serif';ctx.fillStyle='#075e48';ctx.fillText('© 2026 BuyTest · כל הזכויות שמורות',W-margin,H-48);
   }
 
-  const mechanicalEntries=btUnifiedEntries();
+  const dossier=btDossier();
+  const insuranceExceptions=btPdfExceptionCards(dossier);
+  const mechanicalEntries=[
+    {text:'ממצאי דוח המכון לפי מערכת ורמת משמעות',heading:true},
+    ...(latestSummaryResult?btPdfAnalysisCards(latestSummaryResult,false):[{text:'לא נשמר פענוח של סיכום המכון.',alert:true}]),
+    ...(latestSummaryResult?btPdfProfessionalCards(latestSummaryResult,latestComputerResult):[]),
+    ...(insuranceExceptions.length?[{text:'דגשים חריגים ממקורות נוספים',heading:true},...insuranceExceptions]:[])
+  ];
   const requesterAdvisory=inspectionRequesterAdvisory(owner);
   const identityEntries=[
     {text:`מספר רכב: ${vehicle.plate||'לא צוין'} · שם מזמין/ת הבדיקה: ${owner}`,heading:false},
@@ -6149,13 +6256,10 @@ async function btBuildThreePageAfterReportPdf(){
 
   const computerPageNumber=mechanicalPages.length+2;
   const page3=makePage('בדיקה ממוחשבת וקודי תקלות',computerPageNumber);
-  let computerText='';
-  if(latestComputerResult){
-    computerText=`${computerIdentityText(latestComputerIdentity)}\n${analysisTextBlock('פירוש קודי התקלה',latestComputerResult)}`;
-  }else{
-    computerText='לא הועלתה בדיקה ממוחשבת.\nלא ניתן לבדוק שיוך לרכב או לפרש קודי תקלות ללא דוח מחשב.';
-  }
-  btDrawPdfEntries(page3.ctx,btPdfTextEntries(computerText),page3.y,H-165,contentWidth,margin);
+  const computerEntries=latestComputerResult
+    ?[{text:computerIdentityText(latestComputerIdentity),heading:true},...btPdfAnalysisCards(latestComputerResult,true)]
+    :[{text:'לא הועלתה בדיקה ממוחשבת. לא ניתן לפרש קודי תקלות ללא דוח מחשב.',heading:false}];
+  btDrawPdfEntries(page3.ctx,computerEntries,page3.y,H-165,contentWidth,margin);
   drawFooter(page3.ctx,'קוד תקלה מצביע על כיוון אבחון בלבד ואינו קובע לבדו איזה רכיב פגום. במקרה של אי־התאמה בפרטי הרכב אין להסתמך על הקודים לפני אימות דוח המקור.');
   canvases.push(page3.canvas);
 
