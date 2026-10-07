@@ -22,7 +22,7 @@
     const vehicleLookup=document.getElementById('vehicleLookup');
     if(vehicleLookup) vehicleLookup.style.display=current==='insurance'||current==='balcar'?'none':'block';
     const insuranceStart=document.getElementById('insuranceStartSection');
-    if(insuranceStart) insuranceStart.style.display='none';
+    if(insuranceStart) insuranceStart.style.setProperty('display','none','important');
     if(current==='insurance'||current==='balcar') showBalcarUpload();
     else {const uploadPage=document.getElementById('balcarUploadPage');if(uploadPage)uploadPage.style.display='none';}
     if(current==='checklist'&&/^\d{7,8}$/.test(plate())){BuyTestChecklist.open();document.body.dataset.bundleStep='checklist';}
