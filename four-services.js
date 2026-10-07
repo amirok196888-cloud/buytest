@@ -28,7 +28,11 @@
     if(current==='checklist'&&/^\d{7,8}$/.test(plate())){BuyTestChecklist.open();document.body.dataset.bundleStep='checklist';}
     const head=document.getElementById('independentServiceHeader');
     head.querySelector('h1').textContent=services[current]?.title||'';
-    const host=current==='report'?document.getElementById('afterPage'):current==='consultation'?document.getElementById('consultationPage'):document.querySelector('#appShell main');
+    const main=document.querySelector('#appShell main');
+    const upload=document.getElementById('afterInspectionSection');
+    const host=current==='report'?document.getElementById('afterPage'):current==='consultation'?document.getElementById('consultationPage'):main;
+    if(current==='report'&&upload)host.append(upload);
+    else if(upload&&main&&upload.parentElement!==main)main.append(upload);
     host.prepend(head);host.append(document.getElementById('serviceSummary'));
     document.getElementById('serviceSummary').hidden=!current||current==='balcar'||current==='insurance';
     document.title=current?services[current].title+' | BuyTest':'BuyTest — לפני קניית רכב';
