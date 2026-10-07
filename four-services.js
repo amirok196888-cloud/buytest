@@ -19,13 +19,18 @@
     document.body.dataset.bundleStep=current||'lookup';
     if(current==='report'){openAfterPage(false);document.getElementById('afterPagePlate').value=plate();}
     if(current==='consultation'){document.body.classList.add('consultation-page');document.getElementById('consultationPage').hidden=false;document.getElementById('advicePlate').value=plate();document.getElementById('prebuyVehiclePlate').value=plate();const source=btDossier().sources.consultation;document.getElementById('prebuyQuestion').value=source?.question||'';document.getElementById('prebuyAdLink').value=source?.adLink||'';document.getElementById('adviceNotes').value=source?.note||'';}
-    if(current==='insurance'||current==='balcar'){showInsuranceStart();showBalcarUpload();}
+    const vehicleLookup=document.getElementById('vehicleLookup');
+    if(vehicleLookup) vehicleLookup.style.display=current==='insurance'||current==='balcar'?'none':'block';
+    const insuranceStart=document.getElementById('insuranceStartSection');
+    if(insuranceStart) insuranceStart.style.display='none';
+    if(current==='insurance'||current==='balcar') showBalcarUpload();
+    else {const uploadPage=document.getElementById('balcarUploadPage');if(uploadPage)uploadPage.style.display='none';}
     if(current==='checklist'&&/^\d{7,8}$/.test(plate())){BuyTestChecklist.open();document.body.dataset.bundleStep='checklist';}
     const head=document.getElementById('independentServiceHeader');
     head.querySelector('h1').textContent=services[current]?.title||'';
     const host=current==='report'?document.getElementById('afterPage'):current==='consultation'?document.getElementById('consultationPage'):document.querySelector('#appShell main');
     host.prepend(head);host.append(document.getElementById('serviceSummary'));
-    document.getElementById('serviceSummary').hidden=!current||current==='balcar';
+    document.getElementById('serviceSummary').hidden=!current||current==='balcar'||current==='insurance';
     document.title=current?services[current].title+' | BuyTest':'BuyTest — לפני קניית רכב';
     BuyTestBundle.sync();updateSummary();
   }
