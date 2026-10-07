@@ -30,9 +30,19 @@
     head.querySelector('h1').textContent=services[current]?.title||'';
     const main=document.querySelector('#appShell main');
     const upload=document.getElementById('afterInspectionSection');
+    const insuranceUpload=document.getElementById('balcarUploadPage');
     const host=current==='report'?document.getElementById('afterPage'):current==='consultation'?document.getElementById('consultationPage'):main;
-    if(current==='report'&&upload)host.append(upload);
-    else if(upload&&main&&upload.parentElement!==main)main.append(upload);
+    if(current==='report'){
+      if(upload)host.append(upload);
+      if(insuranceUpload){insuranceUpload.style.display='none';host.append(insuranceUpload);}
+      let insuranceButton=document.getElementById('reportInsuranceUploadButton');
+      if(!insuranceButton){insuranceButton=document.createElement('button');insuranceButton.id='reportInsuranceUploadButton';insuranceButton.type='button';insuranceButton.className='primary full';insuranceButton.textContent='העלאת דוח עבר ביטוחי לסיכום';insuranceButton.onclick=()=>showBalcarUpload();}
+      host.insertBefore(insuranceButton,upload||insuranceUpload||document.getElementById('serviceSummary'));
+    }else{
+      document.getElementById('reportInsuranceUploadButton')?.remove();
+      if(upload&&main&&upload.parentElement!==main)main.append(upload);
+      if(insuranceUpload&&main&&insuranceUpload.parentElement!==main){insuranceUpload.style.display='none';main.append(insuranceUpload);}
+    }
     host.prepend(head);host.append(document.getElementById('serviceSummary'));
     document.getElementById('serviceSummary').hidden=!current||current==='balcar'||current==='insurance';
     document.title=current?services[current].title+' | BuyTest':'BuyTest — לפני קניית רכב';
