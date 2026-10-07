@@ -35,25 +35,22 @@
     const button=document.getElementById('externalInsuranceInterpret');
     if(button)button.disabled=true;
     document.getElementById('externalInsuranceText').value='';
-    let worker;
     try{
-      status('קורא את קובץ הדוח במכשיר...');
+      status('מכין עמודים לשליחה ל־Google Vision...');
       const parts=[];
       for(const file of selected){
-        const prepared=file.type==='application/pdf'?await pdfForDocumentOcr(file,quality,12,true):{sources:await imageForDocumentOcr(file)};
-        let text=prepared.text||'';
-        if(!quality(text).ok&&prepared.sources?.length){
-          if(!window.Tesseract)throw new Error('OCR_UNAVAILABLE');
-          worker=worker||await Tesseract.createWorker('heb+eng');
-          const result=await recognizeDocumentSources(worker,prepared.sources,document.getElementById('externalInsuranceStatus'),()=>{},quality);
-          text=result.text||'';
-        }
-        if(!quality(text).ok)throw new Error('TEXT_NOT_FOUND');
-        parts.push('קובץ: '+file.name+'\\n'+text);
+        const prepared=file.type==='application/pdf'
+          ? await pdfForDocumentOcr(file,quality,12,true,true)
+          : {text:'',sources:[],visionSources:await imageForGoogleVision(file)};
+        const visionSources=prepared.visionSources||prepared.sources||[];
+        if(!visionSources.length)throw new Error('GOOGLE_VISION_PAGES_MISSING');
+        const text=await googleVisionRecognize(visionSources,document.getElementById('externalInsuranceStatus'));
+        if(!quality(text).ok)throw new Error('VISION_LOW_QUALITY');
+        parts.push('קובץ: '+file.name+'\n'+text);
       }
       if(run!==version||p!==plate())return;
       files=selected.map(f=>f.name);
-      document.getElementById('externalInsuranceText').value=parts.join('\\n\\n');
+      document.getElementById('externalInsuranceText').value=parts.join('\n\n');
       pendingFiles=[];
       save();
     }catch(error){
@@ -61,9 +58,9 @@
         if(button)button.disabled=!pendingFiles.length;
         document.getElementById('externalInsuranceCorrection').hidden=false;
         document.getElementById('externalInsuranceCorrection').open=true;
-        status(error.message==='PDF_TOO_LONG'?'ה־PDF ארוך מ־12 עמודים. פצל אותו לקבצים לפני ההעלאה.':error.message==='PDF_UNAVAILABLE'?'קורא ה‑PDF לא נטען במכשיר. לא הועלה קובץ; אפשר להדביק למטה את הטקסט מהדוח.':error.message==='OCR_UNAVAILABLE'?'מנוע זיהוי הטקסט לא נטען במכשיר. לא הועלה קובץ; אפשר להדביק למטה את הטקסט מהדוח.':'לא הצלחנו לקרוא את הדוח במלואו. נסה PDF מקורי או צילום ברור; אפשר גם להדביק למטה את הטקסט מהדוח.');
+        status(error.message==='PDF_TOO_LONG'?'ה־PDF ארוך מ־12 עמודים. פצל אותו לקבצים לפני ההעלאה.':error.message==='PDF_UNAVAILABLE'?'קורא ה‑PDF לא נטען. לא נשמר פענוח חלקי.':'Google Vision לא הצליח לקרוא את כל עמודי הדוח באיכות מספקת. לא נשמר פענוח חלקי; נסה שוב עם PDF מקורי או צילום חד וישר יותר.');
       }
-    }finally{if(worker)await worker.terminate();}
+    }
   }
   function save(){
     const p=plate(),text=document.getElementById('externalInsuranceText').value.trim();
@@ -86,7 +83,7 @@
   }
   window.addEventListener('DOMContentLoaded',()=>{
     const panel=document.createElement('section');panel.id='externalInsurancePanel';panel.className='btExternalInsurance';panel.style.cssText='margin:0;padding:0;border:0;background:transparent;box-shadow:none';
-    panel.innerHTML='<button type="button" class="primary full" id="externalInsuranceChoose" style="margin-top:12px">בחירת קובץ מהטלפון</button><button type="button" class="primary full" id="externalInsuranceInterpret" style="margin-top:10px" disabled>פענח את הדוח</button><p class="sub">הורד את הדוח לטלפון, בחר את קובץ ה‑PDF או התמונה, ו‑BuyTest תפענח אותו כאן. הקובץ נקרא במכשיר ואינו נשלח לבלק״ר.</p><input type="file" id="externalInsuranceFile" accept="image/*,application/pdf" multiple hidden><p id="externalInsuranceStatus" role="status" aria-live="polite"></p><div class="info" id="externalInsuranceResult" hidden style="white-space:pre-line"></div><details id="externalInsuranceCorrection" hidden><summary>השלמת פרטים מהדוח</summary><label for="externalInsuranceText">טקסט שנקרא מהדוח</label><textarea id="externalInsuranceText" class="reportInput" rows="8" style="color:#17352d;background:#fff"></textarea><p>מספר רכב אינו חובה. אם נבחר רכב קודם, הפענוח יצורף לסיכום שלו.</p><button type="button" class="primary full" id="externalInsuranceSave">עדכון פענוח דוח העבר הביטוחי</button><button type="button" class="secondary full" id="externalInsuranceRemove">הסרת דוח העבר הביטוחי</button></details>';
+    panel.innerHTML='<button type="button" class="primary full" id="externalInsuranceChoose" style="margin-top:12px">בחירת קובץ מהטלפון</button><button type="button" class="primary full" id="externalInsuranceInterpret" style="margin-top:10px" disabled>פענח את הדוח</button><p class="sub">הורד את הדוח לטלפון, בחר את קובץ ה‑PDF או התמונה. עמודי הדוח יישלחו דרך שירות מאובטח של BuyTest ל‑Google Vision לפענוח. BuyTest אינה מתחברת לבלק״ר.</p><input type="file" id="externalInsuranceFile" accept="image/*,application/pdf" multiple hidden><p id="externalInsuranceStatus" role="status" aria-live="polite"></p><div class="info" id="externalInsuranceResult" hidden style="white-space:pre-line"></div><details id="externalInsuranceCorrection" hidden><summary>השלמת פרטים מהדוח</summary><label for="externalInsuranceText">טקסט שנקרא מהדוח</label><textarea id="externalInsuranceText" class="reportInput" rows="8" style="color:#17352d;background:#fff"></textarea><p>מספר רכב אינו חובה. אם נבחר רכב קודם, הפענוח יצורף לסיכום שלו.</p><button type="button" class="primary full" id="externalInsuranceSave">עדכון פענוח דוח העבר הביטוחי</button><button type="button" class="secondary full" id="externalInsuranceRemove">הסרת דוח העבר הביטוחי</button></details>';
     const mount=document.getElementById('externalInsuranceMount');
     if(mount) mount.append(panel);
     document.getElementById('externalInsuranceChoose').onclick=()=>document.getElementById('externalInsuranceFile').click();
