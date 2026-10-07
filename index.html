@@ -1285,24 +1285,27 @@ function btInsuranceCrossSourceAlerts(dossier){
     const severity=String(item.severity||'').toLowerCase();
     return severity==='low'||severity==='marginal'||text.includes('משמעות נמוכה')||text.includes('משמעות שולית');
   });
+  const inspectionText=String(inspection.text||'');
+  const lowInReport=lowFindings.length>0||inspectionText.includes('משמעות נמוכה')||inspectionText.includes('משמעות שולית');
   const detail=claim=>{
     const parts=[];
     if(claim.date)parts.push('תאריך '+claim.date);
     if(claim.claimNumber)parts.push('תביעה '+claim.claimNumber);
     if(claim.damage&&claim.damage!=='סוג הנזק לא נקרא')parts.push(claim.damage);
     const amounts=(claim.amounts||[]).filter(Boolean);
-    if(amounts.length)parts.push('סכומים שנקראו מהטבלה '+amounts.map(value=>'₪'+value).join(' ו־'));
+    if(amounts.length)parts.push('סכומים שנקראו '+amounts.map(value=>'₪'+value).join(' ו־'));
     return parts.join(' · ');
   };
   const facts=[];
   if(losses.length)facts.push('רישום '+losses.map(detail).filter(Boolean).join('; '));
-  if(large.length)facts.push('בתביעה הקשורה לרכב המבוטח הופיע סכום של 30,000 ₪ ומעלה: '+large.map(detail).filter(Boolean).join('; '));
-  if(depreciation.length)facts.push('נרשמה ירידת ערך של 3% ומעלה בתביעה הקשורה לרכב המבוטח: '+depreciation.map(claim=>detail(claim)+(claim.depreciationRate?' · ירידת ערך '+claim.depreciationRate:'')).filter(Boolean).join('; '));
-  const comparison=lowFindings.length
-    ?' בסיכום בדיקת המכון סווגו '+lowFindings.length+' ממצאים כמשמעות נמוכה או שולית.'
-    :' דוח המכון אינו מסביר או שולל את משמעות אירועי העבר הביטוחי.';
-  return ['אי־התאמה מהותית בין סיכום בדיקת המכון לעבר הביטוחי: '+facts.join('. ')+'.'+comparison+
-    ' אין להציג את ממצאי הבדיקה כקלים בלבד. סכומי תביעה כפי שנקראו אינם מוכיחים לבדם אילו חלקים ניזוקו או מה תוקן. יש להשוות לדוח השמאי, לתמונות הנזק, למסמכי התיקון ולנתוני ירידת הערך ולבצע בדיקת מרכב ושלדה במכון. ברישום אובדן להלכה יש לבדוק את מסמכי השיקום וההשבה לכביש ולברר לפי המסמכים אם נדרש אישור לפי תקנה 309; הכיתוב לבדו אינו מוכיח שהתקנה חלה.'];
+  if(large.length)facts.push('תביעת הרכב המבוטח בסכום של 30,000 ₪ ומעלה: '+large.map(detail).filter(Boolean).join('; '));
+  if(depreciation.length)facts.push('ירידת ערך של 3% ומעלה בתביעת הרכב המבוטח: '+depreciation.map(claim=>detail(claim)+(claim.depreciationRate?' · ירידת ערך '+claim.depreciationRate:'')).filter(Boolean).join('; '));
+  const comparison=lowInReport
+    ?' בדוח המכון מופיע ממצא מרכב/תיקון מרכב שסווג במשמעות נמוכה או שולית.'
+    :' דוח המכון אינו מסביר או שולל את משמעות רישומי העבר הביטוחי.';
+  const primary=constructiveLosses.length?'אובדן להלכה':losses.length?'אובדן/אובדן גמור':'תביעה משמעותית או ירידת ערך';
+  return ['ממצא חריג המחייב התייחסות ובדיקה חוזרת: בעבר הביטוחי מופיע '+primary+'. '+facts.join('. ')+'.'+comparison+
+    ' אין להסיק מהמידע בלבד מה היה מקור הנזק — למשל, ייתכן נזק הצפה — אך גם אין להסתפק בדירוג הנמוך בטופס. יש לבדוק מחדש את המרכב והשלדה ולוודא שלא הוחמץ ממצא במשמעות גבוהה. יש להשוות לדוח השמאי, לתמונות, למסמכי התיקון ולנתוני ירידת הערך. ברישום אובדן להלכה יש לבדוק מסמכי שיקום והשבה לכביש ולוודא אם נדרש הליך ותעודת בדיקה לפי תקנה 309, בהתאם לסוג הנזק. סכומי תביעה כפי שנקראו אינם מוכיחים לבדם אילו חלקים ניזוקו או מה תוקן.'];
 }
 function btSummaryAlerts(dossier=btDossier()){
   const sources=dossier.sources,alerts=[];
