@@ -177,7 +177,7 @@
     }
     output.push('דוח זה מציג תביעות שדווחו לחברות הביטוח. תיקונים פרטיים, תיקונים שלא דרך הביטוח ותיקונים במוסך לא מורשה עלולים שלא להופיע בו; היעדר רישום אינו שולל נזק או תאונה. לכן עדיין מומלץ לבצע בדיקה במכון.');
     output.push('בכל מקרה מומלץ לבצע בדיקה מקצועית במכון. הדוח אינו מחליף בדיקה פיזית, דוח שמאי או אימות מול מסמכי המקור.');
-    return {text:output.join('\n'),plate,queryDate,claims,events,summary,alerts,status:claims.length?'findings':explicitClean?'explicit-clean':'incomplete'};
+    return {text:output.join('\n'),rawText:String(raw||''),plate,queryDate,claims,events,summary,alerts,status:claims.length?'findings':explicitClean?'explicit-clean':'incomplete'};
   }
   root.BuyTestInsurance={interpret};
 })(typeof window==='undefined'?globalThis:window);
