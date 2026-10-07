@@ -1,6 +1,6 @@
 /* Four independent entry pages. Only home navigation; one dossier per vehicle. */
 (() => {
-  const services={insurance:{title:'פענוח עבר ביטוחי — חינם'},checklist:{title:'צ׳קליסט לפני קנייה — חינם'},report:{title:'פענוח דוח מכון — חינם'},consultation:{title:'ייעוץ אישי עם עמוס — 99 ₪'}};
+  const services={balcar:{title:'פענוח דוח בלקאר'},insurance:{title:'פענוח עבר ביטוחי — חינם'},checklist:{title:'צ׳קליסט לפני קנייה — חינם'},report:{title:'פענוח דוח מכון — חינם'},consultation:{title:'ייעוץ אישי עם עמוס — 99 ₪'}};
   let current='';
   const readRoute=()=>new URLSearchParams(location.search).get('service')|| (location.hash==='#report'?'report':'');
   function updateSummary(){
@@ -25,7 +25,7 @@
     head.querySelector('h1').textContent=services[current]?.title||'';
     const host=current==='report'?document.getElementById('afterPage'):current==='consultation'?document.getElementById('consultationPage'):document.querySelector('#appShell main');
     host.prepend(head);host.append(document.getElementById('serviceSummary'));
-    document.getElementById('serviceSummary').hidden=!current;
+    document.getElementById('serviceSummary').hidden=!current||current==='balcar';
     document.title=current?services[current].title+' | BuyTest':'BuyTest — לפני קניית רכב';
     BuyTestBundle.sync();updateSummary();
   }
@@ -74,7 +74,5 @@
     document.querySelectorAll('.returnBtn').forEach(button=>{button.textContent='חזרה לדף הראשי';button.onclick=home;});
     const insuranceText=document.querySelector('#insuranceStartSection .info');insuranceText.textContent=insuranceText.textContent.replace('החבילה','שירות העבר הביטוחי');
     render();
-    const focusId=new URLSearchParams(location.search).get('focus');
-    if(focusId==='externalInsurancePanel')setTimeout(()=>document.getElementById(focusId)?.scrollIntoView({behavior:'smooth',block:'center'}),250);
   });
 })();
