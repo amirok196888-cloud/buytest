@@ -62,7 +62,7 @@
     if(selected.some(f=>!(f.type.startsWith('image/')||f.type==='application/pdf'))){status('אפשר להעלות PDF או תמונה בלבד.');return;}
     let worker;
     try{
-      status('קורא את דוח העבר הביטוחי...');
+      status('קורא את דוח בלקאר...');
       const parts=[];
       for(const file of selected){
         const prepared=file.type==='application/pdf'?await pdfForDocumentOcr(file,quality,12,true):{sources:await imageForDocumentOcr(file)};
@@ -95,8 +95,8 @@
     const labelled=Array.from(text.matchAll(/(?:מספר\s*(?:רכב|רישוי)|מס[׳'״"]?\s*רכב|license\s*plate)\s*[:\-]?\s*([\d\- ]{7,12})/gi)).map(m=>m[1].replace(/\D/g,'')).filter(x=>/^\d{7,8}$/.test(x));
     if(p&&labelled.some(x=>x!==p)){status('נמצא בטקסט מספר רכב אחר. בדוק את דוח המקור ואת זיהוי הטקסט לפני השמירה.');return;}
     const interpretation=BuyTestInsurance.interpret(text);
-    if(p)btSaveSource('insuranceExternal',{title:'פענוח עבר ביטוחי — דוח שהלקוח העלה',rawText:text,files:[...files],text:interpretation.text,alerts:interpretation.alerts,mileage:[],interpretationVersion:2});
-    status(interpretation.status==='incomplete'?'הדוח נקרא, אך חסרים פרטי תביעות קריאים. העלה את טבלת התביעות והנזקים.':p?'✓ דוח העבר הביטוחי פוענח ושולב בסיכום לרכב '+p+'.':'✓ דוח העבר הביטוחי פוענח. התוצאה מוצגת כאן; מספר רכב אינו חובה.');
+    if(p)btSaveSource('insuranceExternal',{title:'פענוח דוח בלקאר — קובץ שהלקוח העלה',rawText:text,files:[...files],text:interpretation.text,alerts:interpretation.alerts,mileage:[],interpretationVersion:2});
+    status(interpretation.status==='incomplete'?'הדוח נקרא, אך חסרים פרטי תביעות קריאים. העלה את טבלת התביעות והנזקים.':p?'✓ דוח העבר הביטוחי פוענח ושולב בסיכום לרכב '+p+'.':'✓ דוח בלקאר פוענח. התוצאה מוצגת כאן.');
     document.getElementById('externalInsuranceResult').textContent=interpretation.text;
     document.getElementById('externalInsuranceResult').hidden=false;
   }
@@ -108,7 +108,7 @@
   }
   window.addEventListener('DOMContentLoaded',()=>{
     const panel=document.createElement('section');panel.id='externalInsurancePanel';panel.className='uploadPanel btExternalInsurance';
-    panel.innerHTML='<h3>אפשר גם להעלות את קובץ הדוח</h3><button type="button" class="primary full" id="externalInsuranceChoose" style="margin-top:12px">העלאת דוח עבר ביטוחי</button><p class="sub">אפשר להעלות PDF או צילום ברור. אין צורך להזין מספר רכב כדי לקבל פענוח.</p><input type="file" id="externalInsuranceFile" accept="image/*,application/pdf" multiple hidden><p id="externalInsuranceStatus" role="status" aria-live="polite"></p><div class="info" id="externalInsuranceResult" hidden style="white-space:pre-line"></div><details id="externalInsuranceCorrection" hidden><summary>השלמת פרטים מהדוח</summary><label for="externalInsuranceText">טקסט שנקרא מהדוח</label><textarea id="externalInsuranceText" class="reportInput" rows="8" style="color:#17352d;background:#fff"></textarea><p>מספר רכב אינו חובה. אם אושר מספר רכב, הפענוח יצורף לסיכום שלו.</p><button type="button" class="primary full" id="externalInsuranceSave">עדכון פענוח העבר הביטוחי</button><button type="button" class="secondary full" id="externalInsuranceRemove">הסרת הדוח החיצוני</button></details>';
+    panel.innerHTML='<h3>העלאת קובץ דוח בלקאר</h3><button type="button" class="primary full" id="externalInsuranceChoose" style="margin-top:12px">בחירת PDF או תמונה</button><p class="sub">העלה PDF או צילום ברור של דוח בלקאר.</p><input type="file" id="externalInsuranceFile" accept="image/*,application/pdf" multiple hidden><p id="externalInsuranceStatus" role="status" aria-live="polite"></p><div class="info" id="externalInsuranceResult" hidden style="white-space:pre-line"></div><details id="externalInsuranceCorrection" hidden><summary>השלמת פרטים מהדוח</summary><label for="externalInsuranceText">טקסט שנקרא מהדוח</label><textarea id="externalInsuranceText" class="reportInput" rows="8" style="color:#17352d;background:#fff"></textarea><p>מספר רכב אינו חובה. אם אושר מספר רכב, הפענוח יצורף לסיכום שלו.</p><button type="button" class="primary full" id="externalInsuranceSave">עדכון פענוח דוח בלקאר</button><button type="button" class="secondary full" id="externalInsuranceRemove">הסרת הדוח החיצוני</button></details>';
     document.getElementById('balcarSharedReportPanel')?.insertAdjacentElement('afterend',panel);
     document.getElementById('externalInsuranceChoose').onclick=()=>document.getElementById('externalInsuranceFile').click();
     document.getElementById('externalInsuranceFile').onchange=function(){void read(this);};
