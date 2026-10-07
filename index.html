@@ -976,7 +976,7 @@ document.getElementById('balcarChoiceDialog')?.addEventListener('click',event=>{
     </div>
     <div id="privacyText" class="legalPage" style="display:none">
       <h2>מדיניות פרטיות</h2>
-      <p>מספר הרכב שנבדק נשלח למאגרי המידע הציבוריים הדרושים להצגת הנתונים. לצורך זיהוי הטקסט, תמונות או עמודי PDF מסיכום הבוחן ומהבדיקה הממוחשבת עשויים להישלח אל Google Cloud Vision דרך שירות מאובטח של BuyTest. לאחר הפענוח מתבצעת בדיקת אימות מקומית בדפדפן באמצעות Tesseract; אם Vision אינו זמין, המנוע המקומי עשוי לשמש כגיבוי. בגרסה זו BuyTest אינו שומר את קובצי הדוח בשרת שלו, והם אינם מצורפים ל־PDF המופק.</p>
+      <p>מספר הרכב שנבדק נשלח למאגרי המידע הציבוריים הדרושים להצגת הנתונים. בעת פענוח, כל עמוד של מסמך שהתקבל — סיכום הבוחן, בדיקה ממוחשבת או דוח עבר ביטוחי — נשלח אל Google Cloud Vision דרך שירות מאובטח של BuyTest. לאחר הפענוח עשויה להתבצע בדיקת אימות מקומית בדפדפן באמצעות Tesseract. אם Google Vision אינו זמין או אינו מצליח לקרוא את כל העמודים, לא נשמר פענוח חלקי. BuyTest אינו שומר את קובצי הדוח בשרת שלו, והם אינם מצורפים ל־PDF המופק.</p>
       <p>שם מזמין/ת הבדיקה והטקסט שזוהה בקובץ משמשים רק לביצוע התהליך ולהפקת הסיכום. אין לצלם מספר זהות, חתימה, כתובת, טלפון, לוגו או מידע אישי שאינו נחוץ. השימוש בשירותי הזיהוי כפוף גם לתנאי השירות ולמדיניות הפרטיות של ספק השירות.</p>
       <p>לצורך מדידת פעילות האתר נשמרים מזהים אקראיים של דפדפן וביקור. מספר הרכב עשוי להישמר כדי למדוד בדיקות ולשייך אליהן נתונים. לצורך בניית היסטוריית קילומטראז׳ נשמרים מספר הרכב, הקילומטראז׳ האחרון שמתקבל ממשרד התחבורה, וקילומטראז׳ שנקרא מסיכום בדיקה שהמשתמש העלה, בצירוף תאריך ומקור הנתון. קובץ הדוח והטקסט המלא שלו אינם נשמרים במאגר היסטוריית הקילומטראז׳. כתובת IP אינה נשמרת במאגר זה. תגובה שנשלחת בטופס נשמרת במערכת BuyTest יחד עם הדירוג ועם שם, מייל או מספר רכב רק אם המשתמש בחר למסור אותם; המידע מוצג לבעל האתר באזור המנהל לצורך מענה ושיפור השירות. לצורך מדידת פרסום ושיפור קמפיינים נעשה שימוש גם ב־Meta Pixel וב־Google Ads/Google Tag, שעשויים להעביר ל־Meta ול־Google מידע טכני על ביקור ופעולות באתר בהתאם למדיניות שלהם. נתוני התשלום מעובדים בדף המאובטח של Cardcom ובהתאם למדיניות שלו. BuyTest אינו מקבל ואינו שומר את מספר הכרטיס. בעל השליטה במידע הוא עמוס רוקח, מפעיל BuyTest. לפנייה בנושא פרטיות, עיון או תיקון מידע אפשר לכתוב ל־buytest2026@gmail.com.</p>
     </div>
@@ -1154,12 +1154,12 @@ function googleVisionImageContent(source){
 async function googleVisionRecognize(sources,state,featureType='DOCUMENT_TEXT_DETECTION'){
   if(!googleVisionReady()) throw new Error('GOOGLE_VISION_PROXY_MISSING');
   const usable=(sources||[]).filter(Boolean);
-  if(!usable.length) return '';
+  if(!usable.length) throw new Error('GOOGLE_VISION_PAGES_MISSING');
   const texts=[];
   let failedParts=0;
   for(let offset=0;offset<usable.length;offset+=1){
-    const batch=usable.slice(offset,offset+1);
-    if(state) state.textContent=`קורא את הדוח באמצעות Google Vision... חלק ${offset+1}–${offset+batch.length} מתוך ${usable.length}`;
+    const source=usable[offset];
+    if(state) state.textContent=`קורא עמוד ${offset+1} מתוך ${usable.length} באמצעות Google Vision...`;
     try{
       const response=await fetch(GOOGLE_VISION_PROXY_ENDPOINT,{
         method:'POST',
@@ -1168,26 +1168,26 @@ async function googleVisionRecognize(sources,state,featureType='DOCUMENT_TEXT_DE
           'apikey':BUYTEST_SUPABASE_ANON_KEY,
           'Authorization':'Bearer '+BUYTEST_SUPABASE_ANON_KEY
         },
-        body:JSON.stringify({requests:batch.map(source=>({
+        body:JSON.stringify({requests:[{
           image:{content:googleVisionImageContent(source)},
           features:[{type:featureType,maxResults:1}],
           imageContext:{languageHints:['he','en']}
-        }))})
+        }]})
       });
       const payload=await response.json().catch(()=>({}));
       if(!response.ok||payload?.error) throw new Error('GOOGLE_VISION_PROXY_FAILED_'+response.status);
-      (payload.responses||[]).forEach(item=>{
-        if(item?.error){failedParts++;return;}
-        const value=item?.fullTextAnnotation?.text||item?.textAnnotations?.[0]?.description||'';
-        if(value) texts.push(cleanOcrText(value));
-      });
+      const item=payload?.responses?.[0];
+      if(item?.error){failedParts++;continue;}
+      const value=item?.fullTextAnnotation?.text||item?.textAnnotations?.[0]?.description||'';
+      if(!String(value).trim()){failedParts++;continue;}
+      texts.push(`עמוד ${offset+1}\n${cleanOcrText(value)}`);
     }catch(error){
       failedParts++;
-      console.warn('Google Vision skipped one document part:',error);
+      console.warn('Google Vision failed to read a document page:',error);
     }
   }
-  if(!texts.length) throw new Error('GOOGLE_VISION_ALL_PARTS_FAILED_'+failedParts);
-  return cleanOcrText(texts.join('\n'));
+  if(failedParts) throw new Error('GOOGLE_VISION_INCOMPLETE_'+failedParts);
+  return cleanOcrText(texts.join('\n\n'));
 }
 // One vehicle dossier across both entry routes; no payment credentials are stored here.
 const btDossiers=new Map();
@@ -3129,6 +3129,12 @@ async function imageForDocumentOcr(file){
   });
 }
 
+async function imageForGoogleVision(file){
+  const image=await loadImageFile(file);
+  const fullPage={x:0,y:0,width:image.naturalWidth,height:image.naturalHeight};
+  return [renderDocumentOcrTile(image,fullPage,'color')];
+}
+
 function pdfPageText(textContent){
   const rows=[];
   (textContent?.items||[]).forEach(item=>{
@@ -3142,7 +3148,7 @@ function pdfPageText(textContent){
   return rows.sort((a,b)=>b.y-a.y).map(row=>row.items.sort((a,b)=>b.x-a.x).map(item=>item.value).join(' ')).join('\n');
 }
 
-async function pdfForDocumentOcr(file,qualityFunction,maxPages=3,rejectExtra=false){
+async function pdfForDocumentOcr(file,qualityFunction,maxPages=3,rejectExtra=false,alwaysRender=true){
   if(!window.pdfjsLib) throw new Error('PDF_UNAVAILABLE');
   pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
   const bytes=new Uint8Array(await file.arrayBuffer());
@@ -3155,7 +3161,7 @@ async function pdfForDocumentOcr(file,qualityFunction,maxPages=3,rejectExtra=fal
     extracted.push(pdfPageText(await page.getTextContent()));
   }
   const directText=cleanOcrText(extracted.join('\n'));
-  if((directText.match(/[א-ת]{2,}/g)||[]).length>=20&&qualityFunction(directText).ok) return {text:directText,sources:[]};
+  if(!alwaysRender&&(directText.match(/[א-ת]{2,}/g)||[]).length>=20&&qualityFunction(directText).ok) return {text:directText,sources:[]};
   const sources=[];
   for(let pageNumber=1;pageNumber<=pageLimit;pageNumber++){
     const page=await pdf.getPage(pageNumber);
@@ -3169,7 +3175,7 @@ async function pdfForDocumentOcr(file,qualityFunction,maxPages=3,rejectExtra=fal
     await page.render({canvasContext:ctx,viewport}).promise;
     sources.push(canvas.toDataURL('image/jpeg',0.92));
   }
-  return {text:'',sources};
+  return {text:directText,sources};
 }
 
 function reportReadQuality(text){
@@ -3368,13 +3374,22 @@ async function handleInspectionFile(input,kind){
     const preparedParts=[];
     for(const [fileIndex,currentFile] of selectedFiles.entries()){
       if(!isSummary&&selectedFiles.length>1) state.textContent=`מכין לקריאה קובץ ${fileIndex+1} מתוך ${selectedFiles.length}...`;
-      preparedParts.push(currentFile.type==='application/pdf'
-        ? await pdfForDocumentOcr(currentFile,qualityFunction)
-        : {text:'',sources:await imageForDocumentOcr(currentFile)});
+      if(currentFile.type==='application/pdf'){
+        const part=await pdfForDocumentOcr(currentFile,qualityFunction,12,true,true);
+        part.visionSources=part.sources;
+        preparedParts.push(part);
+      }else{
+        preparedParts.push({
+          text:'',
+          sources:await imageForDocumentOcr(currentFile),
+          visionSources:await imageForGoogleVision(currentFile)
+        });
+      }
     }
     const prepared={
-      text:preparedParts.map((part,index)=>part.text?`עמוד ${index+1}\n${part.text}`:'').filter(Boolean).join('\n\n'),
-      sources:preparedParts.flatMap(part=>part.sources||[])
+      text:preparedParts.map((part,index)=>part.text?`קובץ ${index+1} — טקסט PDF מקורי\n${part.text}`:'').filter(Boolean).join('\n\n'),
+      sources:preparedParts.flatMap(part=>part.sources||[]),
+      visionSources:preparedParts.flatMap(part=>part.visionSources||[])
     };
     let recognized=diagnosticTableText(prepared.text);
     let selectedEngine=recognized?'pdf-text':'';
@@ -3382,22 +3397,20 @@ async function handleInspectionFile(input,kind){
     let verification={completed:false,added:0,agreements:0};
     let quality=recognized?qualityFunction(recognized):{ok:false,score:0,findings:0,categories:0,unknown:0};
     let visionUsable=false,visionText='';
-    if(!quality.ok&&prepared.sources?.length&&googleVisionReady()){
-      visionAttempted=true;
-      try{
-        visionText=diagnosticTableText(await googleVisionRecognize(prepared.sources,state));
-        const visionQuality=qualityFunction(visionText);
-        const visionHebrewWords=(visionText.match(/[א-ת]{2,}/g)||[]).length;
-        const visionValues=(visionText.match(/\d+(?:[.,]\d+)?/g)||[]).length;
-        visionUsable=visionQuality.ok||(isSummary?visionHebrewWords>=12:computerOcrTextUsable(visionText));
-        if(visionUsable){recognized=visionText;quality={...visionQuality,ok:true};selectedEngine='google-vision';}
-      }catch(error){
-        console.warn('Google Vision document OCR fallback:',error);
-      }
-    }
+    if(!prepared.visionSources?.length) throw new Error('GOOGLE_VISION_PAGES_MISSING');
+    if(!googleVisionReady()) throw new Error('GOOGLE_VISION_PROXY_MISSING');
+    visionAttempted=true;
+    visionText=diagnosticTableText(await googleVisionRecognize(prepared.visionSources,state));
+    const visionQuality=qualityFunction(visionText);
+    const visionHebrewWords=(visionText.match(/[א-ת]{2,}/g)||[]).length;
+    visionUsable=visionQuality.ok||(isSummary?visionHebrewWords>=12:computerOcrTextUsable(visionText));
+    if(!visionUsable) throw new Error('VISION_LOW_QUALITY');
+    recognized=visionText;
+    quality={...visionQuality,ok:true};
+    selectedEngine='google-vision';
     // For scanned reports, Tesseract always audits Google Vision. Its full text
     // never replaces Vision blindly: only missing defect-like lines can be added.
-    const shouldRunTesseract=prepared.sources?.length&&(!quality.ok||visionUsable);
+    const shouldRunTesseract=prepared.sources?.length&&visionUsable;
     if(shouldRunTesseract){
       if(!window.Tesseract){
         if(!visionUsable&&!quality.ok) throw new Error('OCR_UNAVAILABLE');
@@ -3445,7 +3458,10 @@ async function handleInspectionFile(input,kind){
     console.warn('BuyTest document OCR unavailable:',error);
     textArea.value='';
     inspectionOcrMeta[kind]=null;
-    if(error?.message==='OCR_LOW_QUALITY') state.textContent='המערכת חתכה, הגדילה וסרקה את הדוח בכמה מעברים, אך לא זיהתה ממצא בוודאות מספקת. אפשר לנסות PDF מקורי או תמונה חדה יותר.';
+    if(error?.message==='GOOGLE_VISION_PROXY_MISSING') state.textContent='חיבור Google Vision אינו מוגדר. לא נשמר פענוח חלקי; נסה שוב מאוחר יותר.';
+    else if(error?.message?.startsWith('GOOGLE_VISION')||error?.message==='VISION_LOW_QUALITY') state.textContent='Google Vision לא הצליח לקרוא את כל עמודי הדוח באיכות מספקת. לא נשמר פענוח חלקי; נסה PDF מקורי או צילום חד וישר יותר.';
+    else if(error?.message==='PDF_TOO_LONG') state.textContent='ה־PDF ארוך מ־12 עמודים. יש לפצל אותו לקבצים כדי ש‑Google Vision יקרא כל עמוד.';
+    else if(error?.message==='OCR_LOW_QUALITY'||error?.message==='TEXT_NOT_FOUND') state.textContent='המערכת חתכה, הגדילה וסרקה את הדוח בכמה מעברים, אך לא זיהתה ממצא בוודאות מספקת. אפשר לנסות PDF מקורי או תמונה חדה יותר.';
     else if(error?.message==='TEXT_NOT_FOUND') state.textContent='לא זוהה טקסט ברור. יש להעלות PDF מקורי או צילום ישר וקרוב של טבלת הסיכום בלבד.';
     else if(error?.message==='PDF_UNAVAILABLE') state.textContent='קורא ה־PDF לא נטען. ודא שיש חיבור לאינטרנט ונסה שוב.';
     else state.textContent='לא הצלחנו להפעיל את זיהוי הדוח. ודא שיש חיבור לאינטרנט ונסה שוב.';
@@ -6278,7 +6294,7 @@ document.addEventListener('keydown',event=>{
 </div>
 
 <script src="package-149.js?v=8"></script>
-<script src="manager-session.js?v=1"></script><script src="opening-20260928.js?v=3"></script><script src="vehicle-checklist.js?v=4"></script><link rel="stylesheet" href="vehicle-checklist.css?v=2"><script src="bundle-39.js?v=10"></script><script src="insurance-interpretation.js?v=3"></script><script src="external-insurance.js?v=16"></script><link rel="stylesheet" href="bundle-39.css?v=7">
+<script src="manager-session.js?v=1"></script><script src="opening-20260928.js?v=3"></script><script src="vehicle-checklist.js?v=4"></script><link rel="stylesheet" href="vehicle-checklist.css?v=2"><script src="bundle-39.js?v=10"></script><script src="insurance-interpretation.js?v=3"></script><script src="external-insurance.js?v=17"></script><link rel="stylesheet" href="bundle-39.css?v=7">
 <!-- payment-dynamic-plan-v7 -->
 <section id="consultationPage" hidden><button class="secondary" type="button" onclick="closeConsultationPage()">→ חזרה למסך הפתיחה</button><h2 class="routeHeading">התייעצות עם הבוחן</h2><p>עמוס רוקח · 15 שנות ניסיון בבדיקות קנייה</p><div class="card" id="consultationPurchaseIntro"><h3>נשארו לכם שאלות על הרכב?</h3><p>ייעוץ אישי בוואטסאפ על הדוח, הממצאים והבירורים שכדאי להשלים לפני הקנייה. אפשר להתחיל גם בלי דוח.</p><strong class="btConsultPrice">99 ₪</strong><p>ההתייעצות פתוחה ל־48 שעות ממועד אישור התשלום, בשעות המענה המפורטות בתנאים.</p><button class="primary full" type="button" onclick="startPayment('prebuy')">להתייעצות אישית — 99 ₪</button></div></section><dialog id="buytestTour"><button class="secondary" type="button" onclick="closeBuyTestTour()">✕ סגירה</button><iframe title="איך BuyTest עובד" id="buytestTourFrame"></iframe></dialog><script src="four-services.js?v=5"></script><link rel="stylesheet" href="four-services.css?v=4"><style>html.manager-link body.manager-entry[data-service="home"] #appShell{display:block!important}</style>
 </body></html>
