@@ -74,5 +74,7 @@
     document.querySelectorAll('.returnBtn').forEach(button=>{button.textContent='חזרה לדף הראשי';button.onclick=home;});
     const insuranceText=document.querySelector('#insuranceStartSection .info');insuranceText.textContent=insuranceText.textContent.replace('החבילה','שירות העבר הביטוחי');
     render();
+    const focusId=new URLSearchParams(location.search).get('focus');
+    if(focusId==='externalInsurancePanel')setTimeout(()=>document.getElementById(focusId)?.scrollIntoView({behavior:'smooth',block:'center'}),250);
   });
 })();
