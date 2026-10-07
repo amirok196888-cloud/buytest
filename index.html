@@ -1402,15 +1402,20 @@ function btFinalExceptionalFindings(dossier=btDossier()){
   const add=(title,source,text)=>{const value=String(text||'').trim();if(value)items.push({title,source,text:value});};
   const external=dossier.sources?.insuranceExternal;
   const inspection=dossier.sources?.inspection;
-  if(!inspection){
-    if(external?.rawText&&window.BuyTestInsurance){
-      const parsed=BuyTestInsurance.interpret(external.rawText);
-      for(const alert of parsed.alerts||[])add('ממצא חריג בעבר הביטוחי','דוח עבר ביטוחי שהועלה',alert);
-    }else for(const alert of external?.alerts||[])add('ממצא חריג בעבר הביטוחי','דוח עבר ביטוחי שהועלה',alert);
+  const crossAlerts=btInsuranceCrossSourceAlerts(dossier);
+  if(external?.rawText&&window.BuyTestInsurance){
+    const parsed=BuyTestInsurance.interpret(external.rawText);
+    for(const alert of parsed.alerts||[]){
+      const coveredByComparison=crossAlerts.length&&/(?:אובדן|אבדן|ירידת ערך|(?:30|40|50|60)[,. ]?000)/.test(alert);
+      if(!coveredByComparison)add('ממצא חריג בעבר הביטוחי','דוח עבר ביטוחי שהועלה',alert);
+    }
+  }else for(const alert of external?.alerts||[]){
+    const coveredByComparison=crossAlerts.length&&/(?:אובדן|אבדן|ירידת ערך|(?:30|40|50|60)[,. ]?000)/.test(alert);
+    if(!coveredByComparison)add('ממצא חריג בעבר הביטוחי','דוח עבר ביטוחי שהועלה',alert);
   }
   for(const alert of dossier.sources?.checklist?.alerts||[])add('נקודה לבירור מהצ׳קליסט','צ׳קליסט הקונה',alert);
   for(const alert of dossier.sources?.identity?.alerts||[])add('אי־התאמה בשיוך מסמך','בדיקת פרטי הרכב',alert);
-  for(const alert of btInsuranceCrossSourceAlerts(dossier)){
+  for(const alert of crossAlerts){
     const first=String(alert).split(/(?<=\.)\s/)[0];
     const comparison=alert.includes('בדוח המכון מופיע ממצא')
       ?'בדוח המכון נרשם ממצא מרכב במשמעות נמוכה או שולית.'
