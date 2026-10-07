@@ -6600,7 +6600,7 @@ window.loadBalcarSharedReportStandalone=async function(){
   const input=document.getElementById('balcarSharedReportLink'),button=document.getElementById('balcarSharedReportLoad'),status=document.getElementById('balcarSharedReportStatus'),result=document.getElementById('balcarSharedReportResult');
   const setStatus=text=>{if(status)status.textContent=text};
   let reportId='';
-  try{const url=new URL(String(input?.value||'').trim());if(url.protocol==='https:'&&url.hostname==='balcar.co.il'){const match=url.pathname.match(/^\\/CarReport\\/([0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})\\/?$/i);if(match)reportId=match[1]}}catch(_){}
+  try{const url=new URL(String(input?.value||'').trim());if(url.protocol==='https:'&&url.hostname==='balcar.co.il'){const match=url.pathname.match(/^\/CarReport\/([0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})\/?$/i);if(match)reportId=match[1]}}catch(_){}
   if(!reportId){setStatus('הדבק קישור שיתוף מלא לדוח בלקאר בפורמט https://balcar.co.il/CarReport/…');return}
   button.disabled=true;result.style.display='none';setStatus('מנסה לקרוא את דוח בלקאר…');
   try{
@@ -6608,7 +6608,7 @@ window.loadBalcarSharedReportStandalone=async function(){
     if(!data||typeof data!=='object'||Array.isArray(data))throw new Error('invalid_report');
     const vehicle=data.vehicle||{},history=balcarMileageResult(balcarMileageHistory(data)),interpretation=insuranceProfessionalInterpretation(data);
     const identity=[vehicle.manufacturer,vehicle.model,vehicle.year].filter(Boolean).join(' · ')||'פרטי הרכב לא התקבלו';
-    result.textContent=['פענוח דוח בלקאר','פרטי רכב: '+identity,'היסטוריית קילומטראז׳: '+history.text,interpretation.title,interpretation.text,'יש לאמת פרטים מול דוח המקור. פענוח זה אינו מחליף בדיקה מקצועית במכון.'].join('\\n');
+    result.textContent=['פענוח דוח בלקאר','פרטי רכב: '+identity,'היסטוריית קילומטראז׳: '+history.text,interpretation.title,interpretation.text,'יש לאמת פרטים מול דוח המקור. פענוח זה אינו מחליף בדיקה מקצועית במכון.'].join('\n');
     result.style.display='block';setStatus('✓ הדוח נטען והפענוח מוצג כאן.');
   }catch(error){
     console.error('BuyTest Balcar shared-link import failed:',error);
