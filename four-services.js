@@ -1,6 +1,6 @@
 /* Four independent entry pages. Only home navigation; one dossier per vehicle. */
 (() => {
-  const services={balcar:{title:'פענוח דוח בלקאר'},insurance:{title:'פענוח עבר ביטוחי — חינם'},checklist:{title:'צ׳קליסט לפני קנייה — חינם'},report:{title:'פענוח דוח מכון — חינם'},consultation:{title:'ייעוץ אישי עם עמוס — 99 ₪'}};
+  const services={balcar:{title:'פענוח דוח עבר ביטוחי'},insurance:{title:'פענוח עבר ביטוחי — חינם'},checklist:{title:'צ׳קליסט לפני קנייה — חינם'},report:{title:'פענוח דוח מכון — חינם'},consultation:{title:'ייעוץ אישי עם עמוס — 99 ₪'}};
   let current='';
   const readRoute=()=>new URLSearchParams(location.search).get('service')|| (location.hash==='#report'?'report':'');
   function updateSummary(){
@@ -19,7 +19,7 @@
     document.body.dataset.bundleStep=current||'lookup';
     if(current==='report'){openAfterPage(false);document.getElementById('afterPagePlate').value=plate();}
     if(current==='consultation'){document.body.classList.add('consultation-page');document.getElementById('consultationPage').hidden=false;document.getElementById('advicePlate').value=plate();document.getElementById('prebuyVehiclePlate').value=plate();const source=btDossier().sources.consultation;document.getElementById('prebuyQuestion').value=source?.question||'';document.getElementById('prebuyAdLink').value=source?.adLink||'';document.getElementById('adviceNotes').value=source?.note||'';}
-    if(current==='insurance')showInsuranceStart();
+    if(current==='insurance'||current==='balcar'){showInsuranceStart();showBalcarUpload();}
     if(current==='checklist'&&/^\d{7,8}$/.test(plate())){BuyTestChecklist.open();document.body.dataset.bundleStep='checklist';}
     const head=document.getElementById('independentServiceHeader');
     head.querySelector('h1').textContent=services[current]?.title||'';
