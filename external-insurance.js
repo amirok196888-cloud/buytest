@@ -81,6 +81,16 @@
     }
     host.append(box);
   }
+  function reset(){
+    version++;files=[];pendingFiles=[];
+    const file=document.getElementById('externalInsuranceFile');if(file)file.value='';
+    const text=document.getElementById('externalInsuranceText');if(text)text.value='';
+    const correction=document.getElementById('externalInsuranceCorrection');if(correction){correction.hidden=true;correction.open=false;}
+    const button=document.getElementById('externalInsuranceInterpret');if(button)button.disabled=true;
+    const result=document.getElementById('externalInsuranceResult');if(result){result.replaceChildren();result.hidden=true;}
+    status('');
+  }
+  window.BuyTestExternalInsurance={reset};
   function restore(){
     version++;files=[];pendingFiles=[];
     const interpretButton=document.getElementById('externalInsuranceInterpret');if(interpretButton)interpretButton.disabled=true;
