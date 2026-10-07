@@ -40,8 +40,8 @@
     const saved = activePackage();
     const manager = document.body.classList.contains('manager-mode');
     if (originalInsuranceButton) originalInsuranceButton.textContent = saved
-      ? 'הפקת דוח העבר הביטוחי הכלול בחבילה'
-      : manager ? 'תצוגת דוח עבר ביטוחי — ללא חיוב' : 'הפקת עבר ביטוחי — 39 ₪';
+      ? 'העלאת קובץ דוח העבר הביטוחי הכלול בחבילה'
+      : manager ? 'תצוגת העלאת קובץ — ללא חיוב' : 'העלאת קובץ דוח עבר ביטוחי';
     let consult = false;
     if (saved?.accessToken) {
       try {
@@ -77,8 +77,8 @@
       applyPlanAccess(PACKAGE, {scroll: false, progress: {preInspectionCompleted: true, reportCompleted: false}});
       showInsuranceStart();
       const insuranceStatus = document.getElementById('balcarOrderStatus');
-      if (insuranceStatus) insuranceStatus.textContent = 'מצב מנהל — לא הוזמן דוח מספק חיצוני ולא בוצע חיוב.';
-      showBuyTestAccessNotice('מצב מנהל — חבילת 149 ₪ פתוחה לתצוגה ללא חיוב. הפקת דוח עבר ביטוחי מספק חיצוני אינה מבוצעת בתצוגה זו.');
+      if (insuranceStatus) insuranceStatus.textContent = 'מצב מנהל — ניתן להעלות קובץ דוח לפענוח ללא חיוב.';
+      showBuyTestAccessNotice('מצב מנהל — חבילת 149 ₪ פתוחה לתצוגה ללא חיוב. אפשר להעלות קובץ דוח ולפענח אותו במכשיר.');
       section.scrollIntoView({behavior: 'smooth', block: 'start'});
       return;
     }
@@ -124,90 +124,13 @@
     return result;
   };
 
-  async function loadPackageInsurance(saved, seller = {}) {
-    const status = document.getElementById('balcarOrderStatus');
-    if (status) status.textContent = 'מפיק את דוח העבר הביטוחי הכלול בחבילה...';
-    try {
-      let data = await callBuyTestBalcarService({
-        action: 'createPaid', plate: saved.plate, orderId: saved.orderId,
-        clientSecret: saved.clientSecret, ...seller
-      });
-      for (let attempt = 0; attempt < 24 && data?.status !== 'ready'; attempt++) {
-        if (['failed', 'cancelled'].includes(String(data?.status))) throw new Error('report_failed');
-        await new Promise(resolve => setTimeout(resolve, 5000));
-        data = await callBuyTestBalcarService({
-          action: 'statusPaid', plate: saved.plate, orderId: saved.orderId,
-          clientSecret: saved.clientSecret
-        });
-      }
-      if (data?.status === 'ready') {
-        window.buytestBalcarReport = data;
-        renderPaidBalcarReport(data);
-        document.getElementById('balcarReportSection')?.scrollIntoView({behavior: 'smooth', block: 'start'});
-      } else if (status) {
-        status.textContent = 'הדוח עדיין בהכנה. אפשר ללחוץ שוב על הפקת הדוח כדי לבדוק את מצבו.';
-      }
-    } catch (error) {
-      if (status) status.textContent = 'לא הצלחנו להשלים כרגע את הדוח. החבילה כבר שולמה; אין לשלם שוב. נסה להפיק את הדוח מחדש.';
-    }
-  }
-  const oldInsurancePayment = startBalcarPayment;
-  startBalcarPayment = async function (...args) {
-    if (document.body.classList.contains('manager-mode') && activeBuyTestPlan() === PACKAGE) {
-      const status = document.getElementById('balcarOrderStatus');
-      if (status) status.textContent = 'מצב מנהל — לא בוצעה הזמנה מספק הדוח ולא נגבה תשלום.';
-      showBuyTestAccessNotice('דוח עבר ביטוחי אמיתי מחייב רכב והזמנה מהספק. תצוגת חבילת 149 ₪ פתוחה ללא חיוב.');
-      return;
-    }
-    const saved = activePackage();
-    if (!saved) return oldInsurancePayment(...args);
-    const message = document.getElementById('balcarEligibilityMsg');
-    const button = originalInsuranceButton;
-    if (button) button.disabled = true;
-    try {
-      const eligibility = await callBuyTestBalcarService({action: 'eligibility', plate: saved.plate, serviceId: BUYTEST_BALCAR_SERVICE_ID});
-      let seller = {};
-      if (eligibility?.requiresSellerDetails) {
-        const fields = document.getElementById('insuranceSellerFields');
-        const ownershipDate = document.getElementById('insuranceOwnershipDate')?.value || '';
-        const ownerIsraeliId = (document.getElementById('insuranceOwnerId')?.value || '').replace(/\D/g, '');
-        if (fields?.style.display !== 'block' || !/^\d{4}-\d{2}-\d{2}$/.test(ownershipDate) || !/^\d{9}$/.test(ownerIsraeliId)) {
-          if (fields) fields.style.display = 'block';
-          if (message) message.textContent = 'כדי להפיק את הדוח מלאו את תאריך תחילת הבעלות ואת מספר תעודת הזהות, ואז לחצו שוב.';
-          return;
-        }
-        seller = {ownershipDate, ownerIsraeliId};
-      }
-      await loadPackageInsurance(saved, seller);
-    } catch (error) {
-      if (message) message.textContent = 'לא ניתן לבדוק כרגע את זמינות הדוח. לא בוצע חיוב נוסף.';
-    } finally {
-      if (button) button.disabled = false;
-    }
-  };
-  const originalPaidReport = loadPaidBalcarReport;
-  loadPaidBalcarReport = async function (...args) {
-    const saved = activePackage();
-    if (!saved) return originalPaidReport(...args);
-    let details = {};
-    try { details = JSON.parse(localStorage.getItem(BUYTEST_INSURANCE_DETAILS_KEY) || '{}'); } catch (_) {}
-    if (String(details.plate || '') !== String(saved.plate)) details = {};
-    await loadPackageInsurance(saved, details);
-    return !!window.buytestBalcarReport;
-  };
-  const originalResume = resumePaidVehicleFlow;
-  resumePaidVehicleFlow = async function (...args) {
-    const result = await originalResume(...args);
-    if (result && activePackage() && !window.buytestBalcarReport) await loadPaidBalcarReport();
-    return result;
-  };
   const oldPreview = previewPlanAsManager;
   previewPlanAsManager = function (plan = 'all') {
     const result = oldPreview(plan);
     if (plan === PACKAGE && document.body.classList.contains('manager-mode')) {
       showInsuranceStart();
       const insuranceStatus = document.getElementById('balcarOrderStatus');
-      if (insuranceStatus) insuranceStatus.textContent = 'מצב מנהל — לא הוזמן דוח מספק חיצוני ולא בוצע חיוב.';
+      if (insuranceStatus) insuranceStatus.textContent = 'מצב מנהל — ניתן להעלות קובץ דוח לפענוח ללא חיוב.';
     }
     return result;
   };
