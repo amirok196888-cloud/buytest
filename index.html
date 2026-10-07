@@ -419,8 +419,8 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
     <article>
       <span class="balcarChoiceNumber">2</span>
       <h3>יש לך דוח בלקאר?</h3>
-      <p>העלה כאן PDF או צילום ברור של הדוח לקבלת פענוח. אין צורך להזין מספר רכב.</p>
-      <a href="?service=insurance&focus=externalInsurancePanel">העלאת דוח בלקאר ופענוחו</a>
+      <p>העלה קובץ PDF או תמונה, או הדבק קישור שיתוף לדוח בלקאר. אין צורך להזין פרטי רכב.</p>
+      <a href="?service=balcar">העלאה או הדבקת קישור לפענוח</a>
     </article>
   </div>
 </dialog>
@@ -532,13 +532,25 @@ document.getElementById('balcarChoiceDialog')?.addEventListener('click',event=>{
   <div class="balcarOffer insuranceOffer">
     <h3>שלב 2: עבר ביטוחי</h3>
     <p>הפק דוח עבר ביטוחי וקבל פענוח של הנתונים. גם דוח ללא תביעות אינו מבטיח שהרכב לא נפגע ואינו מחליף בדיקה במכון.</p>
-    <p class="info">הפקת העבר הביטוחי מחייבת תעודת זהות של הבעלים ותאריך תחילת הבעלות האחרונה, כפי שמופיעים ברישיון. בלי פרטים מלאים ותואמים לא ניתן להפיק את הדוח. יש לוודא את ההתאמה לרישיון; ניתן לתקן ולהשלים פרטים לאחר פתיחת שירות העבר הביטוחי.</p><div class="uploadPanel btExternalInsurance" id="balcarSharedReportPanel" style="margin:14px 0;padding:16px;border:1px solid #b8ddd0;border-radius:14px;background:#f4fbf7"><h3>כבר יש לך קישור לדוח בלקאר?</h3><p class="sub">הדבק כאן את קישור השיתוף המלא, ונמשוך את נתוני הדוח לסיכום הרכב.</p><label for="balcarSharedReportLink">קישור שיתוף מבלקר</label><input id="balcarSharedReportLink" type="url" inputmode="url" dir="ltr" autocomplete="url" placeholder="https://balcar.co.il/CarReport/…"><button type="button" class="primary full" id="balcarSharedReportLoad" style="margin-top:10px" onclick="loadBalcarSharedReport()">טעינת הדוח ופענוח</button><p id="balcarSharedReportStatus" role="status" aria-live="polite"></p></div><div id="insuranceSellerFields" style="display:block;margin:12px 0;padding:12px;border:1px solid #edcd7a;border-radius:12px;background:#fffaf0">
+    <p class="info">הפקת העבר הביטוחי מחייבת תעודת זהות של הבעלים ותאריך תחילת הבעלות האחרונה, כפי שמופיעים ברישיון. בלי פרטים מלאים ותואמים לא ניתן להפיק את הדוח. יש לוודא את ההתאמה לרישיון; ניתן לתקן ולהשלים פרטים לאחר פתיחת שירות העבר הביטוחי.</p><div id="insuranceSellerFields" style="display:block;margin:12px 0;padding:12px;border:1px solid #edcd7a;border-radius:12px;background:#fffaf0">
       <b>חובה להעתיק את הפרטים במדויק מרישיון הרכב</b>
       <div class="field" style="margin-top:10px"><label for="insuranceOwnershipDate">תאריך תחילת הבעלות</label><input id="insuranceOwnershipDate" type="date"></div>
       <div class="field" style="margin-top:10px"><label for="insuranceOwnerId">תעודת זהות של בעל הרכב</label><input id="insuranceOwnerId" inputmode="numeric" maxlength="9" autocomplete="off" placeholder="9 ספרות, כולל אפסים בתחילת המספר" oninput="this.value=this.value.replace(/\D/g,'').slice(0,9)"></div>
     </div>
     <button class="primary full" id="balcarPlanButton" type="button" data-analytics-click="click_insurance_history" onclick="startBalcarPayment()">הפקת דוח העבר הביטוחי הכלול בחבילה</button>
     <div class="devMsg" id="balcarEligibilityMsg" role="status" aria-live="polite"></div>
+  </div>
+</section>
+<section class="card" id="balcarUploadPage" style="display:none">
+  <h2>פענוח דוח בלקאר</h2>
+  <p class="sub">הדבק קישור שיתוף או העלה PDF או תמונה ברורה של דוח בלקאר. אין צורך במספר רכב או בפרטים נוספים.</p>
+  <div class="uploadPanel btExternalInsurance" id="balcarSharedReportPanel" style="margin:14px 0;padding:16px;border:1px solid #b8ddd0;border-radius:14px;background:#f4fbf7">
+    <h3>הדבקת קישור לדוח בלקאר</h3>
+    <label for="balcarSharedReportLink">קישור השיתוף המלא</label>
+    <input id="balcarSharedReportLink" type="url" inputmode="url" dir="ltr" autocomplete="url" placeholder="https://balcar.co.il/CarReport/…">
+    <button type="button" class="primary full" id="balcarSharedReportLoad" style="margin-top:10px" onclick="loadBalcarSharedReportStandalone()">פענוח הקישור</button>
+    <p id="balcarSharedReportStatus" role="status" aria-live="polite"></p>
+    <div id="balcarSharedReportResult" class="info" style="display:none;white-space:pre-line"></div>
   </div>
 </section>
 <section class="card freeAfterLookup" id="afterInsuranceChoices" style="display:none">
@@ -6583,7 +6595,27 @@ document.addEventListener('keydown',event=>{
 </div>
 
 <script src="package-149.js?v=7"></script>
-<script src="manager-session.js?v=1"></script><script src="opening-20260928.js?v=3"></script><script src="vehicle-checklist.js?v=4"></script><link rel="stylesheet" href="vehicle-checklist.css?v=2"><script src="bundle-39.js?v=10"></script><script src="insurance-interpretation.js?v=1"></script><script src="external-insurance.js?v=10"></script><script>window.loadBalcarSharedReport=async function(){const p=String(plate()||'').replace(/\D/g,'');const input=document.getElementById('balcarSharedReportLink'),button=document.getElementById('balcarSharedReportLoad'),status=document.getElementById('balcarSharedReportStatus');const setStatus=text=>{if(status)status.textContent=text};if(!/^\d{7,8}$/.test(p)){setStatus('יש להזין ולאשר תחילה מספר רכב בן 7 או 8 ספרות.');return}let reportId='';try{const url=new URL(String(input?.value||'').trim());if(url.protocol==='https:'&&url.hostname==='balcar.co.il'){const match=url.pathname.match(/^\/CarReport\/([0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})\/?$/i);if(match)reportId=match[1]}}catch(_){}if(!reportId){setStatus('הדבק קישור שיתוף מלא לדוח בלקאר, בפורמט https://balcar.co.il/CarReport/…');return}button.disabled=true;setStatus('מתחבר לדוח בלקאר ומושך את הנתונים…');try{const data=await callBuyTestBalcarService({action:'status',reportId});if(!data||typeof data!=='object'||Array.isArray(data))throw new Error('invalid_report');const reportPlate=String(data?.vehicle?.plate||data?.plate||'').replace(/\D/g,'');if(reportPlate&&reportPlate!==p)throw new Error('plate_mismatch');if(!data.webReportUrl)data.webReportUrl=input.value.trim();window.buytestBalcarReport=data;renderPaidBalcarReport(data,p);setStatus('✓ דוח בלקאר נטען ופוענח. הסיכום נשמר לרכב '+p+'.')}catch(error){console.error('BuyTest Balcar shared-link import failed:',error);setStatus(error?.status===401?'הקישור נקלט, אבל שרת בלקאר דחה גישה לדוח (401). אפשר להמשיך עם העלאת PDF או צילום ברור של הדוח.':error?.message==='plate_mismatch'?'מספר הרכב בדוח אינו תואם לרכב שנבחר. לא שמרתי את הדוח.':error?.message==='invalid_report'?'הקישור לא החזיר נתוני דוח קריאים. בדוק שהקישור המלא הועתק ונסה שוב.':'לא הצלחתי לטעון את הדוח מהקישור. ייתכן שהקישור אינו תקף או שהדוח אינו זמין.')}finally{button.disabled=false}};</script><link rel="stylesheet" href="bundle-39.css?v=7">
+<script src="manager-session.js?v=1"></script><script src="opening-20260928.js?v=3"></script><script src="vehicle-checklist.js?v=4"></script><link rel="stylesheet" href="vehicle-checklist.css?v=2"><script src="bundle-39.js?v=10"></script><script src="insurance-interpretation.js?v=1"></script><script src="external-insurance.js?v=11"></script><script>
+window.loadBalcarSharedReportStandalone=async function(){
+  const input=document.getElementById('balcarSharedReportLink'),button=document.getElementById('balcarSharedReportLoad'),status=document.getElementById('balcarSharedReportStatus'),result=document.getElementById('balcarSharedReportResult');
+  const setStatus=text=>{if(status)status.textContent=text};
+  let reportId='';
+  try{const url=new URL(String(input?.value||'').trim());if(url.protocol==='https:'&&url.hostname==='balcar.co.il'){const match=url.pathname.match(/^\\/CarReport\\/([0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})\\/?$/i);if(match)reportId=match[1]}}catch(_){}
+  if(!reportId){setStatus('הדבק קישור שיתוף מלא לדוח בלקאר בפורמט https://balcar.co.il/CarReport/…');return}
+  button.disabled=true;result.style.display='none';setStatus('מנסה לקרוא את דוח בלקאר…');
+  try{
+    const data=await callBuyTestBalcarService({action:'status',reportId});
+    if(!data||typeof data!=='object'||Array.isArray(data))throw new Error('invalid_report');
+    const vehicle=data.vehicle||{},history=balcarMileageResult(balcarMileageHistory(data)),interpretation=insuranceProfessionalInterpretation(data);
+    const identity=[vehicle.manufacturer,vehicle.model,vehicle.year].filter(Boolean).join(' · ')||'פרטי הרכב לא התקבלו';
+    result.textContent=['פענוח דוח בלקאר','פרטי רכב: '+identity,'היסטוריית קילומטראז׳: '+history.text,interpretation.title,interpretation.text,'יש לאמת פרטים מול דוח המקור. פענוח זה אינו מחליף בדיקה מקצועית במכון.'].join('\\n');
+    result.style.display='block';setStatus('✓ הדוח נטען והפענוח מוצג כאן.');
+  }catch(error){
+    console.error('BuyTest Balcar shared-link import failed:',error);
+    setStatus(error?.status===401?'הקישור נקלט, אבל שרת בלקאר דחה גישה לדוח (401). אפשר לנסות להעלות PDF או תמונה של הדוח.':error?.message==='invalid_report'?'הקישור לא החזיר נתוני דוח קריאים. בדוק שהועתק הקישור המלא.':'לא הצלחתי לטעון את הדוח מהקישור. אפשר לנסות להעלות PDF או תמונה של הדוח.');
+  }finally{button.disabled=false}
+};
+</script><script>window.loadBalcarSharedReport=async function(){const p=String(plate()||'').replace(/\D/g,'');const input=document.getElementById('balcarSharedReportLink'),button=document.getElementById('balcarSharedReportLoad'),status=document.getElementById('balcarSharedReportStatus');const setStatus=text=>{if(status)status.textContent=text};if(!/^\d{7,8}$/.test(p)){setStatus('יש להזין ולאשר תחילה מספר רכב בן 7 או 8 ספרות.');return}let reportId='';try{const url=new URL(String(input?.value||'').trim());if(url.protocol==='https:'&&url.hostname==='balcar.co.il'){const match=url.pathname.match(/^\/CarReport\/([0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})\/?$/i);if(match)reportId=match[1]}}catch(_){}if(!reportId){setStatus('הדבק קישור שיתוף מלא לדוח בלקאר, בפורמט https://balcar.co.il/CarReport/…');return}button.disabled=true;setStatus('מתחבר לדוח בלקאר ומושך את הנתונים…');try{const data=await callBuyTestBalcarService({action:'status',reportId});if(!data||typeof data!=='object'||Array.isArray(data))throw new Error('invalid_report');const reportPlate=String(data?.vehicle?.plate||data?.plate||'').replace(/\D/g,'');if(reportPlate&&reportPlate!==p)throw new Error('plate_mismatch');if(!data.webReportUrl)data.webReportUrl=input.value.trim();window.buytestBalcarReport=data;renderPaidBalcarReport(data,p);setStatus('✓ דוח בלקאר נטען ופוענח. הסיכום נשמר לרכב '+p+'.')}catch(error){console.error('BuyTest Balcar shared-link import failed:',error);setStatus(error?.status===401?'הקישור נקלט, אבל שרת בלקאר דחה גישה לדוח (401). אפשר להמשיך עם העלאת PDF או צילום ברור של הדוח.':error?.message==='plate_mismatch'?'מספר הרכב בדוח אינו תואם לרכב שנבחר. לא שמרתי את הדוח.':error?.message==='invalid_report'?'הקישור לא החזיר נתוני דוח קריאים. בדוק שהקישור המלא הועתק ונסה שוב.':'לא הצלחתי לטעון את הדוח מהקישור. ייתכן שהקישור אינו תקף או שהדוח אינו זמין.')}finally{button.disabled=false}};</script><link rel="stylesheet" href="bundle-39.css?v=7">
 <!-- payment-dynamic-plan-v7 -->
-<section id="consultationPage" hidden><button class="secondary" type="button" onclick="closeConsultationPage()">→ חזרה למסך הפתיחה</button><h2 class="routeHeading">התייעצות עם הבוחן</h2><p>עמוס רוקח · 15 שנות ניסיון בבדיקות קנייה</p><div class="card" id="consultationPurchaseIntro"><h3>נשארו לכם שאלות על הרכב?</h3><p>ייעוץ אישי בוואטסאפ על הדוח, הממצאים והבירורים שכדאי להשלים לפני הקנייה. אפשר להתחיל גם בלי דוח.</p><strong class="btConsultPrice">99 ₪</strong><p>ההתייעצות פתוחה ל־48 שעות ממועד אישור התשלום, בשעות המענה המפורטות בתנאים.</p><button class="primary full" type="button" onclick="startPayment('prebuy')">להתייעצות אישית — 99 ₪</button></div></section><dialog id="buytestTour"><button class="secondary" type="button" onclick="closeBuyTestTour()">✕ סגירה</button><iframe title="איך BuyTest עובד" id="buytestTourFrame"></iframe></dialog><script src="four-services.js?v=2"></script><link rel="stylesheet" href="four-services.css?v=3"><style>html.manager-link body.manager-entry[data-service="home"] #appShell{display:block!important}</style>
+<section id="consultationPage" hidden><button class="secondary" type="button" onclick="closeConsultationPage()">→ חזרה למסך הפתיחה</button><h2 class="routeHeading">התייעצות עם הבוחן</h2><p>עמוס רוקח · 15 שנות ניסיון בבדיקות קנייה</p><div class="card" id="consultationPurchaseIntro"><h3>נשארו לכם שאלות על הרכב?</h3><p>ייעוץ אישי בוואטסאפ על הדוח, הממצאים והבירורים שכדאי להשלים לפני הקנייה. אפשר להתחיל גם בלי דוח.</p><strong class="btConsultPrice">99 ₪</strong><p>ההתייעצות פתוחה ל־48 שעות ממועד אישור התשלום, בשעות המענה המפורטות בתנאים.</p><button class="primary full" type="button" onclick="startPayment('prebuy')">להתייעצות אישית — 99 ₪</button></div></section><dialog id="buytestTour"><button class="secondary" type="button" onclick="closeBuyTestTour()">✕ סגירה</button><iframe title="איך BuyTest עובד" id="buytestTourFrame"></iframe></dialog><script src="four-services.js?v=3"></script><link rel="stylesheet" href="four-services.css?v=4"><style>html.manager-link body.manager-entry[data-service="home"] #appShell{display:block!important}</style>
 </body></html>
