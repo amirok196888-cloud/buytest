@@ -4,54 +4,108 @@
   const damage=/(?:תאונ[הת]|נזק|תביע[הת]|ירידת\s*ערך|אובדן|אבדן|שלדה|שמא[יו]|פגיע[הת]|הצפה|שריפ[הת])/;
   const coverage=/פרטי\s*(?:הכיסוי|הביטוח)|סכום\s*ביטוח|תוספת\s*ביטוח|תקופת\s*(?:הכיסוי|הביטוח)|פרטי\s*הפוליסה/;
   const format=n=>Number(n).toLocaleString('he-IL');
+  function reverseHebrewTokens(line){
+    return String(line).split(/(\s+)/).reverse().map(token=>{
+      if(!/\p{Script=Hebrew}/u.test(token))return token;
+      const dates=[];
+      const protectedToken=token.replace(/\d{1,4}(?:[\/.\-:]\d{1,4})+/g,match=>{
+        const marker=String.fromCharCode(0xe000+dates.length);dates.push([marker,match]);return marker;
+      });
+      let reversed=Array.from(protectedToken).reverse().join('');
+      for(const [marker,date] of dates)reversed=reversed.replace(marker,date);
+      return reversed;
+    }).join('');
+  }
+  function semanticScore(line){
+    const patterns=[/מספר\s*(?:הרכב|רכב|רישוי)/,/תביע[הות]?/u,/תאונ[הות]?/u,/נזק[ים]?/u,/ירידת\s*ערך/u,/אובדן|אבדן/u,/גניב[הות]?/u,/שמא[יו]/u,/סכום/u,/תוקנ|הוחלפ|פיצוי/u,/שלדה/u];
+    return patterns.reduce((n,re)=>n+(re.test(line)?1:0),0);
+  }
+  function normalizedLine(line){
+    const clean=String(line||'').replace(/[\u200e\u200f\u202a-\u202e]/g,'').trim();
+    const reversed=reverseHebrewTokens(clean);
+    return semanticScore(reversed)>semanticScore(clean)?reversed:clean;
+  }
   function interpret(raw){
-    const lines=String(raw||'').replace(/[\u200e\u200f]/g,'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
-    const events=[],alerts=[];let inClaims=false,inCoverage=false,sectionSeen=false,explicitClean=false;
-    const evidence=[];
+    const lines=String(raw||'').split(/\r?\n/).map(normalizedLine).filter(Boolean);
+    const text=lines.join('\n');
+    const events=[],alerts=[],categories={claims:[],damage:[],depreciation:[],totalLoss:[],theft:[]};
+    const uniquePush=(arr,value)=>{value=String(value||'').trim();if(value&&!arr.includes(value))arr.push(value);};
+    const plateMatch=text.match(/(?:מספר\s*(?:הרכב|רכב|רישוי)|מס[׳'״"]?\s*רכב|רישוי)\s*[:：\-]?\s*(?:מספר\s*)?([0-9][0-9\- ]{5,10})/u);
+    const plate=plateMatch?plateMatch[1].replace(/\D/g,''):null;
+    const coverage=/פרטי\s*(?:הכיסוי|הביטוח)|סכום\s*ביטוח|תוספת\s*ביטוח|תקופת\s*(?:הכיסוי|הביטוח)|פרטי\s*הפוליסה/u;
+    const claimsHeader=/(?:פירוט|פרטי|היסטוריית|ריכוז|סיכום|טבלת?)\s*[-—:׳'’]*\s*(?:תביעות|נזקים|תאונות)|(?:תביעות|נזקים|תאונות)\s*(?:ביטוחיות|שדווחו)?/u;
+    const cleanPatterns=/(?:לא\s+(?:נמצאו?|נרשמו?|הוגשו)\s+(?:כל\s+)?תביעות|אין\s+(?:כל\s+)?תביעות|ללא\s+תביעות|לא\s+(?:נמצא|נרשם)\s+(?:אירועי\s+)?נזק)/u;
+    const damageTerms=/(?:תאונ[הות]?|נזק(?:ים)?|תביע[הות]?|פגיע[הות]?|תוקנ|הוחלפ|הצפ[ה]|שריפ[ה]|שלדה)/u;
+    const amountRE=/(?:סכום\s*(?:התביעה|תביעה|הפיצוי|פיצוי|ששולם|נזק)|תביעה\s*בסך|תשלום|פיצוי)\s*[:：—-]?\s*(?:₪|ש[״"]?ח|שקל)?\s*([\d,]+(?:\.\d{1,2})?)/u;
+    const depRE=/ירידת\s*ערך\s*[:：—-]?\s*(\d+(?:\.\d+)?)\s*%?/u;
+    const dateRE=/\b\d{1,2}[/.\-]\d{1,2}[/.\-]\d{2,4}\b/u;
+    let inCoverage=false,inClaims=false,sectionSeen=false,explicitClean=false;
+    const records=[];
     for(let i=0;i<lines.length;i++){
       const line=lines[i];
-      if(coverage.test(line)){inClaims=false;inCoverage=true;continue;}
-      const header=/(?:טבלה\s*[בב׳'’]|פירוט|פרטי|היסטוריית|ריכוז|סיכום)\s*[-—:׳'’]*\s*(?:תביעות|נזקים|תאונות)|טבלה\s*ב.*(?:תביע|נזק)/.test(line);
-      if(header){inClaims=true;inCoverage=false;sectionSeen=true;}
-      if(inCoverage&&!header)continue;
-      if(/(?:לא\s+(?:נמצא[וה]?|נרשמ[וה]?|הוגשו)|אין|ללא)\s+(?:כל\s+)?תביעות|לא\s+(?:נמצא[וה]?|נרשמ[וה]?)\s+(?:אירועי\s+)?נזק/.test(line)){explicitClean=true;continue;}
-      if(!damage.test(line)||header)continue;
-      // Header labels and coverage history alone are not evidence of an accident.
-      if(/^(?:סוג\s*(?:נזק|תביעה)|תאריך\s*(?:נזק|תביעה)|סכום\s*(?:תביעה|פיצוי)|ירידת\s*ערך|אובדן\s*(?:גמור|להלכה))\s*[:?]?\s*$/.test(line))continue;
-      const positiveLoss=!/(?:לא|אין|ללא)\s+(?:הוגדר\s+)?(?:אובדן|אבדן)/.test(line)&&/(?:הוגדר|נקבע|סוג\s*(?:הנזק|נזק|התביעה|תביעה)\s*[:—-]|סטטוס\s*[:—-]|כן\s*[:—-]?)\s*(?:כ|ה)?(?:אובדן|אבדן)\s*(?:גמור|להלכה)|(?:אובדן|אבדן)\s*(?:גמור|להלכה)\s*[:—-]?\s*כן/.test(line);
-      const amountMatch=line.match(/(?:סכום\s*(?:התביעה|תביעה|הפיצוי|פיצוי|ששולם|נזק)|תביעה\s*בסך|תשלום|פיצוי)\s*[:—-]?\s*([\d,]+(?:\.\d{1,2})?)\s*(?:₪|ש[״"]?ח|שקל)?/);
-      const reduction=line.match(/ירידת\s*ערך\s*[:—-]?\s*(\d+(?:\.\d+)?)\s*%/);
-      const date=line.match(/\b\d{1,2}[/.\-]\d{1,2}[/.\-]\d{2,4}\b/);
-      const narrative=!/^(?:לא|אין|ללא)\s+(?:נמצא[וה]?\s+|נרשמ[וה]?\s+)?(?:נזק|תאונ)/.test(line)&&/(?:נזק\s+(?:ל|ב)|תאונה\s+(?:ב|מ|עם)|תוקנ|הוחלפ|פגיעה\s+(?:ב|ל)|ניזוק|תביעה\s+(?:בגין|על|בסך)|הצפה\s*(?:[:—-]|ברכב)|שריפה\s*(?:[:—-]|ברכב))/.test(line);
-      if(!positiveLoss&&!(amountMatch&&Number(amountMatch[1].replace(/,/g,''))>0)&&!(reduction&&Number(reduction[1])>0)&&!narrative)continue;
-      const amount=amountMatch?Number(amountMatch[1].replace(/,/g,'')):null;
-      const depreciation=reduction?Number(reduction[1]):null;
-      const thirdParty=/צד\s*ג[׳'’]?/.test(line);
-      const context=line.length>450?line.slice(0,450)+'…':line;
-      if(!evidence.includes(context)){evidence.push(context);events.push({source:context,date:date?.[0]||'',amount,depreciation,totalLoss:positiveLoss,thirdParty});}
-      if(positiveLoss)alerts.push('בדוח הביטוחי החיצוני מופיע רישום מפורש של אובדן גמור או אובדן להלכה. יש לדרוש דוח שמאי ותיעוד שיקום.');
-      if(depreciation>0)alerts.push('בדוח הביטוחי החיצוני נרשמה ירידת ערך של '+depreciation+'%. יש לברר את הפגיעה ואת משמעותה המסחרית.');
+      if(coverage.test(line)){inCoverage=true;inClaims=false;continue;}
+      if(claimsHeader.test(line)){inClaims=true;inCoverage=false;sectionSeen=true;}
+      if(cleanPatterns.test(line)){explicitClean=true;continue;}
+      if(inCoverage)continue;
+      const totalLoss=/(?:אובדן|אבדן)\s*(?:גמור|להלכה)/u.test(line)&&!/(?:לא|אין|ללא)\s+(?:הוגדר\s+)?(?:אובדן|אבדן)/u.test(line);
+      const theft=/(?:גניב[הות]?|ניסיון\s+גניבה|פריצה)/u.test(line)&&!/(?:(?:לא|אין|ללא)\s+(?:(?:נמצאה?|דווחה?|הייתה?)\s+)?(?:אירוע\s+)?(?:גניב[הות]?|פריצה))/u.test(line);
+      const dep=line.match(depRE);
+      const amount=line.match(amountRE);
+      const date=line.match(dateRE);
+      const hasDamage=damageTerms.test(line);
+      const descriptive=/(?:נזק\s+(?:ל|ב)|תאונה\s+(?:ב|מ|עם)|תוקנ|הוחלפ|פגיעה\s+(?:ב|ל)|ניזוק|תביעה\s+(?:בגין|על|בסך)|הצפה|שריפה)/u.test(line);
+      const informative=totalLoss||theft||(dep&&Number(dep[1])>0)||(amount&&Number(amount[1].replace(/,/g,''))>0)||descriptive||(date&&hasDamage);
+      if(!informative)continue;
+      const source=line.length>350?line.slice(0,350)+'…':line;
+      const current=records[records.length-1];
+      if(current&&i-current.lastIndex<=2&&current.inClaims===inClaims){
+        uniquePush(current.lines,source);current.lastIndex=i;
+      }else records.push({lines:[source],lastIndex:i,inClaims});
+      if(totalLoss)uniquePush(categories.totalLoss,source);
+      if(theft)uniquePush(categories.theft,source);
+      if(dep&&Number(dep[1])>0)uniquePush(categories.depreciation,Number(dep[1])+'% — '+source);
+      if(hasDamage||descriptive||amount)uniquePush(categories.damage,source);
+      if(/תביע[הות]?/u.test(line)||amount||date)uniquePush(categories.claims,source);
     }
-    const output=['פענוח עבר ביטוחי — מקור: דוח שהלקוח העלה'];
+    for(const record of records){
+      const source=record.lines.join(' | ');
+      const amount=source.match(amountRE);
+      const depreciation=source.match(depRE);
+      const date=source.match(dateRE);
+      const thirdParty=/צד\s*ג[׳'’]?/u.test(source);
+      events.push({source,date:date?.[0]||'',amount:amount?Number(amount[1].replace(/,/g,'')):null,depreciation:depreciation?Number(depreciation[1]):null,totalLoss:/(?:אובדן|אבדן)\s*(?:גמור|להלכה)/u.test(source),theft:/(?:גניב[הות]?|פריצה)/u.test(source),thirdParty});
+    }
+    const output=['פענוח עבר ביטוחי — ממצאים שנקראו מהקובץ'];
+    output.push('מספר רכב בדוח: '+(plate&&/^\d{7,8}$/.test(plate)?plate:'לא זוהה בטקסט שנקרא'));
     if(events.length){
-      output.push('ממצאי תאונות ונזקים שנקראו מהדוח:');
-      for(const e of events){
-        output.push('• לפי הדוח: '+e.source);
-        if(e.thirdParty)output.push('משמעות: הרשומה מתייחסת לצד ג׳; אין להסיק ממנה לבדה מה היקף הנזק לרכב הנבדק.');
-        else if(e.totalLoss)output.push('משמעות: סיווג אובדן הוא רישום מהותי. יש לברר אילו מערכות נפגעו, לקבל דוח שמאי ותיעוד תיקון ולבדוק את איכות השיקום במכון.');
-        else if(e.depreciation>0)output.push('משמעות: ירידת ערך של '+e.depreciation+'% מצביעה על השפעה מסחרית שנקבעה בדוח; יש לברר את סיבתה ואת אזורי התיקון. אין להסיק ממנה לבדה שהשלדה נפגעה.');
-        else if(e.amount>0)output.push('משמעות: דווח תשלום של '+format(e.amount)+' ₪. הסכום לבדו אינו קובע אם הפגיעה קוסמטית או מבנית. יש לקבל פירוט חלקים, דוח שמאי ותמונות לפני התיקון.');
-        else output.push('משמעות: תואר אירוע נזק או תיקון. יש להשוות את האזור המתואר לממצאי מכון הבדיקה ולתיעוד השמאי; חומרת הפגיעה אינה נקבעת מהתיאור בלבד.');
+      output.push('אלה הממצאים שנמצאו בדוח, לפי הפרטים שנקראו:');
+      for(const event of events){
+        const labels=[];
+        if(/תביע[הות]?/u.test(event.source)||event.amount)labels.push('תביעה');
+        if(damageTerms.test(event.source))labels.push('נזק או תיקון');
+        if(event.depreciation>0)labels.push('ירידת ערך '+event.depreciation+'%');
+        if(event.totalLoss)labels.push('אובדן להלכה/גמור');
+        if(event.theft)labels.push('גניבה/פריצה');
+        if(event.thirdParty)labels.push('צד ג׳');
+        output.push('• '+(labels.length?labels.join(' · '):'ממצא ביטוחי')+' — '+event.source);
       }
-      output.push('בהשוואה לדוח המכון: יש לבדוק התאמה באזורי הפגיעה, בחלקים שהוחלפו ובממצאי המרכב והשלדה. היעדר אזכור במכון אינו מבטל אירוע שמופיע בדוח הביטוחי.');
+      if(categories.totalLoss.length)alerts.push('הדוח מציין אובדן להלכה או אובדן גמור. יש לקבל דוח שמאי, מסמכי שיקום ולבדוק את הרכב במכון.');
+      if(categories.depreciation.length)alerts.push('הדוח מציין ירידת ערך. יש לברר את סיבת הירידה ולעיין בדוח השמאי ובממצאי הבדיקה.');
+      if(categories.theft.length)alerts.push('הדוח מציין גניבה או פריצה. יש לברר את האירוע, התיקונים והמסמכים התומכים.');
+      if(categories.totalLoss.length)output.push('רישום אובדן להלכה או אובדן גמור הוא ממצא מהותי. יש לבדוק את סיווג הרכב, לקבל דוח שמאי ומסמכי תיקון ושיקום.');
+      if(categories.theft.length)output.push('ברישום גניבה או פריצה יש לברר אם הרכב הוחזר, מה תוקן והאם קיימים מסמכים ותיעוד.');
+      if(events.some(e=>e.thirdParty))output.push('ברישום צד ג׳ יש להפריד בין הנזק ששולם לצד ג׳ לבין הנזק לרכב הנבדק; הסכום לבדו אינו מלמד מה תוקן ברכב הזה.');
+      if(events.some(e=>e.amount>0))output.push('סכום תביעה לבדו אינו מלמד אילו חלקים נפגעו או מה חומרת הנזק. יש לבקש דוח שמאי, פירוט תיקונים ותמונות.');
+      if(events.some(e=>e.depreciation>0))output.push('ירידת ערך היא נתון מסחרי מהדוח; אין להסיק ממנה לבדה אם נפגעו שלדה או מערכות בטיחות.');
     }else if(explicitClean){
-      output.push('בדוח נכתב במפורש שלא נמצאו תביעות או נזקים מדווחים. אין בכך הוכחה שלא הייתה תאונה או תיקון פרטי שלא דווח לביטוח.');
+      output.push('בדוח נכתב שלא נמצאו תביעות או נזקים מדווחים במסגרת הביטוח.');
     }else{
-      output.push(sectionSeen?'זוהה סעיף תביעות, אך לא נקראו ממנו פרטי אירועים באופן שמאפשר פענוח מהימן.':'לא זוהו פרטי תאונות או נזקים שניתן לפענח. טבלת כיסויים או ביטוח מקיף אינה דוח תביעות.');
-      output.push('יש להעלות צילום ברור של טבלת התביעות והנזקים, כולל כותרות העמודות, או PDF מקורי. אין להסיק שהעבר הביטוחי נקי מהמידע שנקרא.');
+      output.push(sectionSeen?'זוהה סעיף תביעות, אך לא נמצאו בו שורות שאפשר לייחס בבטחה לאירוע מסוים.':'לא נמצאו בטקסט שנקרא פרטי תביעה או נזק שאפשר לסכם בבטחה.');
+      output.push('היעדר רישום בדוח הביטוחי אינו מוכיח שלא היו תאונה או נזק. תיקון פרטי, תיקון ששולם מכיסו של הבעלים או תיקון במוסך לא מורשה עלולים שלא להופיע בדוח.');
     }
-    output.push('הפענוח מבוסס על הטקסט שנקרא מהדוח; הוא אינו מחליף דוח שמאי או בדיקה מקצועית במכון.');
-    return {text:output.join('\n'),events,alerts:[...new Set(alerts)],status:events.length?'findings':explicitClean?'explicit-clean':'incomplete'};
+    output.push('תיקון פרטי, תיקון ששולם מכיסו של הבעלים או תיקון במוסך לא מורשה עלולים שלא להופיע בדוח הביטוחי; היעדר רישום אינו שולל תאונה או נזק.');
+    output.push('בכל מקרה מומלץ לבצע בדיקה מקצועית במכון. הדוח מתעד מידע ביטוחי מדווח ואינו מחליף בדיקה פיזית, דוח שמאי או בירור מסמכים.');
+    return {text:output.join('\n'),events,plate:plate&&/^\d{7,8}$/.test(plate)?plate:null,categories,alerts:[...new Set(alerts)],status:events.length?'findings':explicitClean?'explicit-clean':'incomplete'};
   }
   root.BuyTestInsurance={interpret};
 })(typeof window==='undefined'?globalThis:window);
