@@ -43,7 +43,7 @@
   function restore(){
     version++;files=[];
     document.getElementById('externalInsuranceCorrection').hidden=true;
-    const source=btDossier().sources.insuranceExternal;
+    const source=allowed()?btDossier().sources.insuranceExternal:null;
     document.getElementById('externalInsuranceFile').value='';
     document.getElementById('externalInsuranceText').value=source?.rawText||'';
 
@@ -54,7 +54,6 @@
     status(source?'הפענוח שמור בסיכום לרכב הזה.':'');
   }
   async function read(input){
-    if(!allowed()){status('יש להזין מספר רכב בן 7 או 8 ספרות לפני העלאת הדוח.');input.value='';return;}
     const selected=Array.from(input.files||[]);if(!selected.length)return;
     const p=plate(),run=++version;
     files=[];
@@ -89,16 +88,15 @@
     }finally{if(worker)await worker.terminate();}
   }
   function save(){
-    if(!allowed()){status('יש להזין מספר רכב בן 7 או 8 ספרות לפני הפענוח.');return;}
     const p=plate(),text=document.getElementById('externalInsuranceText').value.trim();
-    if(!/^\d{7,8}$/.test(p)){status('יש להזין מספר רכב.');return;}
+    if(p&&!/^\d{7,8}$/.test(p)){status('מספר הרכב שהוזן אינו מלא. אפשר למחוק אותו ולהמשיך בלי שיוך לרכב, או להזין 7 או 8 ספרות.');return;}
     if(!quality(text).ok){status('יש להעלות דוח קריא או להדביק את תוכנו לפני השמירה.');return;}
     if(text.length>80000){status('הטקסט ארוך מדי. יש לצרף את פרטי הרכב ואת פרטי התביעות והנזקים עד 80,000 תווים.');return;}
     const labelled=Array.from(text.matchAll(/(?:מספר\s*(?:רכב|רישוי)|מס[׳'״"]?\s*רכב|license\s*plate)\s*[:\-]?\s*([\d\- ]{7,12})/gi)).map(m=>m[1].replace(/\D/g,'')).filter(x=>/^\d{7,8}$/.test(x));
-    if(labelled.some(x=>x!==p)){status('נמצא בטקסט מספר רכב אחר. בדוק את דוח המקור ואת זיהוי הטקסט לפני השמירה.');return;}
+    if(p&&labelled.some(x=>x!==p)){status('נמצא בטקסט מספר רכב אחר. בדוק את דוח המקור ואת זיהוי הטקסט לפני השמירה.');return;}
     const interpretation=BuyTestInsurance.interpret(text);
-    btSaveSource('insuranceExternal',{title:'פענוח עבר ביטוחי — דוח שהלקוח העלה',rawText:text,files:[...files],text:interpretation.text,alerts:interpretation.alerts,mileage:[],interpretationVersion:2});
-    status(interpretation.status==='incomplete'?'הדוח נקרא, אך חסרים פרטי תביעות קריאים. העלה את טבלת התביעות והנזקים.':'✓ דוח העבר הביטוחי פוענח ושולב בסיכום לרכב '+p+'.');
+    if(p)btSaveSource('insuranceExternal',{title:'פענוח עבר ביטוחי — דוח שהלקוח העלה',rawText:text,files:[...files],text:interpretation.text,alerts:interpretation.alerts,mileage:[],interpretationVersion:2});
+    status(interpretation.status==='incomplete'?'הדוח נקרא, אך חסרים פרטי תביעות קריאים. העלה את טבלת התביעות והנזקים.':p?'✓ דוח העבר הביטוחי פוענח ושולב בסיכום לרכב '+p+'.':'✓ דוח העבר הביטוחי פוענח. התוצאה מוצגת כאן; מספר רכב אינו חובה.');
     document.getElementById('externalInsuranceResult').textContent=interpretation.text;
     document.getElementById('externalInsuranceResult').hidden=false;
   }
@@ -110,7 +108,7 @@
   }
   window.addEventListener('DOMContentLoaded',()=>{
     const panel=document.createElement('section');panel.id='externalInsurancePanel';panel.className='uploadPanel btExternalInsurance';
-    panel.innerHTML='<h3>אפשר גם להעלות את קובץ הדוח</h3><button type="button" class="primary full" id="externalInsuranceChoose" style="margin-top:12px">העלאת דוח עבר ביטוחי</button><p class="sub">צרף PDF או צילום ברור של טבלת התביעות והנזקים, כולל כותרות העמודות.</p><input type="file" id="externalInsuranceFile" accept="image/*,application/pdf" multiple hidden><p id="externalInsuranceStatus" role="status" aria-live="polite"></p><div class="info" id="externalInsuranceResult" hidden style="white-space:pre-line"></div><details id="externalInsuranceCorrection" hidden><summary>השלמת פרטים מהדוח</summary><label for="externalInsuranceText">טקסט שנקרא מהדוח</label><textarea id="externalInsuranceText" class="reportInput" rows="8" style="color:#17352d;background:#fff"></textarea><p>הפענוח ישויך לרכב <b id="externalInsurancePlate"></b>.</p><button type="button" class="primary full" id="externalInsuranceSave">עדכון פענוח העבר הביטוחי</button><button type="button" class="secondary full" id="externalInsuranceRemove">הסרת הדוח החיצוני</button></details>';
+    panel.innerHTML='<h3>אפשר גם להעלות את קובץ הדוח</h3><button type="button" class="primary full" id="externalInsuranceChoose" style="margin-top:12px">העלאת דוח עבר ביטוחי</button><p class="sub">אפשר להעלות PDF או צילום ברור. אין צורך להזין מספר רכב כדי לקבל פענוח.</p><input type="file" id="externalInsuranceFile" accept="image/*,application/pdf" multiple hidden><p id="externalInsuranceStatus" role="status" aria-live="polite"></p><div class="info" id="externalInsuranceResult" hidden style="white-space:pre-line"></div><details id="externalInsuranceCorrection" hidden><summary>השלמת פרטים מהדוח</summary><label for="externalInsuranceText">טקסט שנקרא מהדוח</label><textarea id="externalInsuranceText" class="reportInput" rows="8" style="color:#17352d;background:#fff"></textarea><p>מספר רכב אינו חובה. אם אושר מספר רכב, הפענוח יצורף לסיכום שלו.</p><button type="button" class="primary full" id="externalInsuranceSave">עדכון פענוח העבר הביטוחי</button><button type="button" class="secondary full" id="externalInsuranceRemove">הסרת הדוח החיצוני</button></details>';
     document.getElementById('balcarSharedReportPanel')?.insertAdjacentElement('afterend',panel);
     document.getElementById('externalInsuranceChoose').onclick=()=>document.getElementById('externalInsuranceFile').click();
     document.getElementById('externalInsuranceFile').onchange=function(){void read(this);};
