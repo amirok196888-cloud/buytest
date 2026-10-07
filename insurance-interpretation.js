@@ -72,7 +72,7 @@
     const text=lines.join('\n');
     const plate=extractPlate(lines);
     const queryDate=extractQueryDate(lines);
-    const claimsHeaderRE=/(?:טבלה\s*ב|פירוט\s*(?:פרטי\s*)?תביעות|פרטי\s*התביעות|טבלת?\s*תביעות|תביעות\s*(?:ביטוחיות|שדווחו)?)/u;
+    const claimsHeaderRE=/(?:טבלה\s*ב|פירוט\s*(?:פרטי\s*)?תביע(?:ה|ות)|פרטי\s*התביע(?:ה|ות)|טבלת?\s*תביע(?:ה|ות)|תביעות\s*(?:ביטוחיות|שדווחו)?)/u;
     const coverageRE=/(?:טבלה\s*א|פרטי\s*(?:הכיסוי|הביטוח)|תקופת\s*(?:הכיסוי|הביטוח)|סכום\s*ביטוח)/u;
     let tableStart=-1;
     for(let i=0;i<lines.length;i++){
@@ -89,15 +89,33 @@
         if(/תאריך\s*(?:ה)?שאילתה/u.test(line))continue;
         const claimNumbers=unique([...line.matchAll(claimNumberRE)].map(m=>m[0]));
         const longIds=unique([...line.matchAll(longIdRE)].map(m=>m[0]));
-        const date=firstMatch(line,dateRE);
-        const party=parseParty(line),damage=parseDamage(line);
+        const neighborTexts=[];
+        const anchorHasDate=Boolean(firstMatch(line,dateRE));
+        for(const direction of [-1,1]){
+          for(let step=1;step<=5;step++){
+            const neighborIndex=i+direction*step;
+            if(neighborIndex<0||neighborIndex>=lines.length)break;
+            const neighbor=lines[neighborIndex];
+            if(/(?<!\d)\d{9,13}(?!\d)/.test(neighbor)||coverageRE.test(neighbor)||/(?:המשך\s+בדף|טבלה\s*ג|הערות\s+כלליות)/u.test(neighbor))break;
+            if(new RegExp(dateRE.source).test(neighbor)){
+              if(direction<0&&!anchorHasDate)neighborTexts.push(neighbor);
+              break;
+            }
+            neighborTexts.push(neighbor);
+          }
+        }
+        const rowText=[...neighborTexts,line].join(' ');
+        const date=firstMatch(line,dateRE)||firstMatch(rowText,dateRE);
+        const party=parseParty(rowText),damage=parseDamage(rowText);
         const partyKnown=party!=='סוג התביעה לא נקרא';
         const damageKnown=damage!=='סוג הנזק לא נקרא';
         if(!claimNumbers.length||(!partyKnown&&!damageKnown&&!date))continue;
         const claimNumber=claimNumbers[0];
         const policyNumber=longIds.find(value=>value!==claimNumber)||'';
-        const percentages=unique([...line.matchAll(/(?<!\d)\d{1,2}(?:[.,]\d+)?\s*%/g)].map(m=>m[0].replace(/\s/g,'')));
-        const amountValues=parseMoneyValues(line,claimNumber,plate);
+        const percentSource=/\d{1,2}(?:[.,]\d+)?\s*%/.test(line)?line:rowText;
+        const percentages=unique([...percentSource.matchAll(/(?<!\d)\d{1,2}(?:[.,]\d+)?\s*%/g)].map(m=>m[0].replace(/\s/g,'')));
+        const amountSource=rowText;
+        const amountValues=parseMoneyValues(amountSource,claimNumber,plate);
         const status=unique([/סגורה|סגור/u.test(line)?'סגורה':'',/פתוחה|פתוח/u.test(line)?'פתוחה':'']);
         const insurer=/פניקס|פיניקס/u.test(line)?'הפניקס':/הראל/u.test(line)?'הראל':/מנורה/u.test(line)?'מנורה':firstMatch(line,/(?:כלל|מגדל|הכשרה|איילון|שומרה)/u);
         const row={
@@ -111,7 +129,7 @@
           theft:/גניב[הות]?|פריצה/u.test(line),
           status:status.join(' / ')||'הסטטוס לא נקרא',
           insurer:insurer||'חברת הביטוח לא נקראה',
-          source:line
+          source:rowText
         };
         const key=[row.date,row.claimNumber,row.party].join('|');
         if(seen.has(key)){
@@ -149,8 +167,13 @@
       sourceRecordCount:claims.reduce((n,c)=>n+c.recordCount,0),
       claimDates:unique(claims.map(c=>c.date))
     };
+    const totalLossMentioned=/(?:אובדן|אבדן)\s*(?:גמור.{0,20}להלכה|להלכה|גמור)/u.test(text);
+    const unlinkedTotalLoss=totalLossMentioned&&!claims.some(c=>/אובדן/u.test(c.damage));
+    summary.totalLossMentioned=totalLossMentioned;
+    summary.unlinkedTotalLoss=unlinkedTotalLoss;
     const alerts=[];
     if(summary.totalLossClaims)alerts.push('בדוח מופיע רישום של אובדן גמור או אובדן להלכה. יש לעיין בדוח השמאי ובמסמכי השיקום.');
+    if(unlinkedTotalLoss)alerts.push('זוהה בטקסט הדוח אזכור של אובדן להלכה/אובדן גמור, אך לא ניתן לשייך אותו בבטחה לשורת תביעה. יש לבדוק את שורת המקור לפני הסקת מסקנה.');
     if(summary.theftClaims)alerts.push('בדוח מופיע רישום גניבה או פריצה. יש לברר את האירוע, התיקונים והמסמכים התומכים.');
     if(claims.some(c=>c.depreciationRate||c.amounts.length>1))alerts.push('בדוח מופיעים נתוני תשלום או ירידת ערך; יש לאמת את משמעות כל סכום מול כותרות הטבלה ודוח השמאי.');
     const output=['פענוח דוח עבר ביטוחי'];

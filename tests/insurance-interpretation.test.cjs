@@ -64,3 +64,30 @@ test('theft and depreciation markers are retained as findings',()=>{
  assert.equal(r.summary.theftClaims,1);
  assert.equal(r.summary.depreciationClaims,1);
 });
+
+test('split OCR rows retain constructive total loss and keep a separate same-date third-party claim',()=>{
+ const raw=[
+  'טבלה ב - פרטי התביעות',
+  '24/07/2020',
+  '2214767326',
+  'בגין נזק לרכב המבוטח',
+  'אובדן גמור (להלכה)',
+  '109101 5%',
+  '24/07/2020',
+  '2214765902',
+  'תביעת ניזוק צד ג׳',
+  'נזק חלקי',
+  '45000'
+ ].join('\\n');
+ const r=interpret(raw);
+ assert.equal(r.summary.eventCount,1);
+ assert.equal(r.summary.totalLossClaims,1);
+ assert.equal(r.claims.find(c=>c.claimNumber==='2214767326')?.damage,'אובדן להלכה');
+ assert.deepEqual(Array.from(r.events[0].claims.map(c=>c.party)).sort(),['תביעת צד ג׳','נזק לרכב המבוטח'].sort());
+});
+
+test('an unassigned loss mention is surfaced instead of being reported as no loss',()=>{
+ const r=interpret('טבלה ב פרטי התביעות\\nתביעה 2214767326\\nהערות כלליות\\nאובדן להלכה');
+ assert.equal(r.summary.unlinkedTotalLoss,true);
+ assert.match(r.alerts.join(' '),/לא ניתן לשייך אותו בבטחה/);
+});

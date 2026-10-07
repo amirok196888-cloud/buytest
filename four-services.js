@@ -2,6 +2,9 @@
 (() => {
   const services={balcar:{title:'פענוח דוח עבר ביטוחי'},insurance:{title:'פענוח עבר ביטוחי — חינם'},checklist:{title:'צ׳קליסט לפני קנייה — חינם'},report:{title:'פענוח דוח מכון — חינם'},consultation:{title:'ייעוץ אישי עם עמוס — 99 ₪'}};
   let current='';
+  let freshReportSessionPending=false;
+  function beginNewReportSession(){freshReportSessionPending=true;}
+  function consumeNewReportSession(p){if(!freshReportSessionPending)return false;freshReportSessionPending=false;if(typeof btBeginNewReportSession==='function')btBeginNewReportSession(p);return true;}
   const readRoute=()=>new URLSearchParams(location.search).get('service')|| (location.hash==='#report'?'report':'');
   function updateSummary(){
     const box=document.getElementById('serviceSummaryContent');if(!box)return;
@@ -11,6 +14,8 @@
     for(const entry of entries){const item=document.createElement(entry.heading?'h3':'p');item.textContent=entry.text;if(entry.alert)item.classList.add('btCritical');box.append(item);}
   }
   function render(route=readRoute()){
+    if(route==='report'&&current!=='report')beginNewReportSession();
+    else if(route!=='report')freshReportSessionPending=false;
     current=services[route]?route:'';
     document.body.dataset.service=current||'home';
     closeAfterPage(false);document.body.classList.remove('consultation-page');document.getElementById('consultationPage').hidden=true;
@@ -34,10 +39,10 @@
     const host=current==='report'?document.getElementById('afterPage'):current==='consultation'?document.getElementById('consultationPage'):main;
     if(current==='report'){
       if(upload)host.append(upload);
-      if(insuranceUpload){insuranceUpload.style.display='none';host.append(insuranceUpload);}
       let insuranceButton=document.getElementById('reportInsuranceUploadButton');
-      if(!insuranceButton){insuranceButton=document.createElement('button');insuranceButton.id='reportInsuranceUploadButton';insuranceButton.type='button';insuranceButton.className='primary full';insuranceButton.textContent='העלאת דוח עבר ביטוחי לסיכום';insuranceButton.onclick=()=>showBalcarUpload();}
-      host.insertBefore(insuranceButton,upload||insuranceUpload||document.getElementById('serviceSummary'));
+      if(!insuranceButton){insuranceButton=document.createElement('button');insuranceButton.id='reportInsuranceUploadButton';insuranceButton.type='button';insuranceButton.className='primary full';insuranceButton.textContent='העלאת קובץ עבר ביטוחי לפענוח';insuranceButton.onclick=()=>showBalcarUpload();}
+      host.append(insuranceButton);
+      if(insuranceUpload){insuranceUpload.style.display='none';host.append(insuranceUpload);}
     }else{
       document.getElementById('reportInsuranceUploadButton')?.remove();
       if(upload&&main&&upload.parentElement!==main)main.append(upload);
@@ -60,7 +65,7 @@
   const oldOpenWhatsApp=openPrebuyWhatsApp;
   openPrebuyWhatsApp=function(){if(!document.body.classList.contains('manager-mode')&&!BuyTestBundle.adviceReceipt())return; captureAdvice();return oldOpenWhatsApp();};
   const oldActivate=activatePurchasedPlan;activatePurchasedPlan=function(...args){const result=oldActivate(...args);if(document.getElementById('independentServiceHeader'))render(current);return result;};
-  window.BuyTestServices={render,home,updateSummary};
+  window.BuyTestServices={render,home,updateSummary,beginNewReportSession,consumeNewReportSession};
   window.addEventListener('popstate',()=>render());
   window.addEventListener('DOMContentLoaded',()=>{
     const lookup=document.getElementById('vehicleLookup');

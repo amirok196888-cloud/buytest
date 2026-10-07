@@ -1157,6 +1157,7 @@ async function googleVisionRecognize(sources,state,featureType='DOCUMENT_TEXT_DE
   if(!usable.length) throw new Error('GOOGLE_VISION_PAGES_MISSING');
   const texts=[];
   let failedParts=0;
+  const failureReasons=[];
   for(let offset=0;offset<usable.length;offset+=1){
     const source=usable[offset];
     if(state) state.textContent=`קורא עמוד ${offset+1} מתוך ${usable.length} באמצעות Google Vision...`;
@@ -1177,16 +1178,17 @@ async function googleVisionRecognize(sources,state,featureType='DOCUMENT_TEXT_DE
       const payload=await response.json().catch(()=>({}));
       if(!response.ok||payload?.error) throw new Error('GOOGLE_VISION_PROXY_FAILED_'+response.status);
       const item=payload?.responses?.[0];
-      if(item?.error){failedParts++;continue;}
+      if(item?.error){failedParts++;failureReasons.push('GOOGLE_VISION_PAGE_ERROR');continue;}
       const value=item?.fullTextAnnotation?.text||item?.textAnnotations?.[0]?.description||'';
-      if(!String(value).trim()){failedParts++;continue;}
+      if(!String(value).trim()){failedParts++;failureReasons.push('GOOGLE_VISION_EMPTY_PAGE');continue;}
       texts.push(`עמוד ${offset+1}\n${cleanOcrText(value)}`);
     }catch(error){
       failedParts++;
+      failureReasons.push(error?.message||'GOOGLE_VISION_PAGE_FAILED');
       console.warn('Google Vision failed to read a document page:',error);
     }
   }
-  if(failedParts) throw new Error('GOOGLE_VISION_INCOMPLETE_'+failedParts);
+  if(failedParts){const proxyFailure=failureReasons.find(reason=>/^GOOGLE_VISION_PROXY_FAILED_/.test(reason));throw new Error(proxyFailure||'GOOGLE_VISION_INCOMPLETE_'+failedParts);}
   return cleanOcrText(texts.join('\n\n'));
 }
 // One vehicle dossier across both entry routes; no payment credentials are stored here.
@@ -1247,6 +1249,24 @@ function btResetVehicleSession(p=plate()){
   btRefreshSummary();
   const status=document.getElementById('analysisStatus');if(status)status.textContent='הסיכום הופק. אפשר להתחיל בדיקה חדשה עם נתונים נקיים.';
  }
+ return true;
+}
+function btBeginNewReportSession(p=plate()){
+ if(!/^\d{7,8}$/.test(p))return false;
+ try{localStorage.removeItem('buytest-dossier-v1:'+p);}catch(_){}
+ btDossiers.set(p,{plate:p,sources:{}});
+ btDossierPlate='';
+ latestSummaryResult=null;latestComputerResult=null;latestComputerIdentity=null;
+ loadedKm=null;interpretedReportKm=null;externalVehicleData={kmHistory:[]};
+ preReportText='';afterReportText='';reportText='';balcarSummaryText='';
+ window.buytestBalcarReport=null;btPreparedPdfFile=null;
+ try{clearInspectionFile('summary');clearInspectionFile('computer');}catch(_){}
+ const owner=document.getElementById('inspectionOwnerName');if(owner)owner.value='';
+ for(const id of ['afterInterpretation','report','balcarSummaryGrid','examinerSummaryText','computerTestText','serviceSummaryContent']){const el=document.getElementById(id);if(el){if('value'in el)el.value='';else el.replaceChildren();}}
+ for(const id of ['summaryReviewArea','computerReviewArea']){const el=document.getElementById(id);if(el)el.style.display='none';}
+ window.BuyTestChecklist?.restore(p);
+ window.BuyTestExternalInsurance?.reset();
+ btRefreshSummary();
  return true;
 }
 function btMileage(value){if(value===null||value===undefined||value==='')return null;const n=Number(String(value).replace(/[,\s]/g,''));return Number.isFinite(n)&&n>=0?n:null;}
@@ -1477,6 +1497,7 @@ async function startAfterInspectionRoute(){
   }
   document.getElementById('plate').value=value;
   setCustomerRoute('report');
+  window.BuyTestServices?.beginNewReportSession?.();
   const results=document.getElementById('vehicleLookup');
   if(results) results.style.display='block';
   results?.scrollIntoView({behavior:'smooth',block:'start'});
@@ -1517,6 +1538,7 @@ async function startLandingPaidRoute(route){
     input?.focus({preventScroll:true});
     return;
   }
+  if(route==='report')window.BuyTestServices?.beginNewReportSession?.();
   await startFreeCheckFromLanding();
   if(document.getElementById('vehicleData')?.style.display!=='block') return;
   if(route==='report'||route==='consultation'){unlockFreeSections();showPreFlowStep(1,{scroll:false});}else showInsuranceStart();
@@ -1686,6 +1708,7 @@ async function loadVehicle(){
   if(!/^\d{7,8}$/.test(p)){alert('יש להזין מספר רכב בן 7 או 8 ספרות');return}
   if(customerEntryRoute==='free'&&!document.body.classList.contains('after-page')) void trackBuyTestFreeStage('free_lookup_submitted');
   window.BuyTestVehicleNotes?.clear();
+  window.BuyTestServices?.consumeNewReportSession?.(p);
   btActivateVehicle(p);
   const status=document.getElementById('status');
   const statusMsg=document.getElementById('statusMsg');
@@ -5778,9 +5801,11 @@ async function analyseInspectionReport(){
       vehicle_mismatch:'מספר הרכב בדוח אינו תואם לרכב שעבורו נפתחה הגישה. יש לבדוק את המספרים לפני הפענוח.',
       text_too_large:'הדוח גדול מדי לפענוח. יש להעלות רק את סיכום הבוחן ואת עמודי הבדיקה הממוחשבת.',
       missing_report_text:'לא התקבל טקסט שניתן לפענח. יש להעלות צילום ברור יותר או PDF מקורי.',
-      invalid_analysis_response:'התקבלה תשובה לא מלאה ממנוע הפענוח. הדוח לא נותח ולא הוצגו מסקנות.'
+      invalid_analysis_response:'התקבלה תשובה לא מלאה ממנוע הפענוח. הדוח לא נותח ולא הוצגו מסקנות.',
+      analysis_failed:'הקובץ נשלח, אך שירות הניתוח לא השלים את הפענוח. לא נוצר סיכום; נסה שוב בעוד כמה דקות.',
+      server_configuration_missing:'שירות הפענוח אינו זמין כרגע. לא נוצר סיכום; אפשר לנסות שוב מאוחר יותר.'
     };
-    const message=messages[error?.message]||'לא ניתן להשלים כרגע את הפענוח המאובטח. הדוח לא נותח ולא הוצגו מסקנות. יש לבדוק את החיבור ולנסות שוב.';
+    const message=messages[error?.message]||(error?.name==='TypeError'?'החיבור לשירות הפענוח נכשל. הדוח לא נותח ולא הוצגו מסקנות; בדוק את החיבור ונסה שוב.':'לא ניתן להשלים כרגע את הפענוח המאובטח. הדוח לא נותח ולא הוצגו מסקנות. יש לבדוק את החיבור ולנסות שוב.');
     if(status){status.textContent=message;status.classList.add('show','error');}
     else alert(message);
   }finally{
@@ -6349,7 +6374,7 @@ document.addEventListener('keydown',event=>{
 </div>
 
 <script src="package-149.js?v=8"></script>
-<script src="manager-session.js?v=1"></script><script src="opening-20260928.js?v=3"></script><script src="vehicle-checklist.js?v=4"></script><link rel="stylesheet" href="vehicle-checklist.css?v=2"><script src="bundle-39.js?v=13"></script><script src="insurance-interpretation.js?v=4"></script><script src="external-insurance.js?v=19"></script><link rel="stylesheet" href="bundle-39.css?v=7">
+<script src="manager-session.js?v=1"></script><script src="opening-20260928.js?v=3"></script><script src="vehicle-checklist.js?v=4"></script><link rel="stylesheet" href="vehicle-checklist.css?v=2"><script src="bundle-39.js?v=14"></script><script src="insurance-interpretation.js?v=5"></script><script src="external-insurance.js?v=20"></script><link rel="stylesheet" href="bundle-39.css?v=7">
 <!-- payment-dynamic-plan-v7 -->
-<section id="consultationPage" hidden><button class="secondary" type="button" onclick="closeConsultationPage()">→ חזרה למסך הפתיחה</button><h2 class="routeHeading">התייעצות עם הבוחן</h2><p>עמוס רוקח · 15 שנות ניסיון בבדיקות קנייה</p><div class="card" id="consultationPurchaseIntro"><h3>נשארו לכם שאלות על הרכב?</h3><p>ייעוץ אישי בוואטסאפ על הדוח, הממצאים והבירורים שכדאי להשלים לפני הקנייה. אפשר להתחיל גם בלי דוח.</p><strong class="btConsultPrice">99 ₪</strong><p>ההתייעצות פתוחה ל־48 שעות ממועד אישור התשלום, בשעות המענה המפורטות בתנאים.</p><button class="primary full" type="button" onclick="startPayment('prebuy')">להתייעצות אישית — 99 ₪</button></div></section><dialog id="buytestTour"><button class="secondary" type="button" onclick="closeBuyTestTour()">✕ סגירה</button><iframe title="איך BuyTest עובד" id="buytestTourFrame"></iframe></dialog><script src="four-services.js?v=7"></script><link rel="stylesheet" href="four-services.css?v=5"><style>html.manager-link body.manager-entry[data-service="home"] #appShell{display:block!important}</style>
+<section id="consultationPage" hidden><button class="secondary" type="button" onclick="closeConsultationPage()">→ חזרה למסך הפתיחה</button><h2 class="routeHeading">התייעצות עם הבוחן</h2><p>עמוס רוקח · 15 שנות ניסיון בבדיקות קנייה</p><div class="card" id="consultationPurchaseIntro"><h3>נשארו לכם שאלות על הרכב?</h3><p>ייעוץ אישי בוואטסאפ על הדוח, הממצאים והבירורים שכדאי להשלים לפני הקנייה. אפשר להתחיל גם בלי דוח.</p><strong class="btConsultPrice">99 ₪</strong><p>ההתייעצות פתוחה ל־48 שעות ממועד אישור התשלום, בשעות המענה המפורטות בתנאים.</p><button class="primary full" type="button" onclick="startPayment('prebuy')">להתייעצות אישית — 99 ₪</button></div></section><dialog id="buytestTour"><button class="secondary" type="button" onclick="closeBuyTestTour()">✕ סגירה</button><iframe title="איך BuyTest עובד" id="buytestTourFrame"></iframe></dialog><script src="four-services.js?v=8"></script><link rel="stylesheet" href="four-services.css?v=6"><style>html.manager-link body.manager-entry[data-service="home"] #appShell{display:block!important}</style>
 </body></html>
