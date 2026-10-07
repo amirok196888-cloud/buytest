@@ -1275,9 +1275,11 @@ function btInsuranceCrossSourceAlerts(dossier){
   if(result.plate&&dossier.plate&&String(result.plate)!==String(dossier.plate))return [];
   const claims=Array.isArray(result.claims)?result.claims:[];
   const losses=claims.filter(claim=>String(claim.damage||'').includes('אובדן'));
+  const constructiveLosses=losses.filter(claim=>String(claim.damage||'').includes('להלכה'));
   const insured=claims.filter(claim=>claim.party==='נזק לרכב המבוטח');
   const large=insured.filter(claim=>(claim.amounts||[]).some(value=>Number(String(value).replace(/[₪,\s]/g,''))>=30000));
-  if(!losses.length&&!large.length)return [];
+  const depreciation=insured.filter(claim=>parseFloat(String(claim.depreciationRate||'').replace(',','.'))>=3);
+  if(!losses.length&&!large.length&&!depreciation.length)return [];
   const lowFindings=(inspection.summary&&inspection.summary.findings||[]).filter(item=>{
     const text=[item.title,item.meaning,item.category].filter(Boolean).join(' ');
     const severity=String(item.severity||'').toLowerCase();
@@ -1294,7 +1296,8 @@ function btInsuranceCrossSourceAlerts(dossier){
   };
   const facts=[];
   if(losses.length)facts.push('רישום '+losses.map(detail).filter(Boolean).join('; '));
-  if(large.length)facts.push('בתביעה הקשורה לרכב המבוטח '+large.map(detail).filter(Boolean).join('; '));
+  if(large.length)facts.push('בתביעה הקשורה לרכב המבוטח הופיע סכום של 30,000 ₪ ומעלה: '+large.map(detail).filter(Boolean).join('; '));
+  if(depreciation.length)facts.push('נרשמה ירידת ערך של 3% ומעלה בתביעה הקשורה לרכב המבוטח: '+depreciation.map(claim=>detail(claim)+(claim.depreciationRate?' · ירידת ערך '+claim.depreciationRate:'')).filter(Boolean).join('; '));
   const comparison=lowFindings.length
     ?' בסיכום בדיקת המכון סווגו '+lowFindings.length+' ממצאים כמשמעות נמוכה או שולית.'
     :' דוח המכון אינו מסביר או שולל את משמעות אירועי העבר הביטוחי.';
