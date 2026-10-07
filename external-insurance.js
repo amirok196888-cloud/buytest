@@ -3,7 +3,7 @@
   let version=0,files=[];
   const quality=text=>({ok:String(text).trim().length>=40,score:String(text).length,findings:0,categories:0,unknown:0});
   const allowed=()=>/^\d{7,8}$/.test(plate());
-  function status(text){document.getElementById('externalInsuranceStatus').textContent=text;}
+  function status(text){const element=document.getElementById('externalInsuranceStatus');if(element)element.textContent=text;}
   function restore(){
     version++;files=[];
     document.getElementById('externalInsuranceCorrection').hidden=true;
@@ -11,7 +11,6 @@
     document.getElementById('externalInsuranceFile').value='';
     document.getElementById('externalInsuranceText').value=source?.rawText||'';
 
-    document.getElementById('externalInsurancePlate').textContent=plate();
     const interpretation=source?BuyTestInsurance.interpret(source.rawText||''):null;
     document.getElementById('externalInsuranceResult').textContent=interpretation?.text||'';
     document.getElementById('externalInsuranceResult').hidden=!source;
@@ -48,7 +47,7 @@
       document.getElementById('externalInsuranceText').value=parts.join('\n\n');
       save();
     }catch(error){
-      if(run===version&&p===plate()){document.getElementById('externalInsuranceCorrection').hidden=false;document.getElementById('externalInsuranceCorrection').open=true;status(error.message==='PDF_TOO_LONG'?'ה־PDF ארוך מ־12 עמודים. פצל אותו לקבצים לפני ההעלאה.':'לא הצלחנו לקרוא את הדוח במלואו. נסה PDF מקורי או צילום ברור; אפשר גם להדביק למטה את הטקסט מהדוח.');}
+      if(run===version&&p===plate()){document.getElementById('externalInsuranceCorrection').hidden=false;document.getElementById('externalInsuranceCorrection').open=true;status(error.message==='PDF_TOO_LONG'?'ה־PDF ארוך מ־12 עמודים. פצל אותו לקבצים לפני ההעלאה.':error.message==='PDF_UNAVAILABLE'?'קורא ה‑PDF לא נטען במכשיר. לא הועלה קובץ; אפשר לנסות שוב מאוחר יותר או להדביק למטה את הטקסט מהדוח.':error.message==='OCR_UNAVAILABLE'?'מנוע זיהוי הטקסט לא נטען במכשיר. לא הועלה קובץ; אפשר להדביק למטה את הטקסט מהדוח.':'לא הצלחנו לקרוא את הדוח במלואו. נסה PDF מקורי או צילום ברור; אפשר גם להדביק למטה את הטקסט מהדוח.');}
     }finally{if(worker)await worker.terminate();}
   }
   function save(){
