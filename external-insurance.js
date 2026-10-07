@@ -4,6 +4,83 @@
   const quality=text=>({ok:String(text).trim().length>=40,score:String(text).length,findings:0,categories:0,unknown:0});
   const allowed=()=>/^\d{7,8}$/.test(plate());
   function status(text){const element=document.getElementById('externalInsuranceStatus');if(element)element.textContent=text;}
+  function renderInterpretation(interpretation){
+    const host=document.getElementById('externalInsuranceResult');
+    if(!host)return;
+    host.replaceChildren();
+    if(!interpretation){host.hidden=true;return;}
+    host.hidden=false;
+    const style=document.createElement('style');
+    style.textContent='.btInsuranceResult{direction:rtl;text-align:right;color:#19352f}.btInsuranceResult h3{margin:0 0 12px;color:#075e49}.btInsuranceMeta,.btInsuranceStats,.btInsuranceEvent{border:1px solid #d7e5e0;border-radius:14px;background:#fff;padding:14px;margin:10px 0}.btInsuranceStats{display:flex;flex-wrap:wrap;gap:8px}.btInsuranceStat{border-radius:10px;background:#f0f8f5;padding:8px 10px}.btInsuranceStat strong{display:block;font-size:1.15em}.btInsuranceTableWrap{overflow-x:auto;max-width:100%}.btInsuranceTable{border-collapse:collapse;min-width:760px;width:100%;background:#fff}.btInsuranceTable th,.btInsuranceTable td{border:1px solid #dce6e2;padding:9px;text-align:right;vertical-align:top}.btInsuranceTable th{background:#eef7f4;color:#155b49;white-space:nowrap}.btInsuranceAlert{border-right:4px solid #d19a25;background:#fff8e8;border-radius:8px;padding:10px;margin:8px 0}.btInsuranceCaution{color:#425b55;line-height:1.65;margin-top:14px}.btInsuranceRaw{margin-top:14px}.btInsuranceRaw pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:360px;overflow:auto;direction:rtl;text-align:right}.btInsuranceUnparsed{white-space:pre-line}';
+    host.append(style);
+    const box=document.createElement('div');box.className='btInsuranceResult';
+    const title=document.createElement('h3');title.textContent='אלה הממצאים שנמצאו בדוח';box.append(title);
+    const meta=document.createElement('div');meta.className='btInsuranceMeta';
+    const vehicle=document.createElement('div');vehicle.textContent='מספר רכב בדוח: '+(interpretation.plate||'לא זוהה בקובץ');meta.append(vehicle);
+    if(interpretation.queryDate){const query=document.createElement('div');query.textContent='תאריך השאילתה בדוח: '+interpretation.queryDate;meta.append(query);}
+    box.append(meta);
+    const summary=interpretation.summary||{};
+    const stats=document.createElement('div');stats.className='btInsuranceStats';
+    const statValues=[
+      ['מועדים לפי תאריך',summary.eventCount],
+      ['תביעות ייחודיות',summary.claimCount],
+      ['שורות מקור',summary.sourceRecordCount],
+      ['תביעות לרכב המבוטח',summary.insuredClaims],
+      ['תביעות צד ג׳',summary.thirdPartyClaims],
+      ['אובדן גמור/להלכה',summary.totalLossClaims],
+      ['שורות עם נתוני ירידת ערך/תשלום',summary.depreciationClaims],
+      ['גניבה/פריצה',summary.theftClaims]
+    ];
+    statValues.forEach(([label,value])=>{
+      if(value===undefined)return;
+      const stat=document.createElement('div');stat.className='btInsuranceStat';
+      const number=document.createElement('strong');number.textContent=String(value);
+      const caption=document.createElement('span');caption.textContent=label;
+      stat.append(number,caption);stats.append(stat);
+    });
+    box.append(stats);
+    if(interpretation.events?.length){
+      interpretation.events.forEach(event=>{
+        const section=document.createElement('section');section.className='btInsuranceEvent';
+        const heading=document.createElement('h4');heading.textContent='ממצאים לפי תאריך: '+(event.date||'לא נקרא');section.append(heading);
+        const wrap=document.createElement('div');wrap.className='btInsuranceTableWrap';
+        const table=document.createElement('table');table.className='btInsuranceTable';
+        const thead=document.createElement('thead'),headRow=document.createElement('tr');
+        ['מספר תביעה','מספר פוליסה','סוג התביעה','סוג הנזק / הרישום','סכומים שנקראו מהטבלה','ירידת ערך','מצב התביעה','חברת הביטוח'].forEach(label=>{
+          const th=document.createElement('th');th.textContent=label;headRow.append(th);
+        });
+        thead.append(headRow);table.append(thead);
+        const tbody=document.createElement('tbody');
+        event.claims.forEach(claim=>{
+          const row=document.createElement('tr');
+          const amountText=claim.amounts?.length?claim.amounts.map(value=>'₪'+value).join(' · '):'לא נקראו';
+          const depreciation=claim.depreciationRate||((claim.amounts?.length>1)?'סכום מופיע; שיוך לא נקרא':'לא צוין');
+          const statusText=(claim.status||'לא נקרא')+(claim.recordCount>1?' · '+claim.recordCount+' שורות מקור':'');
+          [claim.claimNumber||'לא נקרא',claim.policyNumber||'לא נקרא',claim.party||'לא נקרא',claim.damage||'לא נקרא',amountText,depreciation,statusText,claim.insurer||'לא נקראה'].forEach(value=>{
+            const td=document.createElement('td');td.textContent=String(value);row.append(td);
+          });
+          tbody.append(row);
+        });
+        table.append(tbody);wrap.append(table);section.append(wrap);box.append(section);
+      });
+    }else{
+      const unparsed=document.createElement('p');unparsed.className='btInsuranceUnparsed';unparsed.textContent=interpretation.text||'לא נמצאו פרטי תביעה קריאים.';
+      box.append(unparsed);
+    }
+    (interpretation.alerts||[]).forEach(message=>{
+      const alert=document.createElement('div');alert.className='btInsuranceAlert';alert.textContent=message;box.append(alert);
+    });
+    const caution=document.createElement('p');caution.className='btInsuranceCaution';
+    caution.textContent='הדוח מציג תביעות שדווחו לחברות הביטוח. תיקונים פרטיים, תיקונים שלא דרך הביטוח או תיקונים במוסך לא מורשה עלולים שלא להופיע בו. היעדר רישום אינו שולל נזק או תאונה, ובדיקה במכון עדיין מומלצת.';
+    box.append(caution);
+    if(interpretation.rawText){
+      const details=document.createElement('details');details.className='btInsuranceRaw';
+      const summaryLabel=document.createElement('summary');summaryLabel.textContent='הטקסט שנקרא מהקובץ — להצגת מקור הפענוח';
+      const pre=document.createElement('pre');pre.textContent=interpretation.rawText;
+      details.append(summaryLabel,pre);box.append(details);
+    }
+    host.append(box);
+  }
   function restore(){
     version++;files=[];pendingFiles=[];
     const interpretButton=document.getElementById('externalInsuranceInterpret');if(interpretButton)interpretButton.disabled=true;
@@ -13,7 +90,7 @@
     document.getElementById('externalInsuranceText').value=source?.rawText||'';
 
     const interpretation=source?BuyTestInsurance.interpret(source.rawText||''):null;
-    document.getElementById('externalInsuranceResult').textContent=interpretation?.text||'';
+    renderInterpretation(interpretation);
     document.getElementById('externalInsuranceResult').hidden=!source;
     status(source?'הפענוח שמור בסיכום לרכב הזה.':'');
   }
@@ -70,10 +147,9 @@
     const labelled=Array.from(text.matchAll(/(?:מספר\s*(?:רכב|רישוי)|מס[׳'״"]?\s*רכב|license\s*plate)\s*[:\-]?\s*([\d\- ]{7,12})/gi)).map(m=>m[1].replace(/\D/g,'')).filter(x=>/^\d{7,8}$/.test(x));
     if(p&&labelled.some(x=>x!==p)){status('נמצא בטקסט מספר רכב אחר. בדוק את דוח המקור ואת זיהוי הטקסט לפני השמירה.');return;}
     const interpretation=BuyTestInsurance.interpret(text);
-    if(p)btSaveSource('insuranceExternal',{title:'פענוח דוח העבר הביטוחי — קובץ שהלקוח העלה',rawText:text,files:[...files],text:interpretation.text,alerts:interpretation.alerts,mileage:[],interpretationVersion:2});
+    if(p)btSaveSource('insuranceExternal',{title:'פענוח דוח העבר הביטוחי — קובץ שהלקוח העלה',rawText:text,files:[...files],text:interpretation.text,alerts:interpretation.alerts,mileage:[],interpretationVersion:3});
     status(interpretation.status==='incomplete'?'הדוח נקרא, אך חסרים פרטי תביעות קריאים. העלה את טבלת התביעות והנזקים.':p?'✓ דוח העבר הביטוחי פוענח ושולב בסיכום לרכב '+p+'.':'✓ דוח העבר הביטוחי פוענח. התוצאה מוצגת כאן.');
-    document.getElementById('externalInsuranceResult').textContent=interpretation.text;
-    document.getElementById('externalInsuranceResult').hidden=false;
+    renderInterpretation(interpretation);
   }
   function remove(){
     if(!allowed())return;
