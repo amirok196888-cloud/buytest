@@ -1,11 +1,12 @@
 (function(){
   'use strict';
-  let version=0,files=[];
+  let version=0,files=[],pendingFiles=[];
   const quality=text=>({ok:String(text).trim().length>=40,score:String(text).length,findings:0,categories:0,unknown:0});
   const allowed=()=>/^\d{7,8}$/.test(plate());
   function status(text){const element=document.getElementById('externalInsuranceStatus');if(element)element.textContent=text;}
   function restore(){
-    version++;files=[];
+    version++;files=[];pendingFiles=[];
+    const interpretButton=document.getElementById('externalInsuranceInterpret');if(interpretButton)interpretButton.disabled=true;
     document.getElementById('externalInsuranceCorrection').hidden=true;
     const source=allowed()?btDossier().sources.insuranceExternal:null;
     document.getElementById('externalInsuranceFile').value='';
@@ -17,13 +18,23 @@
     status(source?'הפענוח שמור בסיכום לרכב הזה.':'');
   }
   async function read(input){
-    const selected=Array.from(input.files||[]);if(!selected.length)return;
-    input.value='';
-    const p=plate(),run=++version;
-    files=[];
+    const selected=Array.from(input.files||[]);input.value='';if(!selected.length)return;
+    version++;files=[];pendingFiles=[];
     document.getElementById('externalInsuranceText').value='';
-    if(selected.length>6||selected.some(f=>f.size>25*1024*1024)||selected.reduce((n,f)=>n+f.size,0)>40*1024*1024){status('אפשר לצרף עד 6 קבצים, עד 25MB לקובץ ו־40MB בסך הכול.');return;}
-    if(selected.some(f=>!(f.type.startsWith('image/')||f.type==='application/pdf'))){status('אפשר להעלות PDF או תמונה בלבד.');return;}
+    const button=document.getElementById('externalInsuranceInterpret');
+    if(selected.length>6||selected.some(f=>f.size>25*1024*1024)||selected.reduce((n,f)=>n+f.size,0)>40*1024*1024){if(button)button.disabled=true;status('אפשר לצרף עד 6 קבצים, עד 25MB לקובץ ו־40MB בסך הכול.');return;}
+    if(selected.some(f=>!(f.type.startsWith('image/')||f.type==='application/pdf'))){if(button)button.disabled=true;status('אפשר להעלות PDF או תמונה בלבד.');return;}
+    pendingFiles=selected;
+    if(button)button.disabled=false;
+    status(selected.length===1?'הקובץ נבחר. לחץ על „פענח את הדוח”.':selected.length+' קבצים נבחרו. לחץ על „פענח את הדוח”.');
+  }
+  async function interpretPending(){
+    if(!pendingFiles.length)return;
+    const selected=pendingFiles.slice(),p=plate(),run=++version;
+    files=[];
+    const button=document.getElementById('externalInsuranceInterpret');
+    if(button)button.disabled=true;
+    document.getElementById('externalInsuranceText').value='';
     let worker;
     try{
       status('קורא את קובץ הדוח במכשיר...');
@@ -31,23 +42,27 @@
       for(const file of selected){
         const prepared=file.type==='application/pdf'?await pdfForDocumentOcr(file,quality,12,true):{sources:await imageForDocumentOcr(file)};
         let text=prepared.text||'';
-        if(!text&&prepared.sources?.length){
-          if(!quality(text).ok){
-            if(!window.Tesseract)throw new Error('OCR_UNAVAILABLE');
-            worker=worker||await Tesseract.createWorker('heb+eng');
-            const result=await recognizeDocumentSources(worker,prepared.sources,document.getElementById('externalInsuranceStatus'),()=>{},quality);
-            text=result.text||'';
-          }
+        if(!quality(text).ok&&prepared.sources?.length){
+          if(!window.Tesseract)throw new Error('OCR_UNAVAILABLE');
+          worker=worker||await Tesseract.createWorker('heb+eng');
+          const result=await recognizeDocumentSources(worker,prepared.sources,document.getElementById('externalInsuranceStatus'),()=>{},quality);
+          text=result.text||'';
         }
         if(!quality(text).ok)throw new Error('TEXT_NOT_FOUND');
-        parts.push('קובץ: '+file.name+'\n'+text);
+        parts.push('קובץ: '+file.name+'\\n'+text);
       }
       if(run!==version||p!==plate())return;
       files=selected.map(f=>f.name);
-      document.getElementById('externalInsuranceText').value=parts.join('\n\n');
+      document.getElementById('externalInsuranceText').value=parts.join('\\n\\n');
+      pendingFiles=[];
       save();
     }catch(error){
-      if(run===version&&p===plate()){document.getElementById('externalInsuranceCorrection').hidden=false;document.getElementById('externalInsuranceCorrection').open=true;status(error.message==='PDF_TOO_LONG'?'ה־PDF ארוך מ־12 עמודים. פצל אותו לקבצים לפני ההעלאה.':error.message==='PDF_UNAVAILABLE'?'קורא ה‑PDF לא נטען במכשיר. לא הועלה קובץ; אפשר לנסות שוב מאוחר יותר או להדביק למטה את הטקסט מהדוח.':error.message==='OCR_UNAVAILABLE'?'מנוע זיהוי הטקסט לא נטען במכשיר. לא הועלה קובץ; אפשר להדביק למטה את הטקסט מהדוח.':'לא הצלחנו לקרוא את הדוח במלואו. נסה PDF מקורי או צילום ברור; אפשר גם להדביק למטה את הטקסט מהדוח.');}
+      if(run===version&&p===plate()){
+        if(button)button.disabled=!pendingFiles.length;
+        document.getElementById('externalInsuranceCorrection').hidden=false;
+        document.getElementById('externalInsuranceCorrection').open=true;
+        status(error.message==='PDF_TOO_LONG'?'ה־PDF ארוך מ־12 עמודים. פצל אותו לקבצים לפני ההעלאה.':error.message==='PDF_UNAVAILABLE'?'קורא ה‑PDF לא נטען במכשיר. לא הועלה קובץ; אפשר להדביק למטה את הטקסט מהדוח.':error.message==='OCR_UNAVAILABLE'?'מנוע זיהוי הטקסט לא נטען במכשיר. לא הועלה קובץ; אפשר להדביק למטה את הטקסט מהדוח.':'לא הצלחנו לקרוא את הדוח במלואו. נסה PDF מקורי או צילום ברור; אפשר גם להדביק למטה את הטקסט מהדוח.');
+      }
     }finally{if(worker)await worker.terminate();}
   }
   function save(){
@@ -71,11 +86,12 @@
   }
   window.addEventListener('DOMContentLoaded',()=>{
     const panel=document.createElement('section');panel.id='externalInsurancePanel';panel.className='uploadPanel btExternalInsurance';
-    panel.innerHTML='<h3>העלאת קובץ דוח עבר ביטוחי</h3><button type="button" class="primary full" id="externalInsuranceChoose" style="margin-top:12px">בחירת קובץ מהטלפון</button><p class="sub">הורד את הדוח לטלפון, בחר את קובץ ה‑PDF או התמונה, ו‑BuyTest תפענח אותו כאן. הקובץ נקרא במכשיר ואינו נשלח לבלק״ר.</p><input type="file" id="externalInsuranceFile" accept="image/*,application/pdf" multiple hidden><p id="externalInsuranceStatus" role="status" aria-live="polite"></p><div class="info" id="externalInsuranceResult" hidden style="white-space:pre-line"></div><details id="externalInsuranceCorrection" hidden><summary>השלמת פרטים מהדוח</summary><label for="externalInsuranceText">טקסט שנקרא מהדוח</label><textarea id="externalInsuranceText" class="reportInput" rows="8" style="color:#17352d;background:#fff"></textarea><p>מספר רכב אינו חובה. אם אושר מספר רכב, הפענוח יצורף לסיכום שלו.</p><button type="button" class="primary full" id="externalInsuranceSave">עדכון פענוח דוח העבר הביטוחי</button><button type="button" class="secondary full" id="externalInsuranceRemove">הסרת דוח העבר הביטוחי</button></details>';
+    panel.innerHTML='<h3>העלאת קובץ דוח עבר ביטוחי</h3><button type="button" class="primary full" id="externalInsuranceChoose" style="margin-top:12px">בחירת קובץ מהטלפון</button><button type="button" class="primary full" id="externalInsuranceInterpret" style="margin-top:10px" disabled>פענח את הדוח</button><p class="sub">הורד את הדוח לטלפון, בחר את קובץ ה‑PDF או התמונה, ו‑BuyTest תפענח אותו כאן. הקובץ נקרא במכשיר ואינו נשלח לבלק״ר.</p><input type="file" id="externalInsuranceFile" accept="image/*,application/pdf" multiple hidden><p id="externalInsuranceStatus" role="status" aria-live="polite"></p><div class="info" id="externalInsuranceResult" hidden style="white-space:pre-line"></div><details id="externalInsuranceCorrection" hidden><summary>השלמת פרטים מהדוח</summary><label for="externalInsuranceText">טקסט שנקרא מהדוח</label><textarea id="externalInsuranceText" class="reportInput" rows="8" style="color:#17352d;background:#fff"></textarea><p>מספר רכב אינו חובה. אם נבחר רכב קודם, הפענוח יצורף לסיכום שלו.</p><button type="button" class="primary full" id="externalInsuranceSave">עדכון פענוח דוח העבר הביטוחי</button><button type="button" class="secondary full" id="externalInsuranceRemove">הסרת דוח העבר הביטוחי</button></details>';
     const mount=document.getElementById('externalInsuranceMount');
     if(mount) mount.append(panel);
     document.getElementById('externalInsuranceChoose').onclick=()=>document.getElementById('externalInsuranceFile').click();
     document.getElementById('externalInsuranceFile').onchange=function(){void read(this);};
+    document.getElementById('externalInsuranceInterpret').onclick=()=>void interpretPending();
     document.getElementById('externalInsuranceSave').onclick=save;
     document.getElementById('externalInsuranceRemove').onclick=remove;
     const activate=btActivateVehicle;
