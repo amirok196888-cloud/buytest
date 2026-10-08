@@ -183,7 +183,7 @@ body.plan-prebuy .prePurchaseConsultationBox{display:block}
 .preVisitActions{display:grid;grid-template-columns:1.15fr .85fr;gap:9px;margin-top:14px}.preVisitActions button{width:100%}.preVisitToast{display:none;margin-top:10px;padding:9px 12px;border-radius:10px;background:#17352d;color:#fff;text-align:center;font-weight:850}.preVisitToast.show{display:block}
 .preVisitAd{margin-top:14px;border:1px solid #cfe1dc;border-radius:14px;background:#fff;overflow:hidden}.preVisitAd summary{padding:14px 15px;cursor:pointer;font-weight:900;color:#075e48}.preVisitAdBody{padding:0 15px 15px}.preVisitUpload{display:block;padding:15px;border:2px dashed #acd0c5;border-radius:12px;background:#f8fcfb;text-align:center;color:#276556;font-weight:850;cursor:pointer}.preVisitUpload input{display:none}.preVisitAdImage{display:none;width:100%;max-height:330px;object-fit:contain;margin-top:10px;border-radius:12px;background:#edf2f3}.preVisitAdImage.show{display:block}.preVisitCompare{display:none;margin-top:10px}.preVisitCompare.show{display:grid;gap:7px}.preVisitCompare div{padding:10px 12px;border:1px solid #dce8e4;border-radius:11px;background:#fff}.preVisitCompare b{display:block}.preVisitCompare small{display:block;margin-top:2px;color:#60717a;line-height:1.45}
 @media(max-width:520px){.preVisitFacts,.preVisitActions{grid-template-columns:1fr}.preVisitFact.wide{grid-column:auto}}
-.btUnifiedSummary{margin:20px 0;text-align:right;overflow-wrap:anywhere}.btUnifiedSummary p{white-space:pre-line}.insuranceShortSummary{margin:18px 0;padding:18px;border:1px solid #bfdcd2;border-right:5px solid #159b78;border-radius:16px;background:#f5fbf8;line-height:1.65;overflow-wrap:anywhere}.insuranceShortSummary h3{margin:0 0 8px;color:#075e49;font-size:20px}.insuranceShortSummary>p{margin:8px 0}.insuranceShortSummary ol{margin:10px 0 0;padding-right:23px}.insuranceShortSummary ol>li{margin:0 0 10px;padding:12px;border:1px solid #d5e6e0;border-radius:12px;background:#fff}.insuranceShortSummary ul{margin:6px 0 0;padding-right:21px}.insuranceShortSummary ul>li{margin:4px 0}.insuranceCrossCheckNotice{padding:10px 12px;border:1px solid #e4c880;border-radius:10px;background:#fff8e7;color:#5a4312;font-weight:750}.btCritical{color:#a40019!important;background:#fff0f2;border-right:6px solid #d00025;padding:16px;font-weight:800;line-height:1.7}
+.btUnifiedSummary{margin:20px 0;text-align:right;overflow-wrap:anywhere}.btUnifiedSummary p{white-space:pre-line}.insuranceShortSummary{margin:18px 0;padding:18px;border:1px solid #bfdcd2;border-right:5px solid #159b78;border-radius:16px;background:#f5fbf8;line-height:1.65;overflow-wrap:anywhere}.insuranceShortSummary h3{margin:0 0 8px;color:#075e49;font-size:20px}.insuranceShortSummary>p{margin:8px 0}.insuranceShortSummary ol{margin:10px 0 0;padding-right:23px}.insuranceShortSummary ol>li{margin:0 0 10px;padding:12px;border:1px solid #d5e6e0;border-radius:12px;background:#fff}.insuranceShortSummary ul{margin:6px 0 0;padding-right:21px}.insuranceShortSummary ul>li{margin:4px 0}.insuranceCrossCheckNotice{padding:10px 12px;border:1px solid #e4c880;border-radius:10px;background:#fff8e7;color:#5a4312;font-weight:750}.insuranceAnomalyNotice{border-color:#d92d20;background:#fff0f0;color:#8f1d18}.btCritical{color:#a40019!important;background:#fff0f2;border-right:6px solid #d00025;padding:16px;font-weight:800;line-height:1.7}
 .meaningConclusion{padding:12px 14px;margin:12px 0;border-radius:12px;border-right:5px solid}.meaningConclusion.high{background:#fff0ef;border-color:#b42318;color:#7a2019}.meaningConclusion.medium,.categorySummaryCard.medium{background:#fff3e7;border-color:#c65b08;color:#874006}.meaningConclusion.low{background:#fffbe5;border-color:#b78a00;color:#665100}.overallProfessionalConclusion .meaningConclusion h5{color:inherit;margin-top:0}
 
 #managerAnalyticsPanel .analyticsArticleTable{min-width:0;table-layout:fixed}#managerAnalyticsPanel .analyticsArticleTable th,#managerAnalyticsPanel .analyticsArticleTable td{white-space:normal;overflow-wrap:anywhere;padding:10px 7px}#managerAnalyticsPanel .analyticsArticleTable th:first-child,#managerAnalyticsPanel .analyticsArticleTable td:first-child{position:static;width:60%;font-weight:700}#managerAnalyticsPanel .analyticsArticleTable th:not(:first-child),#managerAnalyticsPanel .analyticsArticleTable td:not(:first-child){width:20%}#managerAnalyticsPanel .analyticsArticleTable td:not(:first-child){font-size:18px;font-weight:900;color:#075e48}
@@ -1165,7 +1165,7 @@ function btActivateVehicle(p){
   loadedKm=null;interpretedReportKm=null;externalVehicleData={kmHistory:[]};
   latestSummaryResult=null;latestComputerResult=null;latestComputerIdentity=null;latestInsuranceInterpretation=null;
   preReportText='';afterReportText='';reportText='';balcarSummaryText='';window.buytestBalcarReport=null;
-  btPreparedPdfFile=null;
+  btPreparedPdfFile=null;btPreparedPdfKey='';
   for(const id of ['afterInterpretation','report','balcarSummaryGrid']){const el=document.getElementById(id);if(el)el.innerHTML='';}
   document.querySelectorAll('.check').forEach(el=>{delete el.dataset.answer;el.querySelector('.finding')?.classList.remove('open');el.querySelectorAll('textarea').forEach(t=>t.value='');});
   const saved=btDossier(p);
@@ -3071,7 +3071,7 @@ function showManagerPanel(panel='analytics',{scroll=true}={}){
   if(scroll) document.getElementById(panels[selected])?.scrollIntoView({behavior:'smooth',block:'start'});
 }
 let vehiclePhotoData=[];
-let btPreparedPdfFile=null, btPdfPreparing=null;
+let btPreparedPdfFile=null, btPdfPreparing=null, btPreparedPdfKey='';
 function addVehiclePhotos(input){
   const selected=[...(input.files||[])];
   const remaining=Math.max(0,4-vehiclePhotoData.length);
@@ -5357,6 +5357,8 @@ const professionalConclusionDisclaimer='הסיכום מבוסס רק על המס
 function compactCategoryLabel(value,isComputer=false,item=null){
   const category=normalizeFindingText(value||'');
   const detail=normalizeFindingText([item?.sourceText,item?.matchedTerm,item?.title,item?.meaning].filter(Boolean).join(' '));
+  const sourceDetail=normalizeFindingText([item?.sourceText,item?.matchedTerm,item?.title,item?.observedText].filter(Boolean).join(' '));
+  if(/תיקוני מרכב|תיקון מרכב|החלפת חלקי מרכב|פחחות|שלדה|פגוש/.test(sourceDetail)) return 'שלדה ומרכב';
   if(batteryFindingInfo(item)) return 'תאריך וגיל המצבר';
   if(/חלון גג|גג נפתח|sunroof/.test(detail)&&/לא תקין|תקלה|מנוע|מתג|חשמל|פתיחה|סגירה|תפעול/.test(detail)) return 'חשמל ואבזור';
   if(/תקשורת|מחשב.*מחשב|can\b/.test(category)) return 'תקשורת בין מחשבי הרכב';
@@ -5532,7 +5534,11 @@ function communicationGroupBullet(items,bucket){
 }
 
 function compactAnalysisGroups(result,isComputer=false){
-  const findings=(result?.findings||[]).map(finalizeReportFinding).filter(Boolean);
+  const findings=(result?.findings||[]).map(finalizeReportFinding).filter(Boolean).filter(item=>{
+    if(isComputer) return true;
+    const fact=conciseFindingFact(item,false).replace(/[׳״"'`]/g,'').trim();
+    return !/^(?:תיקון|תיקוני|תיקונים)$/.test(fact);
+  });
   const grouped=new Map();
   findings.forEach(item=>{
     const category=compactCategoryLabel(item.category,isComputer,item);
@@ -5720,7 +5726,7 @@ function insuranceSummaryForReport(interpretation,currentPlate){
  if(anomaly)lines.push('ממצא חריג בעבר הביטוחי: להשוות את הרישומים לממצאי דוח המכון ולמסמכי שמאי או תיקון.');
  if(cleanNote)lines.push(cleanNote);
  if(mismatch)lines.push('אי־התאמה בין מספר הרכב בקובץ למספר הרכב שנבחר באתר.');
- const warning=anomaly?'<p class="insuranceCrossCheckNotice"><b>ממצא חריג מהעבר הביטוחי:</b> יש להשוות לדוח המכון ולמסמכי שמאי או תיקון.</p>':'';
+ const warning=anomaly?'<p class="insuranceCrossCheckNotice insuranceAnomalyNotice"><b>ממצא חריג מהעבר הביטוחי:</b> יש להשוות לדוח המכון ולמסמכי שמאי או תיקון.</p>':'';
  const mismatchHtml=mismatch?'<p class="insuranceCrossCheckNotice"><b>אי־התאמה:</b> מספר הרכב בקובץ שונה מהמספר שנבחר באתר.</p>':'';
  const html='<section class="insuranceShortSummary"><h3>עבר ביטוחי — ממצאים מהקובץ</h3><p>'+(interpretation.plate?'מספר רכב בדוח: '+escapeHtml(interpretation.plate)+'. ':'מספר הרכב לא זוהה בבירור בקובץ. ')+(events.length?'נמצאו '+Number(summary.eventCount||events.length)+' מועדי אירוע ו־'+Number(summary.claimCount||0)+' רישומי תביעה.':'לא נמצאו פרטי תביעה שניתן לשייך בבטחה.')+'</p>'+(cards.length?'<ol>'+cards.join('')+'</ol>':'')+(cleanNote?'<p class="info">'+escapeHtml(cleanNote)+'</p>':'')+warning+mismatchHtml+'</section>';
  return {html,text:lines.join('\n')};
@@ -5925,6 +5931,7 @@ function prepareReportPdf(buttonId='pdfBtn'){
       if(!blob||blob.size<1000) throw new Error('invalid pdf');
       const fileName=`BuyTest-${isBalcar?'Insurance-History-':preliminary?'Checklist-':''}${plate()||'report'}.pdf`;
       btPreparedPdfFile=new File([blob],fileName,{type:'application/pdf'});
+      btPreparedPdfKey=buttonId+'|'+pdfVehicle;
       if(pdfBtn&&!document.getElementById(buttonId+'Download')){
         const downloadBtn=document.createElement('button');
         downloadBtn.id=buttonId+'Download';downloadBtn.type='button';downloadBtn.className='secondary full';
@@ -6405,20 +6412,21 @@ function downloadPdfFile(file){
 async function shareReportPdf(buttonId='pdfBtn',downloadOnly=false){
   const btn=document.getElementById(buttonId);
   if(!reportText&&buttonId!=='checklistPdfBtn'){buildReport();return}
-  if(btPdfPreparing) await btPdfPreparing;
-  prepareReportPdf(buttonId);
-  if(btPdfPreparing) await btPdfPreparing;
-  if(!btPreparedPdfFile){alert('לא הצלחנו להכין את ה־PDF. לחץ שוב על הפקת הסיכום ונסה שנית.');return;}
+  const expectedKey=buttonId+'|'+plate();
+  if(!btPreparedPdfFile||btPreparedPdfKey!==expectedKey){
+    if(btn){btn.disabled=true;btn.textContent='מכין PDF...';}
+    if(!btPdfPreparing) prepareReportPdf(buttonId);
+    const status=document.getElementById('analysisStatus');
+    if(status){status.textContent='ה־PDF עדיין בהכנה. הכפתור יפעל כשההכנה תסתיים.';status.classList.add('show');}
+    return;
+  }
   const file=btPreparedPdfFile;
-  const resetAfterSummary=['finalPdfBtn','serviceSummaryPdf'].includes(buttonId);
-  const finish=()=>{if(resetAfterSummary)setTimeout(()=>btResetVehicleSession(),1000);};
   if(!downloadOnly && navigator.share && (!navigator.canShare || navigator.canShare({files:[file]}))){
-    try{await navigator.share({files:[file],title:buttonId==='balcarPdfBtn'?'BuyTest - סיכום דוח עבר ביטוחי':'BuyTest - סיכום בדיקה'});finish();return;}
+    try{await navigator.share({files:[file],title:buttonId==='balcarPdfBtn'?'BuyTest - סיכום דוח עבר ביטוחי':'BuyTest - סיכום בדיקה'});return;}
     catch(error){if(error?.name==='AbortError')return;console.warn('BuyTest native PDF share unavailable:',error);}
   }
   downloadPdfFile(file);
   if(btn){btn.disabled=false;btn.textContent='✓ ה־PDF הורד למכשיר';setTimeout(()=>btn.textContent=buttonId==='balcarPdfBtn'?'לחץ לשיתוף תקציר ה־PDF':buttonId==='finalPdfBtn'?'לחץ לשיתוף הסיכום המלא כ־PDF':'לחץ לשיתוף או להורדת ה־PDF',2200);}
-  finish();
 }
 // לאחר אימות תשלום מאובטח נפתח השלב שנרכש; השלבים הבאים נפתחים לפי ההתקדמות.
 window.addEventListener('DOMContentLoaded',async()=>{
