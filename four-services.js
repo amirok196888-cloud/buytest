@@ -16,7 +16,7 @@
   }
   function render(route=readRoute()){
     if(route==='report'&&current!=='report'){beginNewReportSession();consumeNewReportSession(plate());reportStarted=false;document.body.dataset.reportStarted='false';}
-    else if(route!=='report')freshReportSessionPending=false;
+    else if(route!=='report'){freshReportSessionPending=false;reportStarted=false;document.body.dataset.reportStarted='false';document.body.classList.remove('plan-report');}
     current=services[route]?route:'';
     document.body.dataset.service=current||'home';
     closeAfterPage(false);document.body.classList.remove('consultation-page');document.getElementById('consultationPage').hidden=true;
