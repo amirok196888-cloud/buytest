@@ -26,6 +26,13 @@
   const longIdRE=/(?<!\d)\d{9,16}(?!\d)/g;
   const moneyTokenRE=/(?<!\d)(?:\d{1,3}(?:,\d{3})+|\d{2,})(?:\.\d{1,2})?(?!\d)/g;
   function firstMatch(value,pattern){const m=String(value||'').match(pattern);return m?m[0]:'';}
+  function fullDate(value){
+    const match=String(value||'').match(/^(\d{1,2})[/.\-](\d{1,2})[/.\-](\d{2,4})$/);
+    if(!match)return '';
+    let year=Number(match[3]);if(match[3].length===2)year+=year>=70?1900:2000;
+    return String(match[1]).padStart(2,'0')+'/'+String(match[2]).padStart(2,'0')+'/'+year;
+  }
+  function dateOrder(value){const date=fullDate(value);const match=date.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);return match?Date.UTC(Number(match[3]),Number(match[2])-1,Number(match[1])):Number.MAX_SAFE_INTEGER;}
   function unique(values){return [...new Set(values.filter(Boolean))];}
   function extractPlate(lines){
     const label=/(?:מס(?:פר)?\s*['׳״"]?\s*(?:רכב|רישוי)|לוחית(?:\s*רישוי)?)/u;
@@ -41,7 +48,7 @@
   function extractQueryDate(lines){
     for(const line of lines){
       if(/תאריך\s*(?:ה)?שאילתה|מועד\s*(?:ה)?שאילתה/u.test(line)){
-        const date=firstMatch(line,dateRE);if(date)return date;
+        const date=firstMatch(line,dateRE);if(date)return fullDate(date)||date;
       }
     }
     return '';
@@ -64,7 +71,7 @@
     return unique([...withoutDates.matchAll(moneyTokenRE)].map(m=>m[0])
       .filter(value=>{
         const number=Number(value.replace(/,/g,''));
-        return number>10&&number<100000000&&value!==claimNumber&&value!==plate&&value.length<=10;
+        return number>=100&&number<100000000&&value!==claimNumber&&value!==plate&&value.length<=10;
       }));
   }
   function interpret(raw){
@@ -105,7 +112,7 @@
           }
         }
         const rowText=[...neighborTexts,line].join(' ');
-        const date=firstMatch(line,dateRE)||firstMatch(rowText,dateRE);
+        const date=fullDate(firstMatch(line,dateRE)||firstMatch(rowText,dateRE))||firstMatch(line,dateRE)||firstMatch(rowText,dateRE);
         const party=parseParty(rowText),damage=parseDamage(rowText);
         const partyKnown=party!=='סוג התביעה לא נקרא';
         const damageKnown=damage!=='סוג הנזק לא נקרא';
@@ -154,7 +161,7 @@
       if(!byDate.has(eventKey))byDate.set(eventKey,{date,claims:[]});
       byDate.get(eventKey).claims.push(claim);
     }
-    const events=[...byDate.values()];
+    const events=[...byDate.values()].sort((a,b)=>dateOrder(a.date)-dateOrder(b.date));
     const summary={
       eventCount:events.length,
       claimCount:claims.length,
