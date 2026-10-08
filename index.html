@@ -3412,7 +3412,8 @@ function reportReadQuality(text){
   const reportSignals=/(מנוע|תיבת|הילוכ|בלמ|שלד|מרכב|היגוי|מתל|צמיג|תאורה|מערכת|ליקוי|תקין|קילומטראז)/.test(normalizeFindingText(cleaned));
   // More recognized text is evidence of a better OCR result. Unknown wording must
   // not penalize Google Vision, otherwise a partial Tesseract result can win.
-  const score=(analysis.findings.length*100)+(categoryCount*25)+Math.min(hebrewWords,160)+Math.min(analysis.unknown.length*4,60);
+  const uniqueFacts=new Set(analysis.findings.map(item=>normalizeFindingText(item.category)+'|'+reportFactIdentity(item.sourceText||item.matchedTerm)));
+  const score=(uniqueFacts.size*100)+(categoryCount*25)+Math.min(hebrewWords,160)-(analysis.unreadable.length*80);
   const ok=hebrewWords>=12&&(analysis.findings.length>=1||categoryCount>=1||reportSignals);
   return {ok,score,findings:analysis.findings.length,categories:categoryCount,unknown:analysis.unknown.length};
 }
@@ -3456,11 +3457,6 @@ async function recognizeDocumentSources(worker,sources,state,setPass,qualityFunc
     const text=diagnosticTableText(pageTexts.join('\n'));
     candidates.push({text,quality:qualityFunction(text)});
   }
-  if(candidates.length>1){
-    const diagnosticParts=candidates.map(candidate=>diagnosticTableText(candidate.text)).filter(Boolean);
-    const mergedText=cleanOcrText(diagnosticParts.join('\n'));
-    if(mergedText) candidates.push({text:mergedText,quality:qualityFunction(mergedText)});
-  }
   candidates.sort((a,b)=>b.quality.score-a.quality.score);
   return candidates[0]||{text:'',quality:{ok:false,score:0,findings:0,categories:0,unknown:0}};
 }
@@ -3499,7 +3495,12 @@ function mergeVerifiedOcrText(primaryText,verifierText,isSummary){
   const verifierLines=ocrComparisonLines(verifierText);
   const additions=[];
   let agreements=0;
+  let verifierCategory='';
   verifierLines.forEach(candidate=>{
+    const heading=reportCategoryFromLine(candidate.raw);
+    if(heading) verifierCategory=heading;
+    if(isSummary&&reportTextIsUnreliable(candidate.raw)) return;
+    const addition=isSummary?(verifierCategory?verifierCategory+'\n'+candidate.raw:''):candidate.raw;
     let best=null,bestScore=0;
     primaryLines.forEach(existing=>{
       const score=ocrLineSimilarity(existing.raw,candidate.raw);
@@ -3509,10 +3510,10 @@ function mergeVerifiedOcrText(primaryText,verifierText,isSummary){
       agreements++;
       const candidateUseful=isUsefulVerifierFinding(candidate.raw,isSummary);
       const existingUseful=best&&isUsefulVerifierFinding(best.raw,isSummary);
-      if(candidateUseful&&!existingUseful&&candidate.normalized.length>(best?.normalized.length||0)+5) additions.push(candidate.raw);
+      if(candidateUseful&&!existingUseful&&candidate.normalized.length>(best?.normalized.length||0)+5) addition&&additions.push(addition);
       return;
     }
-    if(isUsefulVerifierFinding(candidate.raw,isSummary)) additions.push(candidate.raw);
+    if(isUsefulVerifierFinding(candidate.raw,isSummary)) addition&&additions.push(addition);
   });
   const uniqueAdditions=[];
   additions.forEach(line=>{
@@ -4814,7 +4815,7 @@ function findKnowledgeRules(line,categoryHint=''){
     if(!covered) additions.push(rawFormulaToRule(formula));
   });
 
-  if(!curated.length&&!additions.length&&categoryHint){
+  if(!curated.length&&!additions.length&&categoryHint&&!reportTextIsUnreliable(line)){
     const fuzzy=rawFormulaDatabase.filter(formula=>isOperationalFormula(formula)&&formula.category===categoryHint)
       .map(formula=>({formula,score:fuzzyFormulaScore(n,formula.text)}))
       .filter(candidate=>candidate.score>=0.72)
@@ -4866,8 +4867,8 @@ function reportCategoryFromLine(line){
   const n=normalizeFindingText(line).replace(/^\d+\s+/,'').trim();
   const compact=n.replace(/\s/g,'');
   if(compact.includes('הערותכלליות')) return 'הערות כלליות';
-  if(/שלדה\s*ומ?רכ[בג]/.test(n)) return 'שלדת מרכב';
-  if(/העברת\s*הכוח/.test(n)) return 'תיבת העברת הכוח';
+  if(/^שלדה\s*ומ?רכ[בג](?:\s|$)/.test(n)) return 'שלדת מרכב';
+  if(/^(?:תיבת\s+)?העברת\s*הכוח(?:\s|$)/.test(n)) return 'תיבת העברת הכוח';
   if(/סרן\s*קדמי.*היגוי/.test(n)) return 'מערכת ההיגוי';
   if(/^מערכת\s*קירור$/.test(n)) return 'מערכת הקירור';
   if(/^צמיגים$/.test(n)) return 'צמיגים וחישוקים';
@@ -4875,7 +4876,7 @@ function reportCategoryFromLine(line){
     const categoryText=normalizeFindingText(category.name);
     if(!categoryText) return false;
     const categoryCompact=categoryText.replace(/\s/g,'');
-    return n===categoryText||n.startsWith(categoryText+' ')||n.endsWith(' '+categoryText)||(categoryCompact.length>=6&&compact.includes(categoryCompact));
+    return n===categoryText||n.startsWith(categoryText+' ')||(categoryCompact.length>=6&&compact.startsWith(categoryCompact));
   }).sort((a,b)=>b.name.length-a.name.length);
   return matches[0]?.name||'';
 }
@@ -4884,6 +4885,7 @@ function reportSeverityFromLine(line){
   const n=normalizeFindingText(line);
   if(/משמעות\s*גבוהה/.test(n)) return 'high';
   if(/משמעות\s*נמוכה/.test(n)) return 'low';
+  if(/משמעות\s*בינונית/.test(n)) return 'medium';
   if(/ליקויים?\s+שוליים?|ליקוי\s+שולי/.test(n)) return 'minor';
   return null;
 }
@@ -4896,7 +4898,7 @@ function stripReportScaffolding(line,category,severity){
     if(cleaned===categoryText||withoutArticle(cleaned)===withoutArticle(categoryText)||/שלדה\s*ומ?רכ[בג]/.test(cleaned)&&category==='שלדת מרכב') cleaned='';
     else if(cleaned.startsWith(categoryText+' ')) cleaned=cleaned.slice(categoryText.length).trim();
   }
-  if(severity) cleaned=cleaned.replace(/משמעות\s*(?:גבוהה|נמוכה)|ליקויים?\s+שוליים?|ליקוי\s+שולי/g,' ');
+  if(severity) cleaned=cleaned.replace(/משמעות\s*(?:גבוהה|בינונית|נמוכה)|ליקויים?\s+שוליים?|ליקוי\s+שולי/g,' ');
   return cleaned.replace(/^\s*\d+\s*/,' ').replace(/\s+/g,' ').trim();
 }
 
@@ -5019,8 +5021,34 @@ function orderFindingsLikeReport(findings){
     .map(entry=>entry.item);
 }
 
+function reportTextIsUnreliable(value){
+  const text=String(value||'');
+  // Do not turn OCR noise into a diagnosis or silently translate guessed words.
+  const latin=(text.match(/[a-z]{2,}/gi)||[]).filter(word=>! /^(ABS|ESP|ESC|OBD|DTC|SRS|ECU|CAN|DPF|EGR|SCR|NOX|CVT|DSG|ATF|AC|ILS)$/i.test(word));
+  const orphan=(text.match(/(?:^|\s)[א-ת](?=\s|$)/g)||[]).length;
+  return latin.length>0||/[א-ת]{16,}/.test(text)||/[|=]{1,}/.test(text)||orphan>=3||/ריפודפגום|תאריךמצבר|גלגלותמנוע|מערכתההי|שמשה קדמיתהוחלפה/.test(text);
+}
+
+function reportFactIdentity(value){
+  return normalizeFindingText(value).replace(/[^a-z0-9א-ת]/g,'');
+}
+
+function distinctReportFindings(findings){
+  const unique=new Map();
+  for(const item of findings){
+    const fact=item.diagnosisLabel||item.sourceText||item.matchedTerm||'';
+    const key=normalizeFindingText(item.category)+'|'+reportFactIdentity(fact);
+    if(!fact||isSeverityHeadingOnly(fact)) continue;
+    const previous=unique.get(key);
+    // Explicit report severity and manager corrections take priority over aliases.
+    const rank=value=>(value.managerEdited?100:0)+(value.explicitReportSeverity?20:0)+(value.reportSeverity?5:0)+(value.verbatimDiagnosis?0:1);
+    if(!previous||rank(item)>rank(previous)) unique.set(key,item);
+  }
+  return [...unique.values()];
+}
+
 function interpretSummaryText(text){
-  const findings=[],unknown=[],seen=new Set();
+  const findings=[],unknown=[],unreadable=[],seen=new Set();
   text=diagnosticTableText(text);
   const compactReport=normalizeFindingText(text).replace(/\s/g,'');
   const chassisHint=compactReport.includes('סוגשלדהשלדהנפרדת')?'שלדה נפרדת':compactReport.includes('סוגשלדהשלדתמרכב')?'שלדת מרכב':'';
@@ -5038,29 +5066,35 @@ function interpretSummaryText(text){
     const lineSeverity=reportSeverityFromLine(line);
     if(lineSeverity){
       currentSeverity=lineSeverity;
-      currentCategory=chassisHint||'שלדת מרכב';
+      currentCategory=currentCategory||chassisHint||'שלדת מרכב';
     }
     const contentLine=stripReportScaffolding(line,lineCategory,lineSeverity);
     if(!contentLine||isReportStatusScaffolding(contentLine)||isExplicitlyNormal(contentLine)) return;
+    const unreliable=reportTextIsUnreliable(contentLine);
+    if(unreliable) unreadable.push(safeUnknownExcerpt(contentLine));
     let observedCandidate=contentLine;
     let rules=findKnowledgeRules(contentLine,currentCategory);
-    if(!rules.length){
+    if(!rules.length&&!unreliable){
       let continued=contentLine;
       for(let offset=1;offset<=2;offset++){
         const nextLine=lines[index+offset];
         if(!nextLine||reportCategoryFromLine(nextLine)||reportSeverityFromLine(nextLine)) break;
         const nextContent=stripReportScaffolding(nextLine,'',null);
-        if(!nextContent) break;
+        if(!nextContent||reportTextIsUnreliable(nextContent)) break;
         continued+=' '+nextContent;
         const continuedRules=findKnowledgeRules(continued,currentCategory);
         if(continuedRules.length){rules=continuedRules;observedCandidate=continued;break;}
       }
     }
-    const diagnosisSignal=/(תאונה|תיקונ|תיקון|פגיע|הלחמ|חיבור.*לא מקורי|עמוד|משקופ|נקיש|פגומ|זוויות.*היגוי|היגוי.*כיוון|ירידת ערך|הוחלפ|החלפ|לבדוק|סריקת מחשב|תקל|שחוק|רעש|צריכת שמן|חסר|לא מתקפל|שריט|מעיכ|פגמי|קרוע|שבור|נזיל|דליפ|חופש)/.test(normalizeFindingText(contentLine));
+    const diagnosisSignal=/(תאונה|תיקונ|תיקון|פגיע|הלחמ|חיבור.*לא מקורי|עמוד|משקופ|נקיש|פגומ|זוויות.*היגוי|היגוי.*כיוון|ירידת ערך|הוחלפ|החלפ|לבדוק|סריקת מחשב|תקל|שחוק|רעש|רעיד|צריכת שמן|חסר|לא מתקפל|שריט|מעיכ|פגמי|קרוע|שבור|נזיל|דליפ|חופש)/.test(normalizeFindingText(contentLine));
     const fullCoverage=rules.some(rule=>normalizeFindingText(rule.sourceText||rule.matchedTerm||'')===normalizeFindingText(contentLine));
-    if(currentCategory&&(diagnosisSignal||currentSeverity==='high')&&!fullCoverage&&!isMetadataLine(contentLine)){
+    const clauseCategory=currentCategory||(/תיבת הילוכים|תיבת ההילוכים/.test(contentLine)?'תיבת הילוכים':/במנוע|שמן מנוע/.test(contentLine)?'מנוע':'');
+    const ruleCategories=new Set(rules.map(rule=>rule.category));
+    const mixedSystems=ruleCategories.size>1;
+    if(mixedSystems&&!unreliable) unreadable.push(safeUnknownExcerpt(contentLine));
+    if(clauseCategory&&!unreliable&&!mixedSystems&&(diagnosisSignal||currentSeverity==='high')&&!fullCoverage&&!isMetadataLine(contentLine)){
       const severity=currentSeverity||rules.find(rule=>rule.category===currentCategory&&rule.reportSeverity)?.reportSeverity||null;
-      const sourceRule={id:'report-diagnosis-'+index,category:currentCategory,
+      const sourceRule={id:'report-diagnosis-'+index,category:clauseCategory,
         sourceText:contentLine,observedText:contentLine,verbatimDiagnosis:true,
         classification:'source_diagnosis',reportSeverity:severity,
         tag:reportSeverityLabels[severity]||'אבחנה מהדוח — נדרש בירור',
@@ -5069,10 +5103,16 @@ function interpretSummaryText(text){
         decision:severity==='high'?'הממצא נכלל במשמעות גבוהה בדוח המכון. יש לאמת את היקף הנזק ואיכות התיקון לפני החלטה על רכישה.':'יש לברר את האבחנה מול המכון או בעל מקצוע מתאים; אין להסיק רכיב או תקלה שלא נכתבו בדוח.'};
       rules.push(sourceRule);
     }
-    rules=rules.map(rule=>({...rule,observedText:rule.observedText||observedCandidate}));
+    rules=rules.map(rule=>{
+      const phrase=rule.sourceText||rule.matchedTerm||'';
+      // Isolate grounded phrases from mixed/noisy rows. Never inherit the whole row.
+      return {...rule,observedText:unreliable||mixedSystems?phrase:rule.observedText||observedCandidate};
+    });
     if(rules.length){
       rules.forEach(rule=>{
-        const enriched=applyReportSeverity(rule,currentSeverity,currentCategory);
+        const sameSystem=rule.category===currentCategory||chassisCategories.includes(rule.category)&&chassisCategories.includes(currentCategory);
+        const enriched=applyReportSeverity(rule,sameSystem?currentSeverity:null,currentCategory);
+        if(sameSystem&&currentSeverity) enriched.explicitReportSeverity=true;
         const sourceKey=normalizeFindingText(enriched.sourceText||enriched.matchedTerm||enriched.meaning||'');
         const duplicateIndex=findings.findIndex(existing=>{
           if(existing.id!==enriched.id||existing.reportSeverity!==enriched.reportSeverity) return false;
@@ -5088,13 +5128,13 @@ function interpretSummaryText(text){
         const findingKey=[enriched.id,sourceKey,enriched.reportSeverity].join('|');
         if(!seen.has(findingKey)){findings.push(enriched);seen.add(findingKey);}
       });
-    }else if(isPotentialUnknownFindingLine(contentLine)){
+    }else if(!unreliable&&isPotentialUnknownFindingLine(contentLine)){
       const excerpt=safeUnknownExcerpt(contentLine);
       if(excerpt&&!unknown.includes(excerpt)) unknown.push(excerpt);
     }
   });
-  const finalFindings=orderFindingsLikeReport(findings.map(finalizeReportFinding).filter(Boolean));
-  return applyReportMileageContext(applyEngineWarrantyContext({findings:finalFindings,unknown},text),text);
+  const finalFindings=orderFindingsLikeReport(distinctReportFindings(findings.map(finalizeReportFinding).filter(Boolean)));
+  return applyReportMileageContext(applyEngineWarrantyContext({findings:finalFindings,unknown,unreadable:[...new Set(unreadable)]},text),text);
 }
 
 const dtcStatusDefinitions={
@@ -5501,8 +5541,13 @@ const professionalConclusionDisclaimer='הסיכום מבוסס רק על המס
 function compactCategoryLabel(value,isComputer=false,item=null){
   const category=normalizeFindingText(value||'');
   const detail=normalizeFindingText([item?.sourceText,item?.matchedTerm,item?.title,item?.meaning].filter(Boolean).join(' '));
-  const sourceDetail=normalizeFindingText([item?.sourceText,item?.matchedTerm,item?.title,item?.observedText].filter(Boolean).join(' '));
-  if(/תיקוני מרכב|תיקון מרכב|החלפת חלקי מרכב|פחחות|שלדה|פגוש/.test(sourceDetail)) return 'שלדה ומרכב';
+  const sourceDetail=normalizeFindingText([item?.diagnosisLabel,item?.sourceText,item?.matchedTerm,item?.title].filter(Boolean).join(' '));
+  if(!isComputer&&!item?.managerEdited){
+    if(/מזגן|מיזוג/.test(sourceDetail)) return 'מיזוג אוויר';
+    if(/תיקוני מרכב|תיקון מרכב|החלפת חלקי מרכב|פחחות|שלדה|פגוש|שמשה|כנף|מראת צד/.test(sourceDetail)) return 'שלדה ומרכב';
+    if(/נקישה בהגה|משאבת הגה|מסרק הגה|זוויות היגוי|חוסר יציבות בהגה/.test(sourceDetail)) return 'מערכת ההיגוי';
+    if(/פנסים? |פנסי |תאורה/.test(sourceDetail)) return 'חשמל ואבזור';
+  }
   if(batteryFindingInfo(item)) return 'תאריך וגיל המצבר';
   if(/חלון גג|גג נפתח|sunroof/.test(detail)&&/לא תקין|תקלה|מנוע|מתג|חשמל|פתיחה|סגירה|תפעול/.test(detail)) return 'חשמל ואבזור';
   if(/תקשורת|מחשב.*מחשב|can\b/.test(category)) return 'תקשורת בין מחשבי הרכב';
@@ -5602,7 +5647,7 @@ function conciseFindingFact(item,isComputer=false){
   const normalizedSource=normalizeFindingText(source);
   const groundedCandidate=[matched,canonical].find(value=>{
     const normalized=normalizeFindingText(value);
-    return normalized.length>=3&&normalizedSource.includes(normalized);
+    return normalized.length>=3&&findingTextIncludes(normalizedSource,normalized);
   });
   // Prefer the short phrase that is actually present inside the OCR line. This
   // keeps separate findings such as turbo, steering and weak shock absorbers
@@ -5660,9 +5705,9 @@ function groupDecision(category,bucket,items){
   if(bucket==='review') return 'אבחנות אלה נשמרו כלשונן מהדוח. לא הוגדרה להן חומרה אוטומטית; יש להשלים בירור מול המכון או בעל מקצוע מתאים.';
   if(bucket==='medium') return `הממצאים ב${category} דורשים בירור ממוקד וטיפול לפי הממצאים המאומתים.`;
   if(bucket==='high'){
-    if(/מנוע/.test(category)) return 'נרשמו במנוע ממצאים בעלי משמעות גבוהה. יש להשלים אבחון מנוע ממוקד כדי לקבוע את מקורם ואת היקף הטיפול הנדרש.';
+    if(/מנוע/.test(category)) return 'נרשמו במנוע ממצאים בעלי משמעות גבוהה. מדובר בליקוי מכני שעשוי להיות ניתן לתיקון או להחלפת מכלול; יש לאבחן את המקור, היקף העבודה ועלותה ולוודא תקינות לאחר הטיפול. ממצא זה אינו מעיד כשלעצמו על פגיעה מבנית בשלדה.';
     if(/תיבת הילוכים/.test(category)) return 'נרשמו בתיבת ההילוכים ממצאים בעלי משמעות גבוהה. יש להשלים אבחון ממוקד של התיבה ומערכת העברת הכוח.';
-    if(/שלדה|מרכב/.test(category)) return 'נרשמו בשלדה או במרכב ממצאים בעלי משמעות גבוהה. יש לברר במדויק את מיקום הפגיעה או התיקון, היקפם ואופן ביצועם.';
+    if(/שלדה|מרכב/.test(category)) return 'נרשמו בשלדה או במרכב ממצאים בעלי משמעות גבוהה. תיקון עשוי לשקם את החלק, אך אינו מוחק את עבר הפגיעה המבנית; עשויה להישאר ירידת ערך גם לאחר תיקון. יש לברר את מיקום הפגיעה, איכות התיקון והשלכותיה עם שמאי רכב.';
     if(/בלמים|היגוי|מתלים|צמיגים/.test(category)) return 'נרשמו ממצאים בעלי משמעות גבוהה במערכת הקשורה לבטיחות או ליציבות. יש לבדוק ולטפל בהתאם לממצא המאומת.';
     return `נרשמו ב${category} ממצאים בעלי משמעות גבוהה. יש לברר את מקורם ואת היקף הטיפול הנדרש.`;
   }
@@ -5678,13 +5723,21 @@ function communicationGroupBullet(items,bucket){
 }
 
 function compactAnalysisGroups(result,isComputer=false){
-  const findings=(result?.findings||[]).map(finalizeReportFinding).filter(Boolean).filter(item=>{
+  const finalized=(result?.findings||[]).map(finalizeReportFinding).filter(Boolean);
+  const findings=(isComputer?finalized:distinctReportFindings(finalized)).filter(item=>{
     if(isComputer) return true;
     const fact=conciseFindingFact(item,false).replace(/[׳״"'`]/g,'').trim();
     return !/^(?:תיקון|תיקוני|תיקונים)$/.test(fact);
   });
   const grouped=new Map();
+  const displayed=new Map();
   findings.forEach(item=>{
+    const key=compactCategoryLabel(item.category,isComputer,item)+'|'+reportFactIdentity(conciseFindingFact(item,isComputer));
+    const previous=displayed.get(key);
+    const rank=value=>(value.managerEdited?100:0)+(value.explicitReportSeverity?20:0)+(value.verbatimDiagnosis?0:1);
+    if(!previous||rank(item)>rank(previous)) displayed.set(key,item);
+  });
+  [...displayed.values()].forEach(item=>{
     const category=compactCategoryLabel(item.category,isComputer,item);
     const bucket=isComputer?computerStatusBucket(item):summarySeverityBucket(item);
     const key=`${category}__${bucket}`;
@@ -5695,7 +5748,7 @@ function compactAnalysisGroups(result,isComputer=false){
     const communication=isComputer&&group.items.every(isCommunicationFinding);
     let bullets=communication
       ? [communicationGroupBullet(group.items,group.bucket)]
-      : compactUniqueTexts(group.items.filter(item=>isComputer||item.verbatimDiagnosis||!group.items.some(other=>other.verbatimDiagnosis&&normalizeFindingText(other.sourceText)===normalizeFindingText(item.observedText))).map(item=>conciseFindingFact(item,isComputer)));
+      : compactUniqueTexts(group.items.filter(item=>isComputer||!(item.managerEdited&&(item.managerMeaning||item.managerDecision||item.managerQuestion))).filter(item=>isComputer||item.verbatimDiagnosis||!group.items.some(other=>other.verbatimDiagnosis&&normalizeFindingText(other.sourceText)===normalizeFindingText(item.observedText))).map(item=>conciseFindingFact(item,isComputer)));
     if(isComputer&&!communication&&group.bucket==='active') bullets=bullets.map(line=>`תקלה פעילה בזמן הסריקה: ${line}`);
     if(isComputer&&!communication&&group.bucket==='historical') bullets=bullets.map(line=>`תקלה היסטורית בזיכרון: ${line}`);
     return {
@@ -5758,9 +5811,14 @@ function corePurchaseSystemForFinding(item){
 function professionalOverallConclusion(result,computerResult=null){
   const groups=compactAnalysisGroups(result,false);
   const describe=bucket=>groups.filter(group=>group.severity===bucket)
-    .map(group=>group.category+': '+group.bullets.join('; ')).join('. ');
+    .map(group=>group.category+': '+compactUniqueTexts([...group.bullets,...(group.details||[]).map(item=>item.fact)]).join('; ')).join('. ');
   const highFacts=describe('high'),mediumFacts=describe('medium'),lowFacts=describe('low');
-  const highConclusion=highFacts?'על פי דוח המכון, נרשמו הממצאים הבאים במשמעות גבוהה: '+highFacts+'. יש לברר את היקף הנזק או התקלה, איכות התיקונים והשלכותיהם לפני החלטה על רכישה.':'';
+  const highSystems=groups.filter(group=>group.severity==='high');
+  const highGuidance=[
+    highSystems.some(group=>/מנוע|תיבת הילוכים/.test(group.category))?'ליקויים מכניים במנוע או בתיבת ההילוכים עשויים להיות ניתנים לתיקון או להחלפת מכלול. יש לאבחן את היקף הטיפול ועלותו ולוודא תקינות לאחריו.':'',
+    highSystems.some(group=>/שלדה|מרכב/.test(group.category))?'בפגיעה מבנית בשלדה או במרכב, גם תיקון אינו מוחק את עבר הפגיעה ועשויה להישאר ירידת ערך. יש לבדוק את איכות התיקון והשלכות הפגיעה עם שמאי רכב.':''
+  ].filter(Boolean).join(' ');
+  const highConclusion=highFacts?'על פי דוח המכון, נרשמו הממצאים הבאים במשמעות גבוהה: '+highFacts+'. '+(highGuidance||'יש לברר את היקף התקלה ואת הטיפול הנדרש לפני החלטה על רכישה.'):'';
   const mediumConclusion=mediumFacts?'ממצאים במשמעות בינונית: '+mediumFacts+'. יש להשלים בירור מקצועי וטיפול לפי הממצאים המאומתים.':'';
   const lowConclusion=lowFacts?'ממצאים במשמעות נמוכה: '+lowFacts+'. יש להביא בחשבון את היקף הטיפול וההוצאה. ממצאים אלה אינם מבטלים או מפחיתים את חומרת הממצאים במשמעות גבוהה.':'';
   return {highConclusion,mediumConclusion,lowConclusion,disclaimer:professionalConclusionDisclaimer};
@@ -5776,7 +5834,8 @@ function professionalOverallConclusionHtml(result,computerResult=null){
 function compactAnalysisHtml(result,isComputer=false){
   const groups=compactAnalysisGroups(result,isComputer);
   const notice=isComputer?computerActiveNoticeHtml(result):'';
-  return notice+groups.map(group=>{
+  const readingNotice=!isComputer&&result?.unreadable?.length?'<div class="info">חלק מהטקסט בדוח לא נקרא באופן מהימן. קטעים משובשים לא הוצגו כאבחנות; יש לאמת אותם מול דוח המקור או המכון.</div>':'';
+  return notice+readingNotice+groups.map(group=>{
     const bullets=group.bullets.map(line=>`<li>${escapeHtml(line)}</li>`).join('');
     const details=(group.details||[]).map(item=>`<div class="categorySummaryDecision"><b>${escapeHtml(item.fact)}</b>${item.meaning?`<p><b>משמעות מקצועית:</b> ${escapeHtml(item.meaning)}</p>`:''}${item.decision?`<p><b>המשך בירור:</b> ${escapeHtml(item.decision)}</p>`:''}${item.question?`<p><b>מה לברר:</b> ${escapeHtml(item.question)}</p>`:''}</div>`).join('');
     return `<section class="categorySummaryCard ${escapeHtml(group.tone||'')}"><div class="categorySummaryHead"><h4>${escapeHtml(group.category)}</h4><span class="meaningTag">${escapeHtml(group.tag||'סיכום')}</span></div><ul>${bullets}</ul>${details}${group.decision?`<p class="categorySummaryDecision"><b>משמעות מקצועית:</b> ${escapeHtml(group.decision)}</p>`:''}</section>`;
@@ -5786,6 +5845,7 @@ function compactAnalysisHtml(result,isComputer=false){
 function analysisTextBlock(title,result,computerResult=null){
   const isComputer=Array.isArray(result.codes);
   let text=title+'\n';
+  if(!isComputer&&result?.unreadable?.length) text+='חלק מהטקסט בדוח לא נקרא באופן מהימן. קטעים משובשים לא הוצגו כאבחנות; יש לאמת אותם מול דוח המקור או המכון.\n';
   if(result.reportKm) text+=`קילומטראז׳ שנקרא מהדוח: ${fmtNum(result.reportKm)} ק״מ. הנתון משמש כהקשר לממצאים ואינו אבחנה בפני עצמו.\n`;
   if(isComputer){
     const statusCounts=computerStatusCounts(result);
@@ -6217,7 +6277,7 @@ function btPdfTextEntries(text){
 function btPdfAnalysisCards(result,isComputer=false){
   const groups=compactAnalysisGroups(result,isComputer);
   if(!groups.length)return [{text:'לא זוהו ממצאים שניתן לסווג אוטומטית. יש לבדוק מול דוח המקור.',alert:true}];
-  return groups.map(group=>{
+  const entries=groups.map(group=>{
     const bullets=[...(group.bullets||[])];
     (group.details||[]).forEach(item=>{
       bullets.push(item.fact);
@@ -6228,6 +6288,8 @@ function btPdfAnalysisCards(result,isComputer=false){
     if(group.decision)bullets.push('משמעות מקצועית: '+group.decision);
     return {card:{title:group.category,tag:group.tag||'ממצא',severity:group.severity||group.tone,bullets}};
   });
+  if(!isComputer&&result?.unreadable?.length) entries.unshift({text:'חלק מהטקסט בדוח לא נקרא באופן מהימן. קטעים משובשים לא הוצגו כאבחנות; יש לאמת אותם מול דוח המקור או המכון.',alert:true});
+  return entries;
 }
 function btPdfProfessionalCards(summary,computer){
   if(!summary)return [];

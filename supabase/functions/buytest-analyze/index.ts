@@ -1455,7 +1455,7 @@ function findKnowledgeRules(line,categoryHint=''){
     if(!covered) additions.push(rawFormulaToRule(formula));
   });
 
-  if(!curated.length&&!additions.length&&categoryHint){
+  if(!curated.length&&!additions.length&&categoryHint&&!reportTextIsUnreliable(line)){
     const fuzzy=rawFormulaDatabase.filter(formula=>isOperationalFormula(formula)&&formula.category===categoryHint)
       .map(formula=>({formula,score:fuzzyFormulaScore(n,formula.text)}))
       .filter(candidate=>candidate.score>=0.72)
@@ -1507,8 +1507,8 @@ function reportCategoryFromLine(line){
   const n=normalizeFindingText(line).replace(/^\d+\s+/,'').trim();
   const compact=n.replace(/\s/g,'');
   if(compact.includes('הערותכלליות')) return 'הערות כלליות';
-  if(/שלדה\s*ומ?רכ[בג]/.test(n)) return 'שלדת מרכב';
-  if(/העברת\s*הכוח/.test(n)) return 'תיבת העברת הכוח';
+  if(/^שלדה\s*ומ?רכ[בג](?:\s|$)/.test(n)) return 'שלדת מרכב';
+  if(/^(?:תיבת\s+)?העברת\s*הכוח(?:\s|$)/.test(n)) return 'תיבת העברת הכוח';
   if(/סרן\s*קדמי.*היגוי/.test(n)) return 'מערכת ההיגוי';
   if(/^מערכת\s*קירור$/.test(n)) return 'מערכת הקירור';
   if(/^צמיגים$/.test(n)) return 'צמיגים וחישוקים';
@@ -1516,7 +1516,7 @@ function reportCategoryFromLine(line){
     const categoryText=normalizeFindingText(category.name);
     if(!categoryText) return false;
     const categoryCompact=categoryText.replace(/\s/g,'');
-    return n===categoryText||n.startsWith(categoryText+' ')||n.endsWith(' '+categoryText)||(categoryCompact.length>=6&&compact.includes(categoryCompact));
+    return n===categoryText||n.startsWith(categoryText+' ')||(categoryCompact.length>=6&&compact.startsWith(categoryCompact));
   }).sort((a,b)=>b.name.length-a.name.length);
   return matches[0]?.name||'';
 }
@@ -1525,6 +1525,7 @@ function reportSeverityFromLine(line){
   const n=normalizeFindingText(line);
   if(/משמעות\s*גבוהה/.test(n)) return 'high';
   if(/משמעות\s*נמוכה/.test(n)) return 'low';
+  if(/משמעות\s*בינונית/.test(n)) return 'medium';
   if(/ליקויים?\s+שוליים?|ליקוי\s+שולי/.test(n)) return 'minor';
   return null;
 }
@@ -1537,7 +1538,7 @@ function stripReportScaffolding(line,category,severity){
     if(cleaned===categoryText||withoutArticle(cleaned)===withoutArticle(categoryText)||/שלדה\s*ומ?רכ[בג]/.test(cleaned)&&category==='שלדת מרכב') cleaned='';
     else if(cleaned.startsWith(categoryText+' ')) cleaned=cleaned.slice(categoryText.length).trim();
   }
-  if(severity) cleaned=cleaned.replace(/משמעות\s*(?:גבוהה|נמוכה)|ליקויים?\s+שוליים?|ליקוי\s+שולי/g,' ');
+  if(severity) cleaned=cleaned.replace(/משמעות\s*(?:גבוהה|בינונית|נמוכה)|ליקויים?\s+שוליים?|ליקוי\s+שולי/g,' ');
   return cleaned.replace(/^\s*\d+\s*/,' ').replace(/\s+/g,' ').trim();
 }
 
@@ -1660,8 +1661,34 @@ function orderFindingsLikeReport(findings){
     .map(entry=>entry.item);
 }
 
+function reportTextIsUnreliable(value){
+  const text=String(value||'');
+  // Do not turn OCR noise into a diagnosis or silently translate guessed words.
+  const latin=(text.match(/[a-z]{2,}/gi)||[]).filter(word=>! /^(ABS|ESP|ESC|OBD|DTC|SRS|ECU|CAN|DPF|EGR|SCR|NOX|CVT|DSG|ATF|AC|ILS)$/i.test(word));
+  const orphan=(text.match(/(?:^|\s)[א-ת](?=\s|$)/g)||[]).length;
+  return latin.length>0||/[א-ת]{16,}/.test(text)||/[|=]{1,}/.test(text)||orphan>=3||/ריפודפגום|תאריךמצבר|גלגלותמנוע|מערכתההי|שמשה קדמיתהוחלפה/.test(text);
+}
+
+function reportFactIdentity(value){
+  return normalizeFindingText(value).replace(/[^a-z0-9א-ת]/g,'');
+}
+
+function distinctReportFindings(findings){
+  const unique=new Map();
+  for(const item of findings){
+    const fact=item.diagnosisLabel||item.sourceText||item.matchedTerm||'';
+    const key=normalizeFindingText(item.category)+'|'+reportFactIdentity(fact);
+    if(!fact||isSeverityHeadingOnly(fact)) continue;
+    const previous=unique.get(key);
+    // Explicit report severity and manager corrections take priority over aliases.
+    const rank=value=>(value.managerEdited?100:0)+(value.explicitReportSeverity?20:0)+(value.reportSeverity?5:0)+(value.verbatimDiagnosis?0:1);
+    if(!previous||rank(item)>rank(previous)) unique.set(key,item);
+  }
+  return [...unique.values()];
+}
+
 function interpretSummaryText(text){
-  const findings=[],unknown=[],seen=new Set();
+  const findings=[],unknown=[],unreadable=[],seen=new Set();
   text=diagnosticTableText(text);
   const compactReport=normalizeFindingText(text).replace(/\s/g,'');
   const chassisHint=compactReport.includes('סוגשלדהשלדהנפרדת')?'שלדה נפרדת':compactReport.includes('סוגשלדהשלדתמרכב')?'שלדת מרכב':'';
@@ -1679,29 +1706,35 @@ function interpretSummaryText(text){
     const lineSeverity=reportSeverityFromLine(line);
     if(lineSeverity){
       currentSeverity=lineSeverity;
-      currentCategory=chassisHint||'שלדת מרכב';
+      currentCategory=currentCategory||chassisHint||'שלדת מרכב';
     }
     const contentLine=stripReportScaffolding(line,lineCategory,lineSeverity);
     if(!contentLine||isReportStatusScaffolding(contentLine)||isExplicitlyNormal(contentLine)) return;
+    const unreliable=reportTextIsUnreliable(contentLine);
+    if(unreliable) unreadable.push(safeUnknownExcerpt(contentLine));
     let observedCandidate=contentLine;
     let rules=findKnowledgeRules(contentLine,currentCategory);
-    if(!rules.length){
+    if(!rules.length&&!unreliable){
       let continued=contentLine;
       for(let offset=1;offset<=2;offset++){
         const nextLine=lines[index+offset];
         if(!nextLine||reportCategoryFromLine(nextLine)||reportSeverityFromLine(nextLine)) break;
         const nextContent=stripReportScaffolding(nextLine,'',null);
-        if(!nextContent) break;
+        if(!nextContent||reportTextIsUnreliable(nextContent)) break;
         continued+=' '+nextContent;
         const continuedRules=findKnowledgeRules(continued,currentCategory);
         if(continuedRules.length){rules=continuedRules;observedCandidate=continued;break;}
       }
     }
-    const diagnosisSignal=/(תאונה|תיקונ|תיקון|פגיע|הלחמ|חיבור.*לא מקורי|עמוד|משקופ|נקיש|פגומ|זוויות.*היגוי|היגוי.*כיוון|ירידת ערך|הוחלפ|החלפ|לבדוק|סריקת מחשב|תקל|שחוק|רעש|צריכת שמן|חסר|לא מתקפל|שריט|מעיכ|פגמי|קרוע|שבור|נזיל|דליפ|חופש)/.test(normalizeFindingText(contentLine));
+    const diagnosisSignal=/(תאונה|תיקונ|תיקון|פגיע|הלחמ|חיבור.*לא מקורי|עמוד|משקופ|נקיש|פגומ|זוויות.*היגוי|היגוי.*כיוון|ירידת ערך|הוחלפ|החלפ|לבדוק|סריקת מחשב|תקל|שחוק|רעש|רעיד|צריכת שמן|חסר|לא מתקפל|שריט|מעיכ|פגמי|קרוע|שבור|נזיל|דליפ|חופש)/.test(normalizeFindingText(contentLine));
     const fullCoverage=rules.some(rule=>normalizeFindingText(rule.sourceText||rule.matchedTerm||'')===normalizeFindingText(contentLine));
-    if(currentCategory&&(diagnosisSignal||currentSeverity==='high')&&!fullCoverage&&!isMetadataLine(contentLine)){
+    const clauseCategory=currentCategory||(/תיבת הילוכים|תיבת ההילוכים/.test(contentLine)?'תיבת הילוכים':/במנוע|שמן מנוע/.test(contentLine)?'מנוע':'');
+    const ruleCategories=new Set(rules.map(rule=>rule.category));
+    const mixedSystems=ruleCategories.size>1;
+    if(mixedSystems&&!unreliable) unreadable.push(safeUnknownExcerpt(contentLine));
+    if(clauseCategory&&!unreliable&&!mixedSystems&&(diagnosisSignal||currentSeverity==='high')&&!fullCoverage&&!isMetadataLine(contentLine)){
       const severity=currentSeverity||rules.find(rule=>rule.category===currentCategory&&rule.reportSeverity)?.reportSeverity||null;
-      const sourceRule={id:'report-diagnosis-'+index,category:currentCategory,
+      const sourceRule={id:'report-diagnosis-'+index,category:clauseCategory,
         sourceText:contentLine,observedText:contentLine,verbatimDiagnosis:true,
         classification:'source_diagnosis',reportSeverity:severity,
         tag:reportSeverityLabels[severity]||'אבחנה מהדוח — נדרש בירור',
@@ -1710,10 +1743,16 @@ function interpretSummaryText(text){
         decision:severity==='high'?'הממצא נכלל במשמעות גבוהה בדוח המכון. יש לאמת את היקף הנזק ואיכות התיקון לפני החלטה על רכישה.':'יש לברר את האבחנה מול המכון או בעל מקצוע מתאים; אין להסיק רכיב או תקלה שלא נכתבו בדוח.'};
       rules.push(sourceRule);
     }
-    rules=rules.map(rule=>({...rule,observedText:rule.observedText||observedCandidate}));
+    rules=rules.map(rule=>{
+      const phrase=rule.sourceText||rule.matchedTerm||'';
+      // Isolate grounded phrases from mixed/noisy rows. Never inherit the whole row.
+      return {...rule,observedText:unreliable||mixedSystems?phrase:rule.observedText||observedCandidate};
+    });
     if(rules.length){
       rules.forEach(rule=>{
-        const enriched=applyReportSeverity(rule,currentSeverity,currentCategory);
+        const sameSystem=rule.category===currentCategory||chassisCategories.includes(rule.category)&&chassisCategories.includes(currentCategory);
+        const enriched=applyReportSeverity(rule,sameSystem?currentSeverity:null,currentCategory);
+        if(sameSystem&&currentSeverity) enriched.explicitReportSeverity=true;
         const sourceKey=normalizeFindingText(enriched.sourceText||enriched.matchedTerm||enriched.meaning||'');
         const duplicateIndex=findings.findIndex(existing=>{
           if(existing.id!==enriched.id||existing.reportSeverity!==enriched.reportSeverity) return false;
@@ -1729,13 +1768,13 @@ function interpretSummaryText(text){
         const findingKey=[enriched.id,sourceKey,enriched.reportSeverity].join('|');
         if(!seen.has(findingKey)){findings.push(enriched);seen.add(findingKey);}
       });
-    }else if(isPotentialUnknownFindingLine(contentLine)){
+    }else if(!unreliable&&isPotentialUnknownFindingLine(contentLine)){
       const excerpt=safeUnknownExcerpt(contentLine);
       if(excerpt&&!unknown.includes(excerpt)) unknown.push(excerpt);
     }
   });
-  const finalFindings=orderFindingsLikeReport(findings.map(finalizeReportFinding).filter(Boolean));
-  return applyReportMileageContext(applyEngineWarrantyContext({findings:finalFindings,unknown},text),text);
+  const finalFindings=orderFindingsLikeReport(distinctReportFindings(findings.map(finalizeReportFinding).filter(Boolean)));
+  return applyReportMileageContext(applyEngineWarrantyContext({findings:finalFindings,unknown,unreadable:[...new Set(unreadable)]},text),text);
 }
 
 const dtcStatusDefinitions={
@@ -2224,7 +2263,16 @@ function sourceGroundedSummaryResult(result,text){
   return {...result,findings};
 }
 
-function adminCatalog(){const base=rawFormulaDatabase.filter(isOperationalFormula).map(item=>({source_kind:'formula',source_id:item.id,category:item.category,subgroup:item.subgroup||'',source_text:item.text,classification_type:item.classification?.type||'context_dependent',report_severity:item.classification?.severity==='review'?'medium':(item.classification?.severity||'none'),meaning:item.meaning||'',decision:item.decision||'',question:item.question||''}));const observed=observedFormulaAliases.filter(isOperationalFormula).map(item=>({source_kind:'observed',source_id:item.id,category:item.category,subgroup:item.subgroup||'',source_text:item.text,classification_type:item.classification_type||'context_dependent',report_severity:item.report_severity||'none',meaning:item.meaning||'',decision:item.decision||'',question:item.question||''}));return [...observed,...base]}
+const savedCalibrationNotes=[{"id":"oil_burning__split__g18u0f9q","note":"סעיף שנרשם בדרך כלל ככסתח או אם יש חוסר שמן קל","formulaIds":["technotest-478"],"aliasIds":["sample-004"],"phrases":["לבדוק תצרוכת שמן בנסיעה ממושכת","לבדוק תצרוכת שמן בנסיעה"]},{"id":"valve_train_noise","note":"כסת״ח של המכון. לא תקלה משמעותית ולא משפיע לבדו על מסקנת הקנייה, אלה אם באמת יש רעשים מוזרים","formulaIds":["technotest-232"],"aliasIds":["sample-005"],"phrases":["רעש מערכת שסתומים"]},{"id":"timing_noise","note":"בדרך כלל כסת\"ח","formulaIds":["technotest-233","technotest-250"],"aliasIds":[],"phrases":["רעש מערכת תזמון","רעש מערכת תזמון ושסתומים"]},{"id":"accessory_drive__split__g13fjcxg","note":"בדרך כלל נרשם כהגנה כללית","formulaIds":["technotest-563"],"aliasIds":["sample-006"],"phrases":["רעש גלגלות אביזרים ומותחנים","רעש גלגלות מנוע ואביזרים"]},{"id":"engine_repair_history","note":"לבדוק אם מספר מנוע תואם לרישיון","formulaIds":["technotest-479","technotest-485","technotest-614"],"aliasIds":["sample-001","sample-002"],"phrases":["סימני פירוק אגן שמן","סימני פירוק\\ החלפת מנוע","סימני פירוק בין מנוע לגיר","סימני פתיחת ברגים בין המנוע לגיר","סימני שיפוץ והחלפת מנוע"]},{"id":"timing_service","note":"כסת\"ח","formulaIds":["technotest-553","technotest-631"],"aliasIds":["sample-024"],"phrases":["לבדוק מעקב טיפולים","בדוק רצועת תיזמון במוסך מורשה"]},{"id":"engine_warning_computer","note":"לבדוק תקלת מחשב","formulaIds":["technotest-482","technotest-655"],"aliasIds":[],"phrases":["נורת ניהול מנוע דולקת","לבדוק תקלת מחשב במערכת המנוע"]},{"id":"engine_warranty","note":"יבוא בדרך כלל אם לרכב יש מספר קמ' גבוה, או שהותקנו מערכות שיפור למנוע לא חוקיות, או שנמצא בלאי גבוה במנוע","formulaIds":[],"aliasIds":["sample-009"],"phrases":["אין אחריות על המנוע"]},{"id":"coolant_mix_air__split__gizhvhg","note":"בעיה בראש מנוע","formulaIds":["technotest-264"],"aliasIds":[],"phrases":["שמן במים"]},{"id":"fuel_carburetor","note":"כבר לא קיים במערכות החדשות","formulaIds":["technotest-32","technotest-41","technotest-44"],"aliasIds":[],"phrases":["מאייד לא תקין","משנק לא תקין","חסר צינורות לחימום תערובת"]},{"id":"fuel_pump","note":"בדרך כלל כשהמנוע מזייף","formulaIds":["technotest-42"],"aliasIds":[],"phrases":["משאבת דלק פגומה"]},{"id":"fuel_injection","note":"כשיש עשן שחור, או מנוע לא עובד עגול","formulaIds":["technotest-47","technotest-48"],"aliasIds":[],"phrases":["הזרקת דלק לקויה","מערכת הזרקת דלק לא נבדקה"]},{"id":"fuel_turbo","note":"כשיש נזילות ממערכת או מצינורות טורבו","formulaIds":["technotest-46","technotest-49"],"aliasIds":[],"phrases":["מגדש טורבו לא תקין","מגדש טורבו לא נבדק"]},{"id":"fuel_computer","note":"כשמנורת בקרת מנוע דולקת check engien","formulaIds":["technotest-45","technotest-596"],"aliasIds":[],"phrases":["מחשב מערכת דלק לא נבדק","תקלת מחשב במערכת דלק, לתיקון"]},{"id":"exhaust_leaks","note":"דליפה מסעפות יותר חמורה מצנרת פליטה","formulaIds":["technotest-71","technotest-77","technotest-495"],"aliasIds":[],"phrases":["דליפה בחיבורי צינורות","דליפות מהסעפת","דליפות מסעפת פליטה"]},{"id":"exhaust_changes__split__gsoqqjf","note":"אין אחריות על המנוע","formulaIds":["technotest-497"],"aliasIds":[],"phrases":["שינוי במערכת פליטה אין אחריות"]},{"id":"hard_start","note":"התנעה קשה יכולה להעיד על בעיה במנוע","formulaIds":["technotest-56","technotest-60"],"aliasIds":[],"phrases":["התנעה קשה","מתג התנעה פגום"]},{"id":"battery_date","note":"אם תאריך מצבר מעל שנתיים מצביע על בלאי מוגבר","formulaIds":["technotest-291","technotest-292"],"aliasIds":["sample-012","sample-030"],"phrases":["תאריך ייצור מצבר","אין תאריך ייצור על המצבר","לבדוק תאריך מצבר","לאמת תאריך מצבר"]},{"id":"clutch_high","note":"סעיף זה נכתב רק בגלל שהרכב ישן, או בשביל לכסת\"ח, יש להתייחס לסעיף זה רק אם דוושת המצמד גבוהה","formulaIds":["technotest-85"],"aliasIds":[],"phrases":["מצמד מפריד גבוה (בלאי)"]},{"id":"gearbox_behavior","note":"לבדוק את חומרת הפגם במוסך מורשה","formulaIds":["technotest-500","technotest-501","technotest-502","technotest-551"],"aliasIds":[],"phrases":["נקישה בשילוב הילוכים","רעידות בתחילת נסיעה","השהיה בשילוב הילוכים","רעידות יתר"]},{"id":"gearbox_wear","note":"רק בשביל לרשום משהו ברובחעקת תיבת ההילוכים","formulaIds":["technotest-550"],"aliasIds":["sample-013"],"phrases":["בלאי סביר"]},{"id":"front_springs__split__g72ljac","note":"רכב מונמך לא חוקי","formulaIds":["technotest-108"],"aliasIds":[],"phrases":["קפיצים קדמיים נמוכים"]},{"id":"control_arm_bushings","note":"ליקוי ממשי  במתלה הקדמי.","formulaIds":["technotest-605","technotest-661"],"aliasIds":[],"phrases":["תותבים למשולשים קד' פגומים","בלאי תותבים למשולשים"]},{"id":"front_lift_modification","note":"יש אפשרות לשינויים לא חוקיים","formulaIds":["technotest-118","technotest-513"],"aliasIds":[],"phrases":["קיימות טבעות הגבהה בקפיצים","בוצע שינוי במערכת מתלים"]},{"id":"front_crossmember","note":"דרוש כיוון פרונט","formulaIds":["technotest-595","technotest-615"],"aliasIds":[],"phrases":["כיפוף גשר תחתון","מעיכות בגשר קדמי"]},{"id":"rear_lift","note":"יש אפשרות לתוספת לא חוקית","formulaIds":["technotest-131"],"aliasIds":[],"phrases":["קיימות טבעות הגבהה בקפיצים"]},{"id":"rear_noise","note":"יש אפשרות לכסת\"ח","formulaIds":["technotest-667"],"aliasIds":[],"phrases":["נקישות במתלה"]},{"id":"steering_crossmembers","note":"מחייב כיוון פרונט","formulaIds":["technotest-324","technotest-325","technotest-326","technotest-327"],"aliasIds":[],"phrases":["גשר קדמי עקום","גשר קדמי סדוק","מעיכות בגשר","גשר אחורי עקום"]},{"id":"alignment_geometry","note":"מחייב כיוון פרונט","formulaIds":["technotest-328","technotest-343","technotest-348","technotest-349"],"aliasIds":["sample-017","sample-033"],"phrases":["זוויות היגוי (כיוון)","זווית ציר אחורי פגומה","סטיות במקביליות ומרחקי צירים","מידות מרכב אינם עפ\"י הוראת יצרן","זווית היגוי (כיוון)"]},{"id":"steering_vibration","note":"יש מצב שהפגם יהיה מאיזון גלגלים או מציריה פגומה","formulaIds":["technotest-331"],"aliasIds":[],"phrases":["רעידות בגלגלים"]},{"id":"steering_play","note":"פגם שיכול לנבוע מקצה הגה, מוט קישור או נקישה במסרק הגה","formulaIds":["technotest-337","technotest-338","technotest-339","technotest-342","technotest-350"],"aliasIds":[],"phrases":["חופש מוט הגה בתא נהג","חופש במערכת היגוי","חופש זרוע עזר","חופש חיבורי ציר קדמי","חופש במסרק הגה"]},{"id":"steering_center","note":"דרוש כיוון פרונט","formulaIds":["technotest-347"],"aliasIds":[],"phrases":["גלגל הגה אינו ממורכז"]},{"id":"steering_box_knock","note":"ממצא ממשי ומשמעותי במערכת ההיגוי.","formulaIds":["technotest-361","technotest-362","technotest-515"],"aliasIds":[],"phrases":["נקישה בתיבת הגה","חופש ונקישה בתיבת הגה","נקישות במערכת היגוי"]},{"id":"tire_wear_steering","note":"דרוש כיוון פרונט","formulaIds":["technotest-329"],"aliasIds":[],"phrases":["שחיקת צמיגים"]},{"id":"brake_pads_discs","note":"ליקוי בלימה ממשי בעל השלכה בטיחותית.","formulaIds":["technotest-140","technotest-141","technotest-638","technotest-639"],"aliasIds":["sample-034"],"phrases":["רפידות שחוקות","צלחות שחוקות","צלחות בלם ורפידות קדמיות שחוקות","צלחות בלם ורפידות אחוריות שחוקות"]},{"id":"braking_performance","note":"ליקוי בלימה ממשי ומשמעותי בעל השלכה בטיחותית.","formulaIds":["technotest-142","technotest-167"],"aliasIds":[],"phrases":["בלימה לקויה","מערכת בלמים לקויה"]},{"id":"brake_vibration","note":"בדרך כלל צלחות בלם אובליות","formulaIds":["technotest-144","technotest-150"],"aliasIds":["sample-035"],"phrases":["רעידות בבלימה","רעידות בלחיצת דוושת בלם"]},{"id":"brake_noise","note":"החלפת צלחות ורפידות","formulaIds":["technotest-146","technotest-147"],"aliasIds":[],"phrases":["חריקות בבלימה","נקישות בבלימה"]},{"id":"brake_fluid","note":"לבדוק אם יש נזילות של נוזל בלמים","formulaIds":["technotest-169"],"aliasIds":[],"phrases":["חסר נוזל בלמים"]},{"id":"brake_disclaimer","note":"מגבלת בדיקה או כסת״ח; אין בנוסח לבדו הוכחה לליקוי בבלמים.","formulaIds":["technotest-154"],"aliasIds":["sample-020"],"phrases":["לפרק גלגלים לבדיקה"]},{"id":"tire_wear","note":"דרוש כיוון פרונט","formulaIds":["technotest-173","technotest-612"],"aliasIds":[],"phrases":["שחיקת צמיגים בינונית","צמיגים בלאי"]},{"id":"tire_illegal_size","note":"צמיגים שלא תואמים לרישיון","formulaIds":["technotest-181"],"aliasIds":[],"phrases":["מידת צמיגים לא חוקית"]},{"id":"tpms","note":"יכול לנבוע מתקלה בחיישנים","formulaIds":["technotest-583","technotest-584"],"aliasIds":[],"phrases":["נורת לחץ אוויר דולקת"]},{"id":"unibody_major_structure__split__g1ube5xb","note":"רק אם הקורה היא מעבר לנקודת ריתום המתלה זה יהיה משמעות גבוהה","formulaIds":["technotest-376"],"aliasIds":[],"phrases":["קורת רוחב מעבר לנקודת ריתום המתלה/מנוע"]},{"id":"unibody_major_structure__split__g27l5my","note":"אם הוחלף הסף הפנימי זה משמעות גבוהה","formulaIds":["technotest-382"],"aliasIds":[],"phrases":["פח סף פנימי"]},{"id":"unibody_major_structure__split__gokj9dr","note":"כל מה שכתוב קורה אורכית זה שלדה","formulaIds":["technotest-393","technotest-394","technotest-398","technotest-577","technotest-616"],"aliasIds":[],"phrases":["קורה אורכית קדמית עד לנקודת רתום המתלה / מנוע","קורות אורך אחוריות עד לנקודת רתום המתלה / מנוע","קורת רוחב אחורית עד לנקודת רתום המתלה","סימני פגיעה קורת רוחב אחורית","סימני פגיעה קורת רוחב קדמית"]},{"id":"unibody_welded_front__split__g3w899n","note":"בתיקון זה משמעות נמוכה","formulaIds":[],"aliasIds":[],"phrases":["פח חזית כולל גשר חזית עליון מולחם"]},{"id":"unibody_welded_front__split__glp7ka5","note":"בתיקון זה משמעות נמוכה","formulaIds":[],"aliasIds":[],"phrases":["פח חזית מולחם"]},{"id":"unibody_welded_rear__split__gbvl8u2","note":"במידה ותוקן- משמעות נמוכה","formulaIds":["technotest-379"],"aliasIds":[],"phrases":["פח דופן אחורי"]},{"id":"unibody_welded_rear__split__gdtnxcc","note":"רק אם הוחלפו","formulaIds":["technotest-380","technotest-396"],"aliasIds":[],"phrases":["כנף אחורי מולחמת","כנף אחורית ימנית / שמאלית מולחמת"]},{"id":"unibody_welded_rear__split__gw0crhs","note":"במידה והוחלף- משמעות גבוהה","formulaIds":["technotest-397"],"aliasIds":[],"phrases":["פח דופן אחורית"]},{"id":"roof_paint","note":"הממצא בעל משמעות גבוהה לפי סיווג הבדיקה ויש לשקלל אותו בהתאם. במיוחד אם הרכב חדש","formulaIds":["technotest-567","technotest-600"],"aliasIds":[],"phrases":["צבע בגג","צבע גג לא מקורי"]},{"id":"roof_damage","note":"מעיכות ושריטות קלות זה משמעות נמוכה","formulaIds":["technotest-566","technotest-568","technotest-572","technotest-599"],"aliasIds":[],"phrases":["שריטות ומעיכות קלות בגג הרכב","מעיכות חזקות בגג הרכב","חלודה חודרת מתחת לצבע בגג הרכב","מעיכות בגג"]},{"id":"replaced_body_parts","note":"כסתח, או שהבוחן הבחין בפגיעה אבל לא בחלקים שהוחלפו","formulaIds":["technotest-526"],"aliasIds":[],"phrases":["הוחלפו חלקי מרכב"]}];
+function savedCalibrationMeaning(item){
+  const id=String(item?.id||'').replace(/^alias-/, '');
+  const byId=savedCalibrationNotes.find(row=>(row.formulaIds||[]).includes(id)||(row.aliasIds||[]).includes(id));
+  if(byId) return byId.note;
+  const phrase=normalizeFindingText(item?.text||'');
+  return savedCalibrationNotes.find(row=>(row.phrases||[]).some(text=>normalizeFindingText(text)===phrase))?.note||'';
+}
+
+function adminCatalog(){const base=rawFormulaDatabase.filter(isOperationalFormula).map(item=>({source_kind:'formula',source_id:item.id,category:item.category,subgroup:item.subgroup||'',source_text:item.text,classification_type:item.classification?.type||'context_dependent',report_severity:item.classification?.severity==='review'?'medium':(item.classification?.severity||'none'),meaning:item.meaning||savedCalibrationMeaning(item),decision:item.decision||'',question:item.question||''}));const observed=observedFormulaAliases.filter(isOperationalFormula).map(item=>({source_kind:'observed',source_id:item.id,category:item.category,subgroup:item.subgroup||'',source_text:item.text,classification_type:item.classification_type||'context_dependent',report_severity:item.report_severity||'none',meaning:item.meaning||savedCalibrationMeaning(item),decision:item.decision||'',question:item.question||''}));return [...observed,...base]}
 function normalizedOverride(body){const row={source_kind:String(body.source_kind||''),source_id:String(body.source_id||''),category:String(body.category||'').slice(0,100),subgroup:String(body.subgroup||'').trim().slice(0,100),source_text:String(body.source_text||'').slice(0,500),classification_type:String(body.classification_type||'context_dependent').slice(0,80),report_severity:String(body.report_severity||'none'),meaning:String(body.meaning||'').slice(0,2000),decision:String(body.decision||'').slice(0,2000),question:String(body.question||'').slice(0,1000),active:true,updated_at:new Date().toISOString()};if(!['knowledge','formula','observed','custom'].includes(row.source_kind)||!row.source_id||!row.category||row.source_text.length<3||!['safety','high','medium','low','minor','none'].includes(row.report_severity))throw new Error('invalid_override');return row}
 async function saveOverride(body){const row=normalizedOverride(body);const data=await serviceRequest('/rest/v1/buytest_formula_overrides?on_conflict=source_kind,source_id',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=representation'},body:JSON.stringify(row)});return Array.isArray(data)?data[0]:null}
 async function saveOverrides(bodies){if(!Array.isArray(bodies)||!bodies.length||bodies.length>250)throw new Error('invalid_override');const rows=bodies.map(normalizedOverride);const data=await serviceRequest('/rest/v1/buytest_formula_overrides?on_conflict=source_kind,source_id',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=representation'},body:JSON.stringify(rows)});return Array.isArray(data)?data:[]}
