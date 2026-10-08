@@ -3,8 +3,8 @@
   const verified=new Map();
   const key=p=>'buytest-service-receipts:'+p;
   function payload(payment){
-    if(!payment||String(payment.plate)!==plate())return null;
-    try{const data=JSON.parse(atob(payment.accessToken.split('.')[0].replace(/-/g,'+').replace(/_/g,'/')));return data.plate===plate()&&Number(data.exp)>Date.now()/1000?data:null}catch{return null}
+    if(!payment||String(payment.plate)!==plate()&&!(payment.plan==='prebuy'&&payment.plate==='GENERAL'))return null;
+    try{const data=JSON.parse(atob(payment.accessToken.split('.')[0].replace(/-/g,'+').replace(/_/g,'/')));return (data.plate===plate()||(payment.plan==='prebuy'&&data.plate==='GENERAL'))&&Number(data.exp)>Date.now()/1000?data:null}catch{return null}
   }
   function cache(value){
     if(!value?.orderId||!/^\d{7,8}$/.test(String(value.plate)))return;
