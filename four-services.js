@@ -104,14 +104,19 @@
     document.querySelector('#afterPage>button')?.setAttribute('hidden','');
     document.querySelector('#consultationPage>button')?.setAttribute('hidden','');
     document.getElementById('consultationPage').append(document.getElementById('prePurchaseConsultationBox'));
-    const notes=document.createElement('div');notes.className='field wide';notes.innerHTML='<label for="adviceNotes">הערות מהייעוץ לסיכום (רשות)</label><textarea id="adviceNotes" maxlength="4000" placeholder="אפשר לרשום כאן את הדברים שעלו בייעוץ"></textarea>';document.querySelector('#prePurchaseConsultationBox .consultationFormGrid').append(notes);
-    for(const id of ['prebuyQuestion','prebuyAdLink','adviceNotes'])document.getElementById(id).addEventListener('input',captureAdvice);
-    document.getElementById('prebuyVehiclePlate').readOnly=true;
-    document.getElementById('prebuyVehiclePlate').value=plate();
-    document.getElementById('prebuyVehiclePlate').previousElementSibling.textContent='מספר הרכב שנבחר';
-    document.querySelector('#insuranceStartSection h3').textContent='פענוח עבר ביטוחי — חינם';
+    const consultationGrid=document.querySelector('#prePurchaseConsultationBox .consultationFormGrid');
+    if(consultationGrid){
+      const notes=document.createElement('div');notes.className='field wide';notes.innerHTML='<label for="adviceNotes">הערות מהייעוץ לסיכום (רשות)</label><textarea id="adviceNotes" maxlength="4000" placeholder="אפשר לרשום כאן את הדברים שעלו בייעוץ"></textarea>';
+      consultationGrid.append(notes);
+    }
+    for(const id of ['prebuyQuestion','prebuyAdLink','adviceNotes'])document.getElementById(id)?.addEventListener('input',captureAdvice);
+    const prebuyPlate=document.getElementById('prebuyVehiclePlate');
+    if(prebuyPlate){prebuyPlate.readOnly=true;prebuyPlate.value=plate();if(prebuyPlate.previousElementSibling)prebuyPlate.previousElementSibling.textContent='מספר הרכב שנבחר';}
+    const insuranceHeading=document.querySelector('#insuranceStartSection h3');
+    if(insuranceHeading)insuranceHeading.textContent='פענוח עבר ביטוחי — חינם';
     document.querySelectorAll('.returnBtn').forEach(button=>{button.textContent='חזרה לדף הראשי';button.onclick=home;});
-    const insuranceText=document.querySelector('#insuranceStartSection .info');insuranceText.textContent=insuranceText.textContent.replace('החבילה','שירות העבר הביטוחי');
+    const insuranceText=document.querySelector('#insuranceStartSection .info');
+    if(insuranceText)insuranceText.textContent=insuranceText.textContent.replace('החבילה','שירות העבר הביטוחי');
     render();
   });
 })();
