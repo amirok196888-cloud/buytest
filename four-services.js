@@ -6,7 +6,7 @@
   let reportStarted=false;
   function beginNewReportSession(){freshReportSessionPending=true;}
   function consumeNewReportSession(p){if(!freshReportSessionPending)return false;freshReportSessionPending=false;if(typeof btBeginNewReportSession==='function')btBeginNewReportSession(p);return true;}
-  const readRoute=()=>{const requested=new URLSearchParams(location.search).get('service')|| (location.hash==='#report'?'report':'');return requested==='insurance'||requested==='balcar'?'report':requested;};
+  const readRoute=()=>{const requested=new URLSearchParams(location.search).get('service')|| (location.hash==='#report'?'report':'');return requested==='insurance'?'balcar':requested;};
   function updateSummary(){
     const box=document.getElementById('serviceSummaryContent');if(!box)return;
     box.replaceChildren();
@@ -37,16 +37,28 @@
     head.querySelector('h1').textContent=insuranceShortcut&&current==='report'?'פענוח דוח עבר ביטוחי':services[current]?.title||'';
     const main=document.querySelector('#appShell main');
     const upload=document.getElementById('afterInspectionSection');
-    const insuranceUpload=document.getElementById('balcarUploadPage');
+    const balcarPage=document.getElementById('balcarUploadPage');
+    const balcarMount=document.getElementById('balcarExistingMount');
+    const insurancePanel=document.getElementById('insuranceHistoryUploadPanel');
+    const reportSlot=document.getElementById('reportInsuranceSlot');
     const host=current==='report'?document.getElementById('afterPage'):current==='consultation'?document.getElementById('consultationPage'):main;
+    document.getElementById('reportInsuranceUploadButton')?.remove();
     if(current==='report'){
       if(upload)host.append(upload);
-      document.getElementById('reportInsuranceUploadButton')?.remove();
-      if(insuranceUpload)insuranceUpload.style.display='none';
+      if(insurancePanel&&reportSlot&&insurancePanel.parentElement!==reportSlot)reportSlot.append(insurancePanel);
+      if(balcarPage){balcarPage.hidden=true;balcarPage.style.display='none';}
     }else{
-      document.getElementById('reportInsuranceUploadButton')?.remove();
-      if(upload&&main&&upload.parentElement!==main)main.append(upload);
-      if(insuranceUpload&&main&&insuranceUpload.parentElement!==main){insuranceUpload.style.display='none';main.append(insuranceUpload);}
+      if(current==='balcar'||current==='insurance'){
+        if(upload)upload.style.display='none';
+        if(insurancePanel&&balcarMount&&insurancePanel.parentElement!==balcarMount)balcarMount.append(insurancePanel);
+        if(balcarPage){balcarPage.hidden=false;balcarPage.style.display='block';}
+        const optionalPlate=document.getElementById('balcarOptionalPlate');
+        if(optionalPlate)optionalPlate.value=plate();
+      }else{
+        if(upload&&main&&upload.parentElement!==main)main.append(upload);
+        if(insurancePanel&&reportSlot&&insurancePanel.parentElement!==reportSlot)reportSlot.append(insurancePanel);
+        if(balcarPage){balcarPage.hidden=true;balcarPage.style.display='none';}
+      }
     }
     host.prepend(head);host.append(document.getElementById('serviceSummary'));
     document.getElementById('serviceSummary').hidden=!current||current==='balcar'||current==='insurance'||current==='report';
