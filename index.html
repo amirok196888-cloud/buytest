@@ -5029,6 +5029,17 @@ function reportTextIsUnreliable(value){
   return latin.length>0||/[א-ת]{16,}/.test(text)||/[|=]{1,}/.test(text)||orphan>=3||/ריפודפגום|תאריךמצבר|גלגלותמנוע|מערכתההי|שמשה קדמיתהוחלפה/.test(text);
 }
 
+function reportSystemFamily(category){
+  if(/שלד|מרכב/.test(category)) return 'body';
+  if(/היגוי/.test(category)) return 'steering';
+  if(/בלמ/.test(category)) return 'brakes';
+  if(/מתל|קפיצ/.test(category)) return 'suspension';
+  if(/תאורה|מצבר|טעינה|התנעה|חשמל/.test(category)) return 'electrical';
+  if(/מנוע|גידוש|דלק|הצתה|פליטה/.test(category)) return 'engine';
+  if(/תיבת|מצמד|ציריות|העברת/.test(category)) return 'transmission';
+  return category;
+}
+
 function reportFactIdentity(value){
   return normalizeFindingText(value).replace(/[^a-z0-9א-ת]/g,'');
 }
@@ -5090,7 +5101,8 @@ function interpretSummaryText(text){
     const fullCoverage=rules.some(rule=>normalizeFindingText(rule.sourceText||rule.matchedTerm||'')===normalizeFindingText(contentLine));
     const clauseCategory=currentCategory||(/תיבת הילוכים|תיבת ההילוכים/.test(contentLine)?'תיבת הילוכים':/במנוע|שמן מנוע/.test(contentLine)?'מנוע':'');
     const ruleCategories=new Set(rules.map(rule=>rule.category));
-    const mixedSystems=ruleCategories.size>1;
+    const families=new Set([...ruleCategories].map(reportSystemFamily));
+    const mixedSystems=families.size>1||Boolean(currentCategory&&rules.some(rule=>reportSystemFamily(rule.category)!==reportSystemFamily(currentCategory)));
     if(mixedSystems&&!unreliable) unreadable.push(safeUnknownExcerpt(contentLine));
     if(clauseCategory&&!unreliable&&!mixedSystems&&(diagnosisSignal||currentSeverity==='high')&&!fullCoverage&&!isMetadataLine(contentLine)){
       const severity=currentSeverity||rules.find(rule=>rule.category===currentCategory&&rule.reportSeverity)?.reportSeverity||null;
