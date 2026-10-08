@@ -112,10 +112,10 @@
     summary.querySelector('button').id='serviceSummaryPdf';summary.querySelector('button').onclick=()=>{btRefreshSummary();shareReportPdf('serviceSummaryPdf');};
     document.querySelector('#appShell main').append(summary);
     const advice=document.createElement('div');advice.className='card';
-    advice.innerHTML='<label for="advicePlate">מספר הרכב לייעוץ ולסיכום</label><input id="advicePlate" inputmode="numeric" maxlength="8" placeholder="7 או 8 ספרות"><button type="button" class="secondary full">אישור מספר הרכב</button>';
+    advice.innerHTML='<label for="advicePlate">מספר הרכב לייעוץ ולסיכום (רשות)</label><input id="advicePlate" inputmode="numeric" maxlength="8" placeholder="7 או 8 ספרות"><button type="button" class="secondary full">אישור מספר הרכב</button>';
     document.getElementById('consultationPurchaseIntro').before(advice);
     advice.querySelector('input').oninput=function(){sanitizePlateInput(this);};
-    advice.querySelector('button').onclick=async()=>{const input=advice.querySelector('input');if(!/^\d{7,8}$/.test(input.value)){input.setCustomValidity('יש להזין מספר רכב בן 7 או 8 ספרות');input.reportValidity();return;}input.setCustomValidity('');document.getElementById('plate').value=input.value;document.getElementById('prebuyVehiclePlate').value=input.value;await loadVehicle();};
+    advice.querySelector('button').onclick=async()=>{const input=advice.querySelector('input');if(!input.value){input.setCustomValidity('');document.getElementById('plate').value='';document.getElementById('prebuyVehiclePlate').value='';return;}if(!/^\d{7,8}$/.test(input.value)){input.setCustomValidity('יש להזין מספר רכב בן 7 או 8 ספרות');input.reportValidity();return;}input.setCustomValidity('');document.getElementById('plate').value=input.value;document.getElementById('prebuyVehiclePlate').value=input.value;await loadVehicle();};
     document.querySelectorAll('.serviceHome,.appBackHome').forEach(link=>link.onclick=home);
     document.querySelector('#afterPage>button')?.setAttribute('hidden','');
     document.querySelector('#consultationPage>button')?.setAttribute('hidden','');
@@ -127,7 +127,7 @@
     }
     for(const id of ['prebuyQuestion','prebuyAdLink','adviceNotes'])document.getElementById(id)?.addEventListener('input',captureAdvice);
     const prebuyPlate=document.getElementById('prebuyVehiclePlate');
-    if(prebuyPlate){prebuyPlate.readOnly=true;prebuyPlate.value=plate();if(prebuyPlate.previousElementSibling)prebuyPlate.previousElementSibling.textContent='מספר הרכב שנבחר';}
+    if(prebuyPlate){prebuyPlate.readOnly=false;prebuyPlate.value=plate();if(prebuyPlate.previousElementSibling)prebuyPlate.previousElementSibling.textContent='מספר רכב (רשות)';}
     const insuranceHeading=document.querySelector('#insuranceStartSection h3');
     if(insuranceHeading)insuranceHeading.textContent='פענוח עבר ביטוחי — חינם';
     document.querySelectorAll('.returnBtn').forEach(button=>{button.textContent='חזרה לדף הראשי';button.onclick=home;});
