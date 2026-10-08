@@ -3,6 +3,7 @@
   const services={balcar:{title:'פענוח דוח עבר ביטוחי'},insurance:{title:'פענוח עבר ביטוחי — חינם'},checklist:{title:'צ׳קליסט לפני קנייה — חינם'},report:{title:'פענוח דוח מכון — חינם'},consultation:{title:'ייעוץ אישי עם עמוס — 99 ₪'}};
   let current='';
   let freshReportSessionPending=false;
+  let reportStarted=false;
   function beginNewReportSession(){freshReportSessionPending=true;}
   function consumeNewReportSession(p){if(!freshReportSessionPending)return false;freshReportSessionPending=false;if(typeof btBeginNewReportSession==='function')btBeginNewReportSession(p);return true;}
   const readRoute=()=>{const requested=new URLSearchParams(location.search).get('service')|| (location.hash==='#report'?'report':'');return requested==='insurance'||requested==='balcar'?'report':requested;};
@@ -14,7 +15,7 @@
     for(const entry of entries){const item=document.createElement(entry.heading?'h3':'p');item.textContent=entry.text;if(entry.alert)item.classList.add('btCritical');box.append(item);}
   }
   function render(route=readRoute()){
-    if(route==='report'&&current!=='report')beginNewReportSession();
+    if(route==='report'&&current!=='report'){beginNewReportSession();consumeNewReportSession(plate());reportStarted=false;document.body.dataset.reportStarted='false';}
     else if(route!=='report')freshReportSessionPending=false;
     current=services[route]?route:'';
     document.body.dataset.service=current||'home';
@@ -22,7 +23,7 @@
     document.getElementById('beforeInspectionRoute').hidden=true;
     document.getElementById('afterInspectionRoute').hidden=true;
     document.body.dataset.bundleStep=current||'lookup';
-    if(current==='report'){openAfterPage(false);document.getElementById('afterPagePlate').value=plate();}
+    if(current==='report'){openAfterPage(false);document.getElementById('afterPageVehicle').style.display='none';document.getElementById('afterPagePlate').value=plate();}
     if(current==='consultation'){document.body.classList.add('consultation-page');document.getElementById('consultationPage').hidden=false;document.getElementById('advicePlate').value=plate();document.getElementById('prebuyVehiclePlate').value=plate();const source=btDossier().sources.consultation;document.getElementById('prebuyQuestion').value=source?.question||'';document.getElementById('prebuyAdLink').value=source?.adLink||'';document.getElementById('adviceNotes').value=source?.note||'';}
     const vehicleLookup=document.getElementById('vehicleLookup');
     if(vehicleLookup) vehicleLookup.style.display=current==='insurance'||current==='balcar'?'none':'block';
@@ -51,6 +52,18 @@
     document.title=current?services[current].title+' | BuyTest':'BuyTest — לפני קניית רכב';
     BuyTestBundle.sync();updateSummary();
   }
+  function beginReport(){
+    if(current!=='report')render('report');
+    reportStarted=true;
+    document.body.dataset.reportStarted='true';
+    document.body.classList.add('plan-report');
+    const entry=document.getElementById('preSummarySection');
+    if(entry){entry.classList.remove('active');entry.style.display='none';}
+    const upload=document.getElementById('afterInspectionSection');
+    if(upload){upload.style.display='block';upload.scrollIntoView({behavior:'smooth',block:'start'});}
+    document.getElementById('inspectionOwnerName')?.focus({preventScroll:true});
+    return true;
+  }
   function captureAdvice(){if(!/^\d{7,8}$/.test(plate()))return;const question=document.getElementById('prebuyQuestion').value,adLink=document.getElementById('prebuyAdLink').value,note=document.getElementById('adviceNotes').value;btSaveSource('consultation',{title:'שאלות והערות מהייעוץ — דיווח המשתמש',question,adLink,note,text:[question,adLink,note?'הערות המשתמש מהייעוץ: '+note:''].filter(Boolean).join('\n')});}
   function home(event){event?.preventDefault();
     BuyTestChecklist.capture();
@@ -63,7 +76,11 @@
   const oldOpenWhatsApp=openPrebuyWhatsApp;
   openPrebuyWhatsApp=function(){if(!document.body.classList.contains('manager-mode')&&!BuyTestBundle.adviceReceipt())return; captureAdvice();return oldOpenWhatsApp();};
   const oldActivate=activatePurchasedPlan;activatePurchasedPlan=function(...args){const result=oldActivate(...args);if(document.getElementById('independentServiceHeader'))render(current);return result;};
-  window.BuyTestServices={render,home,updateSummary,beginNewReportSession,consumeNewReportSession};
+  window.BuyTestServices={render,home,updateSummary,beginNewReportSession,consumeNewReportSession,beginReport};
+  const priorHasReport=BuyTestBundle.hasReport;
+  BuyTestBundle.hasReport=()=>reportStarted||priorHasReport();
+  const priorUnlock=BuyTestBundle.unlock;
+  BuyTestBundle.unlock=async(intent='checklist',...args)=>intent==='report'&&current==='report'?beginReport():priorUnlock(intent,...args);
   window.addEventListener('popstate',()=>render());
   window.addEventListener('DOMContentLoaded',()=>{
     const lookup=document.getElementById('vehicleLookup');
