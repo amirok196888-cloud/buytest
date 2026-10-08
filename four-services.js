@@ -5,7 +5,7 @@
   let freshReportSessionPending=false;
   function beginNewReportSession(){freshReportSessionPending=true;}
   function consumeNewReportSession(p){if(!freshReportSessionPending)return false;freshReportSessionPending=false;if(typeof btBeginNewReportSession==='function')btBeginNewReportSession(p);return true;}
-  const readRoute=()=>new URLSearchParams(location.search).get('service')|| (location.hash==='#report'?'report':'');
+  const readRoute=()=>{const requested=new URLSearchParams(location.search).get('service')|| (location.hash==='#report'?'report':'');return requested==='insurance'||requested==='balcar'?'report':requested;};
   function updateSummary(){
     const box=document.getElementById('serviceSummaryContent');if(!box)return;
     box.replaceChildren();
@@ -39,17 +39,15 @@
     const host=current==='report'?document.getElementById('afterPage'):current==='consultation'?document.getElementById('consultationPage'):main;
     if(current==='report'){
       if(upload)host.append(upload);
-      let insuranceButton=document.getElementById('reportInsuranceUploadButton');
-      if(!insuranceButton){insuranceButton=document.createElement('button');insuranceButton.id='reportInsuranceUploadButton';insuranceButton.type='button';insuranceButton.className='primary full';insuranceButton.textContent='העלאת קובץ עבר ביטוחי לפענוח';insuranceButton.onclick=()=>showBalcarUpload();}
-      host.append(insuranceButton);
-      if(insuranceUpload){insuranceUpload.style.display='none';host.append(insuranceUpload);}
+      document.getElementById('reportInsuranceUploadButton')?.remove();
+      if(insuranceUpload)insuranceUpload.style.display='none';
     }else{
       document.getElementById('reportInsuranceUploadButton')?.remove();
       if(upload&&main&&upload.parentElement!==main)main.append(upload);
       if(insuranceUpload&&main&&insuranceUpload.parentElement!==main){insuranceUpload.style.display='none';main.append(insuranceUpload);}
     }
     host.prepend(head);host.append(document.getElementById('serviceSummary'));
-    document.getElementById('serviceSummary').hidden=!current||current==='balcar'||current==='insurance';
+    document.getElementById('serviceSummary').hidden=!current||current==='balcar'||current==='insurance'||current==='report';
     document.title=current?services[current].title+' | BuyTest':'BuyTest — לפני קניית רכב';
     BuyTestBundle.sync();updateSummary();
   }
