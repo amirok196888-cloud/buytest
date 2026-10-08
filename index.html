@@ -391,14 +391,22 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 
 <a class="btService btChecklist" href="?service=checklist&v=20261008"><strong>צ׳קליסט לפני קנייה</strong><small>חינם</small></a>
 <a class="btService btReport" href="?service=report&v=20261008-2"><strong>פענוח דוח מכון</strong><small>חינם</small></a>
-<a class="btService btInsurance" href="?service=report&focus=insurance&v=20261008-3"><strong>פענוח דוח עבר ביטוחי</strong><small>קובץ שהורדתם</small></a>
+<button class="btService btInsurance" type="button" onclick="openBalcarChoices()"><strong>דוח עבר ביטוחי · בלק״ר</strong><small>הפקה או פענוח דוח קיים</small></button>
 <a class="btService btConsult" href="?service=consultation&v=20261008"><strong>ייעוץ אישי עם עמוס</strong><small>99 ₪</small></a>
 <div class="btFreeInquiry btHomeInquiry"><a id="consultationFreeInquiry" href="https://wa.me/972552997673?text=%D7%A9%D7%9C%D7%95%D7%9D%20%D7%A2%D7%9E%D7%95%D7%A1%2C%20%D7%94%D7%92%D7%A2%D7%AA%D7%99%20%D7%9E%D6%BEBuyTest%20%D7%95%D7%99%D7%A9%20%D7%9C%D7%99%20%D7%A9%D7%90%D7%9C%D7%94%20%D7%A2%D7%9C%20%D7%A9%D7%99%D7%A8%D7%95%D7%AA%20%D7%94%D7%99%D7%99%D7%A2%D7%95%D7%A5%20%D7%9C%D7%A4%D7%A0%D7%99%20%D7%A7%D7%A0%D7%99%D7%99%D7%AA%20%D7%A8%D7%9B%D7%91." target="_blank" rel="noopener noreferrer">יש שאלה על השירות? שלחו לי הודעה בוואטסאפ</a><small>בירור ראשוני ללא עלות</small></div>
 </div>
-
+<dialog id="balcarChoiceDialog" aria-labelledby="balcarChoiceTitle" style="width:min(92vw,680px);border:0;border-radius:20px;padding:24px;color:#20343d;box-shadow:0 20px 70px #10252b55">
+  <button type="button" class="secondary" style="float:left" onclick="document.getElementById(&quot;balcarChoiceDialog&quot;).close()">סגירה</button>
+  <h2 id="balcarChoiceTitle">דוח עבר ביטוחי מבלק״ר</h2>
+  <p>בחר איך להמשיך:</p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">
+    <a class="primary full" style="display:flex;align-items:center;justify-content:center;min-height:88px;text-align:center;text-decoration:none" href="https://balcar.co.il/balcar-check" target="_blank" rel="noopener noreferrer">מעבר לבלק״ר להפקת דוח</a>
+    <a class="secondary full" style="display:flex;align-items:center;justify-content:center;min-height:88px;text-align:center;text-decoration:none" href="?service=balcar&amp;v=20261008-5">יש לי דוח בלק״ר — העלאה ופענוח כאן</a>
+  </div>
+</dialog>
 <script>
-function openBalcarChoices(){const d=document.getElementById('balcarChoiceDialog');if(d&&!d.open)d.showModal()}
-document.getElementById('balcarChoiceDialog')?.addEventListener('click',event=>{if(event.target===event.currentTarget)event.currentTarget.close()});
+function openBalcarChoices(){const d=document.getElementById("balcarChoiceDialog");if(d&&!d.open)d.showModal()}
+document.getElementById("balcarChoiceDialog")?.addEventListener("click",event=>{if(event.target===event.currentTarget)event.currentTarget.close()});
 </script>
 <button class="btTourButton" type="button" onclick="openBuyTestTour()">איך זה עובד? ▶</button>
 </div>
@@ -772,7 +780,7 @@ document.getElementById('balcarChoiceDialog')?.addEventListener('click',event=>{
 <div class="caseLabel">אחרי המכון</div>
 <h2>פענוח דוחות</h2>
 <div class="privacyStrip"><strong>מה עומד מאחורי הפענוח?</strong><br>הפענוח מבוסס על מאגר ידע מקצועי שעמוס רוקח בנה בעמל רב לאורך יותר מ־15 שנות ניסיון בבדיקות רכב. המערכת נעזרת במאגר כדי להסביר את הכתוב בדוח ולסמן נושאים שדורשים בירור; היא אינה מחליפה בדיקה במכון או התייעצות אישית עם עמוס.</div>
-<p class="sub">תחילה הזן את מספר הרכב וטען את פרטיו מהמאגר. לאחר מכן אפשר להעלות דוח בדיקה ועבר ביטוחי לפענוח משותף.</p>
+<p class="sub">תחילה הזן את מספר הרכב וטען את פרטיו מהמאגר. לאחר מכן אפשר להעלות דוח בדיקה; דוח עבר ביטוחי אפשר לצרף כרשות. מספר שלא זוהה יוצג כ״לא זוהה״ והפענוח ימשיך.</p>
 
 <div class="reportPlateStep">
   <label for="inspectionPlate">מספר הרכב</label>
@@ -798,11 +806,13 @@ document.getElementById('balcarChoiceDialog')?.addEventListener('click',event=>{
       <button class="secondary full" type="button" onclick="clearInspectionFile('summary')">לחץ להסרת הקובץ</button>
     </div>
   </div>
+  <div id="reportInsuranceSlot">
   <div class="uploadPanel" id="insuranceHistoryUploadPanel">
-    <h3>עבר ביטוחי · חובה לאימות הרכב</h3>
-    <p class="sub">העלה את קובץ הדוח שהורדת. BuyTest אינה מתחברת לבלק״ר.</p>
+    <h3>עבר ביטוחי מבלק״ר · רשות</h3>
+    <p class="sub">אפשר להעלות דוח קיים. מספר רכב שלא זוהה יסומן כך ולא יעצור את פענוח דוח המכון.</p>
     <div id="externalInsuranceMount"></div>
   </div>
+</div>
   <div class="uploadPanel">
     <h3>פלט סריקת תקלות ממחשב הרכב (אם קיבלתם)</h3>
     <p class="sub">אפשר לצרף עד 6 תמונות או קובצי PDF.</p>
@@ -823,6 +833,14 @@ document.getElementById('balcarChoiceDialog')?.addEventListener('click',event=>{
 <button class="primary full" id="finalPdfBtn" data-analytics-click="click_report_pdf" onclick="shareReportPdf('finalPdfBtn')" style="display:none">לחץ לשיתוף הסיכום המלא כ־PDF</button>
 <div class="postReportConsultation" id="postReportConsultation"><h3>רוצה לעבור על הממצאים עם הבוחן עמוס רוקח?</h3><p>אחרי הפענוח אפשר להתייעץ אישית עם הבוחן עמוס רוקח בוואטסאפ למשך 48 שעות. הייעוץ הוא בחירה נוספת.</p><button class="primary full" type="button" data-analytics-click="click_consultation_plan" onclick="startPayment('consultation')">התייעצות עם הבוחן עמוס רוקח — 99 ₪</button></div>
 <button class="secondary full returnBtn" type="button" onclick="returnToVehicle()">לחץ לחזרה לנתוני הרכב</button>
+</section>
+<section class="card" id="balcarUploadPage" hidden style="max-width:840px;margin:20px auto">
+  <div class="caseLabel">דוח עבר ביטוחי</div>
+  <h2>פענוח דוח קיים מבלק״ר</h2>
+  <p class="sub">העלה כאן דוח שכבר הפקת בבלק״ר. אם לא יזוהה מספר הרכב, נציג זאת ונמשיך להציג את הפענוח. אפשר להזין מספר רכב כדי לשמור את התוצאה בסיכום של אותו רכב.</p>
+  <div class="field"><label for="balcarOptionalPlate">מספר רכב לשמירה בסיכום (רשות)</label><input id="balcarOptionalPlate" inputmode="numeric" maxlength="8" placeholder="7 או 8 ספרות" oninput="sanitizePlateInput(this);document.getElementById('plate').value=this.value"></div>
+  <div id="balcarExistingMount"></div>
+  <p><a href="https://balcar.co.il/balcar-check" target="_blank" rel="noopener noreferrer">עדיין אין לך דוח? מעבר לבלק״ר להפקה</a></p>
 </section>
 <section class="clarificationBox prePurchaseConsultationBox" id="prePurchaseConsultationBox" aria-labelledby="prePurchaseConsultationTitle">
   <div class="caseLabel">ייעוץ לפני רכישה · WhatsApp בלבד</div>
@@ -2333,10 +2351,16 @@ function showInsuranceStart(){
   showBalcarUpload();
 }
 function showBalcarUpload(){
-  const page=document.getElementById('afterInspectionSection');
+  const page=document.getElementById('balcarUploadPage');
+  const panel=document.getElementById('insuranceHistoryUploadPanel');
+  const mount=document.getElementById('balcarExistingMount');
   if(!page)return;
+  if(panel&&mount&&panel.parentElement!==mount)mount.append(panel);
+  page.hidden=false;
   page.style.display='block';
   page.scrollIntoView({behavior:'smooth',block:'start'});
+  const optionalPlate=document.getElementById('balcarOptionalPlate');
+  if(optionalPlate&&!optionalPlate.value)optionalPlate.value=plate();
   document.getElementById('externalInsuranceChoose')?.focus({preventScroll:true});
 }
 function showFreeStart(){
@@ -2355,7 +2379,8 @@ function showLicenseFlow(){
 }
 function continueToInsuranceFlow(){
   trackBuyTestFreeCompletedOnce(plate());
-  showBalcarUpload();
+  if(window.BuyTestServices?.beginReport)BuyTestServices.beginReport();
+  else showBalcarUpload();
 }
 function unlockFreeSections(){
   const progress=document.getElementById('preFlowProgress');
@@ -5351,7 +5376,7 @@ function assessComputerVehicleIdentity(extracted){
   const expected=currentVehicleIdentity();
   const evidence=[];
   if(extracted.vin) evidence.push(`מספר שלדה שנקרא מהדוח: ${extracted.vin}`);
-  if(extracted.plate) evidence.push(`מספר רכב שנקרא מהדוח: ${extracted.plate}`);
+  html+=`<div class="inspectionIdentityItem"><span class="inspectionIdentityLabel">מספר רכב שנקרא מסיכום הבוחן</span><strong class="inspectionIdentityValue">${escapeHtml(inspectionPlate||'לא זוהה')}</strong></div>`;
   if(extracted.maker) evidence.push(`יצרן שנקרא מהדוח: ${extracted.maker}`);
   if(extracted.model) evidence.push(`דגם שנקרא מהדוח: ${extracted.model}`);
   if(extracted.year) evidence.push(`שנת ייצור שנקראה מהדוח: ${extracted.year}`);
@@ -5864,8 +5889,7 @@ async function analyseInspectionReport(){
   if(document.body.dataset.reportRegistryPlate!==analysisPlate){blockIdentity('צריך לטעון את פרטי הרכב מהמאגר לפני פענוח הדוחות.');return;}
   const summaryText=document.getElementById('examinerSummaryText').value.trim();
   const inspectionPlate=reportVehiclePlate(summaryText);
-  if(!inspectionPlate){blockIdentity('לא הצלחנו לקרוא מספר רכב מסיכום הבוחן. יש לוודא שמספר הרכב ברור בצילום ולנסות להעלות את הדוח שוב.');return;}
-  if(inspectionPlate!==analysisPlate){blockIdentity('מספר הרכב שנקרא מסיכום הבוחן ('+inspectionPlate+') שונה מהמספר שהוזן ('+analysisPlate+'). הפענוח נעצר כדי לא לשייך את הדוח לרכב אחר.');return;}
+  if(inspectionPlate&&inspectionPlate!==analysisPlate){blockIdentity('מספר הרכב שנקרא מסיכום הבוחן ('+inspectionPlate+') שונה מהמספר שהוזן ('+analysisPlate+'). הפענוח נעצר כדי לא לשייך את הדוח לרכב אחר.');return;}
   const computerText=document.getElementById('computerTestText').value.trim();
   const computerPlate=computerText?reportVehiclePlate(computerText):'';
   if(computerPlate&&computerPlate!==analysisPlate){blockIdentity('מספר הרכב שנקרא מהבדיקה הממוחשבת שונה מהמספר שהוזן. הפענוח נעצר כדי לא לשייך את הדוח לרכב אחר.');return;}
@@ -5887,17 +5911,17 @@ async function analyseInspectionReport(){
   if(button){button.disabled=true;button.textContent='מפענח את הדוחות...';}
   if(status){status.textContent='מפענח את הדוח...';status.classList.add('show');status.classList.remove('error');}
   try{
+  let insuranceCurrent=window.BuyTestExternalInsurance?.getCurrent?.()||null;
   if(window.BuyTestExternalInsurance?.prepare){
-    status.textContent='קורא את הקבצים שהועלו ומפענח את הדוחות...';
-    await window.BuyTestExternalInsurance.prepare();
+    status.textContent='מפענח את סיכום הבוחן. דוח עבר ביטוחי מצורף הוא רשות...';
+    try{insuranceCurrent=await window.BuyTestExternalInsurance.prepare();}
+    catch(insuranceError){console.warn('BuyTest insurance report could not be read; continuing with the inspection report:',insuranceError);}
   }
-  const insuranceCurrent=window.BuyTestExternalInsurance?.getCurrent?.()||null;
-  if(insuranceCurrent?.busy)throw new Error('insurance_ocr_failed');
-  if(!insuranceCurrent?.text)throw new Error('insurance_missing');
-  const insurancePlate=String(reportVehiclePlate(insuranceCurrent.text)||insuranceCurrent.interpretation?.plate||'').replace(/\D/g,'');
-  if(!insurancePlate)throw new Error('insurance_plate_unreadable');
-  if(insurancePlate!==analysisPlate)throw new Error('insurance_vehicle_mismatch');
-  insuranceSummary=insuranceCurrent?.interpretation?insuranceSummaryForReport(insuranceCurrent.interpretation,analysisPlate):{html:'',text:''};
+  if(insuranceCurrent?.busy)insuranceCurrent=null;
+  const insuranceText=String(insuranceCurrent?.text||'').trim();
+  const insurancePlate=insuranceText?String(reportVehiclePlate(insuranceText)||insuranceCurrent?.interpretation?.plate||'').replace(/\D/g,''):'';
+  if(insurancePlate&&insurancePlate!==analysisPlate)throw new Error('insurance_vehicle_mismatch');
+  insuranceSummary=insuranceText&&insuranceCurrent?.interpretation?insuranceSummaryForReport(insuranceCurrent.interpretation,analysisPlate):{html:'',text:''};
   const saved=window.BuyTestBundle?.reportReceipt()||storedBuyTestPayment();
   const expected={
     plate:plate(),
@@ -5941,14 +5965,17 @@ async function analyseInspectionReport(){
   const requesterAdvisory=inspectionRequesterAdvisory(ownerName);
   let html='<div class="inspectionIdentity">';
   html+='<div class="inspectionIdentityTitle">פרטי הבדיקה</div><div class="inspectionIdentityGrid">';
-  html+=`<div class="inspectionIdentityItem"><span class="inspectionIdentityLabel">מספר רכב שנקרא מהדוח</span><strong class="inspectionIdentityValue">${escapeHtml(analysisPlate||'לא זוהה בבירור')}</strong></div>`;
+  html+=`<div class="inspectionIdentityItem"><span class="inspectionIdentityLabel">מספר רכב שנקרא מסיכום הבוחן</span><strong class="inspectionIdentityValue">${escapeHtml(inspectionPlate||'לא זוהה')}</strong></div>`;
   html+=`<div class="inspectionIdentityItem"><span class="inspectionIdentityLabel">שם מזמין/ת הבדיקה</span><strong class="inspectionIdentityValue">${escapeHtml(ownerName)}</strong></div>`;
-  html+=`<div class="inspectionIdentityItem"><span class="inspectionIdentityLabel">אימות זהות העבר הביטוחי</span><strong class="inspectionIdentityValue">${escapeHtml(insurancePlate)} · תואם לדוח הבדיקה</strong></div>`;
+  html+=`<div class="inspectionIdentityItem"><span class="inspectionIdentityLabel">אימות זהות העבר הביטוחי</span><strong class="inspectionIdentityValue">${escapeHtml(insurancePlate?insurancePlate+' · תואם למספר הרכב שנבחר':insuranceText?'לא זוהה מספר בדוח · התאמה לא אומתה':'לא צורף דוח · לא אומת')}</strong></div>`;
   const registryDetails=reportRegistryDetails();
   if(registryDetails.length)html+=`<div class="inspectionIdentityItem inspectionRegistryItem"><span class="inspectionIdentityLabel">נתוני רכב ממאגר הרישוי</span><strong class="inspectionIdentityValue">${escapeHtml(registryDetails.join(' · '))}</strong></div>`;
   html+=`<div class="inspectionIdentityItem"><span class="inspectionIdentityLabel">קילומטראז׳ ${displayedKm?'('+kmSource+')':''}</span><strong class="inspectionIdentityValue">${displayedKm?fmtNum(displayedKm)+' ק״מ':'לא זמין'}</strong></div>`;
   html+='</div>';
   html+='</div>';
+  if(!inspectionPlate)html+='<div class="info"><b>מספר הרכב לא זוהה בסיכום הבוחן.</b> הפענוח נמשך לפי מספר הרכב שהוזן, ולכן התאמה ישירה מול המספר שבדוח לא אומתה.</div>';
+  if(insuranceText&&!insurancePlate)html+='<div class="info">מספר הרכב בעבר הביטוחי לא זוהה. הדוח פוענח, אך התאמתו לרכב לא אומתה.</div>';
+  if(!insuranceText)html+='<div class="info">לא צורף דוח עבר ביטוחי. פענוח דוח המכון הושלם בנפרד.</div>';
   html+=insuranceSummary.html;
   html+='<h3>ממצאי דוח הבדיקה במכון</h3>';
   if(summaryResult.reportKm){
@@ -5977,7 +6004,18 @@ async function analyseInspectionReport(){
 
   const pre=collectPreInspection();
   preReportText=pre.text;
-  afterReportText='פענוח דוחות לרכב '+(analysisPlate||'לא זוהה בבירור')+'\n'+`שם מזמין/ת הבדיקה: ${ownerName}\n`+(registryDetails.length?'נתוני רכב ממאגר הרישוי: '+registryDetails.join(' · ')+'\n':'')+`אימות זהות העבר הביטוחי: ${insurancePlate} — תואם לדוח הבדיקה\n`+(insuranceSummary.text?insuranceSummary.text+'\n':'')+(requesterAdvisory?`${requesterAdvisory.pdfText}\n`:'')+`קילומטראז׳: ${displayedKm?fmtNum(displayedKm)+' ק״מ':'לא זמין'}${displayedKm?' ('+kmSource+')':''}\n`+analysisTextBlock('פענוח סיכום הבוחן',summaryResult,computerResult)+(computerText?'\n'+computerIdentityText(computerResult.vehicleIdentity)+'\n'+analysisTextBlock('פענוח הבדיקה הממוחשבת',computerResult):'')+'\nהבהרה: המידע אינו מחליף בדיקה פיזית או אבחון מקצועי.';
+  afterReportText='פענוח דוחות לרכב '+analysisPlate+'\n'
+    +'מספר רכב שנקרא מסיכום הבוחן: '+(inspectionPlate||'לא זוהה')+'\n'
+    +'שם מזמין/ת הבדיקה: '+ownerName+'\n'
+    +(registryDetails.length?'נתוני רכב ממאגר הרישוי: '+registryDetails.join(' · ')+'\n':'')
+    +'אימות זהות העבר הביטוחי: '+(insurancePlate?insurancePlate+' — תואם למספר הרכב שנבחר':insuranceText?'לא זוהה מספר — התאמה לא אומתה':'לא צורף דוח')+'\n'
+    +(insuranceSummary.text?insuranceSummary.text+'\n':'')
+    +(!inspectionPlate?'מספר הרכב לא זוהה בסיכום הבוחן; הפענוח נמשך, אך לא בוצע אימות ישיר מול מספר מתוך הדוח.\n':'')
+    +(requesterAdvisory?requesterAdvisory.pdfText+'\n':'')
+    +'קילומטראז׳: '+(displayedKm?fmtNum(displayedKm)+' ק״מ':'לא זמין')+(displayedKm?' ('+kmSource+')':'')+'\n'
+    +analysisTextBlock('פענוח סיכום הבוחן',summaryResult,computerResult)
+    +(computerText?'\n'+computerIdentityText(computerResult.vehicleIdentity)+'\n'+analysisTextBlock('פענוח הבדיקה הממוחשבת',computerResult):'')
+    +'\nהבהרה: המידע אינו מחליף בדיקה פיזית או אבחון מקצועי.';
   if(pre.findings.length||!btDossier().sources.notes)btSaveSource('notes',{title:'נתונים ודגשים שהוזנו לפני המכון',text:preReportText,alerts:pre.findings.map(x=>'דיווח לקוח — '+x.title+': '+x.text)});
   btCaptureInspection(ownerName,summaryResult,computerText?computerResult:null,afterReportText);
   prepareReportPdf('finalPdfBtn');
@@ -5992,8 +6030,8 @@ async function analyseInspectionReport(){
     console.error('BuyTest secure analysis error:',error);
     const messages={
       insurance_ocr_failed:'לא הצלחנו לקרוא את קובץ העבר הביטוחי בשלמותו. לא נוצר סיכום חלקי; יש לנסות שוב עם קובץ ברור יותר.',
-      insurance_missing:'יש להעלות את קובץ העבר הביטוחי כדי לוודא שהוא שייך לאותו רכב לפני הפענוח.',
-      insurance_plate_unreadable:'לא הצלחנו לזהות מספר רכב בעבר הביטוחי. הדוחות לא יאוחדו בלי אימות; יש לוודא שהמספר נראה בבירור ולהעלות את הקובץ שוב.',
+      insurance_missing:'דוח עבר ביטוחי לא צורף. פענוח דוח המכון ממשיך בנפרד.',
+      insurance_plate_unreadable:'מספר הרכב בעבר הביטוחי לא זוהה. פענוח דוח המכון ימשיך, וההתאמה תסומן כלא מאומתת.',
       insurance_vehicle_mismatch:'מספר הרכב בעבר הביטוחי שונה ממספר הרכב שהוזן. הפענוח נעצר כדי לא לשלב מידע על רכבים שונים.',
       paid_access_required:'הרשאת הפענוח אינה פעילה או שפג תוקפה. יש לפתוח מחדש את הגישה לרכב זה.',
       vehicle_mismatch:'מספר הרכב בדוח אינו תואם לרכב שעבורו נפתחה הגישה. יש לבדוק את המספרים לפני הפענוח.',
