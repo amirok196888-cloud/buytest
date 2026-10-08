@@ -35,15 +35,21 @@
   function dateOrder(value){const date=fullDate(value);const match=date.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);return match?Date.UTC(Number(match[3]),Number(match[2])-1,Number(match[1])):Number.MAX_SAFE_INTEGER;}
   function unique(values){return [...new Set(values.filter(Boolean))];}
   function extractPlate(lines){
-    const label=/(?:מס(?:פר)?\s*['׳״"]?\s*(?:רכב|רישוי)|לוחית(?:\s*רישוי)?)/u;
-    for(const line of lines){
-      const m=label.exec(line);if(!m)continue;
-      const left=line.slice(Math.max(0,m.index-24),m.index);
-      const right=line.slice(m.index+m[0].length,m.index+m[0].length+28);
-      const numbers=[...left.matchAll(/(?<!\d)\d{7,8}(?!\d)/g),...right.matchAll(/(?<!\d)\d{7,8}(?!\d)/g)];
-      if(numbers.length)return numbers[0][0];
+    const label=/(?:מס(?:פר)?\s*['׳״”"']?\s*(?:ה?רכב|רישוי|רישיון)|(?:ה?רכב|רישוי|רישיון)\s*מס(?:פר)?|לוחית\s*(?:ה?רישוי|רישוי)?|vehicle\s*(?:registration|plate|number)|(?:plate|registration)\s*(?:no\\.?|number))/iu;
+    const number=/(?<!\d)(\d(?:[\s.-]?\d){6,7})(?!\d)/g;
+    let best=null;
+    for(let i=0;i<lines.length;i++){
+      const from=Math.max(0,i-1),to=Math.min(lines.length,i+2);
+      const context=lines.slice(from,to).join(' ');
+      const labels=Array.from(context.matchAll(new RegExp(label.source,'giu')));
+      if(!labels.length)continue;
+      const numbers=Array.from(context.matchAll(number)).map(match=>({value:match[1].replace(/\D/g,''),position:match.index+(match[0].length-match[1].length)})).filter(item=>/^\d{7,8}$/.test(item.value));
+      for(const labelMatch of labels)for(const candidate of numbers){
+        const distance=Math.abs(candidate.position-labelMatch.index);
+        if(!best||distance<best.distance)best={value:candidate.value,distance};
+      }
     }
-    return '';
+    return best?.value||'';
   }
   function extractQueryDate(lines){
     for(const line of lines){

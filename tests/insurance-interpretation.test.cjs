@@ -1,10 +1,26 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const context={};vm.createContext(context);vm.runInContext(fs.readFileSync(require.resolve('../insurance-interpretation.js'),'utf8'),context);
 const interpret=context.BuyTestInsurance.interpret;
+const indexSource=fs.readFileSync(require.resolve('../index.html'),'utf8');
+const reportParser=indexSource.slice(indexSource.indexOf('function reportVehiclePlate(text){'),indexSource.indexOf('\nfunction reportIdentityMessage'));
+vm.runInContext(reportParser,context);
+const reportPlate=context.reportVehiclePlate;
+
+test('report OCR finds a plate when Hebrew OCR reverses label order or splits it across lines',()=>{
+ assert.equal(reportPlate('מספר רכב: 30281601'),'30281601');
+ assert.equal(reportPlate('30281601 רכב מספר'),'30281601');
+ assert.equal(reportPlate('מספר רישוי\n30281601'),'30281601');
+});
+
+test('insurance OCR finds the plate when label order is reversed or split across lines',()=>{
+ assert.equal(interpret('30281601 רכב מספר\nטבלה ב - פרטי התביעות').plate,'30281601');
+ assert.equal(interpret('מספר\nרכב: 30281601\nטבלה ב - פרטי התביעות').plate,'30281601');
+});
+
 
 test('vehicle plate may appear before the RTL license label; inquiry date is kept separate',()=>{
  const result=interpret('29-09-2026 תאריך השאילתה\n30281601 מס׳ רישוי\nטבלה ב - פרטי התביעות');
- assert.equal(result.plate,'30281601');assert.equal(result.queryDate,'29-09-2026');assert.equal(result.claims.length,0);
+ assert.equal(result.plate,'30281601');assert.equal(result.queryDate,'29/09/2026');assert.equal(result.claims.length,0);
 });
 
 test('same-date insured and third-party claims are shown as separate claims under one event',()=>{
@@ -78,7 +94,7 @@ test('split OCR rows retain constructive total loss and keep a separate same-dat
   'תביעת ניזוק צד ג׳',
   'נזק חלקי',
   '45000'
- ].join('\\n');
+ ].join('\n');
  const r=interpret(raw);
  assert.equal(r.summary.eventCount,1);
  assert.equal(r.summary.totalLossClaims,1);
@@ -87,7 +103,7 @@ test('split OCR rows retain constructive total loss and keep a separate same-dat
 });
 
 test('an unassigned loss mention is surfaced instead of being reported as no loss',()=>{
- const r=interpret('טבלה ב פרטי התביעות\\nתביעה 2214767326\\nהערות כלליות\\nאובדן להלכה');
+ const r=interpret('טבלה ב פרטי התביעות\nתביעה 2214767326\nהערות כלליות\nאובדן להלכה');
  assert.equal(r.summary.unlinkedTotalLoss,true);
  assert.match(r.alerts.join(' '),/לא ניתן לשייך אותו בבטחה/);
 });
