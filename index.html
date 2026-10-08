@@ -5945,7 +5945,7 @@ function prepareReportPdf(buttonId='pdfBtn'){
       console.error('BuyTest PDF prepare error:',e);
       if(pdfBtn){pdfBtn.disabled=false;pdfBtn.textContent='נסה שוב ליצור PDF';}
       return null;
-    }
+    }finally{btPdfPreparing=null;}
   })();
 }
 
