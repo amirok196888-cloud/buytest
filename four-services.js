@@ -68,7 +68,7 @@
   }
   function captureAdvice(){if(!/^\d{7,8}$/.test(plate()))return;const question=document.getElementById('prebuyQuestion').value,adLink=document.getElementById('prebuyAdLink').value,note=document.getElementById('adviceNotes').value;btSaveSource('consultation',{title:'שאלות והערות מהייעוץ — דיווח המשתמש',question,adLink,note,text:[question,adLink,note?'הערות המשתמש מהייעוץ: '+note:''].filter(Boolean).join('\n')});}
   function home(event){event?.preventDefault();
-    BuyTestChecklist.capture();
+    try{window.BuyTestChecklist?.capture?.();}catch(error){console.warn('BuyTest checklist state could not be saved before returning home:',error);}
     const url=new URL(location.href);url.searchParams.delete('service');url.hash='';history.pushState(null,'',url.pathname+url.search);render('');window.scrollTo({top:0,behavior:'instant'});
   }
   const oldLoad=loadVehicle;
