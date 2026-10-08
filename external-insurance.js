@@ -108,9 +108,9 @@ function reset(){
     if(p&&!/^\d{7,8}$/.test(p)){status('מספר הרכב אינו מלא. אפשר להסירו או להזין 7 או 8 ספרות.');return false;}
     if(!quality(text).ok){status('הקובץ לא נקרא ברמת דיוק מספקת. יש להעלות PDF מקורי או צילום חד, ישר ומלא יותר.');return false;}
     if(text.length>80000){status('הטקסט ארוך מדי. יש לצרף את פרטי הרכב ואת פרטי התביעות והנזקים עד 80,000 תווים.');return false;}
-    const labelled=Array.from(text.matchAll(/(?:מספר\s*(?:רכב|רישוי)|מס[׳'״"]?\s*רכב|license\s*plate)\s*[:\-]?\s*([\d\- ]{7,12})/gi)).map(m=>m[1].replace(/\D/g,'')).filter(x=>/^\d{7,8}$/.test(x));
-    if(p&&labelled.some(x=>x!==p)){status('נמצא בקובץ מספר רכב אחר. בדוק את דוח המקור ואת המספר לפני הפענוח.');return false;}
     const interpretation=BuyTestInsurance.interpret(text);
+    const detectedPlate=String(interpretation.plate||'').replace(/\D/g,'');
+    if(p&&detectedPlate&&detectedPlate!==p){status('נמצא בקובץ מספר רכב אחר. בדוק את דוח המקור ואת המספר לפני הפענוח.');return false;}
     if(p)btSaveSource('insuranceExternal',{title:'פענוח דוח העבר הביטוחי — קובץ שהלקוח העלה',rawText:text,files:[...files],text:interpretation.text,alerts:interpretation.alerts,mileage:[],interpretationVersion:3});
     status(interpretation.status==='incomplete'?'הדוח נקרא, אך חסרים פרטי תביעות קריאים. העלה את טבלת התביעות והנזקים.':p?'✓ דוח העבר הביטוחי פוענח ושולב בסיכום לרכב '+p+'.':'✓ דוח העבר הביטוחי פוענח. התוצאה מוצגת כאן.');
     renderInterpretation(interpretation);

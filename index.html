@@ -1453,25 +1453,22 @@ function setExternalVehicleData(data={}){
 function plate(){return document.getElementById('plate').value.replace(/\D/g,'')}
 function sanitizePlateInput(input){input.value=String(input.value||'').replace(/\D/g,'').slice(0,8)}
 function reportVehiclePlate(text){
-  const lines=String(text||'').replace(/\r/g,'\n').split(/\n+/).map(line=>line.trim()).filter(Boolean);
-  const label=/(?:מס(?:פר|['׳״’`׳.]?)\s*(?:רכב|רישוי)|מס\s*רכב|רכב\s*מספר|מספר\s*הרכב|לוחית\s*(?:הרישוי|רישוי)|vehicle\s*(?:registration|plate|number))/i;
-  const platePattern=/(?:^|\D)(\d(?:[\s-]?\d){6,7})(?!\d)/g;
+  const lines=String(text||'').replace(/[\u200e\u200f\u202a-\u202e]/g,'').replace(/\r/g,'\n').split(/\n+/).map(line=>line.trim()).filter(Boolean);
+  const label=/(?:מס(?:פר)?\s*['׳״’`.]?\s*(?:ה?רכב|רישוי|רישיון)|(?:ה?רכב|רישוי|רישיון)\s*מס(?:פר)?|לוחית\s*(?:ה?רישוי|רישוי)?|vehicle\s*(?:registration|plate|number)|(?:plate|registration)\s*(?:no\.?|number))/iu;
+  const number=/(?<!\d)(\d(?:[\s.-]?\d){6,7})(?!\d)/g;
+  let best=null;
   for(let i=0;i<lines.length;i++){
-    const labelPosition=lines[i].search(label);
-    if(labelPosition<0)continue;
-    const start=Math.max(0,i-1),end=Math.min(lines.length,i+2);
-    const neighborhood=lines.slice(start,end).join(' ');
-    const matches=Array.from(neighborhood.matchAll(platePattern)).map(match=>({
-      value:match[1].replace(/\D/g,''),
-      position:match.index+(match[0].length-match[1].length),
-      labelPosition:labelPosition+(i-start?neighborhood.slice(0,neighborhood.indexOf(lines[i])).length+1:0)
-    })).filter(item=>/^\d{7,8}$/.test(item.value));
-    if(matches.length){
-      matches.sort((a,b)=>Math.abs(a.position-a.labelPosition)-Math.abs(b.position-b.labelPosition));
-      return matches[0].value;
+    if(!label.test(lines[i]))continue;
+    const from=Math.max(0,i-1),to=Math.min(lines.length,i+2);
+    const context=lines.slice(from,to).join(' ');
+    const labelMatches=Array.from(context.matchAll(new RegExp(label.source,'giu')));
+    const numbers=Array.from(context.matchAll(number)).map(match=>({value:match[1].replace(/\D/g,''),position:match.index+(match[0].length-match[1].length)})).filter(item=>/^\d{7,8}$/.test(item.value));
+    for(const labelMatch of labelMatches)for(const candidate of numbers){
+      const distance=Math.abs(candidate.position-labelMatch.index);
+      if(!best||distance<best.distance)best={value:candidate.value,distance};
     }
   }
-  return '';
+  return best?.value||'';
 }
 function reportIdentityMessage(message,error=false){
   const status=document.getElementById('reportVehicleStatus');
@@ -6693,7 +6690,7 @@ document.addEventListener('keydown',event=>{
 </div>
 
 <script src="package-149.js?v=8"></script>
-<script src="manager-session.js?v=1"></script><script src="opening-20260928.js?v=3"></script><script src="vehicle-checklist.js?v=4"></script><link rel="stylesheet" href="vehicle-checklist.css?v=2"><script src="bundle-39.js?v=14"></script><script src="insurance-interpretation.js?v=6"></script><script src="external-insurance.js?v=21"></script><link rel="stylesheet" href="bundle-39.css?v=7">
+<script src="manager-session.js?v=1"></script><script src="opening-20260928.js?v=3"></script><script src="vehicle-checklist.js?v=4"></script><link rel="stylesheet" href="vehicle-checklist.css?v=2"><script src="bundle-39.js?v=14"></script><script src="insurance-interpretation.js?v=7"></script><script src="external-insurance.js?v=22"></script><link rel="stylesheet" href="bundle-39.css?v=7">
 <!-- payment-dynamic-plan-v7 -->
-<section id="consultationPage" hidden><button class="secondary" type="button" onclick="closeConsultationPage()">→ חזרה למסך הפתיחה</button><h2 class="routeHeading">התייעצות עם הבוחן</h2><p>עמוס רוקח · 15 שנות ניסיון בבדיקות קנייה</p><div class="card" id="consultationPurchaseIntro"><h3>נשארו לכם שאלות על הרכב?</h3><p>ייעוץ אישי בוואטסאפ על הדוח, הממצאים והבירורים שכדאי להשלים לפני הקנייה. אפשר להתחיל גם בלי דוח.</p><strong class="btConsultPrice">99 ₪</strong><p>ההתייעצות פתוחה ל־48 שעות ממועד אישור התשלום, בשעות המענה המפורטות בתנאים.</p><button class="primary full" type="button" onclick="startPayment('prebuy')">להתייעצות אישית — 99 ₪</button></div></section><dialog id="buytestTour"><button class="secondary" type="button" onclick="closeBuyTestTour()">✕ סגירה</button><iframe title="איך BuyTest עובד" id="buytestTourFrame"></iframe></dialog><script src="four-services.js?v=15"></script><link rel="stylesheet" href="four-services.css?v=6"><style>html.manager-link body.manager-entry[data-service="home"] #appShell{display:block!important}</style>
+<section id="consultationPage" hidden><button class="secondary" type="button" onclick="closeConsultationPage()">→ חזרה למסך הפתיחה</button><h2 class="routeHeading">התייעצות עם הבוחן</h2><p>עמוס רוקח · 15 שנות ניסיון בבדיקות קנייה</p><div class="card" id="consultationPurchaseIntro"><h3>נשארו לכם שאלות על הרכב?</h3><p>ייעוץ אישי בוואטסאפ על הדוח, הממצאים והבירורים שכדאי להשלים לפני הקנייה. אפשר להתחיל גם בלי דוח.</p><strong class="btConsultPrice">99 ₪</strong><p>ההתייעצות פתוחה ל־48 שעות ממועד אישור התשלום, בשעות המענה המפורטות בתנאים.</p><button class="primary full" type="button" onclick="startPayment('prebuy')">להתייעצות אישית — 99 ₪</button></div></section><dialog id="buytestTour"><button class="secondary" type="button" onclick="closeBuyTestTour()">✕ סגירה</button><iframe title="איך BuyTest עובד" id="buytestTourFrame"></iframe></dialog><script src="four-services.js?v=16"></script><link rel="stylesheet" href="four-services.css?v=6"><style>html.manager-link body.manager-entry[data-service="home"] #appShell{display:block!important}</style>
 </body></html>
