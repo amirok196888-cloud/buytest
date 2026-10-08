@@ -15,8 +15,8 @@
     for(const entry of entries){const item=document.createElement(entry.heading?'h3':'p');item.textContent=entry.text;if(entry.alert)item.classList.add('btCritical');box.append(item);}
   }
   function render(route=readRoute()){
-    if(route==='report'&&current!=='report'){beginNewReportSession();consumeNewReportSession(plate());reportStarted=false;document.body.dataset.reportStarted='false';}
-    else if(route!=='report'){freshReportSessionPending=false;reportStarted=false;document.body.dataset.reportStarted='false';document.body.classList.remove('plan-report');}
+    if(route==='report'&&current!=='report'){beginNewReportSession();consumeNewReportSession(plate());reportStarted=false;document.body.dataset.reportStarted='false';document.getElementById('afterInspectionSection')?.style.removeProperty('display');}
+    else if(route!=='report'){freshReportSessionPending=false;reportStarted=false;document.body.dataset.reportStarted='false';document.body.classList.remove('plan-report');document.getElementById('afterInspectionSection')?.style.removeProperty('display');}
     current=services[route]?route:'';
     document.body.dataset.service=current||'home';
     closeAfterPage(false);document.body.classList.remove('consultation-page');document.getElementById('consultationPage').hidden=true;
@@ -58,9 +58,9 @@
     document.body.dataset.reportStarted='true';
     document.body.classList.add('plan-report');
     const entry=document.getElementById('preSummarySection');
-    if(entry){entry.classList.remove('active');entry.style.display='none';}
+    if(entry){entry.classList.remove('active');entry.style.setProperty('display','none','important');}
     const upload=document.getElementById('afterInspectionSection');
-    if(upload){upload.style.display='block';upload.scrollIntoView({behavior:'smooth',block:'start'});}
+    if(upload){upload.hidden=false;upload.style.setProperty('display','block','important');upload.scrollIntoView({behavior:'smooth',block:'start'});}
     document.getElementById('inspectionOwnerName')?.focus({preventScroll:true});
     return true;
   }
