@@ -49,6 +49,7 @@ function reset(){
     status(source?'דוח העבר הביטוחי נשמר במכשיר.':'');
   }
   async function read(input){
+    if(window.btReportIdentityReady&&!window.btReportIdentityReady()){input.value='';return;}
     const selected=Array.from(input.files||[]);input.value='';if(!selected.length)return;
     version++;files=[];pendingFiles=[];
     document.getElementById('externalInsuranceText').value='';

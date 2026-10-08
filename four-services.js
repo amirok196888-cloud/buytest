@@ -16,8 +16,8 @@
   }
   function render(route=readRoute()){
     const insuranceShortcut=new URLSearchParams(location.search).get('focus')==='insurance';
-    if(route==='report'&&current!=='report'){beginNewReportSession();consumeNewReportSession(plate());reportStarted=false;document.body.dataset.reportStarted='false';document.getElementById('afterInspectionSection')?.style.removeProperty('display');}
-    else if(route!=='report'){freshReportSessionPending=false;reportStarted=false;document.body.dataset.reportStarted='false';document.body.classList.remove('plan-report');document.getElementById('afterInspectionSection')?.style.removeProperty('display');}
+    if(route==='report'&&current!=='report'){beginNewReportSession();consumeNewReportSession(plate());reportStarted=false;document.body.dataset.reportStarted='false';delete document.body.dataset.reportRegistryPlate;document.getElementById('afterInspectionSection')?.style.removeProperty('display');}
+    else if(route!=='report'){freshReportSessionPending=false;reportStarted=false;document.body.dataset.reportStarted='false';delete document.body.dataset.reportRegistryPlate;document.body.classList.remove('plan-report');document.getElementById('afterInspectionSection')?.style.removeProperty('display');}
     current=services[route]?route:'';
     document.body.dataset.service=current||'home';
     closeAfterPage(false);document.body.classList.remove('consultation-page');document.getElementById('consultationPage').hidden=true;
@@ -63,7 +63,9 @@
     if(entry){entry.classList.remove('active');entry.style.setProperty('display','none','important');}
     const upload=document.getElementById('afterInspectionSection');
     if(upload){upload.hidden=false;upload.style.setProperty('display','block','important');upload.scrollIntoView({behavior:'smooth',block:'start'});}
-    document.getElementById('inspectionOwnerName')?.focus({preventScroll:true});
+    const reportPlate=document.getElementById('inspectionPlate');
+    if(reportPlate){if(!reportPlate.value)reportPlate.value=plate();syncReportPlate(reportPlate);}
+    document.getElementById(document.body.dataset.reportRegistryPlate===plate()?'inspectionOwnerName':'inspectionPlate')?.focus({preventScroll:true});
     return true;
   }
   function captureAdvice(){if(!/^\d{7,8}$/.test(plate()))return;const question=document.getElementById('prebuyQuestion').value,adLink=document.getElementById('prebuyAdLink').value,note=document.getElementById('adviceNotes').value;btSaveSource('consultation',{title:'שאלות והערות מהייעוץ — דיווח המשתמש',question,adLink,note,text:[question,adLink,note?'הערות המשתמש מהייעוץ: '+note:''].filter(Boolean).join('\n')});}
