@@ -1204,21 +1204,21 @@ function btResetVehicleSession(p=plate()){
  }
  return true;
 }
-function btBeginNewReportSession(p=plate()){
- if(!/^\d{7,8}$/.test(p))return false;
- try{localStorage.removeItem('buytest-dossier-v1:'+p);}catch(_){}
- btDossiers.set(p,{plate:p,sources:{}});
+function btBeginNewReportSession(p=plate(),{preserveFiles=false}={}){
+ const validPlate=/^\d{7,8}$/.test(String(p||''));
+ if(validPlate){try{localStorage.removeItem('buytest-dossier-v1:'+p);}catch(_){}btDossiers.set(p,{plate:p,sources:{}});}
  btDossierPlate='';
  latestSummaryResult=null;latestComputerResult=null;latestComputerIdentity=null;latestInsuranceInterpretation=null;
  loadedKm=null;interpretedReportKm=null;externalVehicleData={kmHistory:[]};
  preReportText='';afterReportText='';reportText='';balcarSummaryText='';
  window.buytestBalcarReport=null;btPreparedPdfFile=null;
- try{clearInspectionFile('summary');clearInspectionFile('computer');}catch(_){}
- const owner=document.getElementById('inspectionOwnerName');if(owner)owner.value='';
- for(const id of ['afterInterpretation','report','balcarSummaryGrid','examinerSummaryText','computerTestText','serviceSummaryContent']){const el=document.getElementById(id);if(el){if('value'in el)el.value='';else el.replaceChildren();}}
- for(const id of ['summaryReviewArea','computerReviewArea']){const el=document.getElementById(id);if(el)el.style.display='none';}
- window.BuyTestChecklist?.restore(p);
- window.BuyTestExternalInsurance?.reset();
+ if(!preserveFiles){try{clearInspectionFile('summary');clearInspectionFile('computer');}catch(_){}}
+ if(!preserveFiles){const owner=document.getElementById('inspectionOwnerName');if(owner)owner.value='';}
+ const resetIds=preserveFiles?['afterInterpretation','report','balcarSummaryGrid','serviceSummaryContent']:['afterInterpretation','report','balcarSummaryGrid','examinerSummaryText','computerTestText','serviceSummaryContent'];
+ for(const id of resetIds){const el=document.getElementById(id);if(el){if('value'in el)el.value='';else el.replaceChildren();}}
+ if(!preserveFiles)for(const id of ['summaryReviewArea','computerReviewArea']){const el=document.getElementById(id);if(el)el.style.display='none';}
+ if(validPlate)window.BuyTestChecklist?.restore(p);
+ if(!preserveFiles)window.BuyTestExternalInsurance?.reset();
  btRefreshSummary();
  return true;
 }
@@ -1424,6 +1424,16 @@ function setExternalVehicleData(data={}){
 }
 function plate(){return document.getElementById('plate').value.replace(/\D/g,'')}
 function sanitizePlateInput(input){input.value=String(input.value||'').replace(/\D/g,'').slice(0,8)}
+function reportVehiclePlate(text){
+  const labels=/(?:מס(?:פר|['׳״’`.]?)\s*(?:רכב|רישוי)|מס\s*רכב|רכב\s*מספר|מספר\s*רישוי)/i;
+  for(const line of String(text||'').split(/\n+/)){
+    if(!labels.test(line))continue;
+    const match=line.match(/(?:^|\D)(\d(?:[\s-]?\d){6,7})(?!\d)/);
+    const value=match?.[1]?.replace(/\D/g,'');
+    if(/^\d{7,8}$/.test(value||''))return value;
+  }
+  return '';
+}
 function syncVehicleLookupButton(){
   const button=document.getElementById('vehicleLookupButton');
   if(!button) return;
@@ -3517,6 +3527,14 @@ async function handleInspectionFile(input,kind){
     if(!recognized) throw new Error('TEXT_NOT_FOUND');
     if(!isSummary&&!quality?.ok&&computerOcrTextUsable(recognized)) quality={...quality,ok:true,limited:true};
     if(!quality?.ok) throw new Error('OCR_LOW_QUALITY');
+    if(isSummary&&!plate()){
+      const detectedPlate=reportVehiclePlate(recognized);
+      if(detectedPlate){
+        document.getElementById('plate').value=detectedPlate;
+        btBeginNewReportSession(detectedPlate,{preserveFiles:true});
+        btActivateVehicle(detectedPlate);
+      }
+    }
     textArea.value=recognized;
     if(isSummary) void trackBuyTestReportStage('report_read_ready',reportContext);
     inspectionOcrMeta[kind]={...quality,engine:selectedEngine,visionAttempted,tesseractAttempted,verification};
@@ -5781,6 +5799,7 @@ async function analyseInspectionReport(){
   const requesterAdvisory=inspectionRequesterAdvisory(ownerName);
   let html='<div class="inspectionIdentity">';
   html+='<div class="inspectionIdentityTitle">פרטי הבדיקה</div><div class="inspectionIdentityGrid">';
+  html+=`<div class="inspectionIdentityItem"><span class="inspectionIdentityLabel">מספר רכב שנקרא מהדוח</span><strong class="inspectionIdentityValue">${escapeHtml(analysisPlate||'לא זוהה בבירור')}</strong></div>`;
   html+=`<div class="inspectionIdentityItem"><span class="inspectionIdentityLabel">שם מזמין/ת הבדיקה</span><strong class="inspectionIdentityValue">${escapeHtml(ownerName)}</strong></div>`;
   html+=`<div class="inspectionIdentityItem"><span class="inspectionIdentityLabel">קילומטראז׳ ${displayedKm?'('+kmSource+')':''}</span><strong class="inspectionIdentityValue">${displayedKm?fmtNum(displayedKm)+' ק״מ':'לא זמין'}</strong></div>`;
   html+='</div>';
@@ -5813,7 +5832,7 @@ async function analyseInspectionReport(){
 
   const pre=collectPreInspection();
   preReportText=pre.text;
-  afterReportText='פענוח דוחות לרכב '+analysisPlate+'\n'+`שם מזמין/ת הבדיקה: ${ownerName}\n`+(insuranceSummary.text?insuranceSummary.text+'\n':'')+(requesterAdvisory?`${requesterAdvisory.pdfText}\n`:'')+`קילומטראז׳: ${displayedKm?fmtNum(displayedKm)+' ק״מ':'לא זמין'}${displayedKm?' ('+kmSource+')':''}\n`+analysisTextBlock('פענוח סיכום הבוחן',summaryResult,computerResult)+(computerText?'\n'+computerIdentityText(computerResult.vehicleIdentity)+'\n'+analysisTextBlock('פענוח הבדיקה הממוחשבת',computerResult):'')+'\nהבהרה: המידע אינו מחליף בדיקה פיזית או אבחון מקצועי.';
+  afterReportText='פענוח דוחות לרכב '+(analysisPlate||'לא זוהה בבירור')+'\n'+`שם מזמין/ת הבדיקה: ${ownerName}\n`+(insuranceSummary.text?insuranceSummary.text+'\n':'')+(requesterAdvisory?`${requesterAdvisory.pdfText}\n`:'')+`קילומטראז׳: ${displayedKm?fmtNum(displayedKm)+' ק״מ':'לא זמין'}${displayedKm?' ('+kmSource+')':''}\n`+analysisTextBlock('פענוח סיכום הבוחן',summaryResult,computerResult)+(computerText?'\n'+computerIdentityText(computerResult.vehicleIdentity)+'\n'+analysisTextBlock('פענוח הבדיקה הממוחשבת',computerResult):'')+'\nהבהרה: המידע אינו מחליף בדיקה פיזית או אבחון מקצועי.';
   if(pre.findings.length||!btDossier().sources.notes)btSaveSource('notes',{title:'נתונים ודגשים שהוזנו לפני המכון',text:preReportText,alerts:pre.findings.map(x=>'דיווח לקוח — '+x.title+': '+x.text)});
   btCaptureInspection(ownerName,summaryResult,computerText?computerResult:null,afterReportText);
   prepareReportPdf('finalPdfBtn');
@@ -6488,5 +6507,5 @@ document.addEventListener('keydown',event=>{
 <script src="package-149.js?v=8"></script>
 <script src="manager-session.js?v=1"></script><script src="opening-20260928.js?v=3"></script><script src="vehicle-checklist.js?v=4"></script><link rel="stylesheet" href="vehicle-checklist.css?v=2"><script src="bundle-39.js?v=14"></script><script src="insurance-interpretation.js?v=6"></script><script src="external-insurance.js?v=21"></script><link rel="stylesheet" href="bundle-39.css?v=7">
 <!-- payment-dynamic-plan-v7 -->
-<section id="consultationPage" hidden><button class="secondary" type="button" onclick="closeConsultationPage()">→ חזרה למסך הפתיחה</button><h2 class="routeHeading">התייעצות עם הבוחן</h2><p>עמוס רוקח · 15 שנות ניסיון בבדיקות קנייה</p><div class="card" id="consultationPurchaseIntro"><h3>נשארו לכם שאלות על הרכב?</h3><p>ייעוץ אישי בוואטסאפ על הדוח, הממצאים והבירורים שכדאי להשלים לפני הקנייה. אפשר להתחיל גם בלי דוח.</p><strong class="btConsultPrice">99 ₪</strong><p>ההתייעצות פתוחה ל־48 שעות ממועד אישור התשלום, בשעות המענה המפורטות בתנאים.</p><button class="primary full" type="button" onclick="startPayment('prebuy')">להתייעצות אישית — 99 ₪</button></div></section><dialog id="buytestTour"><button class="secondary" type="button" onclick="closeBuyTestTour()">✕ סגירה</button><iframe title="איך BuyTest עובד" id="buytestTourFrame"></iframe></dialog><script src="four-services.js?v=9"></script><link rel="stylesheet" href="four-services.css?v=6"><style>html.manager-link body.manager-entry[data-service="home"] #appShell{display:block!important}</style>
+<section id="consultationPage" hidden><button class="secondary" type="button" onclick="closeConsultationPage()">→ חזרה למסך הפתיחה</button><h2 class="routeHeading">התייעצות עם הבוחן</h2><p>עמוס רוקח · 15 שנות ניסיון בבדיקות קנייה</p><div class="card" id="consultationPurchaseIntro"><h3>נשארו לכם שאלות על הרכב?</h3><p>ייעוץ אישי בוואטסאפ על הדוח, הממצאים והבירורים שכדאי להשלים לפני הקנייה. אפשר להתחיל גם בלי דוח.</p><strong class="btConsultPrice">99 ₪</strong><p>ההתייעצות פתוחה ל־48 שעות ממועד אישור התשלום, בשעות המענה המפורטות בתנאים.</p><button class="primary full" type="button" onclick="startPayment('prebuy')">להתייעצות אישית — 99 ₪</button></div></section><dialog id="buytestTour"><button class="secondary" type="button" onclick="closeBuyTestTour()">✕ סגירה</button><iframe title="איך BuyTest עובד" id="buytestTourFrame"></iframe></dialog><script src="four-services.js?v=10"></script><link rel="stylesheet" href="four-services.css?v=6"><style>html.manager-link body.manager-entry[data-service="home"] #appShell{display:block!important}</style>
 </body></html>
