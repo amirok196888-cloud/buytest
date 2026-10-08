@@ -15,6 +15,7 @@
     for(const entry of entries){const item=document.createElement(entry.heading?'h3':'p');item.textContent=entry.text;if(entry.alert)item.classList.add('btCritical');box.append(item);}
   }
   function render(route=readRoute()){
+    const insuranceShortcut=new URLSearchParams(location.search).get('focus')==='insurance';
     if(route==='report'&&current!=='report'){beginNewReportSession();consumeNewReportSession(plate());reportStarted=false;document.body.dataset.reportStarted='false';document.getElementById('afterInspectionSection')?.style.removeProperty('display');}
     else if(route!=='report'){freshReportSessionPending=false;reportStarted=false;document.body.dataset.reportStarted='false';document.body.classList.remove('plan-report');document.getElementById('afterInspectionSection')?.style.removeProperty('display');}
     current=services[route]?route:'';
@@ -33,7 +34,7 @@
     else {const uploadPage=document.getElementById('balcarUploadPage');if(uploadPage)uploadPage.style.display='none';}
     if(current==='checklist'&&/^\d{7,8}$/.test(plate())){BuyTestChecklist.open();document.body.dataset.bundleStep='checklist';}
     const head=document.getElementById('independentServiceHeader');
-    head.querySelector('h1').textContent=services[current]?.title||'';
+    head.querySelector('h1').textContent=insuranceShortcut&&current==='report'?'פענוח דוח עבר ביטוחי':services[current]?.title||'';
     const main=document.querySelector('#appShell main');
     const upload=document.getElementById('afterInspectionSection');
     const insuranceUpload=document.getElementById('balcarUploadPage');
@@ -49,8 +50,9 @@
     }
     host.prepend(head);host.append(document.getElementById('serviceSummary'));
     document.getElementById('serviceSummary').hidden=!current||current==='balcar'||current==='insurance'||current==='report';
-    document.title=current?services[current].title+' | BuyTest':'BuyTest — לפני קניית רכב';
+    document.title=current?(insuranceShortcut&&current==='report'?'פענוח דוח עבר ביטוחי':services[current].title)+' | BuyTest':'BuyTest — לפני קניית רכב';
     BuyTestBundle.sync();updateSummary();
+    if(current==='report'&&insuranceShortcut&&!reportStarted){beginReport();document.getElementById('externalInsuranceChoose')?.focus({preventScroll:true});}
   }
   function beginReport(){
     if(current!=='report')render('report');
