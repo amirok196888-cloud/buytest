@@ -3708,7 +3708,7 @@ async function handleInspectionFile(input,kind){
 
 const findingKnowledgeBase=[
   {id:'engine-overhaul-evidence',terms:['סימני שיפוץ מנוע','סימני שיפוץ במנוע'],category:'מנוע',tag:'נדרש בירור',tone:'clarify',classification:'repair_history_or_evidence',reportSeverity:'medium',meaning:'נרשמו סימנים לשיפוץ מנוע. יש לברר מה בוצע; סימני שיפוץ אינם מוכיחים לבדם שהמנוע הוחלף.',decision:'יש לברר במוסך את היקף השיפוץ ותיעודו. כאשר נדרשה בדיקת מספר המנוע, יש לאמת גם את התאמת המספר לרישיון.'},
-  {id:'engine-number-verification-required',terms:['לבדוק מספר מנוע במוסך מורשה','לבדוק מספר מנוע','בדוק מספר מנוע','בדיקת מספר מנוע','מספר מנוע לא נראה','מספר מנוע לא זוהה','מספר מנוע לא קריא','לא ניתן לראות את מספר המנוע','לא ניתן לזהות את מספר המנוע'],patterns:[/(?:לבדוק|בדוק|לאמת|אימות|בדיקת)\s+(?:את\s+)?מספר\s+ה?מנוע/,/מספר\s+ה?מנוע\s+(?:לא\s+(?:נראה|זוהה|קריא|נמצא)|אינו\s+(?:נראה|קריא))/,/לא\s+ניתן\s+(?:לראות|לזהות|לקרוא)\s+(?:את\s+)?מספר\s+ה?מנוע/],category:'מנוע',tag:'נדרש בירור במוסך מורשה',tone:'clarify',classification:'recommendation',reportSeverity:null,requiresEngineNumberVerification:true,meaning:'מספר המנוע דורש אימות. ייתכן שלא היה גלוי לבוחן; אין בכך לבדו הוכחה שהמנוע הוחלף.',decision:'יש לגשת למוסך מורשה, לאתר ולקרוא את מספר המנוע ולאמת התאמה לרישיון הרכב.'},
+  {id:'engine-number-verification-required',terms:['לבדוק מספר מנוע במוסך מורשה','לבדוק מספר מנוע','בדוק מספר מנוע','בדיקת מספר מנוע','מספר מנוע לא נראה','מספר מנוע לא זוהה','מספר מנוע לא קריא','לא ניתן לראות את מספר המנוע','לא ניתן לזהות את מספר המנוע'],patterns:[/(?:לבדוק|בדוק|לאמת|אימות|בדיקת)\s+(?:את\s+)?מספר\s+ה?מנוע/,/מספר\s+ה?מנוע\s+(?:לא\s+(?:נראה|זוהה|קריא|נמצא)|אינו\s+(?:נראה|קריא))/,/לא\s+ניתן\s+(?:לראות|לזהות|לקרוא)\s+(?:את\s+)?מספר\s+ה?מנוע/],category:'מנוע',tag:'נדרש בירור במוסך מורשה',tone:'clarify',classification:'recommendation',reportSeverity:'medium',requiresEngineNumberVerification:true,meaning:'מספר המנוע דורש אימות. ייתכן שלא היה גלוי לבוחן; אין בכך לבדו הוכחה שהמנוע הוחלף.',decision:'יש לגשת למוסך מורשה, לאתר ולקרוא את מספר המנוע ולאמת התאמה לרישיון הרכב.'},
   {id:'severe-accident-explicit',terms:['רכב לאחר תאונה קשה','לאחר תאונה קשה'],patterns:[/רכב\s*לאחר\s*תאונה\s*קשה/],category:'שלדת מרכב',tag:'משמעות גבוהה',tone:'safety',classification:'repair_history_or_evidence',reportSeverity:'high',meaning:'דוח המכון מציין במפורש שהרכב לאחר תאונה קשה.',decision:'זהו עבר תאונתי חמור לפי דוח המכון. לפני החלטה על רכישה יש לברר את היקף הפגיעה המבנית, איכות התיקונים, התאמת המרכב לנתוני היצרן וירידת הערך עם שמאי.'},
   {id:'engine-oil-sweat-report',terms:['סימני הזעה שמן מנוע','סימני הזעת שמן מנוע'],patterns:[/סימני\s*הזע[הת]?\s*שמן/],category:'מנוע',tag:'משמעות בינונית',tone:'clarify',classification:'actual_finding',reportSeverity:'medium',suppresses:['oil-sweat'],meaning:'נרשמו סימני הזעת שמן במנוע. זו לחות שמנונית, ויש להבדיל בינה לבין נזילה פעילה.',decision:'יש לאתר את מקור ההזעה ולבדוק אם היא קלה ויבשה או פעילה. יש להביא בחשבון טיפול באטימה לפי הממצאים.'},
   {id:'engine-internal-knocks-report',terms:['נקישות פנימיות','רעשים ונקישות פנימיות'],patterns:[/נקיש[א-ת]*\s*פנימ/],category:'מנוע',tag:'משמעות גבוהה',tone:'safety',classification:'actual_finding',reportSeverity:'high',meaning:'נרשמו נקישות פנימיות במנוע. זהו ממצא מכני ממשי, גם כאשר מקורו המדויק עדיין לא אובחן.',decision:'יש לבצע אבחון מנוע ממוקד ולהעריך את מקור הנקישות ואת עלות הטיפול לפני קבלת החלטה.'},
@@ -4017,6 +4017,12 @@ function isEngineNumberVerificationText(value){
   return /(?:לבדוק|בדוק|לאמת|אימות|בדיקת)\s+(?:את\s+)?מספר\s+ה?מנוע/.test(text)
     || /מספר\s+ה?מנוע\s+(?:לא\s+(?:נראה|זוהה|קריא|נמצא)|אינו\s+(?:נראה|קריא))/.test(text)
     || /לא\s+ניתן\s+(?:לראות|לזהות|לקרוא)\s+(?:את\s+)?מספר\s+ה?מנוע/.test(text);
+}
+
+function ensureEngineNumberSignificance(item){
+  if(!item||!(item.requiresEngineNumberVerification||isEngineNumberVerificationText(item.sourceText||item.matchedTerm||''))) return item;
+  const severity=['high','safety'].includes(item.reportSeverity)?item.reportSeverity:'medium';
+  return {...item,requiresEngineNumberVerification:true,reportSeverity:severity,tag:reportSeverityLabels[severity]||'משמעות בינונית',tone:severity==='medium'?'clarify':'safety'};
 }
 
 function engineNumberFollowUpText(result){
@@ -5008,7 +5014,7 @@ function finalizeReportFinding(item){
       cleaned.decision=professionalDecision({...cleaned,meaning:cleaned.meaning,decision:''});
     }
   }
-  return applyManagerFormulaOverride(cleaned);
+  return ensureEngineNumberSignificance(applyManagerFormulaOverride(cleaned));
 }
 
 function reportConclusionOrder(category){
@@ -5633,7 +5639,7 @@ function batteryFindingInfo(item){
 }
 
 function summarySeverityBucket(item){
-  if(item?.requiresEngineNumberVerification&&!item?.explicitReportSeverity) return 'review';
+  if(item?.requiresEngineNumberVerification||isEngineNumberVerificationText(item?.sourceText||item?.matchedTerm||'')) return ['high','safety'].includes(item?.reportSeverity)?'high':'medium';
   const battery=batteryFindingInfo(item);
   if(battery) return battery.bucket;
   if(item?.classification==='source_diagnosis'&&!item?.reportSeverity) return 'review';
@@ -5846,22 +5852,28 @@ function professionalOverallConclusion(result,computerResult=null){
   const groups=compactAnalysisGroups(result,false);
   const describe=bucket=>groups.filter(group=>group.severity===bucket)
     .map(group=>group.category+': '+compactUniqueTexts([...group.bullets,...(group.details||[]).map(item=>item.fact)]).join('; ')).join('. ');
-  const highFacts=describe('high'),mediumFacts=describe('medium'),lowFacts=describe('low');
+  const highFacts=describe('high'),mediumFacts=describe('medium'),lowFacts=describe('low'),reviewFacts=describe('review'),informationFacts=describe('marginal');
+  const numberFollowUp=engineNumberFollowUpText(result);
+  const numberIsHigh=groups.some(group=>group.severity==='high'&&group.items.some(item=>item.requiresEngineNumberVerification||isEngineNumberVerificationText(item.sourceText||item.matchedTerm||'')));
   const highSystems=groups.filter(group=>group.severity==='high');
   const highGuidance=[
     highSystems.some(group=>/מנוע|תיבת הילוכים/.test(group.category))?'ליקויים מכניים במנוע או בתיבת ההילוכים עשויים להיות ניתנים לתיקון או להחלפת מכלול. יש לאבחן את היקף הטיפול ועלותו ולוודא תקינות לאחריו.':'',
     highSystems.some(group=>/שלדה|מרכב/.test(group.category))?'בפגיעה מבנית בשלדה או במרכב, גם תיקון אינו מוחק את עבר הפגיעה ועשויה להישאר ירידת ערך. יש לבדוק את איכות התיקון והשלכות הפגיעה עם שמאי רכב.':''
   ].filter(Boolean).join(' ');
-  const highConclusion=highFacts?'על פי דוח המכון, נרשמו הממצאים הבאים במשמעות גבוהה: '+highFacts+'. '+(highGuidance||'יש לברר את היקף התקלה ואת הטיפול הנדרש לפני החלטה על רכישה.'):'';
-  const mediumConclusion=mediumFacts?'ממצאים במשמעות בינונית: '+mediumFacts+'. יש להשלים בירור מקצועי וטיפול לפי הממצאים המאומתים.':'';
+  let highConclusion=highFacts?'על פי דוח המכון, נרשמו הממצאים הבאים במשמעות גבוהה: '+highFacts+'. '+(highGuidance||'יש לברר את היקף התקלה ואת הטיפול הנדרש לפני החלטה על רכישה.'):'';
+  const mediumConclusion=mediumFacts?'ממצאים במשמעות בינונית: '+mediumFacts+'. '+(numberFollowUp&&!numberIsHigh?numberFollowUp+' ':'')+'יש להשלים בירור מקצועי וטיפול לפי הממצאים המאומתים.':'';
+  if(numberFollowUp&&numberIsHigh) highConclusion+=' '+numberFollowUp;
   const lowConclusion=lowFacts?'ממצאים במשמעות נמוכה: '+lowFacts+'. יש להביא בחשבון את היקף הטיפול וההוצאה. ממצאים אלה אינם מבטלים או מפחיתים את חומרת הממצאים במשמעות גבוהה.':'';
-  return {highConclusion,mediumConclusion,lowConclusion,disclaimer:professionalConclusionDisclaimer};
+  const reviewParts=[reviewFacts?'ממצאים שדורשים המשך בירור: '+reviewFacts+'.':'',...(result?.unknown||[]).filter(text=>!reportTextIsUnreliable(text)).map(text=>'נוסח בדוח שדורש בירור: '+text+'.'),result?.unreadable?.length?'חלק מהטקסט בדוח לא נקרא באופן מהימן. יש לאמת את הקטעים המשובשים מול דוח המקור או המכון.':''].filter(Boolean);
+  const reviewConclusion=reviewParts.length?reviewParts.join(' ')+' יש להשלים בירור מול המכון או בעל המקצוע המתאים; חומרת הממצאים לא נקבעה.':'';
+  const informationConclusion=informationFacts?'מידע, המלצות והסתייגויות שנרשמו בדוח: '+informationFacts+'. יש להתייחס לכל הנחיה שנרשמה; מידע זה אינו קובע לבדו שיש תקלה.':'';
+  return {highConclusion,mediumConclusion,lowConclusion,reviewConclusion,informationConclusion,disclaimer:professionalConclusionDisclaimer};
 }
 
 function professionalOverallConclusionHtml(result,computerResult=null){
   const conclusion=professionalOverallConclusion(result,computerResult);
-  const blocks=[['high','גבוהה',conclusion.highConclusion],['medium','בינונית',conclusion.mediumConclusion],['low','נמוכה',conclusion.lowConclusion]]
-    .filter(([, ,text])=>text).map(([severity,label,text])=>`<section class="meaningConclusion ${severity}"><h5>מסקנת משמעות ${label}</h5><p>${escapeHtml(text)}</p></section>`).join('');
+  const blocks=[['high','גבוהה',conclusion.highConclusion],['medium','בינונית',conclusion.mediumConclusion],['low','נמוכה',conclusion.lowConclusion],['review','לבירור',conclusion.reviewConclusion],['marginal','מידע',conclusion.informationConclusion]]
+    .filter(([, ,text])=>text).map(([severity,label,text])=>`<section class="meaningConclusion ${severity}"><h5>${severity==='review'?'נושאים לבירור':severity==='marginal'?'מידע והסתייגויות':'מסקנת משמעות '+label}</h5><p>${escapeHtml(text)}</p></section>`).join('');
   return `<section class="overallProfessionalConclusion"><h4>תמונה מקצועית מסכמת</h4>${blocks}<span class="legalConclusion">${escapeHtml(conclusion.disclaimer)}</span></section>`;
 }
 
@@ -5904,6 +5916,8 @@ function analysisTextBlock(title,result,computerResult=null){
     if(conclusion.highConclusion) text+=`מסקנת משמעות גבוהה\n• ${conclusion.highConclusion}\n`;
     if(conclusion.mediumConclusion) text+=`מסקנת משמעות בינונית\n• ${conclusion.mediumConclusion}\n`;
     if(conclusion.lowConclusion) text+=`מסקנת משמעות נמוכה\n• ${conclusion.lowConclusion}\n`;
+    if(conclusion.reviewConclusion) text+=`נושאים לבירור\n• ${conclusion.reviewConclusion}\n`;
+    if(conclusion.informationConclusion) text+=`מידע והסתייגויות\n• ${conclusion.informationConclusion}\n`;
     text+=`הבהרה: ${conclusion.disclaimer}\n`;
   }
   if(!groups.length) text+='• לא זוהו ממצאים שניתן לסווג אוטומטית. יש להסתמך על דוח המקור ולברר כל ממצא מהותי עם בעל מקצוע.\n';
@@ -6327,7 +6341,7 @@ function btPdfAnalysisCards(result,isComputer=false){
     return {card:{title:group.category,tag:group.tag||'ממצא',severity:group.severity||group.tone,bullets}};
   });
   const engineFollowUp=!isComputer?engineNumberFollowUpText(result):'';
-  if(engineFollowUp) entries.unshift({card:{title:'מספר מנוע — נדרש בירור במוסך מורשה',tag:'המשך בירור',severity:'review',bullets:[engineFollowUp]}});
+  if(engineFollowUp) entries.unshift({card:{title:'מספר מנוע — נדרש בירור במוסך מורשה',tag:'משמעות בינונית לפחות',severity:groups.some(group=>group.severity==='high'&&group.items.some(item=>item.requiresEngineNumberVerification))?'high':'medium',bullets:[engineFollowUp]}});
   if(!isComputer&&result?.unreadable?.length) entries.unshift({text:'חלק מהטקסט בדוח לא נקרא באופן מהימן. קטעים משובשים לא הוצגו כאבחנות; יש לאמת אותם מול דוח המקור או המכון.',alert:true});
   return entries;
 }
@@ -6337,7 +6351,9 @@ function btPdfProfessionalCards(summary,computer){
   return [
     ['high','מסקנת משמעות גבוהה',conclusion.highConclusion],
     ['medium','מסקנת משמעות בינונית',conclusion.mediumConclusion],
-    ['low','מסקנת משמעות נמוכה',conclusion.lowConclusion]
+    ['low','מסקנת משמעות נמוכה',conclusion.lowConclusion],
+    ['review','נושאים לבירור',conclusion.reviewConclusion],
+    ['marginal','מידע והסתייגויות',conclusion.informationConclusion]
   ].filter(([,title,text])=>Boolean(text)).map(([severity,title,text])=>({card:{title,tag:'תמונה מקצועית מסכמת',severity,bullets:[text]}}));
 }
 function btPdfExceptionCards(dossier=btDossier()){

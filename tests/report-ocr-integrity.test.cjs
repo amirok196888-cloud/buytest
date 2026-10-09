@@ -15,7 +15,7 @@ test('clean foreign-system text below brakes does not become a brake finding',()
 
 test('engine number instruction remains visible and requires authorized garage even without repair evidence',()=>{
  const c=engine();const r=c.interpretSummaryText('מנוע\nלבדוק מספר מנוע במוסך מורשה');
- const item=r.findings.find(f=>f.requiresEngineNumberVerification);assert.ok(item);assert.equal(item.reportSeverity,null);
+ const item=r.findings.find(f=>f.requiresEngineNumberVerification);assert.ok(item);assert.equal(item.reportSeverity,'medium');
  const followup=c.engineNumberFollowUpText(r);assert.match(followup,/יש לאתר ולקרוא את מספר המנוע/);assert.match(followup,/לאמת את התאמתו לרישיון/);assert.match(followup,/אינה מוכיחה לבדה שהמנוע הוחלף/);
  for(const output of [c.compactAnalysisHtml(r),c.analysisTextBlock('סיכום',r),JSON.stringify(c.btPdfAnalysisCards(r))]){assert.match(output,/מספר מנוע — נדרש בירור במוסך מורשה/);assert.match(output,/יש להשלים את הבירור גם אם לא נרשמו סימני פירוק או שיפוץ/);}
  assert.equal(c.professionalOverallConclusion(r).highConclusion,'');
@@ -38,4 +38,38 @@ test('unreadable engine number is a follow-up instruction, whereas an actual ide
 test('number mismatch retains its own significance rather than being described as a visibility problem',()=>{
  const c=engine(),r=c.interpretSummaryText('מנוע\nמספר מנוע לא תואם לרישיון הרכב');assert.ok(r.findings.length);assert.equal(c.engineNumberFollowUpText(r),'');
  assert.ok(r.findings.some(f=>f.reportSeverity==='high'));
+});
+
+
+test('engine verification appears as medium with garage instructions in the final PDF conclusion',()=>{
+ const c=engine();for(const history of ['', '\nסימני פתיחת ברגים בין המנוע לגיר','\nסימני שיפוץ מנוע']){
+ const r=c.interpretSummaryText('מנוע\nלבדוק מספר מנוע במוסך מורשה'+history);
+ const finalCards=c.btPdfProfessionalCards(r,null),medium=finalCards.find(entry=>entry.card.severity==='medium');assert.ok(medium);
+ const text=medium.card.bullets.join(' ');assert.match(text,/לבדוק מספר מנוע במוסך מורשה/);assert.match(text,/נדרשת בדיקה במוסך מורשה/);assert.match(text,/לאמת את התאמתו לרישיון הרכב/);
+ if(history) assert.match(text,/לברר במוסך מה בוצע/);
+ assert.match(c.professionalOverallConclusionHtml(r),/מסקנת משמעות בינונית/);
+ }
+});
+test('explicit high severity is preserved, while low or legacy review cannot downgrade engine verification',()=>{
+ const c=engine();for(const reportSeverity of ['high','low','none',null]){
+ const r={findings:[{category:'מנוע',sourceText:'לבדוק מספר מנוע במוסך מורשה',reportSeverity,managerEdited:true}]};
+ const group=c.compactAnalysisGroups(r)[0];assert.equal(group.severity,reportSeverity==='high'?'high':'medium');
+ const cards=c.btPdfProfessionalCards(r,null);assert.ok(cards.some(entry=>entry.card.bullets.some(text=>text.includes('לאמת את התאמתו לרישיון הרכב'))));
+ }
+});
+
+
+test('every interpreted significance bucket reaches the final PDF summary including review and information',()=>{
+ const c=engine();const r={findings:[
+ {category:'מנוע',sourceText:'נקישות פנימיות',reportSeverity:'high'},
+ {category:'מנוע',sourceText:'לבדוק מספר מנוע במוסך מורשה',reportSeverity:'medium',requiresEngineNumberVerification:true},
+ {category:'מערכת ההיגוי',sourceText:'נקישה בהגה',reportSeverity:'low'},
+ {category:'מערכת מתלה קדמי',sourceText:'אבחנה לא מוכרת במתלה',classification:'source_diagnosis',reportSeverity:null},
+ {category:'מנוע',sourceText:'הנחיית תחזוקה נוספת',classification:'recommendation',reportSeverity:'none'}
+ ],unknown:['נזילה במקום שלא זוהה'],unreadable:['nywnl ||']};
+ const cards=c.btPdfProfessionalCards(r,null);const text=cards.map(entry=>entry.card.bullets.join(' ')).join(' ');
+ for(const item of r.findings) assert.ok(text.includes(item.sourceText),item.sourceText);
+ assert.ok(cards.some(entry=>entry.card.title==='נושאים לבירור'));assert.ok(cards.some(entry=>entry.card.title==='מידע והסתייגויות'));
+ assert.match(text,/נזילה במקום שלא זוהה/);assert.match(text,/לא נקרא באופן מהימן/);assert.ok(!text.includes('nywnl'));
+ const html=c.professionalOverallConclusionHtml(r);assert.match(html,/נושאים לבירור/);assert.match(html,/מידע והסתייגויות/);
 });
