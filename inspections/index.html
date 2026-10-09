@@ -27,12 +27,15 @@
     <article class="example" id="elantra-20261009" style="margin-bottom:18px">
       <h3>יונדאי אלנטרה — פענוח דוח בדיקה לדוגמה</h3>
       <p>פענוח ממצאי דוח המכון לפי מערכות ורמת משמעות, כולל ממצאי שלדה ומרכב ופער בין נתוני הקילומטראז׳ במקורות. הדוח כולל גם את פענוח סריקת מחשב הרכב.</p>
-      <p>הדוח המלא מוצג כאן באתר, לאחר השחרת שם המזמין ומספר הרכב.</p>
+      <p>שם המזמין ומספר הרכב הושחרו. לחצו לפתיחת כל חמשת עמודי הדוח.</p>
+      <button class="reportLink" type="button" aria-expanded="false" aria-controls="elantraFullReport" style="border:0;font:inherit;font-weight:900;cursor:pointer" onclick="const report=document.getElementById('elantraFullReport');report.hidden=!report.hidden;this.setAttribute('aria-expanded',String(!report.hidden));this.textContent=report.hidden?'פתיחת הדוח המלא':'סגירת הדוח המלא';">פתיחת הדוח המלא</button>
+      <div id="elantraFullReport" hidden>
       <img src="/inspections/reports/elantra-20261009/page-1.jpg" alt="פענוח דוח יונדאי אלנטרה — עמוד 1 מתוך 5, פרטים מזהים הושחרו" width="1190" height="1684" style="display:block;width:100%;height:auto" loading="eager">
       <img src="/inspections/reports/elantra-20261009/page-2.jpg" alt="פענוח דוח יונדאי אלנטרה — עמוד 2 מתוך 5, פרטים מזהים הושחרו" width="1190" height="1684" style="display:block;width:100%;height:auto" loading="lazy">
       <img src="/inspections/reports/elantra-20261009/page-3.jpg" alt="פענוח דוח יונדאי אלנטרה — עמוד 3 מתוך 5, פרטים מזהים הושחרו" width="1190" height="1684" style="display:block;width:100%;height:auto" loading="lazy">
       <img src="/inspections/reports/elantra-20261009/page-4.jpg" alt="פענוח דוח יונדאי אלנטרה — עמוד 4 מתוך 5, פרטים מזהים הושחרו" width="1190" height="1684" style="display:block;width:100%;height:auto" loading="lazy">
       <img src="/inspections/reports/elantra-20261009/page-5.jpg" alt="פענוח דוח יונדאי אלנטרה — עמוד 5 מתוך 5, פרטים מזהים הושחרו" width="1190" height="1684" style="display:block;width:100%;height:auto" loading="lazy">
+      </div>
       <a class="cta" href="/?service=report">לפענוח הדוח שלכם ←</a>
     </article>
     <article class="example" id="corolla-20261009" style="margin-bottom:18px">
