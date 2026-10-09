@@ -12,6 +12,8 @@ function cleanOcrText(text){return String(text||'').replace(/\r/g,'').replace(/[
 function diagnosticTableText(text){const cleaned=cleanOcrText(text);const marker=/הערות\s*כלליות|לחזור\s+לה\s*משך\s+בדיקה\s+לאחר\s+תיקון|יש\s+לברר\s+זמני\s+טיפולים/i;const match=marker.exec(cleaned);return match&&match.index>180?cleaned.slice(0,match.index).trim():cleaned}
 
 const findingKnowledgeBase=[
+  {id:'engine-overhaul-evidence',terms:['סימני שיפוץ מנוע','סימני שיפוץ במנוע'],category:'מנוע',tag:'נדרש בירור',tone:'clarify',classification:'repair_history_or_evidence',reportSeverity:'medium',meaning:'נרשמו סימנים לשיפוץ מנוע. יש לברר מה בוצע; סימני שיפוץ אינם מוכיחים לבדם שהמנוע הוחלף.',decision:'יש לברר במוסך את היקף השיפוץ ותיעודו. כאשר נדרשה בדיקת מספר המנוע, יש לאמת גם את התאמת המספר לרישיון.'},
+  {id:'engine-number-verification-required',terms:['לבדוק מספר מנוע במוסך מורשה','לבדוק מספר מנוע','בדוק מספר מנוע','בדיקת מספר מנוע','מספר מנוע לא נראה','מספר מנוע לא זוהה','מספר מנוע לא קריא','לא ניתן לראות את מספר המנוע','לא ניתן לזהות את מספר המנוע'],patterns:[/(?:לבדוק|בדוק|לאמת|אימות|בדיקת)\s+(?:את\s+)?מספר\s+ה?מנוע/,/מספר\s+ה?מנוע\s+(?:לא\s+(?:נראה|זוהה|קריא|נמצא)|אינו\s+(?:נראה|קריא))/,/לא\s+ניתן\s+(?:לראות|לזהות|לקרוא)\s+(?:את\s+)?מספר\s+ה?מנוע/],category:'מנוע',tag:'נדרש בירור במוסך מורשה',tone:'clarify',classification:'recommendation',reportSeverity:null,requiresEngineNumberVerification:true,meaning:'מספר המנוע דורש אימות. ייתכן שלא היה גלוי לבוחן; אין בכך לבדו הוכחה שהמנוע הוחלף.',decision:'יש לגשת למוסך מורשה, לאתר ולקרוא את מספר המנוע ולאמת התאמה לרישיון הרכב.'},
   {id:'severe-accident-explicit',terms:['רכב לאחר תאונה קשה','לאחר תאונה קשה'],patterns:[/רכב\s*לאחר\s*תאונה\s*קשה/],category:'שלדת מרכב',tag:'משמעות גבוהה',tone:'safety',classification:'repair_history_or_evidence',reportSeverity:'high',meaning:'דוח המכון מציין במפורש שהרכב לאחר תאונה קשה.',decision:'זהו עבר תאונתי חמור לפי דוח המכון. לפני החלטה על רכישה יש לברר את היקף הפגיעה המבנית, איכות התיקונים, התאמת המרכב לנתוני היצרן וירידת הערך עם שמאי.'},
   {id:'engine-oil-sweat-report',terms:['סימני הזעה שמן מנוע','סימני הזעת שמן מנוע'],patterns:[/סימני\s*הזע[הת]?\s*שמן/],category:'מנוע',tag:'משמעות בינונית',tone:'clarify',classification:'actual_finding',reportSeverity:'medium',suppresses:['oil-sweat'],meaning:'נרשמו סימני הזעת שמן במנוע. זו לחות שמנונית, ויש להבדיל בינה לבין נזילה פעילה.',decision:'יש לאתר את מקור ההזעה ולבדוק אם היא קלה ויבשה או פעילה. יש להביא בחשבון טיפול באטימה לפי הממצאים.'},
   {id:'engine-internal-knocks-report',terms:['נקישות פנימיות','רעשים ונקישות פנימיות'],patterns:[/נקיש[א-ת]*\s*פנימ/],category:'מנוע',tag:'משמעות גבוהה',tone:'safety',classification:'actual_finding',reportSeverity:'high',meaning:'נרשמו נקישות פנימיות במנוע. זהו ממצא מכני ממשי, גם כאשר מקורו המדויק עדיין לא אובחן.',decision:'יש לבצע אבחון מנוע ממוקד ולהעריך את מקור הנקישות ואת עלות הטיפול לפני קבלת החלטה.'},
@@ -742,9 +744,26 @@ function reportLines(value){
     .filter(line=>line.length>2);
 }
 
+function isEngineNumberVerificationText(value){
+  const text=normalizeFindingText(value);
+  return /(?:לבדוק|בדוק|לאמת|אימות|בדיקת)\s+(?:את\s+)?מספר\s+ה?מנוע/.test(text)
+    || /מספר\s+ה?מנוע\s+(?:לא\s+(?:נראה|זוהה|קריא|נמצא)|אינו\s+(?:נראה|קריא))/.test(text)
+    || /לא\s+ניתן\s+(?:לראות|לזהות|לקרוא)\s+(?:את\s+)?מספר\s+ה?מנוע/.test(text);
+}
+
+function engineNumberFollowUpText(result){
+  const findings=result?.findings||[];
+  const facts=findings.map(item=>normalizeFindingText(item.sourceText||item.matchedTerm||''));
+  if(!facts.some(isEngineNumberVerificationText)) return '';
+  const history=facts.some(text=>/סימני\s+(?:פתיחת\s+ברגים|פירוק).*מנוע.*גיר|סימני\s+(?:שיפוץ|פירוק|החלפת)\s+(?:ה?מנוע)|סימני\s+שיפוץ\s+והחלפת\s+מנוע/.test(text));
+  const base='נדרשת בדיקה במוסך מורשה: יש לאתר ולקרוא את מספר המנוע ולאמת את התאמתו לרישיון הרכב. ייתכן שהבוחן לא הצליח לראות את המספר בזמן הבדיקה; ההפניה לבירור אינה מוכיחה לבדה שהמנוע הוחלף.';
+  return base+(history?' ההנחיה מופיעה לצד סימני פירוק, פתיחת ברגים בין המנוע לגיר או שיפוץ מנוע. יש לברר במוסך מה בוצע, לבדוק תיעוד תיקון או החלפה ולוודא התאמה לרישיון.':' יש להשלים את הבירור גם אם לא נרשמו סימני פירוק או שיפוץ.');
+}
+
 function isMetadataLine(line){
   const n=normalizeFindingText(line);
   const compact=n.replace(/\s/g,'');
+  if(isEngineNumberVerificationText(n)) return false;
   const categoryHeading=reportCategoryFromLine(line);
   const categoryOnly=Boolean(categoryHeading)
     && !/\d/.test(n)
@@ -1427,8 +1446,10 @@ function findKnowledgeRules(line,categoryHint=''){
       const normalizedTerm=normalizeFindingText(term);
       if(normalizedTerm&&findingTextIncludes(n,normalizedTerm)&&normalizedTerm.length>longest.length) longest=normalizedTerm;
     });
-    if(!longest&&(rule.patterns||[]).some(pattern=>pattern.test(n))) longest=normalizeFindingText(rule.terms[0]||rule.id);
-    if(longest){const matchedRule={...rule,classification:rule.classification||ruleClassification[rule.id]||'context_dependent',matchedTerm:longest,matchSource:'מאגר מקצועי'};matches.push(applyExpertCalibration(matchedRule,{id:rule.id,text:longest,terms:rule.terms}));}
+    if(!longest&&(rule.patterns||[]).some(pattern=>pattern.test(n))){
+      longest=rule.requiresEngineNumberVerification?((rule.patterns||[]).map(pattern=>n.match(pattern)?.[0]).find(Boolean)||''):normalizeFindingText(rule.terms[0]||rule.id);
+    }
+    if(longest){const matchedRule={...rule,classification:rule.classification||ruleClassification[rule.id]||'context_dependent',matchedTerm:longest,matchSource:'מאגר מקצועי'};matches.push(matchedRule.requiresEngineNumberVerification?matchedRule:applyExpertCalibration(matchedRule,{id:rule.id,text:longest,terms:rule.terms}));}
   });
 
   const suppressed=new Set(matches.flatMap(item=>item.suppresses||[]));
@@ -1737,7 +1758,7 @@ function interpretSummaryText(text){
         if(continuedRules.length){rules=continuedRules;observedCandidate=continued;break;}
       }
     }
-    const diagnosisSignal=/(תאונה|תיקונ|תיקון|פגיע|הלחמ|חיבור.*לא מקורי|עמוד|משקופ|נקיש|פגומ|זוויות.*היגוי|היגוי.*כיוון|ירידת ערך|הוחלפ|החלפ|לבדוק|סריקת מחשב|תקל|שחוק|רעש|רעיד|צריכת שמן|חסר|לא מתקפל|שריט|מעיכ|פגמי|קרוע|שבור|נזיל|דליפ|חופש)/.test(normalizeFindingText(contentLine));
+    const diagnosisSignal=/(תאונה|שיפו|תיקונ|תיקון|פגיע|הלחמ|חיבור.*לא מקורי|עמוד|משקופ|נקיש|פגומ|זוויות.*היגוי|היגוי.*כיוון|ירידת ערך|הוחלפ|החלפ|לבדוק|סריקת מחשב|תקל|שחוק|רעש|רעיד|צריכת שמן|חסר|לא מתקפל|שריט|מעיכ|פגמי|קרוע|שבור|נזיל|דליפ|חופש)/.test(normalizeFindingText(contentLine));
     const fullCoverage=rules.some(rule=>normalizeFindingText(rule.sourceText||rule.matchedTerm||'')===normalizeFindingText(contentLine));
     const clauseCategory=currentCategory||(/תיבת הילוכים|תיבת ההילוכים/.test(contentLine)?'תיבת הילוכים':/במנוע|שמן מנוע/.test(contentLine)?'מנוע':'');
     const ruleCategories=new Set(rules.map(rule=>rule.category));
