@@ -5479,7 +5479,6 @@ function assessComputerVehicleIdentity(extracted){
   const expected=currentVehicleIdentity();
   const evidence=[];
   if(extracted.vin) evidence.push(`מספר שלדה שנקרא מהדוח: ${extracted.vin}`);
-  html+=`<div class="inspectionIdentityItem"><span class="inspectionIdentityLabel">מספר רכב שנקרא מסיכום הבוחן</span><strong class="inspectionIdentityValue">${escapeHtml(inspectionPlate||'לא זוהה')}</strong></div>`;
   if(extracted.maker) evidence.push(`יצרן שנקרא מהדוח: ${extracted.maker}`);
   if(extracted.model) evidence.push(`דגם שנקרא מהדוח: ${extracted.model}`);
   if(extracted.year) evidence.push(`שנת ייצור שנקראה מהדוח: ${extracted.year}`);
