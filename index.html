@@ -4846,7 +4846,7 @@ function fuzzyFormulaScore(line,formulaText){
   return (lineCoverage*0.65)+(formulaCoverage*0.35);
 }
 
-function findKnowledgeRules(line,categoryHint=''){
+function findKnowledgeRules(line,categoryHint='',catalogRows=loadFormulaOverrides()){
   const n=normalizeFindingText(line);
   const matches=[];
   findingKnowledgeBase.forEach(rule=>{
@@ -4900,7 +4900,7 @@ function findKnowledgeRules(line,categoryHint=''){
 
   const preferred=[];
   const sourcePositions=new Map();
-  [...curated,...additions].forEach(item=>{
+  [...curated,...additions].filter(item=>!isDeletedFormulaFinding(item,catalogRows)).forEach(item=>{
     if(item.matchSource==='מאגר מקצועי'){preferred.push(item);return;}
     const sourceKey=normalizeFindingText(item.sourceText||'');
     if(!sourceKey){preferred.push(item);return;}
@@ -5183,8 +5183,9 @@ function reportSystemFamily(category){
 }
 
 function isDeletedFormulaFinding(item,rows=loadFormulaOverrides()){
-  const fact=reportFactIdentity(item?.sourceText||item?.matchedTerm||item?.text||'');
-  return rows.some(row=>row.active===false&&(item?.id===overrideFindingIdForDeletion(row)||fact&&fact===reportFactIdentity(row.source_text||row.text||'')));
+  const id=String(item?.id||'');
+  if(!id)return false;
+  return rows.some(row=>row.active===false&&id===overrideFindingIdForDeletion(row));
 }
 function overrideFindingIdForDeletion(row){
   if(row.source_kind==='formula'||row.source_kind==='base')return 'formula-'+row.source_id;
@@ -5211,7 +5212,7 @@ function distinctReportFindings(findings){
   return [...unique.values()];
 }
 
-function interpretSummaryText(text){
+function interpretSummaryText(text,catalogRows=loadFormulaOverrides()){
   const findings=[],unknown=[],unreadable=[],seen=new Set();
   text=diagnosticTableText(text);
   const compactReport=normalizeFindingText(text).replace(/\s/g,'');
@@ -5239,7 +5240,7 @@ function interpretSummaryText(text){
     const diagnosisCategory=reportFindingCategory(contentLine,currentCategory,chassisHint);
     const diagnosisSeverity=diagnosisCategory===currentCategory?currentSeverity:lineSeverity;
     let observedCandidate=contentLine;
-    let rules=findKnowledgeRules(contentLine,diagnosisCategory);
+    let rules=findKnowledgeRules(contentLine,diagnosisCategory,catalogRows);
     if(!rules.length&&!unreliable){
       let continued=contentLine;
       for(let offset=1;offset<=2;offset++){
@@ -5248,7 +5249,7 @@ function interpretSummaryText(text){
         const nextContent=stripReportScaffolding(nextLine,'',null);
         if(!nextContent||reportTextIsUnreliable(nextContent)) break;
         continued+=' '+nextContent;
-        const continuedRules=findKnowledgeRules(continued,diagnosisCategory);
+        const continuedRules=findKnowledgeRules(continued,diagnosisCategory,catalogRows);
         if(continuedRules.length){rules=continuedRules;observedCandidate=continued;break;}
       }
     }
@@ -5300,7 +5301,7 @@ function interpretSummaryText(text){
       if(excerpt&&!unknown.includes(excerpt)) unknown.push(excerpt);
     }
   });
-  const finalFindings=orderFindingsLikeReport(distinctReportFindings(findings.map(finalizeReportFinding).filter(Boolean).filter(item=>!isDeletedFormulaFinding(item))));
+  const finalFindings=orderFindingsLikeReport(distinctReportFindings(findings.map(finalizeReportFinding).filter(Boolean).filter(item=>!isDeletedFormulaFinding(item,catalogRows))));
   return applyReportMileageContext(applyEngineWarrantyContext({findings:finalFindings,unknown,unreadable:[...new Set(unreadable)]},text),text);
 }
 

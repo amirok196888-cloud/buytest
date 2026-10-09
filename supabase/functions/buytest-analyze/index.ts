@@ -1453,7 +1453,7 @@ function fuzzyFormulaScore(line,formulaText){
   return (lineCoverage*0.65)+(formulaCoverage*0.35);
 }
 
-function findKnowledgeRules(line,categoryHint=''){
+function findKnowledgeRules(line,categoryHint='',catalogRows=loadFormulaOverrides()){
   const n=normalizeFindingText(line);
   const matches=[];
   findingKnowledgeBase.forEach(rule=>{
@@ -1507,7 +1507,7 @@ function findKnowledgeRules(line,categoryHint=''){
 
   const preferred=[];
   const sourcePositions=new Map();
-  [...curated,...additions].forEach(item=>{
+  [...curated,...additions].filter(item=>!isDeletedFormulaFinding(item,catalogRows)).forEach(item=>{
     if(item.matchSource==='מאגר מקצועי'){preferred.push(item);return;}
     const sourceKey=normalizeFindingText(item.sourceText||'');
     if(!sourceKey){preferred.push(item);return;}
@@ -1789,8 +1789,9 @@ function reportSystemFamily(category){
 }
 
 function isDeletedFormulaFinding(item,rows=loadFormulaOverrides()){
-  const fact=reportFactIdentity(item?.sourceText||item?.matchedTerm||item?.text||'');
-  return rows.some(row=>row.active===false&&(item?.id===overrideFindingIdForDeletion(row)||fact&&fact===reportFactIdentity(row.source_text||row.text||'')));
+  const id=String(item?.id||'');
+  if(!id)return false;
+  return rows.some(row=>row.active===false&&id===overrideFindingIdForDeletion(row));
 }
 function overrideFindingIdForDeletion(row){
   if(row.source_kind==='formula'||row.source_kind==='base')return 'formula-'+row.source_id;
@@ -1817,7 +1818,7 @@ function distinctReportFindings(findings){
   return [...unique.values()];
 }
 
-function interpretSummaryText(text){
+function interpretSummaryText(text,catalogRows=loadFormulaOverrides()){
   const findings=[],unknown=[],unreadable=[],seen=new Set();
   text=diagnosticTableText(text);
   const compactReport=normalizeFindingText(text).replace(/\s/g,'');
@@ -1845,7 +1846,7 @@ function interpretSummaryText(text){
     const diagnosisCategory=reportFindingCategory(contentLine,currentCategory,chassisHint);
     const diagnosisSeverity=diagnosisCategory===currentCategory?currentSeverity:lineSeverity;
     let observedCandidate=contentLine;
-    let rules=findKnowledgeRules(contentLine,diagnosisCategory);
+    let rules=findKnowledgeRules(contentLine,diagnosisCategory,catalogRows);
     if(!rules.length&&!unreliable){
       let continued=contentLine;
       for(let offset=1;offset<=2;offset++){
@@ -1854,7 +1855,7 @@ function interpretSummaryText(text){
         const nextContent=stripReportScaffolding(nextLine,'',null);
         if(!nextContent||reportTextIsUnreliable(nextContent)) break;
         continued+=' '+nextContent;
-        const continuedRules=findKnowledgeRules(continued,diagnosisCategory);
+        const continuedRules=findKnowledgeRules(continued,diagnosisCategory,catalogRows);
         if(continuedRules.length){rules=continuedRules;observedCandidate=continued;break;}
       }
     }
@@ -1906,7 +1907,7 @@ function interpretSummaryText(text){
       if(excerpt&&!unknown.includes(excerpt)) unknown.push(excerpt);
     }
   });
-  const finalFindings=orderFindingsLikeReport(distinctReportFindings(findings.map(finalizeReportFinding).filter(Boolean).filter(item=>!isDeletedFormulaFinding(item))));
+  const finalFindings=orderFindingsLikeReport(distinctReportFindings(findings.map(finalizeReportFinding).filter(Boolean).filter(item=>!isDeletedFormulaFinding(item,catalogRows))));
   return applyReportMileageContext(applyEngineWarrantyContext({findings:finalFindings,unknown,unreadable:[...new Set(unreadable)]},text),text);
 }
 
@@ -2459,4 +2460,4 @@ async function saveOverride(body){const row=normalizedOverride(body);const data=
 async function saveOverrides(bodies){if(!Array.isArray(bodies)||!bodies.length||bodies.length>250)throw new Error('invalid_override');const rows=bodies.map(normalizedOverride);const data=await serviceRequest('/rest/v1/buytest_formula_overrides?on_conflict=source_kind,source_id',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=representation'},body:JSON.stringify(rows)});return Array.isArray(data)?data:[]}
 async function deleteOverride(body){const sourceKind=String(body.source_kind||'');const sourceId=String(body.source_id||'');if(!['knowledge','formula','observed','custom'].includes(sourceKind)||!sourceId)throw new Error('invalid_override');await serviceRequest('/rest/v1/buytest_formula_overrides?source_kind=eq.'+encodeURIComponent(sourceKind)+'&source_id=eq.'+encodeURIComponent(sourceId),{method:'DELETE',headers:{Prefer:'return=minimal'}});return true}
 
-Deno.serve(async req=>{const origin=req.headers.get('origin');if(req.method==='OPTIONS'){if(origin!==ALLOWED_ORIGIN)return json(origin,{ok:false,error:'origin_not_allowed'},403);return new Response(null,{status:204,headers:cors(origin)})}if(req.method!=='POST')return json(origin,{ok:false,error:'method_not_allowed'},405);if(origin!==ALLOWED_ORIGIN)return json(origin,{ok:false,error:'origin_not_allowed'},403);let body;try{body=await req.json()}catch{return json(origin,{ok:false,error:'invalid_json'},400)}try{const admin=await isAdmin(req.headers.get('x-buytest-manager-pin')||body.adminPin);if(body.action==='adminCatalog'){if(!admin)return json(origin,{ok:false,error:'admin_denied'},403);const catalogOverrides=await overrides();return json(origin,{ok:true,rows:adminCatalog().filter(row=>!isDeletedFormulaFinding({id:overrideFindingIdForDeletion(row),sourceText:row.source_text},catalogOverrides)),overrides:catalogOverrides})}if(body.action==='adminDeleteDiagnosis'){if(!admin)return json(origin,{ok:false,error:'admin_denied'},403);return json(origin,{ok:true,row:await saveOverride({...body.row,active:false})})}if(body.action==='adminSaveOverride'){if(!admin)return json(origin,{ok:false,error:'admin_denied'},403);return json(origin,{ok:true,row:await saveOverride(body.row||{})})}if(body.action==='adminSaveOverrides'){if(!admin)return json(origin,{ok:false,error:'admin_denied'},403);return json(origin,{ok:true,rows:await saveOverrides(body.rows||[])})}if(body.action==='adminDeleteOverride'){if(!admin)return json(origin,{ok:false,error:'admin_denied'},403);await deleteOverride(body.row||{});return json(origin,{ok:true})}const entitlement=admin?{scopes:['report'],plate:String(body?.expected?.plate||'').replace(/\D/g,'')}:await verifyEntitlement(body.accessToken);if(!entitlement||!entitlement.scopes.includes('report'))return json(origin,{ok:false,error:'paid_report_required'},403);const summaryText=String(body.summaryText||'');const computerText=String(body.computerText||'');if(summaryText.length>250000||computerText.length>250000)return json(origin,{ok:false,error:'text_too_large'},413);if(summaryText.length<5&&!computerText)return json(origin,{ok:false,error:'missing_report_text'},400);const expected=body.expected&&typeof body.expected==='object'?body.expected:{};if(!admin&&String(entitlement.plate)!==String(expected.plate||'').replace(/\D/g,''))return json(origin,{ok:false,error:'vehicle_mismatch'},409);const rows=await overrides();const summary=summaryText?sourceGroundedSummaryResult(applyCustomRules(summaryText,applyServerOverrides(interpretSummaryText(summaryText),rows),rows),summaryText):null;const computer=computerText?applyServerOverrides(interpretComputerText(computerText,expected),rows):null;return json(origin,{ok:true,summary,computer})}catch(error){console.error('BuyTest analyzer error',error);return json(origin,{ok:false,error:error?.message==='invalid_override'?'invalid_override':'analysis_failed'},error?.message==='invalid_override'?400:500)}});
+Deno.serve(async req=>{const origin=req.headers.get('origin');if(req.method==='OPTIONS'){if(origin!==ALLOWED_ORIGIN)return json(origin,{ok:false,error:'origin_not_allowed'},403);return new Response(null,{status:204,headers:cors(origin)})}if(req.method!=='POST')return json(origin,{ok:false,error:'method_not_allowed'},405);if(origin!==ALLOWED_ORIGIN)return json(origin,{ok:false,error:'origin_not_allowed'},403);let body;try{body=await req.json()}catch{return json(origin,{ok:false,error:'invalid_json'},400)}try{const admin=await isAdmin(req.headers.get('x-buytest-manager-pin')||body.adminPin);if(body.action==='adminCatalog'){if(!admin)return json(origin,{ok:false,error:'admin_denied'},403);const catalogOverrides=await overrides();return json(origin,{ok:true,rows:adminCatalog().filter(row=>!isDeletedFormulaFinding({id:overrideFindingIdForDeletion(row),sourceText:row.source_text},catalogOverrides)),overrides:catalogOverrides})}if(body.action==='adminDeleteDiagnosis'){if(!admin)return json(origin,{ok:false,error:'admin_denied'},403);return json(origin,{ok:true,row:await saveOverride({...body.row,active:false})})}if(body.action==='adminSaveOverride'){if(!admin)return json(origin,{ok:false,error:'admin_denied'},403);return json(origin,{ok:true,row:await saveOverride(body.row||{})})}if(body.action==='adminSaveOverrides'){if(!admin)return json(origin,{ok:false,error:'admin_denied'},403);return json(origin,{ok:true,rows:await saveOverrides(body.rows||[])})}if(body.action==='adminDeleteOverride'){if(!admin)return json(origin,{ok:false,error:'admin_denied'},403);await deleteOverride(body.row||{});return json(origin,{ok:true})}const entitlement=admin?{scopes:['report'],plate:String(body?.expected?.plate||'').replace(/\D/g,'')}:await verifyEntitlement(body.accessToken);if(!entitlement||!entitlement.scopes.includes('report'))return json(origin,{ok:false,error:'paid_report_required'},403);const summaryText=String(body.summaryText||'');const computerText=String(body.computerText||'');if(summaryText.length>250000||computerText.length>250000)return json(origin,{ok:false,error:'text_too_large'},413);if(summaryText.length<5&&!computerText)return json(origin,{ok:false,error:'missing_report_text'},400);const expected=body.expected&&typeof body.expected==='object'?body.expected:{};if(!admin&&String(entitlement.plate)!==String(expected.plate||'').replace(/\D/g,''))return json(origin,{ok:false,error:'vehicle_mismatch'},409);const rows=await overrides();const summary=summaryText?sourceGroundedSummaryResult(applyCustomRules(summaryText,applyServerOverrides(interpretSummaryText(summaryText,rows),rows),rows),summaryText):null;const computer=computerText?applyServerOverrides(interpretComputerText(computerText,expected),rows):null;return json(origin,{ok:true,summary,computer})}catch(error){console.error('BuyTest analyzer error',error);return json(origin,{ok:false,error:error?.message==='invalid_override'?'invalid_override':'analysis_failed'},error?.message==='invalid_override'?400:500)}});

@@ -11,7 +11,7 @@ function harness(){
  return {c,element,memory,saved,run:s=>vm.runInContext(s,c)};
 }
 function row(extra={}){return {source_kind:'custom',source_id:'test-roof',category:'שלדת מרכב',source_text:'תיקון ייחודי בגג',classification_type:'actual_finding',report_severity:'high',meaning:'פגיעה ברכיב מבני עליון שיש לברר את היקפה.',decision:'לבדוק את חיבורי הגג ותיעוד התיקון.',question:'האם קיימות תמונות לפני התיקון?',...extra};}
-function analyze(c,text,rows){return c.applyCustomRules(text,c.applyServerOverrides(c.interpretSummaryText(text),rows),rows);}
+function analyze(c,text,rows){return c.applyCustomRules(text,c.applyServerOverrides(c.interpretSummaryText(text,rows),rows),rows);}
 test('edit an original diagnosis moves category, edits wording and preserves individually written meaning across reload',async()=>{
  const h=harness(),{c,element,run}=h;run("globalThis.original=rawFormulaDatabase.find(row=>row.category==='מנוע');");
  c.editFormulaEntry('base',c.original.id);
@@ -99,18 +99,43 @@ test('moving an existing chassis diagnosis to another severity updates its group
 test('opening an original diagnosis preserves its group severity instead of substituting automatic calibration',()=>{
  const h=harness();for(const item of h.c.formulaAdminRows().filter(r=>['שלדת מרכב','שלדה נפרדת'].includes(r.category))){h.c.editFormulaEntry(item.kind,item.id);assert.equal(h.element('formulaSeverity').value,item.severity,item.id);}
 });
-test('manager can delete an original diagnosis and duplicates, without losing other edits',async()=>{
+test('manager deletes only the chosen diagnosis and preserves the duplicate and other edits',async()=>{
  const h=harness();h.c.confirm=()=>true;
  h.c.saveFormulaOverrideRows([{id:'keep',source_kind:'formula',source_id:'technotest-214',category:'מנוע',text:'הלחמות בבלוק המנוע',meaning:'משמעות שכתב המנהל'}]);
  await h.c.deleteFormulaDiagnosis('base','technotest-583');
  assert.equal(h.saved[0].action,'adminDeleteDiagnosis');assert.equal(h.saved[0].row.active,false);
- assert.ok(!h.c.formulaAdminRows().some(r=>r.id==='technotest-583'||r.id==='technotest-584'));
+ assert.ok(!h.c.formulaAdminRows().some(r=>r.id==='technotest-583'));assert.ok(h.c.formulaAdminRows().some(r=>r.id==='technotest-584'));
  assert.equal(h.c.loadFormulaOverrides().find(r=>r.id==='keep').meaning,'משמעות שכתב המנהל');
  // Reloaded catalog continues to exclude the deleted diagnosis.
- assert.ok(!h.c.formulaAdminRows().some(r=>r.text==='נורת לחץ אוויר דולקת'));
+ assert.ok(h.c.formulaAdminRows().some(r=>r.id==='technotest-584'&&r.text==='נורת לחץ אוויר דולקת'));
 });
 test('failed or cancelled deletion leaves the diagnosis in place',async()=>{
  const h=harness();h.c.confirm=()=>false;await h.c.deleteFormulaDiagnosis('base','technotest-583');assert.equal(h.saved.length,0);
  h.c.confirm=()=>true;h.c.callBuyTestAnalyzeService=async()=>{throw Error('offline');};await h.c.deleteFormulaDiagnosis('base','technotest-583');
  assert.ok(h.c.formulaAdminRows().some(r=>r.id==='technotest-583'));assert.match(h.element('formulaAdminMessage').textContent,/לא נמחקה/);
+});
+test('adding a new diagnosis with wording previously deleted stays visible and survives catalog reload',async()=>{
+ const h=harness();const deleted={id:'deleted-original',source_kind:'formula',source_id:'technotest-550',category:'תיבת הילוכים',text:'בלאי סביר',active:false};h.c.saveFormulaOverrideRows([deleted,{...deleted,id:'deleted-alias',source_kind:'observed',source_id:'sample-013'}]);
+ h.c.newFormulaEntry();h.element('formulaCategory').value='תיבת הילוכים';h.element('formulaText').value='בלאי סביר';h.element('formulaMeaning').value='המשמעות החדשה שכתב המנהל';h.element('formulaSeverity').value='low';await h.c.saveCustomFormula();
+ const added=h.c.loadCustomFormulas()[0];assert.ok(added);assert.ok(h.c.formulaAdminRows().some(r=>r.kind==='custom'&&r.id===added.id),'new diagnosis is visible');
+ assert.ok(!h.c.formulaAdminRows().some(r=>r.kind!=='custom'&&r.text==='בלאי סביר'),'deleted originals and aliases remain deleted');
+ const centralRows=h.c.loadFormulaOverrides().map(h.c.serverFormulaRow);
+ h.c.callBuyTestAnalyzeService=async()=>({overrides:centralRows,rows:h.c.adminCatalog().filter(r=>!h.c.isDeletedFormulaFinding({id:h.c.overrideFindingIdForDeletion(r),sourceText:r.source_text},centralRows))});
+ await h.c.syncFormulaAdminFromServer();const visible=h.c.formulaAdminRows().filter(r=>r.text==='בלאי סביר');assert.equal(visible.length,1);assert.equal(visible[0].meaning,'המשמעות החדשה שכתב המנהל');
+});
+test('replacement wording reaches customer analysis without reviving the deleted record',()=>{
+ const {c}=harness();const deleted={source_kind:'formula',source_id:'technotest-550',category:'תיבת הילוכים',source_text:'בלאי סביר',active:false};
+ const replacement=row({source_id:'replacement-wear',category:'תיבת הילוכים',source_text:'בלאי סביר',meaning:'משמעות חדשה ומדויקת',report_severity:'low',active:true});
+ const r=analyze(c,'תיבת הילוכים\nבלאי סביר',[deleted,replacement]);
+ assert.equal(r.findings.length,1);assert.ok(!r.findings.some(f=>f.id==='formula-technotest-550'));assert.equal(r.findings[0].managerMeaning,replacement.meaning);
+ const removedAgain={...replacement,active:false};assert.ok(!analyze(c,'תיבת הילוכים\nבלאי סביר',[deleted,removedAgain]).findings.some(f=>f.managerMeaning===replacement.meaning));
+});
+test('deleting one of two identical custom diagnoses keeps the other and its meaning after reload',async()=>{
+ const h=harness();h.c.confirm=()=>true;
+ const a={id:'same-a',category:'מנוע',text:'אבחנת בלאי ייחודית',meaning:'משמעות ראשונה',report_severity:'low'},b={...a,id:'same-b',meaning:'משמעות שנייה'};
+ h.c.saveCustomFormulaRows([a,b]);h.c.saveFormulaOverrideRows([a,b].map(r=>({...r,source_kind:'custom',source_id:r.id,active:true})));
+ await h.c.deleteFormulaDiagnosis('custom','same-a');
+ assert.ok(!h.c.formulaAdminRows().some(r=>r.id===a.id));assert.equal(h.c.formulaAdminRows().find(r=>r.id===b.id).meaning,b.meaning);
+ const central=h.c.loadFormulaOverrides().map(h.c.serverFormulaRow);h.c.callBuyTestAnalyzeService=async()=>({rows:[],overrides:central});await h.c.syncFormulaAdminFromServer();
+ assert.equal(h.c.formulaAdminRows().filter(r=>r.kind==='custom').length,1);assert.equal(h.c.formulaAdminRows().find(r=>r.id===b.id).meaning,b.meaning);
 });

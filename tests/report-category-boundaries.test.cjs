@@ -29,10 +29,10 @@ test('all 636 catalog records have category identifiers matching their audited c
  for(const r of c.catalog){const d=c.definitions.find(d=>d.name===r.category);assert.ok(d||r.category==='ממצאים נוספים',r.id);if(d)assert.equal(r.category_id,d.id,r.id);}
  for(const d of c.definitions)assert.equal(d.formula_count,c.catalog.filter(r=>r.category===d.name).length,d.name);
 });
-test('central deletion suppresses exact duplicate aliases and preserves a different diagnosis',()=>{
+test('central deletion preserves an identical diagnosis with a different identity',()=>{
  const c=engine();const deleted={source_kind:'formula',source_id:'technotest-583',source_text:'נורת לחץ אוויר דולקת',category:'צמיגים וחישוקים',active:false};
- const result=c.applyCustomRules('צמיגים וחישוקים\nנורת לחץ אוויר דולקת\nצמיגים קדמיים פגומים',c.applyServerOverrides(c.interpretSummaryText('צמיגים וחישוקים\nנורת לחץ אוויר דולקת\nצמיגים קדמיים פגומים'),[deleted]),[deleted]);
- assert.ok(!result.findings.some(f=>/נורת לחץ אוויר/.test(f.sourceText||'')));assert.ok(result.findings.some(f=>/צמיגים קדמיים/.test(f.sourceText||'')));
+ const result=c.applyCustomRules('צמיגים וחישוקים\nנורת לחץ אוויר דולקת\nצמיגים קדמיים פגומים',c.applyServerOverrides(c.interpretSummaryText('צמיגים וחישוקים\nנורת לחץ אוויר דולקת\nצמיגים קדמיים פגומים',[deleted]),[deleted]),[deleted]);
+ assert.ok(!result.findings.some(f=>f.id==='formula-technotest-583'));assert.ok(result.findings.some(f=>/נורת לחץ אוויר/.test(f.sourceText||'')));assert.ok(result.findings.some(f=>/צמיגים קדמיים/.test(f.sourceText||'')));
  assert.equal(c.normalizedOverride({...deleted,source_text:'נורת לחץ אוויר דולקת',report_severity:'none'}).active,false);
 });
 test('every catalog phrase parses without leaking a nested component into a different system',()=>{
