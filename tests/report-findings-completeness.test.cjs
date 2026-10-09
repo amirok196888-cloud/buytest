@@ -54,3 +54,45 @@ test('browser and server parser stay identical',()=>{
  const extract=s=>s.slice(s.indexOf('function interpretSummaryText(text){'),s.indexOf('\nconst dtcStatusDefinitions=',s.indexOf('function interpretSummaryText(text){')));
  assert.equal(extract(html),extract(server));
 });
+
+test('body impact after tyres remains a body finding even without the body heading',()=>{
+ const c=engine();
+ for(const phrase of ['סימני פגיעה מאחור','סימני פגיעה בחזית','סימני פגיעה במרכב']){
+  const r=c.interpretSummaryText('צמיגים וחישוקים\nצמיגים פגומים, '+phrase);
+  const body=r.findings.find(f=>f.sourceText===phrase);
+  assert.equal(body?.category,'שלדת מרכב',phrase);
+  assert.ok(!r.findings.some(f=>/צמיג/.test(f.category)&&String(f.sourceText).includes(phrase)));
+  assert.ok(r.findings.some(f=>/צמיג/.test(f.category)));
+  const groups=c.compactAnalysisGroups(r);
+  assert.ok(groups.some(g=>/שלד|מרכב/.test(g.category)&&g.bullets.includes(phrase)));
+  assert.ok(!groups.some(g=>/צמיג/.test(g.category)&&g.bullets.some(b=>b.includes(phrase))));
+ }
+});
+test('body impact preserves explicit severity and separate chassis without assuming damage severity',()=>{
+ const c=engine();
+ const r=c.interpretSummaryText('צמיגים וחישוקים\nמשמעות נמוכה: סימני פגיעה מאחור');
+ assert.equal(r.findings.find(f=>f.sourceText==='סימני פגיעה מאחור')?.reportSeverity,'low');
+ const plain=c.interpretSummaryText('צמיגים וחישוקים\nסימני פגיעה מאחור');
+ assert.notEqual(plain.findings[0].reportSeverity,'high');
+ assert.equal(c.interpretSummaryText('שלדה נפרדת\nסימני פגיעה מאחור').findings[0].category,'שלדה נפרדת');
+ const tyre=c.interpretSummaryText('צמיגים וחישוקים\nצמיגים אחוריים פגומים');
+ assert.ok(tyre.findings.every(f=>/צמיג/.test(f.category)));
+});
+test('previously misclassified body impact is corrected when rendering a saved result',()=>{
+ const c=engine();
+ const groups=c.compactAnalysisGroups({findings:[{id:'report-diagnosis-1',category:'צמיגים וחישוקים',sourceText:'סימני פגיעה מאחור',observedText:'סימני פגיעה מאחור',verbatimDiagnosis:true,classification:'source_diagnosis',reportSeverity:'low'}]});
+ assert.equal(groups.length,1);assert.match(groups[0].category,/שלד|מרכב/);
+});
+
+test('explicit body heading retains rear impact even when OCR joins its words',()=>{
+ const c=engine();
+ for(const phrase of ['סימני פגיעה מאחור','סימני פגיעהמאחור','סימניפגיעהמאחור']){
+  const r=c.interpretSummaryText('צמיגים וחישוקים\nצמיגים פגומים\nשלדת מרכב\nמשמעות נמוכה: '+phrase);
+  const impact=r.findings.find(f=>f.sourceText===phrase);
+  assert.equal(impact?.category,'שלדת מרכב');assert.equal(impact.reportSeverity,'low');
+  const g=c.compactAnalysisGroups(r).find(g=>g.bullets.includes(phrase));
+  assert.equal(g?.category,'שלדה ומרכב');
+  const legacy=c.compactAnalysisGroups({findings:[{...impact,category:'צמיגים וחישוקים'}]});
+  assert.equal(legacy[0].category,'שלדה ומרכב');
+ }
+});

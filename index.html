@@ -5023,6 +5023,16 @@ function isSeverityHeadingOnly(value){
   return compact==='משמעותנמוכה'||compact==='משמעותגבוהה'||compact==='ליקוישולי'||compact==='ליקוייםשוליים';
 }
 
+function reportFindingCategory(source,category='',chassisHint=''){
+  const text=normalizeFindingText(source);
+  // A directional body-impact diagnosis cannot inherit a preceding tyre row.
+  // Keep explicit component diagnoses (e.g. a damaged rear tyre) in their system.
+  if(/(?:סימני\s*)?פגיע(?:ה|ות)\s*(?:מאחור|מלפנים|בחזית|במרכב|בגוף\s*הרכב)(?:\s|$)/.test(text)){
+    return category==='שלדה נפרדת'||chassisHint==='שלדה נפרדת'?'שלדה נפרדת':'שלדת מרכב';
+  }
+  return category;
+}
+
 function finalizeReportFinding(item){
   if(!item) return null;
   const source=item.sourceText||item.matchedTerm||'';
@@ -5040,7 +5050,9 @@ function finalizeReportFinding(item){
       cleaned.decision=professionalDecision({...cleaned,meaning:cleaned.meaning,decision:''});
     }
   }
-  return ensureEngineNumberSignificance(applyManagerFormulaOverride(cleaned));
+  cleaned=applyManagerFormulaOverride(cleaned);
+  cleaned.category=reportFindingCategory(cleaned.sourceText||cleaned.matchedTerm||'',cleaned.category);
+  return ensureEngineNumberSignificance(cleaned);
 }
 
 function reportConclusionOrder(category){
@@ -5136,8 +5148,10 @@ function interpretSummaryText(text){
     if(!contentLine||isReportStatusScaffolding(contentLine)||isExplicitlyNormal(contentLine)) return;
     const unreliable=reportTextIsUnreliable(contentLine);
     if(unreliable) unreadable.push(safeUnknownExcerpt(contentLine));
+    const diagnosisCategory=reportFindingCategory(contentLine,currentCategory,chassisHint);
+    const diagnosisSeverity=diagnosisCategory===currentCategory?currentSeverity:lineSeverity;
     let observedCandidate=contentLine;
-    let rules=findKnowledgeRules(contentLine,currentCategory);
+    let rules=findKnowledgeRules(contentLine,diagnosisCategory);
     if(!rules.length&&!unreliable){
       let continued=contentLine;
       for(let offset=1;offset<=2;offset++){
@@ -5146,19 +5160,19 @@ function interpretSummaryText(text){
         const nextContent=stripReportScaffolding(nextLine,'',null);
         if(!nextContent||reportTextIsUnreliable(nextContent)) break;
         continued+=' '+nextContent;
-        const continuedRules=findKnowledgeRules(continued,currentCategory);
+        const continuedRules=findKnowledgeRules(continued,diagnosisCategory);
         if(continuedRules.length){rules=continuedRules;observedCandidate=continued;break;}
       }
     }
     const diagnosisSignal=/(תאונה|שיפו|תיקונ|תיקון|פגיע|הלחמ|חיבור.*לא מקורי|עמוד|משקופ|נקיש|פגומ|זוויות.*היגוי|היגוי.*כיוון|ירידת ערך|הוחלפ|החלפ|לבדוק|סריקת מחשב|תקל|שחוק|רעש|רעיד|צריכת שמן|חסר|לא מתקפל|שריט|מעיכ|פגמי|קרוע|שבור|נזיל|דליפ|חופש)/.test(normalizeFindingText(contentLine));
     const fullCoverage=rules.some(rule=>normalizeFindingText(rule.sourceText||rule.matchedTerm||'')===normalizeFindingText(contentLine));
-    const clauseCategory=currentCategory||(/תיבת הילוכים|תיבת ההילוכים/.test(contentLine)?'תיבת הילוכים':/במנוע|שמן מנוע/.test(contentLine)?'מנוע':'');
+    const clauseCategory=diagnosisCategory||(/תיבת הילוכים|תיבת ההילוכים/.test(contentLine)?'תיבת הילוכים':/במנוע|שמן מנוע/.test(contentLine)?'מנוע':'');
     const ruleCategories=new Set(rules.map(rule=>rule.category));
     const families=new Set([...ruleCategories].map(reportSystemFamily));
-    const mixedSystems=families.size>1||Boolean(currentCategory&&rules.some(rule=>reportSystemFamily(rule.category)!==reportSystemFamily(currentCategory)));
+    const mixedSystems=families.size>1||Boolean(diagnosisCategory&&rules.some(rule=>reportSystemFamily(rule.category)!==reportSystemFamily(diagnosisCategory)));
     if(mixedSystems&&!unreliable) unreadable.push(safeUnknownExcerpt(contentLine));
-    if(clauseCategory&&!unreliable&&!mixedSystems&&(diagnosisSignal||currentSeverity==='high')&&!fullCoverage&&!isMetadataLine(contentLine)){
-      const severity=currentSeverity||rules.find(rule=>rule.category===currentCategory&&rule.reportSeverity)?.reportSeverity||null;
+    if(clauseCategory&&!unreliable&&!mixedSystems&&(diagnosisSignal||diagnosisSeverity==='high')&&!fullCoverage&&!isMetadataLine(contentLine)){
+      const severity=diagnosisSeverity||rules.find(rule=>rule.category===diagnosisCategory&&rule.reportSeverity)?.reportSeverity||null;
       const sourceRule={id:'report-diagnosis-'+index,category:clauseCategory,
         sourceText:contentLine,observedText:contentLine,verbatimDiagnosis:true,
         classification:'source_diagnosis',reportSeverity:severity,
@@ -5175,9 +5189,9 @@ function interpretSummaryText(text){
     });
     if(rules.length){
       rules.forEach(rule=>{
-        const sameSystem=rule.category===currentCategory||chassisCategories.includes(rule.category)&&chassisCategories.includes(currentCategory);
-        const enriched=applyReportSeverity(rule,sameSystem?currentSeverity:null,currentCategory);
-        if(sameSystem&&currentSeverity) enriched.explicitReportSeverity=true;
+        const sameSystem=rule.category===diagnosisCategory||chassisCategories.includes(rule.category)&&chassisCategories.includes(diagnosisCategory);
+        const enriched=applyReportSeverity(rule,sameSystem?diagnosisSeverity:null,diagnosisCategory);
+        if(sameSystem&&diagnosisSeverity) enriched.explicitReportSeverity=true;
         const sourceKey=normalizeFindingText(enriched.sourceText||enriched.matchedTerm||enriched.meaning||'');
         const duplicateIndex=findings.findIndex(existing=>{
           if(existing.id!==enriched.id||existing.reportSeverity!==enriched.reportSeverity) return false;
