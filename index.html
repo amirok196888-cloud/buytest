@@ -3835,7 +3835,7 @@ const ruleClassification={
 const formulaClassificationLabels={actual_finding:'ממצא מסוים שנרשם',limitation_or_disclaimer:'הסתייגות כללית',recommendation:'המלצה לבדיקה נוספת',maintenance_recommendation:'תחזוקה / כיוון',repair_history_or_evidence:'סימן לתיקון או החלפה',information:'מידע בלבד',context_dependent:'תלוי הקשר'};
 
 </script>
-<script src="buytest-formulas-v126.js?v=127"></script>
+<script src="buytest-formulas-v126.js?v=20261009-categories"></script>
 <script>
 const expertDecisionByFormulaId=new Map();
 const expertDecisionByAliasId=new Map();
@@ -4126,16 +4126,17 @@ function formulaOverrideFor(category,text,kind='',id=''){
   const rows=loadFormulaOverrides();
   const sourceKind=kind?serverFormulaSourceKind(kind):'';
   if(sourceKind&&id){
-    const byIdentity=rows.find(item=>item.source_kind===sourceKind&&String(item.source_id)===String(id));
+    const byIdentity=rows.find(item=>item.active!==false&&item.source_kind===sourceKind&&String(item.source_id)===String(id));
     if(byIdentity) return byIdentity;
   }
   const key=formulaOverrideKey(category,text);
-  return rows.find(item=>formulaOverrideKey(item.category,item.text)===key)||null;
+  return rows.find(item=>item.active!==false&&formulaOverrideKey(item.category,item.text)===key)||null;
 }
 
 function formulaOverrideForFinding(item){
   const itemId=String(item?.id||'');
   const byIdentity=loadFormulaOverrides().find(row=>{
+    if(row.active===false)return false;
     const sourceId=String(row.source_id||'');
     if(row.source_kind==='formula') return itemId===('formula-'+sourceId);
     if(row.source_kind==='observed') return itemId===('formula-alias-'+sourceId)||itemId===('alias-'+sourceId);
@@ -4163,7 +4164,7 @@ function serverFormulaRow(row){
     report_severity:row.report_severity||row.severity||'none',
     meaning:row.meaning||'',
     decision:row.decision||'',
-    question:row.question||''
+    question:row.question||'',active:row.active!==false
   };
 }
 function localFormulaOverride(row){
@@ -4179,7 +4180,7 @@ function localFormulaOverride(row){
     meaning:row.meaning||'',
     decision:row.decision||'',
     question:row.question||'',
-    updated_at:row.updated_at||''
+    active:row.active!==false,updated_at:row.updated_at||''
   };
 }
 async function syncFormulaAdminFromServer(){
@@ -4195,7 +4196,7 @@ async function syncFormulaAdminFromServer(){
   if(pending.length) data=await callBuyTestAnalyzeService({action:'adminCatalog'});
   const synced=Array.isArray(data.overrides)?data.overrides:[];
   saveFormulaOverrideRows(synced.map(localFormulaOverride));
-  const custom=synced.filter(row=>row.source_kind==='custom').map(row=>({
+  const custom=synced.filter(row=>row.source_kind==='custom'&&row.active!==false).map(row=>({
     id:row.source_id,
     category:row.category,
     text:row.source_text,
@@ -4205,16 +4206,17 @@ async function syncFormulaAdminFromServer(){
     meaning:row.meaning||'',
     decision:row.decision||'',
     question:row.question||'',
-    updated_at:row.updated_at||''
+    active:row.active!==false,updated_at:row.updated_at||''
   }));
   saveCustomFormulaRows(custom);
-  serverFormulaCatalog=Array.isArray(data.rows)?data.rows.map(row=>({...localFormulaOverride(row),kind:row.source_kind==='formula'?'base':row.source_kind,id:row.source_id,type:row.classification_type,severity:row.report_severity})):null;
+  serverFormulaCatalog=Array.isArray(data.rows)?data.rows.filter(row=>row.active!==false).map(row=>({...localFormulaOverride(row),kind:row.source_kind==='formula'?'base':row.source_kind,id:row.source_id,type:row.classification_type,severity:row.report_severity})):null;
   refreshFormulaSubgroupOptions();renderFormulaAdminList();
 }
 
 function applyManagerFormulaOverride(item){
   if(!item) return item;
   const source=item.sourceText||item.matchedTerm||'';
+  if(isDeletedFormulaFinding(item))return null;
   const override=formulaOverrideForFinding(item);
   const fromServer=item.managerEdited&&Object.prototype.hasOwnProperty.call(item,'managerMeaning');
   const effectiveOverride=fromServer?null:override;
@@ -4309,9 +4311,9 @@ function formulaAdminRows(){
   const base=rawFormulaDatabase.filter(isOperationalFormula).map(item=>({kind:'base',id:item.id,text:item.text,category:item.category,subgroup:item.subgroup||'',type:item.classification?.type||'context_dependent',severity:item.classification?.severity==='review'?'medium':(item.classification?.severity||'none'),meaning:item.meaning||'',decision:item.decision||'',question:item.question||'',procedure127:Boolean(item.procedure_127)}));
   const observed=observedFormulaAliases.filter(isOperationalFormula).map(item=>({kind:'observed',id:item.id,text:item.text,category:item.category,subgroup:item.subgroup||'',type:item.classification_type||'context_dependent',severity:item.report_severity||'none',meaning:item.meaning||'',decision:item.decision||'',question:item.question||''}));
   const custom=loadCustomFormulas().filter(isOperationalFormula).map(item=>({kind:'custom',id:item.id,text:item.text,category:item.category,subgroup:item.subgroup||'',type:item.classification_type||'context_dependent',severity:item.report_severity||'none',meaning:item.meaning||'',decision:item.decision||'',question:item.question||''}));
-  return [...custom,...(serverFormulaCatalog||[...observed,...base])].map(item=>{
+  return [...custom,...(serverFormulaCatalog||[...observed,...base])].filter(item=>!isDeletedFormulaFinding({id:item.kind==='base'?'formula-'+item.id:item.kind==='observed'?'formula-alias-'+item.id:'custom-'+item.id,sourceText:item.text})).map(item=>{
     const override=formulaOverrideFor(item.category,item.text,item.kind,item.id);
-    return {...item,sourceCategory:item.category,originalText:item.text,override,category:override?.category??item.category,text:override?.text??item.text,subgroup:override?.subgroup??item.subgroup??'',type:override?.classification_type??item.type,severity:override?.report_severity??item.severity,meaning:override?.meaning??item.meaning,decision:override?.decision??item.decision,question:override?.question??item.question};
+    return {...item,sourceCategory:item.category,originalText:item.text,override,category:reportComponentCategory(override?.text??item.text,override?.category??item.category)||override?.category||item.category,text:override?.text??item.text,subgroup:override?.subgroup??item.subgroup??'',type:override?.classification_type??item.type,severity:override?.report_severity??item.severity,meaning:override?.meaning??item.meaning,decision:override?.decision??item.decision,question:override?.question??item.question};
   });
 }
 
@@ -4378,7 +4380,7 @@ function renderFormulaAdminList(){
     const procedure=item.procedure127?' · מסומן בנוהל 127':'';
     const edited=item.override?' · נערכה במנהל':'';
     const reset=item.override&&item.kind!=='custom'?`<button class="secondary" type="button" onclick="deleteFormulaOverride('${item.override.id}')">איפוס התיקון</button>`:'';
-    const remove=item.kind==='custom'?`<button class="secondary" type="button" onclick="deleteCustomFormula('${item.id}')">מחיקה</button>`:'';
+    const remove=`<button class="secondary" type="button" onclick="deleteFormulaDiagnosis('${item.kind}','${item.id}')">מחיקה</button>`;
     const controls=`<div style="margin-top:7px;display:flex;gap:6px;flex-wrap:wrap"><button class="secondary" type="button" onclick="editFormulaEntry('${item.kind}','${item.id}')">עריכת אבחנה</button>${reset}${remove}</div>`;
     const severity=item.severity||'none';
     const key=formulaAdminKey(item);
@@ -4617,6 +4619,23 @@ async function deleteFormulaOverride(id){
   if(editingFormulaTarget&&formulaOverrideKey(editingFormulaTarget.category,editingFormulaTarget.text)===formulaOverrideKey(item.category,item.text)) resetFormulaEditor();
   formulaAdminMessage('התיקון אופס. המערכת חזרה למסקנה המקורית.');
   renderFormulaAdminList();
+}
+
+async function deleteFormulaDiagnosis(kind,id){
+  const item=formulaAdminRows().find(row=>row.kind===kind&&row.id===id);
+  if(!item||!confirm('למחוק את האבחנה „'+item.text+'” מהמאגר?'))return;
+  const value={...formulaAdminSaveValue(item,item.subgroup),active:false};
+  try{
+    const saved=await callBuyTestAnalyzeService({action:'adminDeleteDiagnosis',row:serverFormulaRow(value)});
+    const tombstone=saved.row?localFormulaOverride({...serverFormulaRow(value),...saved.row}):value;
+    const rows=loadFormulaOverrides().filter(row=>!(serverFormulaSourceKind(row.source_kind)===value.source_kind&&String(row.source_id)===String(id)));
+    rows.push({...tombstone,active:false});saveFormulaOverrideRows(rows);
+    if(kind==='custom')saveCustomFormulaRows(loadCustomFormulas().filter(row=>row.id!==id));
+    if(serverFormulaCatalog)serverFormulaCatalog=serverFormulaCatalog.filter(row=>!(row.kind===kind&&row.id===id));
+    selectedFormulaAdminKeys.delete(kind+'|'+id);
+    if(editingFormulaTarget?.id===id)resetFormulaEditor();
+    renderFormulaAdminList();formulaAdminMessage('האבחנה נמחקה מהמאגר המרכזי.');
+  }catch(error){formulaAdminMessage('האבחנה לא נמחקה. אפשר לנסות שוב.',true);}
 }
 
 async function deleteCustomFormula(id){
@@ -4902,7 +4921,11 @@ function findKnowledgeRules(line,categoryHint=''){
       : [item.category,item.classification,normalizeFindingText(item.sourceText||item.matchedTerm||item.id)].join('|');
     if(!seen.has(semanticKey)){
       seen.add(semanticKey);
-      const enriched={...item,contextNote:contextNoteFor(item)};
+      const inferred=reportComponentCategory(item.sourceText||item.matchedTerm||'',item.category);
+      const nestedComponent=/כנף.*נושאת בולם|בולם זעזועים להגה/.test(n);
+      if(nestedComponent&&reportSystemFamily(inferred||item.category)!==reportSystemFamily(reportComponentCategory(line,categoryHint)))return;
+      if(!inferred&&categoryHint&&reportSystemFamily(item.category)!==reportSystemFamily(categoryHint))return;
+      const enriched={...item,category:inferred||item.category,contextNote:contextNoteFor(item)};
       const specific=specificFindingInterpretation(enriched);
       if(specific){
         enriched.meaning=specific.meaning;
@@ -4929,6 +4952,8 @@ function reportCategoryFromLine(line){
     const categoryText=normalizeFindingText(category.name);
     if(!categoryText) return false;
     const categoryCompact=categoryText.replace(/\s/g,'');
+    const tail=n.startsWith(categoryText+' ')?n.slice(categoryText.length).trim():'';
+    if(tail&&!reportSeverityFromLine(tail)&&/שורף|מזייף|מצלצל|פגומ|לקוי|נזיל|לא תקין|אינו|שחוק|חלש|מנותק|דולק|רועש|חסר|חוסר/.test(tail))return false;
     return n===categoryText||n.startsWith(categoryText+' ')||(categoryCompact.length>=6&&compact.startsWith(categoryCompact));
   }).sort((a,b)=>b.name.length-a.name.length);
   return matches[0]?.name||'';
@@ -5023,13 +5048,61 @@ function isSeverityHeadingOnly(value){
   return compact==='משמעותנמוכה'||compact==='משמעותגבוהה'||compact==='ליקוישולי'||compact==='ליקוייםשוליים';
 }
 
-function reportFindingCategory(source,category='',chassisHint=''){
+function reportComponentCategory(source,category='',chassisHint=''){
   const text=normalizeFindingText(source);
-  // A directional body-impact diagnosis cannot inherit a preceding tyre row.
-  // Keep explicit component diagnoses (e.g. a damaged rear tyre) in their system.
-  if(/(?:סימני\s*)?פגיע(?:ה|ות)\s*(?:מאחור|מלפנים|בחזית|במרכב|בגוף\s*הרכב)(?:\s|$)/.test(text)){
-    return category==='שלדה נפרדת'||chassisHint==='שלדה נפרדת'?'שלדה נפרדת':'שלדת מרכב';
+  const body=category==='שלדה נפרדת'||chassisHint==='שלדה נפרדת'?'שלדה נפרדת':'שלדת מרכב';
+  if(/מתקן בקורת בלמים/.test(text))return 'מערכת הבלמים (ללא פירוק גלגלים)';
+  if(/מידות מרכב/.test(text))return 'מערכת ההיגוי';
+  // Structural parts mentioning engines, wheels or suspension remain body parts.
+  if(/שלד|מרכב|פחחות|פגוש|כנף|משקוף|קורת|קורה |קורות|ריצפ|רצפ|מכסה (?:תא )?מנוע|דופן.*מנוע|בית גלגל|תיקונ.*(?:פח|צבע)|שמשה|ריפוד|חגורת בטיחות|(?:פגיע(?:ה|ות)|תיקון פגיעה)\s*(?:מאחור|מלפנים|בחזית|בצד|צד|במרכב|בגוף הרכב)/.test(text)) return body;
+  if(/מזגן|מיזוג|מערכת אוורור פנימית/.test(text)) return 'מיזוג אוויר';
+  // Oil/coolant contamination and pressure from cylinders are engine findings.
+  if(/מצתים רטובים בשמן|(?:מים|נוזל קירור) בשמן|מעבר לחץ.*קירור|ראש מנוע|בלוק מנוע|בין (?:ה)?מנוע ל(?:גיר|תיבת)|בין בלוק מנוע לתיבת/.test(text)) return 'מנוע';
+  if(/קולר.*(?:גיר|הילוכים)|(?:גיר|הילוכים).*קולר/.test(text)) return 'תיבת הילוכים';
+  if(/טורבו|גידוש|אינטרקולר/.test(text)) return 'מערכת גידוש המנוע';
+  if(/שמן במים|מערכת חימום|מיכל עיבוי|מכל עיבוי|טרמוסטט|תרמוסטט|רדיאטור|מצנן|מערכת (?:ה)?קירור|נוזל קירור|משאבת מים|צינורות מים|פקקי מים|חסר מים|חוסר מים|נזילות? מים|התחממות/.test(text)) return 'מערכת הקירור';
+  if(/נורת לחץ אוויר|צמיג|חישוק|גלגל חילוף/.test(text)) return 'צמיגים וחישוקים';
+  if(/פנס|תאורה|אור בלם|אור חניה|איתות|החלפת אורות/.test(text)) return 'מערכת תאורה';
+  if(/בלמ|בלם|בלימ|רפיד|צלחות|\babs\b/.test(text)) return 'מערכת הבלמים (ללא פירוק גלגלים)';
+  if(/מצמד מאוורר/.test(text))return 'מערכת הקירור';
+  if(/מצמד/.test(text)&&!/מצמד מאוורר/.test(text)) return 'מצמד';
+  if(/צירי[הות]|גל[ -]הינע|צלבים/.test(text)) return 'ציריות/גל הינע';
+  if(/דיפרנציאל|תיבת העבר|4x4/.test(text)) return 'תיבת העברת הכוח';
+  if(/תיבת (?:ה)?הילוכים|הילוכ|דסקיות הילוכים|(?:^|\s)גיר(?:\s|$)/.test(text)) return 'תיבת הילוכים';
+  if(/הגה|היגוי/.test(text)) return 'מערכת ההיגוי';
+  if(text==='מתלים פגומים'&&/פליטה/.test(category))return category;
+  if(/מתל[הים]|קפיצ|משולש|תותבים|מסבי גלגל|מוט מייצב|בולמי זעזועים|בולם זעזועים|נזילת שמן בולם/.test(text)){
+    if(/אחור/.test(text))return 'מערכת מתלה אחורי';
+    if(/קדמ|קד'/.test(text))return 'מערכת מתלה קדמי';
+    return /מתלה קדמי|מתלה אחורי/.test(category)?category:'מערכת המתלים';
   }
+  if(/אלטרנטור|מערכת טעינה|אין טעינה/.test(text)) return 'מערכת הטעינה';
+  if(/מצבר|התנעה|מתנע|קטבי|קוטבי/.test(text)) return 'מערכת ההתנעה (כולל מצבר)';
+  if(/מצת|הצתה|מפלג/.test(text)) return 'מערכת הצתה';
+  if(/פליטה|ממיר קטליטי|זיהום אוויר|לוכד חלקיקים|אוריאה/.test(text)) return 'מערכת הפליטה ומערכות למניעת זיהום אוויר';
+  if(/דלק|קניסטר|קנסטר|מאייד|משנק|הזרק/.test(text)) return 'מערכת דלק';
+  if(/מנוע חלון|חלונות חשמל|חוטי חשמל|מערכת חשמל|מולטימדיה|מגבים|צופר|כיוון מראות|נעילת דלתות/.test(text)) return 'חשמל ואבזור';
+  if(/מנוע|שמן מנוע|לחץ שמן|גל ארכובה|גל זיזים|מערכת תזמון|רצועת תיזמון|מערכת שסתומים|לחץ דחיסה|צילינדר/.test(text)) return 'מנוע';
+  return '';
+}
+
+function reportFindingCategory(source,category='',chassisHint=''){
+  const explicit=reportComponentCategory(source,category,chassisHint);
+  if(explicit) return explicit;
+  const term=normalizeFindingText(source);
+  if(!reportFindingCategory.phrases){
+    reportFindingCategory.phrases=new Map();
+    for(const row of [...rawFormulaDatabase,...observedFormulaAliases]){
+      if(!isOperationalFormula(row))continue;
+      const key=normalizeFindingText(row.text);
+      const values=reportFindingCategory.phrases.get(key)||new Set();values.add(row.category);reportFindingCategory.phrases.set(key,values);
+    }
+  }
+  const candidates=[...(reportFindingCategory.phrases.get(term)||[])];
+  if(candidates.includes(category))return category;
+  // Context-free generic wording (e.g. vibration or an oil leak) cannot identify a system.
+  if(candidates.length&&!category)return 'ממצאים נוספים';
+  if(candidates.length&&category&&!candidates.some(value=>reportSystemFamily(value)===reportSystemFamily(category)))return 'ממצאים נוספים';
   return category;
 }
 
@@ -5051,6 +5124,7 @@ function finalizeReportFinding(item){
     }
   }
   cleaned=applyManagerFormulaOverride(cleaned);
+  if(!cleaned)return null;
   cleaned.category=reportFindingCategory(cleaned.sourceText||cleaned.matchedTerm||'',cleaned.category);
   return ensureEngineNumberSignificance(cleaned);
 }
@@ -5096,6 +5170,9 @@ function reportTextIsUnreliable(value){
 
 function reportSystemFamily(category){
   if(/שלד|מרכב/.test(category)) return 'body';
+  if(/קירור/.test(category)) return 'cooling';
+  if(/מיזוג|מזגן/.test(category)) return 'air-conditioning';
+  if(/צמיג|חישוק/.test(category)) return 'tires';
   if(/היגוי/.test(category)) return 'steering';
   if(/בלמ/.test(category)) return 'brakes';
   if(/מתל|קפיצ/.test(category)) return 'suspension';
@@ -5103,6 +5180,17 @@ function reportSystemFamily(category){
   if(/מנוע|גידוש|דלק|הצתה|פליטה/.test(category)) return 'engine';
   if(/תיבת|מצמד|ציריות|העברת/.test(category)) return 'transmission';
   return category;
+}
+
+function isDeletedFormulaFinding(item,rows=loadFormulaOverrides()){
+  const fact=reportFactIdentity(item?.sourceText||item?.matchedTerm||item?.text||'');
+  return rows.some(row=>row.active===false&&(item?.id===overrideFindingIdForDeletion(row)||fact&&fact===reportFactIdentity(row.source_text||row.text||'')));
+}
+function overrideFindingIdForDeletion(row){
+  if(row.source_kind==='formula'||row.source_kind==='base')return 'formula-'+row.source_id;
+  if(row.source_kind==='observed')return 'formula-alias-'+row.source_id;
+  if(row.source_kind==='knowledge')return row.source_id;
+  return 'custom-'+row.source_id;
 }
 
 function reportFactIdentity(value){
@@ -5212,7 +5300,7 @@ function interpretSummaryText(text){
       if(excerpt&&!unknown.includes(excerpt)) unknown.push(excerpt);
     }
   });
-  const finalFindings=orderFindingsLikeReport(distinctReportFindings(findings.map(finalizeReportFinding).filter(Boolean)));
+  const finalFindings=orderFindingsLikeReport(distinctReportFindings(findings.map(finalizeReportFinding).filter(Boolean).filter(item=>!isDeletedFormulaFinding(item))));
   return applyReportMileageContext(applyEngineWarrantyContext({findings:finalFindings,unknown,unreadable:[...new Set(unreadable)]},text),text);
 }
 
@@ -5667,12 +5755,6 @@ function compactCategoryLabel(value,isComputer=false,item=null){
   const category=normalizeFindingText(value||'');
   const detail=normalizeFindingText([item?.sourceText,item?.matchedTerm,item?.title,item?.meaning].filter(Boolean).join(' '));
   const sourceDetail=normalizeFindingText([item?.diagnosisLabel,item?.sourceText,item?.matchedTerm,item?.title].filter(Boolean).join(' '));
-  if(!isComputer&&!item?.managerEdited){
-    if(/מזגן|מיזוג/.test(sourceDetail)) return 'מיזוג אוויר';
-    if(/תיקוני מרכב|תיקון מרכב|החלפת חלקי מרכב|פחחות|שלדה|פגוש|שמשה|כנף|מראת צד/.test(sourceDetail)) return 'שלדה ומרכב';
-    if(/נקישה בהגה|משאבת הגה|מסרק הגה|זוויות היגוי|חוסר יציבות בהגה/.test(sourceDetail)) return 'מערכת ההיגוי';
-    if(/פנסים? |פנסי |תאורה/.test(sourceDetail)) return 'חשמל ואבזור';
-  }
   if(isComputer&&/כריות.*אוויר/.test(category)) return 'מערכת כריות האוויר';
   if(batteryFindingInfo(item)) return 'תאריך וגיל המצבר';
   if(/חלון גג|גג נפתח|sunroof/.test(detail)&&/לא תקין|תקלה|מנוע|מתג|חשמל|פתיחה|סגירה|תפעול/.test(detail)) return 'חשמל ואבזור';

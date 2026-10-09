@@ -40,11 +40,11 @@ test('new and edited phrases are recognized and their distinct meanings reach HT
  for(const r of rows){assert.ok(markup.includes(r.meaning));assert.ok(text.includes(r.meaning));assert.ok(markup.includes(r.decision));}
  assert.ok(markup.includes('categorySummaryCard high'));assert.ok(markup.includes('categorySummaryCard medium'));
 });
-test('an edited original still recognizes its original report phrase after a category move',()=>{
+test('an edited original preserves its meaning and the original phrase determines the correct system',()=>{
  const h=harness();const original=h.c.adminCatalog().find(r=>r.source_text==='זוויות היגוי (כיוון)')||h.c.adminCatalog().find(r=>/זוויות היגוי/.test(r.source_text));assert.ok(original);
  const override={...original,category:'צמיגים וחישוקים',source_text:'כיוון גאומטריית הגלגלים',report_severity:'low',meaning:'משמעות מקצועית ייחודית לכיוון',decision:'פעולה לכיוון'};
  const old=analyze(h.c,original.category+'\n'+original.source_text,[override]);
- const updated=old.findings.find(f=>f.managerEdited&&f.managerMeaning===override.meaning);assert.ok(updated);assert.equal(updated.category,override.category);assert.equal(updated.reportSeverity,'low');
+ const updated=old.findings.find(f=>f.managerEdited&&f.managerMeaning===override.meaning);assert.ok(updated);assert.equal(updated.category,original.category);assert.equal(updated.reportSeverity,'low');
  const fresh=analyze(h.c,'צמיגים וחישוקים\nכיוון גאומטריית הגלגלים',[override]);assert.ok(fresh.findings.some(f=>f.managerMeaning===override.meaning));
 });
 test('ordinary customer uses server meanings even with empty or stale local manager storage',()=>{
@@ -98,4 +98,19 @@ test('moving an existing chassis diagnosis to another severity updates its group
 });
 test('opening an original diagnosis preserves its group severity instead of substituting automatic calibration',()=>{
  const h=harness();for(const item of h.c.formulaAdminRows().filter(r=>['שלדת מרכב','שלדה נפרדת'].includes(r.category))){h.c.editFormulaEntry(item.kind,item.id);assert.equal(h.element('formulaSeverity').value,item.severity,item.id);}
+});
+test('manager can delete an original diagnosis and duplicates, without losing other edits',async()=>{
+ const h=harness();h.c.confirm=()=>true;
+ h.c.saveFormulaOverrideRows([{id:'keep',source_kind:'formula',source_id:'technotest-214',category:'מנוע',text:'הלחמות בבלוק המנוע',meaning:'משמעות שכתב המנהל'}]);
+ await h.c.deleteFormulaDiagnosis('base','technotest-583');
+ assert.equal(h.saved[0].action,'adminDeleteDiagnosis');assert.equal(h.saved[0].row.active,false);
+ assert.ok(!h.c.formulaAdminRows().some(r=>r.id==='technotest-583'||r.id==='technotest-584'));
+ assert.equal(h.c.loadFormulaOverrides().find(r=>r.id==='keep').meaning,'משמעות שכתב המנהל');
+ // Reloaded catalog continues to exclude the deleted diagnosis.
+ assert.ok(!h.c.formulaAdminRows().some(r=>r.text==='נורת לחץ אוויר דולקת'));
+});
+test('failed or cancelled deletion leaves the diagnosis in place',async()=>{
+ const h=harness();h.c.confirm=()=>false;await h.c.deleteFormulaDiagnosis('base','technotest-583');assert.equal(h.saved.length,0);
+ h.c.confirm=()=>true;h.c.callBuyTestAnalyzeService=async()=>{throw Error('offline');};await h.c.deleteFormulaDiagnosis('base','technotest-583');
+ assert.ok(h.c.formulaAdminRows().some(r=>r.id==='technotest-583'));assert.match(h.element('formulaAdminMessage').textContent,/לא נמחקה/);
 });
