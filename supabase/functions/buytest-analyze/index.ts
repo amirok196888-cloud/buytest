@@ -1198,17 +1198,17 @@ function applyExpertCalibration(rule,formula){
   return calibrated;
 }
 
-function reportKmForEngineWarranty(text,useRegistry=true){
+function reportMileageReadings(text){
   const reportValues=[];
-  const known=Number(loadedKm||externalVehicleData.kmHistory?.[0]?.km||0);
-  const raw=normalizeFindingText(text);
-  const number='([0-9]{4,7}|[0-9]{1,3}(?:\\s+[0-9]{3}){1,2})';
-  const unit='(?:קמ|קילומטראז|קילומטרים?)';
+  // Preserve numeric separators; normalize Hebrew quote marks only.
+  const raw=String(text||'').replace(/[\u05f3\u05f4'"׳״]/g,'').replace(/\s+/g,' ');
+  const number='([0-9]{1,3}(?:[,\\s][0-9]{3}){1,2}|[0-9]{4,7})(?![0-9]|[,\\s][0-9]{3}\\b)';
+  const unit='(?:קמ|קילומטראז|קילומטרים?|מד\\s*אוץ|נסועה|odometer|mileage|km)';
+  const separator='\\s*[:=.-]?\\s*';
   const patterns=[
-    new RegExp('קמ\\s*(?:או\\s*מייל)?\\s*'+number,'gi'),
-    new RegExp('(?:מונה\\s+)?'+unit+'\\s*(?:מונה\\s*)?'+number,'gi'),
-    new RegExp(number+'\\s*(?:מונה\\s*)?'+unit,'gi'),
-    new RegExp('מונה\\s+'+number,'gi')
+    new RegExp('(?:מונה\\s+)?'+unit+separator+'(?:או\\s*מייל\\s*)?(?:מונה\\s*)?'+number,'gi'),
+    new RegExp('(?<![0-9])'+number+separator+'(?:מונה\\s*)?'+unit+'(?!\\s*[:=])','gi'),
+    new RegExp('מונה'+separator+number,'gi')
   ];
   patterns.forEach(pattern=>{
     for(const match of raw.matchAll(pattern)){
@@ -1216,7 +1216,13 @@ function reportKmForEngineWarranty(text,useRegistry=true){
       if(value>=1000&&value<=2000000) reportValues.push(value);
     }
   });
-  if(reportValues.length) return Math.max(...reportValues);
+  return [...new Set(reportValues)];
+}
+function reportKmForEngineWarranty(text,useRegistry=true){
+  const readings=reportMileageReadings(text);
+  if(readings.length===1) return readings[0];
+  if(readings.length>1) return 0;
+  const known=Number(loadedKm||externalVehicleData.kmHistory?.[0]?.km||0);
   return useRegistry&&known>=1000&&known<=2000000?known:0;
 }
 
@@ -1251,6 +1257,7 @@ function applyEngineWarrantyContext(result,text){
 function applyReportMileageContext(result,text){
   const km=reportKmForEngineWarranty(text,false);
   result.reportKm=km||null;
+  result.reportMileageReadings=reportMileageReadings(text);
   if(!km) return result;
   const wearIds=new Set([
     'expert-internal_wear','expert-engine_vapor_blowby','expert-internal_knocks',
