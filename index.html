@@ -1132,7 +1132,7 @@ function googleVisionImageContent(source){
   const comma=String(source||'').indexOf(',');
   return comma>=0?String(source).slice(comma+1):String(source||'');
 }
-async function googleVisionRecognize(sources,state,featureType='DOCUMENT_TEXT_DETECTION'){
+async function googleVisionRecognize(sources,state,featureType='DOCUMENT_TEXT_DETECTION',progress=null){
   if(!googleVisionReady()) throw new Error('GOOGLE_VISION_PROXY_MISSING');
   const usable=(sources||[]).filter(Boolean);
   if(!usable.length) throw new Error('GOOGLE_VISION_PAGES_MISSING');
@@ -1141,7 +1141,8 @@ async function googleVisionRecognize(sources,state,featureType='DOCUMENT_TEXT_DE
   const failureReasons=[];
   for(let offset=0;offset<usable.length;offset+=1){
     const source=usable[offset];
-    if(state) state.textContent=`קורא עמוד ${offset+1} מתוך ${usable.length} באמצעות Google Vision...`;
+    if(progress) progress(15+30*offset/usable.length);
+    else if(state) state.textContent=`קורא עמוד ${offset+1} מתוך ${usable.length} באמצעות Google Vision...`;
     try{
       const response=await fetch(GOOGLE_VISION_PROXY_ENDPOINT,{
         method:'POST',
@@ -3447,15 +3448,26 @@ function computerReadQuality(text){
   return {ok,score,findings:analysis.findings.length,categories:0,unknown:analysis.unknown.length};
 }
 
-async function recognizeDocumentSources(worker,sources,state,setPass,qualityFunction){
+function createDocumentReadProgress(state){
+  let percent=0;
+  return (value,label='קורא ומאמת את הדוח')=>{
+    const next=Number(value);
+    if(Number.isFinite(next)) percent=Math.max(percent,Math.min(99,Math.max(1,Math.floor(next))));
+    state.textContent=label+'… '+percent+'%';
+    return percent;
+  };
+}
+
+async function recognizeDocumentSources(worker,sources,state,setPass,qualityFunction,progress=null){
   const candidates=[];
   for(const psm of ['3','6','11']){
-    setPass(psm);
     await worker.setParameters({preserve_interword_spaces:'1',tessedit_pageseg_mode:psm});
     const pageTexts=[];
     for(let index=0;index<sources.length;index++){
-      state.textContent=`מבצע בדיקת אימות מקומית... מעבר ${psm==='3'?'ראשון':psm==='6'?'שני':'נוסף'}, חלק ${index+1} מתוך ${sources.length}`;
+      setPass(psm,index,sources.length);
+      if(!progress) state.textContent='מאמת את קריאת הדוח…';
       const result=await worker.recognize(sources[index]);
+      if(progress) progress(45+50*((['3','6','11'].indexOf(psm)*sources.length+index+1)/(3*sources.length)),'מאמת את קריאת הדוח');
       pageTexts.push(cleanOcrText(result?.data?.text));
     }
     const text=diagnosticTableText(pageTexts.join('\n'));
@@ -3599,12 +3611,13 @@ async function handleInspectionFile(input,kind){
   state.classList.add('show');
   state.textContent=isSummary?'✓ הקובץ נבחר: '+file.name+'. קובץ המקור לא יצורף לפלט.':`✓ נבחרו ${selectedFiles.length} קבצים/עמודים. קובצי המקור לא יצורפו לפלט.`;
   let worker=null;
+  const readProgress=createDocumentReadProgress(state);
   try{
-    state.textContent='מכין את דוח הבדיקה לקריאה...';
+    readProgress(1,'מכין את הדוח לקריאה');
     const qualityFunction=isSummary?reportReadQuality:computerReadQuality;
     const preparedParts=[];
     for(const [fileIndex,currentFile] of selectedFiles.entries()){
-      if(!isSummary&&selectedFiles.length>1) state.textContent=`מכין לקריאה קובץ ${fileIndex+1} מתוך ${selectedFiles.length}...`;
+      readProgress(1+14*fileIndex/selectedFiles.length,'מכין את הדוח לקריאה');
       if(currentFile.type==='application/pdf'){
         const part=await pdfForDocumentOcr(currentFile,qualityFunction,12,true,true);
         part.visionSources=part.sources;
@@ -3631,7 +3644,9 @@ async function handleInspectionFile(input,kind){
     if(!prepared.visionSources?.length) throw new Error('GOOGLE_VISION_PAGES_MISSING');
     if(!googleVisionReady()) throw new Error('GOOGLE_VISION_PROXY_MISSING');
     visionAttempted=true;
-    visionText=diagnosticTableText(await googleVisionRecognize(prepared.visionSources,state));
+    readProgress(15);
+    visionText=diagnosticTableText(await googleVisionRecognize(prepared.visionSources,state,'DOCUMENT_TEXT_DETECTION',readProgress));
+    readProgress(45);
     const visionQuality=qualityFunction(visionText);
     const visionHebrewWords=(visionText.match(/[א-ת]{2,}/g)||[]).length;
     visionUsable=visionQuality.ok||(isSummary?visionHebrewWords>=12:computerOcrTextUsable(visionText));
@@ -3648,14 +3663,14 @@ async function handleInspectionFile(input,kind){
       }else{
         try{
           tesseractAttempted=true;
-          if(visionUsable) state.textContent='Google Vision סיים. מפעיל בדיקת אימות מקומית...';
-          let currentPass='6';
+          readProgress(45,'מאמת את קריאת הדוח');
+          let currentPass='3',currentSource=0,totalSources=prepared.sources.length;
           worker=await Tesseract.createWorker('heb+eng',1,{
             logger:m=>{
-              if(m.status==='recognizing text') state.textContent=`בודק את פענוח Vision במנוע המקומי... מעבר ${currentPass==='3'?'ראשון':currentPass==='6'?'שני':'נוסף'} ${Math.round((m.progress||0)*100)}%`;
+              if(m.status==='recognizing text') readProgress(45+50*((['3','6','11'].indexOf(currentPass)*totalSources+currentSource+Math.min(1,Math.max(0,Number(m.progress)||0)))/(3*totalSources)),'מאמת את קריאת הדוח');
             }
           });
-          const best=await recognizeDocumentSources(worker,prepared.sources,state,value=>{currentPass=value;},qualityFunction);
+          const best=await recognizeDocumentSources(worker,prepared.sources,state,(value,index,count)=>{currentPass=value;currentSource=index;totalSources=count;},qualityFunction,readProgress);
           if(visionUsable){
             verification=mergeVerifiedOcrText(visionText,best.text,isSummary);
             recognized=verification.text||visionText;
@@ -3689,7 +3704,7 @@ async function handleInspectionFile(input,kind){
     textArea.value=recognized;
     if(isSummary) void trackBuyTestReportStage('report_read_ready',reportContext);
     inspectionOcrMeta[kind]={...quality,engine:selectedEngine,visionAttempted,tesseractAttempted,verification};
-    state.innerHTML=ocrSuccessHtml(selectedEngine,quality.findings+quality.unknown,verification,{limited:Boolean(quality.limited),isComputer:!isSummary});
+    state.innerHTML='100% · '+ocrSuccessHtml(selectedEngine,quality.findings+quality.unknown,verification,{limited:Boolean(quality.limited),isComputer:!isSummary});
     if(isSummary) refreshInspectionHeader(reportKmForEngineWarranty(recognized,false));
     if(review) review.style.display='block';
   }catch(error){
@@ -5586,6 +5601,7 @@ function meaningCardHtml(item){
 
 const compactSeverityRank={high:4,medium:3,review:2,low:2,marginal:1,active:3,unresolved:2,historical:1};
 const automatedInterpretationDisclaimer='טל״ח: בפענוח אוטומטי עלולות להתרחש טעויות זיהוי, תמלול, שיוך או פרשנות. במקרה של אי־התאמה, דוח המקור גובר. אין להסתמך על ממצא שאינו מופיע בדוח המקורי.';
+const reportReadingNote='הפענוח מבוסס על הממצאים שניתן לזהות במסמך שהועלה. פרטים שאינם ברורים במסמך יש לברר מול דוח המקור או המכון.';
 const professionalConclusionDisclaimer='הסיכום מבוסס רק על המסמכים והטקסט שהועלו למערכת ואינו בדיקה פיזית עצמאית של הרכב. הוא אינו קובע שהרכב תקין או בטוח, אינו הערכת שווי ואינו המלצה לבצע או להימנע מעסקה. יש לאמת את הממצאים מול דוח המקור ובעל מקצוע מתאים. '+automatedInterpretationDisclaimer;
 
 function compactCategoryLabel(value,isComputer=false,item=null){
@@ -5875,7 +5891,7 @@ function professionalOverallConclusion(result,computerResult=null){
   const mediumConclusion=mediumFacts?'ממצאים במשמעות בינונית: '+mediumFacts+'. '+(numberFollowUp&&!numberIsHigh?numberFollowUp+' ':'')+'יש להשלים בירור מקצועי וטיפול לפי הממצאים המאומתים.':'';
   if(numberFollowUp&&numberIsHigh) highConclusion+=' '+numberFollowUp;
   const lowConclusion=lowFacts?'ממצאים במשמעות נמוכה: '+lowFacts+'. יש להביא בחשבון את היקף הטיפול וההוצאה. ממצאים אלה אינם מבטלים או מפחיתים את חומרת הממצאים במשמעות גבוהה.':'';
-  const reviewParts=[reviewFacts?'ממצאים שדורשים המשך בירור: '+reviewFacts+'.':'',...(result?.unknown||[]).filter(text=>!reportTextIsUnreliable(text)).map(text=>'נוסח בדוח שדורש בירור: '+text+'.'),result?.unreadable?.length?'חלק מהטקסט בדוח לא נקרא באופן מהימן. יש לאמת את הקטעים המשובשים מול דוח המקור או המכון.':''].filter(Boolean);
+  const reviewParts=[reviewFacts?'ממצאים שדורשים המשך בירור: '+reviewFacts+'.':'',...(result?.unknown||[]).filter(text=>!reportTextIsUnreliable(text)).map(text=>'נוסח בדוח שדורש בירור: '+text+'.')].filter(Boolean);
   const reviewConclusion=reviewParts.length?reviewParts.join(' ')+' יש להשלים בירור מול המכון או בעל המקצוע המתאים; חומרת הממצאים לא נקבעה.':'';
   const informationConclusion=informationFacts?'מידע, המלצות והסתייגויות שנרשמו בדוח: '+informationFacts+'. יש להתייחס לכל הנחיה שנרשמה; מידע זה אינו קובע לבדו שיש תקלה.':'';
   return {highConclusion,mediumConclusion,lowConclusion,reviewConclusion,informationConclusion,disclaimer:professionalConclusionDisclaimer};
@@ -5885,7 +5901,7 @@ function professionalOverallConclusionHtml(result,computerResult=null){
   const conclusion=professionalOverallConclusion(result,computerResult);
   const blocks=[['high','גבוהה',conclusion.highConclusion],['medium','בינונית',conclusion.mediumConclusion],['low','נמוכה',conclusion.lowConclusion],['review','לבירור',conclusion.reviewConclusion],['marginal','מידע',conclusion.informationConclusion]]
     .filter(([, ,text])=>text).map(([severity,label,text])=>`<section class="meaningConclusion ${severity}"><h5>${severity==='review'?'נושאים לבירור':severity==='marginal'?'מידע והסתייגויות':'מסקנת משמעות '+label}</h5><p>${escapeHtml(text)}</p></section>`).join('');
-  return `<section class="overallProfessionalConclusion"><h4>תמונה מקצועית מסכמת</h4>${blocks}<span class="legalConclusion">${escapeHtml(conclusion.disclaimer)}</span></section>`;
+  return `<section class="overallProfessionalConclusion"><h4>תמונה מקצועית מסכמת</h4>${blocks}<span class="legalConclusion">${escapeHtml(reportReadingNote+' '+conclusion.disclaimer)}</span></section>`;
 }
 
 function compactAnalysisHtml(result,isComputer=false){
@@ -5893,8 +5909,8 @@ function compactAnalysisHtml(result,isComputer=false){
   const notice=isComputer?computerActiveNoticeHtml(result):'';
   const engineFollowUp=!isComputer?engineNumberFollowUpText(result):'';
   const engineNotice=engineFollowUp?'<div class="info"><b>מספר מנוע — נדרש בירור במוסך מורשה</b><p>'+escapeHtml(engineFollowUp)+'</p></div>':'';
-  const readingNotice=!isComputer&&result?.unreadable?.length?'<div class="info">חלק מהטקסט בדוח לא נקרא באופן מהימן. קטעים משובשים לא הוצגו כאבחנות; יש לאמת אותם מול דוח המקור או המכון.</div>':'';
-  return notice+engineNotice+readingNotice+groups.map(group=>{
+
+  return notice+engineNotice+groups.map(group=>{
     const bullets=group.bullets.map(line=>`<li>${escapeHtml(line)}</li>`).join('');
     const details=(group.details||[]).map(item=>`<div class="categorySummaryDecision"><b>${escapeHtml(item.fact)}</b>${item.meaning?`<p><b>משמעות מקצועית:</b> ${escapeHtml(item.meaning)}</p>`:''}${item.decision?`<p><b>המשך בירור:</b> ${escapeHtml(item.decision)}</p>`:''}${item.question?`<p><b>מה לברר:</b> ${escapeHtml(item.question)}</p>`:''}</div>`).join('');
     return `<section class="categorySummaryCard ${escapeHtml(group.tone||'')}"><div class="categorySummaryHead"><h4>${escapeHtml(group.category)}</h4><span class="meaningTag">${escapeHtml(group.tag||'סיכום')}</span></div><ul>${bullets}</ul>${details}${group.decision?`<p class="categorySummaryDecision"><b>משמעות מקצועית:</b> ${escapeHtml(group.decision)}</p>`:''}</section>`;
@@ -5906,7 +5922,7 @@ function analysisTextBlock(title,result,computerResult=null){
   let text=title+'\n';
   const engineFollowUp=!isComputer?engineNumberFollowUpText(result):'';
   if(engineFollowUp) text+='מספר מנוע — נדרש בירור במוסך מורשה\n'+engineFollowUp+'\n';
-  if(!isComputer&&result?.unreadable?.length) text+='חלק מהטקסט בדוח לא נקרא באופן מהימן. קטעים משובשים לא הוצגו כאבחנות; יש לאמת אותם מול דוח המקור או המכון.\n';
+
   if(result.reportKm) text+=`קילומטראז׳ שנקרא מהדוח: ${fmtNum(result.reportKm)} ק״מ. הנתון משמש כהקשר לממצאים ואינו אבחנה בפני עצמו.\n`;
   if(isComputer){
     const statusCounts=computerStatusCounts(result);
@@ -5929,7 +5945,7 @@ function analysisTextBlock(title,result,computerResult=null){
     if(conclusion.lowConclusion) text+=`מסקנת משמעות נמוכה\n• ${conclusion.lowConclusion}\n`;
     if(conclusion.reviewConclusion) text+=`נושאים לבירור\n• ${conclusion.reviewConclusion}\n`;
     if(conclusion.informationConclusion) text+=`מידע והסתייגויות\n• ${conclusion.informationConclusion}\n`;
-    text+=`הבהרה: ${conclusion.disclaimer}\n`;
+    text+=`הבהרה: ${reportReadingNote} ${conclusion.disclaimer}\n`;
   }
   if(!groups.length) text+='• לא זוהו ממצאים שניתן לסווג אוטומטית. יש להסתמך על דוח המקור ולברר כל ממצא מהותי עם בעל מקצוע.\n';
   return text.trim();
@@ -6353,7 +6369,7 @@ function btPdfAnalysisCards(result,isComputer=false){
   });
   const engineFollowUp=!isComputer?engineNumberFollowUpText(result):'';
   if(engineFollowUp) entries.unshift({card:{title:'מספר מנוע — נדרש בירור במוסך מורשה',tag:'משמעות בינונית לפחות',severity:groups.some(group=>group.severity==='high'&&group.items.some(item=>item.requiresEngineNumberVerification))?'high':'medium',bullets:[engineFollowUp]}});
-  if(!isComputer&&result?.unreadable?.length) entries.unshift({text:'חלק מהטקסט בדוח לא נקרא באופן מהימן. קטעים משובשים לא הוצגו כאבחנות; יש לאמת אותם מול דוח המקור או המכון.',alert:true});
+
   return entries;
 }
 function btPdfProfessionalCards(summary,computer){
@@ -6532,7 +6548,7 @@ async function btBuildThreePageAfterReportPdf(){
     ctx.fillStyle='#d9e2e6';ctx.fillRect(margin,top,contentWidth,2);
     ctx.direction='rtl';ctx.textAlign='right';ctx.textBaseline='top';
     ctx.font='400 17px Arial, sans-serif';ctx.fillStyle='#4d6069';
-    btWrapRtl(ctx,notice,contentWidth).slice(0,2).forEach((line,index)=>ctx.fillText(line,W-margin,top+16+index*25));
+    btWrapRtl(ctx,reportReadingNote+' '+notice,contentWidth).slice(0,3).forEach((line,index)=>ctx.fillText(line,W-margin,top+16+index*25));
     ctx.font='700 16px Arial, sans-serif';ctx.fillStyle='#075e48';ctx.fillText('© 2026 BuyTest · כל הזכויות שמורות',W-margin,H-48);
   }
 
