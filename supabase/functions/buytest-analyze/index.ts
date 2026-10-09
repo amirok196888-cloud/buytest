@@ -1884,6 +1884,7 @@ function extractDtcCodeDetails(text){
   const found=[];
   const source=String(text||'').toUpperCase();
   for(const match of source.matchAll(/\b([PCBU])[\s\-:.]*([0-9A-FOIL])[\s\-:.]*([0-9A-FOIL])[\s\-:.]*([0-9A-FOIL])[\s\-:.]*([0-9A-FOIL])(?:[\s\-:.]*([0-9A-FOIL])[\s\-:.]*([0-9A-FOIL]))?\b/g)){
+    if(!/[0-9]/.test(match[0])) continue;
     const code=match.slice(1,6).join('').replace(/[O]/g,'0').replace(/[IL]/g,'1');
     const extension=match[6]&&match[7]?(match[6]+match[7]).replace(/[O]/g,'0').replace(/[IL]/g,'1'):'';
     const displayCode=extension?`${code}-${extension}`:code;
@@ -1960,14 +1961,59 @@ function dtcKnowledgeFor(code){
   return dtcKnowledgeBase.find(item=>item.match.test(code))||fallbackDtcKnowledge(code);
 }
 
-function dtcFinding(code,text){
-  const knowledge=dtcKnowledgeFor(code);
-  const displayCode=dtcDisplayCode(text,code);
-  const statusKey=detectDtcStatus(dtcContextForCode(text,code));
+function computerModuleName(line){
+  const s=String(line||'');
+  if(/\b(?:air\s*bag|srs|supplemental restraint)\b|כריות?\s*אוויר/i.test(s)) return 'מערכת כריות האוויר';
+  if(/\b(?:ABS|anti.lock braking|ESC|ESP)\b/i.test(s)) return 'מערכת הבלמים ובקרת היציבות';
+  if(/\b(?:ECM|PCM|engine control module)\b/i.test(s)) return 'מנוע';
+  if(/\b(?:TCM|transmission control module)\b/i.test(s)) return 'תיבת הילוכים';
+  if(/\b(?:TPMS|tire pressure monitoring)\b/i.test(s)) return 'לחץ אוויר בצמיגים';
+  if(/\b(?:AC|air conditioning)\b/i.test(s)) return 'מיזוג אוויר';
+  if(/\b(?:EPS|electric power steering)\b/i.test(s)) return 'מערכת ההיגוי';
+  if(/\b(?:body control module|BCM)\b/i.test(s)) return 'חשמל ואבזור';
+  if(/\b(?:cluster module|smart junction block)\b/i.test(s)) return 'חשמל ואבזור';
+  return '';
+}
+
+function computerCodeRecords(text){
+  const lines=cleanOcrText(text).split('\n').map(s=>s.trim()).filter(Boolean),records=[];
+  let module='';
+  lines.forEach((line,index)=>{
+    const heading=computerModuleName(line);
+    if(heading) module=heading;
+    extractDtcCodeDetails(line).forEach(detail=>{
+      let context=line;
+      for(let i=index+1;i<Math.min(lines.length,index+4);i++){
+        if(extractDtcCodes(lines[i]).length||computerModuleName(lines[i])) break;
+        context+=' · '+lines[i];
+      }
+      const status=detectDtcStatus(context);
+      const record={...detail,module,context,statusKey:status==='unknown'?detectDtcStatus(dtcContextForCode(text,detail.code)):status};
+      if(!records.some(r=>r.code===record.code&&r.displayCode===record.displayCode&&r.module===record.module&&r.statusKey===record.statusKey)) records.push(record);
+    });
+  });
+  return records;
+}
+
+function computerDocumentKnowledge(record,base){
+  const context=record?.context||'',system=record?.module||base.system;
+  const airbag=/كر|כריות/.test(system);
+  const checks=airbag?['סריקה חוזרת של מחשב כריות האוויר בסורק מתאים','בדיקת נורת כריות האוויר בעת פתיחת מתג ההצתה וכיבויה לאחר הבדיקה העצמית','בירור מועד התקלה והתיקון שבוצע','בדיקת מצבר, טעינה והזנות מתח']:base.checks;
+  if(/warning\s*lamp\s*(?:failure|fault)|תקלה.*נורת.*אזהרה/i.test(context)) return {system,title:airbag?'תקלה בנורת האזהרה של כריות האוויר':'תקלה בנורת האזהרה',severity:airbag?'safety':'medium',direction:'בדוח נרשמה תקלה בנורת האזהרה או במעגל שלה. אין בכך לקבוע שהכריות נפתחו או שהמערכת אינה פועלת כיום.',checks};
+  if(/battery\s*voltage\s*(?:low|too low)|מתח.*מצבר.*נמוך/i.test(context)) return {system,title:airbag?'מתח מצבר נמוך שנרשם במחשב כריות האוויר':'מתח מצבר נמוך',severity:airbag?'safety':'medium',direction:'מחשב המערכת תיעד מתח אספקה נמוך. ייתכן קשר למצבר, לטעינה או להזנת המחשב; הקוד לבדו אינו מוכיח שהמצבר פגום.',checks};
+  return {...base,system,severity:airbag?'safety':base.severity,title:record?.module&&base.title.startsWith('קוד במערכת')?'תקלה שתועדה ב'+system:base.title,checks};
+}
+
+function dtcFinding(code,text,record=null){
+  const knowledge=computerDocumentKnowledge(record,dtcKnowledgeFor(code));
+  const displayCode=record?.displayCode||dtcDisplayCode(text,code);
+  const statusKey=record?.statusKey||detectDtcStatus(dtcContextForCode(text,code));
   const status=dtcStatusDefinitions[statusKey];
   const highImpact=['safety','high'].includes(knowledge.severity)&&statusKey!=='historical';
   return {
-    id:'dtc-'+code,
+    id:'dtc-'+code+'-'+(record?.module||'')+'-'+statusKey,
+    title:knowledge.title,
+    computerModule:record?.module||'',
     code,
     displayCode,
     dtcStatusKey:statusKey,
@@ -2171,7 +2217,7 @@ function computerDescriptionFindings(text){
 function interpretComputerText(text,expected={}){
   const unknown=[];
   const codes=extractDtcCodes(text);
-  const findings=[...dtcClusterFindings(codes),...codes.map(code=>dtcFinding(code,text)),...computerDescriptionFindings(text)];
+  const findings=[...dtcClusterFindings(codes),...computerCodeRecords(text).map(record=>dtcFinding(record.code,text,record)),...computerDescriptionFindings(text)];
   let genericAbnormalAdded=false;
   reportLines(text).forEach(line=>{
     if(isMetadataLine(line)||extractDtcCodes(line).length) return;

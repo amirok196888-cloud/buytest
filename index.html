@@ -5263,6 +5263,7 @@ function extractDtcCodeDetails(text){
   const found=[];
   const source=String(text||'').toUpperCase();
   for(const match of source.matchAll(/\b([PCBU])[\s\-:.]*([0-9A-FOIL])[\s\-:.]*([0-9A-FOIL])[\s\-:.]*([0-9A-FOIL])[\s\-:.]*([0-9A-FOIL])(?:[\s\-:.]*([0-9A-FOIL])[\s\-:.]*([0-9A-FOIL]))?\b/g)){
+    if(!/[0-9]/.test(match[0])) continue;
     const code=match.slice(1,6).join('').replace(/[O]/g,'0').replace(/[IL]/g,'1');
     const extension=match[6]&&match[7]?(match[6]+match[7]).replace(/[O]/g,'0').replace(/[IL]/g,'1'):'';
     const displayCode=extension?`${code}-${extension}`:code;
@@ -5339,14 +5340,59 @@ function dtcKnowledgeFor(code){
   return dtcKnowledgeBase.find(item=>item.match.test(code))||fallbackDtcKnowledge(code);
 }
 
-function dtcFinding(code,text){
-  const knowledge=dtcKnowledgeFor(code);
-  const displayCode=dtcDisplayCode(text,code);
-  const statusKey=detectDtcStatus(dtcContextForCode(text,code));
+function computerModuleName(line){
+  const s=String(line||'');
+  if(/\b(?:air\s*bag|srs|supplemental restraint)\b|כריות?\s*אוויר/i.test(s)) return 'מערכת כריות האוויר';
+  if(/\b(?:ABS|anti.lock braking|ESC|ESP)\b/i.test(s)) return 'מערכת הבלמים ובקרת היציבות';
+  if(/\b(?:ECM|PCM|engine control module)\b/i.test(s)) return 'מנוע';
+  if(/\b(?:TCM|transmission control module)\b/i.test(s)) return 'תיבת הילוכים';
+  if(/\b(?:TPMS|tire pressure monitoring)\b/i.test(s)) return 'לחץ אוויר בצמיגים';
+  if(/\b(?:AC|air conditioning)\b/i.test(s)) return 'מיזוג אוויר';
+  if(/\b(?:EPS|electric power steering)\b/i.test(s)) return 'מערכת ההיגוי';
+  if(/\b(?:body control module|BCM)\b/i.test(s)) return 'חשמל ואבזור';
+  if(/\b(?:cluster module|smart junction block)\b/i.test(s)) return 'חשמל ואבזור';
+  return '';
+}
+
+function computerCodeRecords(text){
+  const lines=cleanOcrText(text).split('\n').map(s=>s.trim()).filter(Boolean),records=[];
+  let module='';
+  lines.forEach((line,index)=>{
+    const heading=computerModuleName(line);
+    if(heading) module=heading;
+    extractDtcCodeDetails(line).forEach(detail=>{
+      let context=line;
+      for(let i=index+1;i<Math.min(lines.length,index+4);i++){
+        if(extractDtcCodes(lines[i]).length||computerModuleName(lines[i])) break;
+        context+=' · '+lines[i];
+      }
+      const status=detectDtcStatus(context);
+      const record={...detail,module,context,statusKey:status==='unknown'?detectDtcStatus(dtcContextForCode(text,detail.code)):status};
+      if(!records.some(r=>r.code===record.code&&r.displayCode===record.displayCode&&r.module===record.module&&r.statusKey===record.statusKey)) records.push(record);
+    });
+  });
+  return records;
+}
+
+function computerDocumentKnowledge(record,base){
+  const context=record?.context||'',system=record?.module||base.system;
+  const airbag=/كر|כריות/.test(system);
+  const checks=airbag?['סריקה חוזרת של מחשב כריות האוויר בסורק מתאים','בדיקת נורת כריות האוויר בעת פתיחת מתג ההצתה וכיבויה לאחר הבדיקה העצמית','בירור מועד התקלה והתיקון שבוצע','בדיקת מצבר, טעינה והזנות מתח']:base.checks;
+  if(/warning\s*lamp\s*(?:failure|fault)|תקלה.*נורת.*אזהרה/i.test(context)) return {system,title:airbag?'תקלה בנורת האזהרה של כריות האוויר':'תקלה בנורת האזהרה',severity:airbag?'safety':'medium',direction:'בדוח נרשמה תקלה בנורת האזהרה או במעגל שלה. אין בכך לקבוע שהכריות נפתחו או שהמערכת אינה פועלת כיום.',checks};
+  if(/battery\s*voltage\s*(?:low|too low)|מתח.*מצבר.*נמוך/i.test(context)) return {system,title:airbag?'מתח מצבר נמוך שנרשם במחשב כריות האוויר':'מתח מצבר נמוך',severity:airbag?'safety':'medium',direction:'מחשב המערכת תיעד מתח אספקה נמוך. ייתכן קשר למצבר, לטעינה או להזנת המחשב; הקוד לבדו אינו מוכיח שהמצבר פגום.',checks};
+  return {...base,system,severity:airbag?'safety':base.severity,title:record?.module&&base.title.startsWith('קוד במערכת')?'תקלה שתועדה ב'+system:base.title,checks};
+}
+
+function dtcFinding(code,text,record=null){
+  const knowledge=computerDocumentKnowledge(record,dtcKnowledgeFor(code));
+  const displayCode=record?.displayCode||dtcDisplayCode(text,code);
+  const statusKey=record?.statusKey||detectDtcStatus(dtcContextForCode(text,code));
   const status=dtcStatusDefinitions[statusKey];
   const highImpact=['safety','high'].includes(knowledge.severity)&&statusKey!=='historical';
   return {
-    id:'dtc-'+code,
+    id:'dtc-'+code+'-'+(record?.module||'')+'-'+statusKey,
+    title:knowledge.title,
+    computerModule:record?.module||'',
     code,
     displayCode,
     dtcStatusKey:statusKey,
@@ -5559,7 +5605,7 @@ function computerDescriptionFindings(text){
 function interpretComputerText(text){
   const unknown=[];
   const codes=extractDtcCodes(text);
-  const findings=[...dtcClusterFindings(codes),...codes.map(code=>dtcFinding(code,text)),...computerDescriptionFindings(text)];
+  const findings=[...dtcClusterFindings(codes),...computerCodeRecords(text).map(record=>dtcFinding(record.code,text,record)),...computerDescriptionFindings(text)];
   let genericAbnormalAdded=false;
   reportLines(text).forEach(line=>{
     if(isMetadataLine(line)||extractDtcCodes(line).length) return;
@@ -5613,6 +5659,7 @@ function compactCategoryLabel(value,isComputer=false,item=null){
     if(/נקישה בהגה|משאבת הגה|מסרק הגה|זוויות היגוי|חוסר יציבות בהגה/.test(sourceDetail)) return 'מערכת ההיגוי';
     if(/פנסים? |פנסי |תאורה/.test(sourceDetail)) return 'חשמל ואבזור';
   }
+  if(isComputer&&/כריות.*אוויר/.test(category)) return 'מערכת כריות האוויר';
   if(batteryFindingInfo(item)) return 'תאריך וגיל המצבר';
   if(/חלון גג|גג נפתח|sunroof/.test(detail)&&/לא תקין|תקלה|מנוע|מתג|חשמל|פתיחה|סגירה|תפעול/.test(detail)) return 'חשמל ואבזור';
   if(/תקשורת|מחשב.*מחשב|can\b/.test(category)) return 'תקשורת בין מחשבי הרכב';
@@ -5704,7 +5751,7 @@ function findingLocationPrefix(item,fact){
 function conciseFindingFact(item,isComputer=false){
   if(isComputer){
     const code=item?.displayCode||item?.code||'';
-    const description=compactFirstSentence(item?.computerDescription||item?.title||item?.matchedTerm||item?.meaning,145);
+    const description=compactFirstSentence((typeof item?.computerDescription==='string'?item.computerDescription:'')||item?.title||item?.matchedTerm||item?.meaning,145);
     return [code,description].filter(Boolean).join(' — ')||'קוד שנקרא בסריקה.';
   }
   const source=String(item?.observedText||item?.sourceText||'').replace(/\s+/g,' ').trim();
@@ -5754,7 +5801,7 @@ function computerStatusBucket(item){
 }
 
 function severityTag(bucket){
-  return {high:'משמעות גבוהה',medium:'משמעות בינונית',review:'אבחנות לבירור',low:'משמעות נמוכה',marginal:'משמעות שולית',active:'תקלות פעילות בזמן הסריקה',historical:'תקלות עבר — לידיעה',unresolved:'מצב התקלה לא הוכרע'}[bucket]||'סיכום';
+  return {high:'משמעות גבוהה',medium:'משמעות בינונית',review:'אבחנות לבירור',low:'משמעות נמוכה',marginal:'משמעות שולית',active:'תקלות פעילות בזמן הסריקה',historical:'תקלות היסטוריות — נדרש בירור',unresolved:'מצב התקלה לא הוכרע'}[bucket]||'סיכום';
 }
 
 function groupDecision(category,bucket,items){
@@ -5764,7 +5811,7 @@ function groupDecision(category,bucket,items){
     if(battery.ageMonths<24) return 'גיל המצבר נמוך משנתיים; המידע מוצג לידיעה ואינו מהווה תקלה בפני עצמו.';
     return 'גיל המצבר הוא שנתיים ומעלה. אין בכך לקבוע שהמצבר פגום, אך מומלץ לבדוק עומס, התנעה וטעינה.';
   }
-  if(bucket==='historical') return 'הקודים נמצאים בזיכרון המחשב ואינם מסומנים כפעילים בעת הסריקה. לידיעה בלבד.';
+  if(bucket==='historical') return /כריות.*אוויר/.test(category)?'במחשב כריות האוויר נרשמו תקלות היסטוריות. הן אינן מסומנות כפעילות בזמן הסריקה, אך מדובר במערכת בטיחות ולכן יש לברר במוסך את מקורן, מה תוקן, תקינות נורת האזהרה והאם הקודים חוזרים בסריקה חוזרת. אין בכך לבדו הוכחה לפתיחת כריות אוויר או לתאונה.':'הקודים תועדו כאירועי עבר ואינם מסומנים כפעילים בזמן הסריקה. יש לברר את מועד הופעתם, הטיפול שבוצע והאם הם חוזרים בבדיקה עדכנית.';
   if(bucket==='active') return 'הקודים מסומנים כתקלות פעילות בזמן הסריקה. יש לבצע אבחון ממוחשב, לברר ולתקן בהתאם לממצא המאומת.';
   if(bucket==='unresolved') return 'מצב הקודים לא הובהר בדוח. אין לקבוע אם הם פעילים או היסטוריים לפני אימות בסורק מתאים.';
   if(bucket==='marginal') return 'המידע מוצג לידיעה ואינו מהווה תקלה בפני עצמו, אלא אם נרשם לצדו ממצא נוסף.';
@@ -5890,7 +5937,8 @@ function professionalOverallConclusion(result,computerResult=null){
   const mediumConclusion=mediumFacts?'ממצאים במשמעות בינונית: '+mediumFacts+'. '+(numberFollowUp&&!numberIsHigh?numberFollowUp+' ':'')+'יש להשלים בירור מקצועי וטיפול לפי הממצאים המאומתים.':'';
   if(numberFollowUp&&numberIsHigh) highConclusion+=' '+numberFollowUp;
   const lowConclusion=lowFacts?'ממצאים במשמעות נמוכה: '+lowFacts+'. יש להביא בחשבון את היקף הטיפול וההוצאה. ממצאים אלה אינם מבטלים או מפחיתים את חומרת הממצאים במשמעות גבוהה.':'';
-  const reviewParts=[reviewFacts?'ממצאים שדורשים המשך בירור: '+reviewFacts+'.':'',...(result?.unknown||[]).filter(text=>!reportTextIsUnreliable(text)).map(text=>'נוסח בדוח שדורש בירור: '+text+'.')].filter(Boolean);
+  const computerReview=computerResult?compactAnalysisGroups(computerResult,true).map(group=>group.category+' — '+group.tag+': '+group.bullets.join('; ')+'. '+group.decision):[];
+  const reviewParts=[...computerReview,reviewFacts?'ממצאים שדורשים המשך בירור: '+reviewFacts+'.':'',...(result?.unknown||[]).filter(text=>!reportTextIsUnreliable(text)).map(text=>'נוסח בדוח שדורש בירור: '+text+'.')].filter(Boolean);
   const reviewConclusion=reviewParts.length?reviewParts.join(' ')+' יש להשלים בירור מול המכון או בעל המקצוע המתאים; חומרת הממצאים לא נקבעה.':'';
   const informationConclusion=informationFacts?'מידע, המלצות והסתייגויות שנרשמו בדוח: '+informationFacts+'. יש להתייחס לכל הנחיה שנרשמה; מידע זה אינו קובע לבדו שיש תקלה.':'';
   return {highConclusion,mediumConclusion,lowConclusion,reviewConclusion,informationConclusion,disclaimer:professionalConclusionDisclaimer};
