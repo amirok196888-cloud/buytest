@@ -30,6 +30,7 @@
 <link rel="icon" type="image/png" href="buytest-logo-2026.png">
 <link rel="apple-touch-icon" href="buytest-logo-2026.png">
 <title>BuyTest | פענוח עבר ביטוחי וסיכומי בדיקות רכב</title>
+<script src="/internal-traffic.js?v=1"></script>
 <!-- Meta Pixel Code -->
 <script>
 !function(f,b,e,v,n,t,s)
@@ -41,7 +42,7 @@ t.src=v;s=b.getElementsByTagName(e)[0];
 s.parentNode.insertBefore(t,s)}(window,document,'script',
 'https://connect.facebook.net/en_US/fbevents.js');
 fbq('init','1944984039489234');
-if(!new URLSearchParams(location.search).has('manager')) fbq('track','PageView');
+if(!BuyTestInternalTraffic.blocked()) fbq('track','PageView');
 </script>
 <!-- End Meta Pixel Code -->
 <!-- Google tag (gtag.js) -->
@@ -50,7 +51,7 @@ if(!new URLSearchParams(location.search).has('manager')) fbq('track','PageView')
 window.dataLayer=window.dataLayer||[];
 function gtag(){dataLayer.push(arguments)}
 gtag('js',new Date());
-gtag('config','AW-18445003355');
+if(!BuyTestInternalTraffic.blocked()) gtag('config','AW-18445003355');
 </script>
 <!-- End Google tag -->
 <style>
@@ -1021,15 +1022,15 @@ let buyTestFeedbackItems=[];
 let buyTestFeedbackLoaded=false;
 let balcarSummaryText='';
 function buyTestMetaTrack(eventName,parameters={}){
-  if(typeof window.fbq!=='function'||new URLSearchParams(location.search).has('manager')||document.body.classList.contains('manager-mode')) return;
+  if(typeof window.fbq!=='function'||BuyTestInternalTraffic.blocked()) return;
   try{window.fbq('track',eventName,parameters)}catch(error){console.warn('BuyTest Meta event skipped:',error)}
 }
 function buyTestMetaTrackCustom(eventName,parameters={}){
-  if(typeof window.fbq!=='function'||new URLSearchParams(location.search).has('manager')||document.body.classList.contains('manager-mode')) return;
+  if(typeof window.fbq!=='function'||BuyTestInternalTraffic.blocked()) return;
   try{window.fbq('trackCustom',eventName,parameters)}catch(error){console.warn('BuyTest Meta event skipped:',error)}
 }
 function buyTestGoogleTrackFreeStartedOnce(vehiclePlate){
-  if(typeof window.gtag!=='function'||new URLSearchParams(location.search).has('manager')||document.body.classList.contains('manager-mode')) return;
+  if(typeof window.gtag!=='function'||BuyTestInternalTraffic.blocked()) return;
   const plate=String(vehiclePlate||'').replace(/\D/g,'');
   const storageKey=BUYTEST_GOOGLE_FREE_STARTED_KEY_PREFIX+(plate||'unknown');
   try{if(sessionStorage.getItem(storageKey)==='1') return}catch(_error){}
@@ -1039,7 +1040,7 @@ function buyTestGoogleTrackFreeStartedOnce(vehiclePlate){
   }catch(error){console.warn('BuyTest Google Ads conversion skipped:',error)}
 }
 function buyTestGoogleTrackFreeCompletedOnce(vehiclePlate){
-  if(typeof window.gtag!=='function'||new URLSearchParams(location.search).has('manager')||document.body.classList.contains('manager-mode')) return;
+  if(typeof window.gtag!=='function'||BuyTestInternalTraffic.blocked()) return;
   const plate=String(vehiclePlate||'').replace(/\D/g,'');
   const storageKey=BUYTEST_GOOGLE_FREE_COMPLETED_KEY_PREFIX+(plate||'unknown');
   try{if(sessionStorage.getItem(storageKey)==='1') return}catch(_error){}
@@ -1058,7 +1059,7 @@ function trackBuyTestFreeCompletedOnce(vehiclePlate){
   buyTestGoogleTrackFreeCompletedOnce(normalizedPlate);
 }
 function buyTestGoogleTrackBundleClickOnce(vehiclePlate){
-  if(typeof window.gtag!=='function'||new URLSearchParams(location.search).has('manager')||document.body.classList.contains('manager-mode')) return;
+  if(typeof window.gtag!=='function'||BuyTestInternalTraffic.blocked()) return;
   const normalizedPlate=String(vehiclePlate||'').replace(/\D/g,'');
   if(!/^\d{7,8}$/.test(normalizedPlate)) return;
   const storageKey='buytestGoogleBundle39ClickV1:'+normalizedPlate;
@@ -1083,7 +1084,7 @@ function buyTestMetaTrackPurchaseOnce(payment){
   try{localStorage.setItem(storageKey,'1')}catch(_error){}
 }
 function buyTestGoogleTrackPurchaseOnce(payment){
-  if(typeof window.gtag!=='function'||new URLSearchParams(location.search).has('manager')||document.body.classList.contains('manager-mode')) return;
+  if(typeof window.gtag!=='function'||BuyTestInternalTraffic.blocked()) return;
   if(!payment?.orderId) return;
   const storageKey=BUYTEST_GOOGLE_PURCHASE_KEY_PREFIX+String(payment.orderId);
   try{if(localStorage.getItem(storageKey)==='1') return}catch(_error){}
@@ -2668,6 +2669,7 @@ function buyTestAnalyticsIdentity(){
   return {visitorId,sessionId:session.id};
 }
 async function callBuyTestAnalyticsService(body,{manager=false}={}){
+  if(body.action==='track'&&BuyTestInternalTraffic.blocked()) return {ok:true,excluded:true};
   const headers={'Content-Type':'application/json','apikey':BUYTEST_SUPABASE_ANON_KEY,'Authorization':'Bearer '+BUYTEST_SUPABASE_ANON_KEY};
   if(manager&&buyTestManagerPin) headers['x-buytest-manager-pin']=buyTestManagerPin;
   const response=await fetch(BUYTEST_ANALYTICS_ENDPOINT,{method:'POST',headers,body:JSON.stringify(body),keepalive:body.action==='track'||body.action==='mileage_record'});
@@ -2684,7 +2686,7 @@ function buyTestIsoDate(value){
   return Number.isNaN(parsed.getTime())?'':parsed.toISOString().slice(0,10);
 }
 async function saveBuyTestMileageObservations(observations){
-  if(new URLSearchParams(location.search).has('manager')||document.body.classList.contains('manager-mode')) return;
+  if(BuyTestInternalTraffic.blocked()) return;
   const vehiclePlate=plate();
   if(!/^\d{7,8}$/.test(vehiclePlate)) return;
   const today=new Date().toISOString().slice(0,10);
@@ -2711,7 +2713,7 @@ async function saveBuyTestMileageObservation(observation){return saveBuyTestMile
 const trackBuyTestFreeStage=window.BuyTestFreeFunnel.createTracker({
   identity:()=>buyTestAnalyticsIdentity(),
   send:body=>callBuyTestAnalyticsService(body),
-  blocked:()=>new URLSearchParams(location.search).has('manager')||document.body.classList.contains('manager-mode'),
+  blocked:()=>BuyTestInternalTraffic.blocked(),
   vehicle:()=>/^\d{7,8}$/.test(plate())?plate():null,
   attribution:()=>buyTestTrafficAttribution()
 });
@@ -2720,11 +2722,11 @@ document.getElementById('plate')?.addEventListener('input',event=>{
 });
 const trackBuyTestReportStage=window.BuyTestReportFunnel.createTracker({
   identity:()=>buyTestAnalyticsIdentity(),send:body=>callBuyTestAnalyticsService(body),
-  blocked:()=>{const q=new URLSearchParams(location.search);return q.has('manager')||q.has('admin')||q.get('mode')==='manager'||document.body.classList.contains('manager-mode')||Boolean(buyTestManagerPin);},
+  blocked:()=>BuyTestInternalTraffic.blocked(),
   attribution:()=>buyTestTrafficAttribution()
 });
 async function trackBuyTestEvent(eventType){
-  if(new URLSearchParams(location.search).has('manager')||document.body.classList.contains('manager-mode')) return;
+  if(BuyTestInternalTraffic.blocked()) return;
   try{
     const identity=buyTestAnalyticsIdentity();
     const attribution=buyTestTrafficAttribution();
@@ -3268,6 +3270,7 @@ async function openManagerPreview(codeValue){
   document.documentElement.classList.remove('manager-link');
   document.body.classList.remove('manager-entry','manager-dashboard','manager-all');
   document.body.classList.add('manager-mode');
+  BuyTestInternalTraffic.mark();
   const purchaseBox=document.getElementById('purchaseBox');
   if(purchaseBox) purchaseBox.style.display='none';
   const managerBox=document.getElementById('managerPreviewBox');

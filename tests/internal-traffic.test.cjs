@@ -1,0 +1,14 @@
+const test=require('node:test'),assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs');
+const source=fs.readFileSync('internal-traffic.js','utf8');
+function storage(){const map=new Map();return {getItem:k=>map.get(k)||null,setItem:(k,v)=>map.set(k,v)}}
+function context(search='',local=storage(),session=storage()){
+ const ctx={URLSearchParams,location:{search},localStorage:local,sessionStorage:session,document:{body:{classList:{contains:()=>false}}}};
+ vm.runInNewContext(source,ctx);return ctx;
+}
+for(const query of ['?manager','?manager=formulas','?admin','?mode=manager','?internal_test=1']) test('Exclude before first event: '+query,()=>assert.equal(context(query).BuyTestInternalTraffic.blocked(),true));
+test('Customer and real ChatGPT referrals remain counted',()=>{for(const q of ['', '?utm_source=google','?utm_source=chatgpt','?internal_test=0'])assert.equal(context(q).BuyTestInternalTraffic.blocked(),false)});
+test('Manager exclusion survives clean URLs, reloads and other tabs in same browser',()=>{const local=storage();context('?admin',local);assert.equal(context('',local).BuyTestInternalTraffic.blocked(),true)});
+test('Authenticated manager entry marks later navigation',()=>{const ctx=context();ctx.BuyTestInternalTraffic.mark();ctx.location.search='';assert.equal(ctx.BuyTestInternalTraffic.blocked(),true)});
+test('Storage unavailable still blocks manager and test traffic in current document',()=>{const bad={getItem(){throw Error()},setItem(){throw Error()}};assert.equal(context('?internal_test=1',bad,bad).BuyTestInternalTraffic.blocked(),true)});
+test('All landing variants guard head tracking, events and both funnels',()=>{for(const file of ['index.html','facebook-20260928.html','facebook-final-20260928.html']){const html=fs.readFileSync(file,'utf8');assert.ok(html.indexOf('/internal-traffic.js')<html.indexOf("fbq('track'"));assert.match(html,/if\(!BuyTestInternalTraffic.blocked\(\)\) gtag\('config'/);assert.match(html,/body.action==='track'&&BuyTestInternalTraffic.blocked\(\)/);assert.equal((html.match(/blocked:\(\)=>BuyTestInternalTraffic.blocked\(\)/g)||[]).length,2)}});
+test('Blog sends zero events for excluded visits and two for customer view plus click',async()=>{for(const blocked of [true,false]){let sends=0,click;const ctx={BuyTestInternalTraffic:{blocked:()=>blocked},crypto:{randomUUID:()=> 'anonymous_visitor_123456789'},localStorage:storage(),location:{search:'',pathname:'/articles/test/',hostname:'buytest.co.il',href:'https://buytest.co.il/articles/test/',origin:'https://buytest.co.il'},document:{title:'Test',referrer:'',addEventListener:(_,f)=>click=f},URL,URLSearchParams,fetch:async()=>{sends++},Element:class {closest(){return {href:'https://buytest.co.il/'}}}};vm.runInNewContext(fs.readFileSync('articles/blog-analytics.js','utf8'),ctx);click({target:new ctx.Element()});assert.equal(sends,blocked?0:2)}});

@@ -57,6 +57,7 @@
     return { trafficSource: host && host !== location.hostname.toLowerCase() ? 'other' : 'direct', utmSource: host, utmMedium: host ? 'referral' : '', utmCampaign: '' };
   }
   async function track(eventType) {
+    if(globalThis.BuyTestInternalTraffic?.blocked()) return;
     const body = { action: 'track', eventType, pagePath: location.pathname, pageTitle: document.title, ...identity(), ...attribution() };
     try {
       await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: anonKey, Authorization: 'Bearer ' + anonKey }, body: JSON.stringify(body), keepalive: true });

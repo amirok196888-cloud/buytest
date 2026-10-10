@@ -8,3 +8,5 @@
 - Compare the active server and the current main branch before publishing; preserve concurrent edits. Verify the completed Pages deployment and active server source before saying a repair is published.
 - The workflow checks changes automatically. The GitHub Pages branch deployment is separate, so a green local check is also required before updating main or deploying the server.
 - Never commit uploaded reports, source screenshots, customer names, vehicle identifiers or credentials as test fixtures.
+
+- Always open live site verification with `?internal_test=1` (or append `&internal_test=1`). Keep this marker on the first navigation of every new browser context, including articles. Never generate customer campaign events during internal checks.
