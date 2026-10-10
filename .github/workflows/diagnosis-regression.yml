@@ -25,3 +25,4 @@ jobs:
           tests/report-ocr-integrity.test.cjs
           tests/diagnosis-manager.test.cjs
           tests/computer-module-meaning.test.cjs
+          tests/wrapped-diagnoses.test.cjs

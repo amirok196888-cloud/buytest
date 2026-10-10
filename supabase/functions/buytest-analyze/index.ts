@@ -739,12 +739,47 @@ function normalizeFindingText(value){
     .trim();
 }
 
+function reportWrappedContinuation(previous,next){
+  if(!previous||!next||reportCategoryFromLine(previous)||reportCategoryFromLine(next)||reportSeverityFromLine(next))return false;
+  if(isMetadataLine(previous)||isMetadataLine(next)||reportTextIsUnreliable(previous)||reportTextIsUnreliable(next))return false;
+  const left=stripReportScaffolding(previous,'',reportSeverityFromLine(previous)),right=normalizeFindingText(next),combined=left+' '+right;
+  const prefix=term=>{
+    const normalized=normalizeFindingText(term);
+    return normalized===combined||normalized.startsWith(combined+' ');
+  };
+  const knownContinuation=findingKnowledgeBase.some(rule=>rule.terms.some(prefix))
+    || [...rawFormulaDatabase,...observedFormulaAliases].some(row=>isOperationalFormula(row)&&prefix(row.text));
+  if(knownContinuation)return true;
+  const component=reportComponentCategory(previous)||reportComponentCategory(combined);
+  const nextComponent=reportComponentCategory(next);
+  if(component&&nextComponent&&reportSystemFamily(component)!==reportSystemFamily(nextComponent))return false;
+  const continuation=/^(?:שחוק(?:ה|ות|ים)?|פגומ(?:ה|ות|ים)?|יבש(?:ה|ות|ים)?|סדוק(?:ה|ות|ים)?|חלש(?:ה|ות|ים)?|קרוע(?:ה|ות|ים)?|שבור(?:ה|ות|ים)?|רופפ(?:ה|ות|ים)?|לא תקינ(?:ה|ות|ים)?|תקינ(?:ה|ות|ים)?|תקין|קדמי|קדמית|קדמיים|אחורי|אחורית|אחוריים|ימין|שמאל)(?:\s|$)/.test(right);
+  if(continuation&&component)return true;
+  const exactKnown=text=>findingKnowledgeBase.some(rule=>rule.terms.some(term=>normalizeFindingText(term)===text))
+    || [...rawFormulaDatabase,...observedFormulaAliases].some(row=>isOperationalFormula(row)&&normalizeFindingText(row.text)===text);
+  if(exactKnown(left)||exactKnown(right))return false;
+  // New independent findings remain separate even in forms that omit punctuation.
+  if(/^(?:לבדוק|בדיקת|נזיל|דליפ|חסר|חוסר|חופש|רעש|רעיד|נקיש|פגיע|סימני|תיקונ|תיקון|ריתוכ|הוחלפ|הוחלף|החלפ|צמיגים|צלחות|רפידות)/.test(right))return false;
+  return Boolean(component||/(תאונה|פגיע|תיקונ|תיקון|הוחלפ|הוחלף|ריתוכ|הלחמ|חיבור|לבדוק|תצרוכת|צריכת)/.test(left));
+}
+
 function reportLines(value){
-  return cleanOcrText(value)
-    .split(/[\n;•●▪]+/)
-    .flatMap(line=>line.split(/\s*,\s*/))
-    .map(line=>line.trim())
-    .filter(line=>line.length>2);
+  const parts=cleanOcrText(value).split(/([,;•●▪!?\n]+|\.(?!\d))/);
+  const lines=[];
+  let hardBoundary=true;
+  for(const part of parts){
+    if(/\n{2,}/.test(part))hardBoundary=true;
+    if(!part.trim())continue;
+    if(/^[,;•●▪!?.\n]+$/.test(part)){
+      if(/[,;•●▪!?.]/.test(part))hardBoundary=true;
+      continue;
+    }
+    const text=part.trim(),previous=lines.at(-1);
+    if(!hardBoundary&&reportWrappedContinuation(previous,text))lines[lines.length-1]=previous+' '+text;
+    else lines.push(text);
+    hardBoundary=false;
+  }
+  return lines.filter(line=>line.length>2);
 }
 
 function isEngineNumberVerificationText(value){
@@ -804,7 +839,7 @@ function isPotentialUnknownFindingLine(line){
 function isExplicitlyNormal(line){
   const n=normalizeFindingText(line);
   const bad=/(לא תקין|אינו תקין|בלתי תקין|חריג|נכשל|לקוי|פגום|שחוק|נזיל|דליפ|חופש|רעש|פגיעה|תיקון|החלפה|סדק|מעיכה)/.test(n);
-  const good=/(^|\s)(תקין|עבר בהצלחה)(\s|$)|ללא ממצאים|לא נמצאו ממצאים|לא נמצאה תקלה|אין תקלות|לא נמצאו תקלות|ללא קודי תקלה|אפס תקלות|no fault codes|no dtc/.test(n);
+  const good=/(^|\s)(תקין|תקינה|תקינים|תקינות|עבר בהצלחה)(\s|$)|ללא ממצאים|לא נמצאו ממצאים|לא נמצאה תקלה|אין תקלות|לא נמצאו תקלות|ללא קודי תקלה|אפס תקלות|no fault codes|no dtc/.test(n);
   return good&&!bad;
 }
 
@@ -1864,18 +1899,6 @@ function interpretSummaryText(text,catalogRows=loadFormulaOverrides()){
     }
     let observedCandidate=contentLine;
     let rules=findKnowledgeRules(contentLine,diagnosisCategory,catalogRows);
-    if(!rules.length&&!unreliable){
-      let continued=contentLine;
-      for(let offset=1;offset<=2;offset++){
-        const nextLine=lines[index+offset];
-        if(!nextLine||reportCategoryFromLine(nextLine)||reportSeverityFromLine(nextLine)) break;
-        const nextContent=stripReportScaffolding(nextLine,'',null);
-        if(!nextContent||reportTextIsUnreliable(nextContent)) break;
-        continued+=' '+nextContent;
-        const continuedRules=findKnowledgeRules(continued,diagnosisCategory,catalogRows);
-        if(continuedRules.length){rules=continuedRules;observedCandidate=continued;break;}
-      }
-    }
     const diagnosisSignal=/(תאונה|שיפו|תיקונ|תיקון|פגיע|הלחמ|חיבור.*לא מקורי|עמוד|משקופ|נקיש|פגומ|זוויות.*היגוי|היגוי.*כיוון|ירידת ערך|הוחלפ|הוחלף|החלפ|לבדוק|סריקת מחשב|תקל|שחוק|רעש|רעיד|צריכת שמן|יבש|יבשים|סדוק|חסר|לא מתקפל|שריט|מעיכ|פגמי|קרוע|שבור|נזיל|דליפ|חופש)/.test(normalizeFindingText(contentLine));
     const fullCoverage=rules.some(rule=>normalizeFindingText(rule.sourceText||rule.matchedTerm||'')===normalizeFindingText(contentLine));
     const clauseCategory=diagnosisCategory||(/תיבת הילוכים|תיבת ההילוכים/.test(contentLine)?'תיבת הילוכים':/במנוע|שמן מנוע/.test(contentLine)?'מנוע':'');
