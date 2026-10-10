@@ -113,3 +113,9 @@ test('saved explanations interleaved with plain findings preserve all eighteen s
  }
  assert.deepEqual(Array.from(c.compactAnalysisGroups(r).flatMap(g=>c.compactGroupFacts(g))),expected);
 });
+
+test('orphan OCR fragments remain diagnostic audit data and never appear as conclusions',()=>{
+ const c=engine(),r=c.interpretSummaryText('צמיגים וחישוקים\nאווירדולקת\nשחוקות');assert.ok(r.unknown.length);
+ const conclusion=c.professionalOverallConclusion(r).reviewConclusion;assert.ok(!conclusion.includes('אווירדולקת'));assert.ok(!conclusion.includes('שחוקות'));
+ assert.ok(!JSON.stringify(c.btPdfAnalysisCards(r)).includes('אווירדולקת'));
+});

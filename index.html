@@ -6214,7 +6214,7 @@ function professionalOverallConclusion(result,computerResult=null){
   if(numberFollowUp&&numberIsHigh) highConclusion+=' '+numberFollowUp;
   const lowConclusion=lowFacts?'ממצאים במשמעות נמוכה: '+lowFacts+'. יש להביא בחשבון את היקף הטיפול וההוצאה. ממצאים אלה אינם מבטלים או מפחיתים את חומרת הממצאים במשמעות גבוהה.':'';
   const computerReview=computerResult?compactAnalysisGroups(computerResult,true).map(group=>group.category+' — '+group.tag+': '+group.bullets.join('; ')+'. '+group.decision):[];
-  const reviewParts=[...computerReview,reviewFacts?'ממצאים שדורשים המשך בירור: '+reviewFacts+'.':'',...(result?.unknown||[]).filter(text=>!reportTextIsUnreliable(text)).map(text=>'נוסח בדוח שדורש בירור: '+text+'.')].filter(Boolean);
+  const reviewParts=[...computerReview,reviewFacts?'ממצאים שדורשים המשך בירור: '+reviewFacts+'.':'',...(result?.unknown||[]).filter(text=>!reportTextIsUnreliable(text)&&!reportClauseIsFragment(text)).map(text=>'נוסח בדוח שדורש בירור: '+text+'.')].filter(Boolean);
   const reviewConclusion=reviewParts.length?reviewParts.join(' ')+' יש להשלים בירור מול המכון או בעל המקצוע המתאים; חומרת הממצאים לא נקבעה.':'';
   const informationConclusion=informationFacts?'מידע, המלצות והסתייגויות שנרשמו בדוח: '+informationFacts+'. יש להתייחס לכל הנחיה שנרשמה; מידע זה אינו קובע לבדו שיש תקלה.':'';
   return {highConclusion,mediumConclusion,lowConclusion,reviewConclusion,informationConclusion,disclaimer:professionalConclusionDisclaimer};
