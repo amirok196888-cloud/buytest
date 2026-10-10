@@ -20,6 +20,7 @@
     else if(route!=='report'){freshReportSessionPending=false;reportStarted=false;document.body.dataset.reportStarted='false';delete document.body.dataset.reportRegistryPlate;document.body.classList.remove('plan-report');document.getElementById('afterInspectionSection')?.style.removeProperty('display');}
     current=services[route]?route:'';
     document.body.dataset.service=current||'home';
+    if(current==='consultation')void window.BuyTestConsultation?.entered();
     closeAfterPage(false);document.body.classList.remove('consultation-page');document.getElementById('consultationPage').hidden=true;
     document.getElementById('beforeInspectionRoute').hidden=true;
     document.getElementById('afterInspectionRoute').hidden=true;

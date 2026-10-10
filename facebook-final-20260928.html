@@ -2685,6 +2685,7 @@ async function loadBuyTestAnalytics(range=buyTestAnalyticsRange){
     renderBuyTestBlogAnalytics(blog);
     window.BuyTestFreeFunnel.render(data.freeFunnel);
     window.BuyTestReportFunnel.render(data.reportFunnel);
+    window.BuyTestConsultation?.renderStats(stats.consultation);
     if(status) status.textContent='עודכן '+new Date().toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});
   }catch(error){
     console.error('BuyTest analytics loading failed:',error);
@@ -6441,4 +6442,4 @@ document.addEventListener('keydown',event=>{
 <script src="package-149.js?v=7"></script>
 <script src="manager-session.js?v=1"></script><script src="opening-20260928.js?v=1"></script>
 <!-- payment-dynamic-plan-v7 -->
-<section id="consultationPage" hidden><button class="secondary" type="button" onclick="closeConsultationPage()">→ חזרה למסך הפתיחה</button><h1>התייעצות עם הבוחן</h1><p>עמוס רוקח · 15 שנות ניסיון בבדיקות קנייה</p><div class="card" id="consultationPurchaseIntro"><h2>נשארו לכם שאלות על הרכב?</h2><p>ייעוץ אישי בוואטסאפ על הדוח, הממצאים והבירורים שכדאי להשלים לפני הקנייה. אפשר להתחיל גם בלי דוח.</p><strong class="btConsultPrice">149 ₪</strong><p>ההתייעצות פתוחה ל־48 שעות ממועד אישור התשלום, בשעות המענה המפורטות בתנאים.</p><button class="primary full" type="button" onclick="startPayment('prebuy')">להתייעצות אישית — 149 ₪</button></div></section><dialog id="buytestTour"><button class="secondary" type="button" onclick="closeBuyTestTour()">✕ סגירה</button><iframe title="איך BuyTest עובד" id="buytestTourFrame"></iframe></dialog></body></html>
+<section id="consultationPage" hidden><button class="secondary" type="button" onclick="closeConsultationPage()">→ חזרה למסך הפתיחה</button><h1>התייעצות עם הבוחן</h1><p>עמוס רוקח · 15 שנות ניסיון בבדיקות קנייה</p><div class="card" id="consultationPurchaseIntro"><h2>נשארו לכם שאלות על הרכב?</h2><p>ייעוץ אישי בוואטסאפ על הדוח, הממצאים והבירורים שכדאי להשלים לפני הקנייה. אפשר להתחיל גם בלי דוח.</p><strong class="btConsultPrice">149 ₪</strong><p>ההתייעצות פתוחה ל־48 שעות ממועד אישור התשלום, בשעות המענה המפורטות בתנאים.</p><button class="primary full" type="button" onclick="startPayment('prebuy')">להתייעצות אישית — 149 ₪</button></div></section><dialog id="buytestTour"><button class="secondary" type="button" onclick="closeBuyTestTour()">✕ סגירה</button><iframe title="איך BuyTest עובד" id="buytestTourFrame"></iframe></dialog><script src="consultation-preflight.js?v=1"></script></body></html>
