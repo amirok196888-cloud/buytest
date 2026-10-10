@@ -1,0 +1,27 @@
+name: Diagnosis regression checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnosis-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify diagnosis catalog, OCR categories, saved edits and PDF output
+        run: >-
+          node --test --test-concurrency=1
+          tests/report-category-boundaries.test.cjs
+          tests/report-reading-display.test.cjs
+          tests/report-ocr-integrity.test.cjs
+          tests/diagnosis-manager.test.cjs
+          tests/computer-module-meaning.test.cjs

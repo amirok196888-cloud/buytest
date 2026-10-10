@@ -9,7 +9,7 @@ const externalVehicleData = { kmHistory: [] };
 
 function fmtNum(v){return(v===null||v===undefined||v==='')?'—':Number(v).toLocaleString('he-IL')}
 function cleanOcrText(text){return String(text||'').replace(/\r/g,'').replace(/[ \t]+\n/g,'\n').replace(/\n{3,}/g,'\n\n').trim()}
-function diagnosticTableText(text){const cleaned=cleanOcrText(text);const marker=/הערות\s*כלליות|לחזור\s+לה\s*משך\s+בדיקה\s+לאחר\s+תיקון|יש\s+לברר\s+זמני\s+טיפולים/i;const match=marker.exec(cleaned);return match&&match.index>180?cleaned.slice(0,match.index).trim():cleaned}
+function diagnosticTableText(text){const cleaned=cleanOcrText(text);const marker=/הערות\s*כלליות|במידה\s*וסעיף\s*בטופס\s*הבדיקה\s*האחיד\s*סומן|לחזור\s+לה\s*משך\s+בדיקה\s+לאחר\s+תיקון|יש\s+לברר\s+זמני\s+טיפולים/i;const match=marker.exec(cleaned);return match&&(match.index>180||/^במידה/.test(match[0]))?cleaned.slice(0,match.index).trim():cleaned}
 
 const findingKnowledgeBase=[
   {id:'engine-overhaul-evidence',terms:['סימני שיפוץ מנוע','סימני שיפוץ במנוע'],category:'מנוע',tag:'נדרש בירור',tone:'clarify',classification:'repair_history_or_evidence',reportSeverity:'medium',meaning:'נרשמו סימנים לשיפוץ מנוע. יש לברר מה בוצע; סימני שיפוץ אינם מוכיחים לבדם שהמנוע הוחלף.',decision:'יש לברר במוסך את היקף השיפוץ ותיעודו. כאשר נדרשה בדיקת מספר המנוע, יש לאמת גם את התאמת המספר לרישיון.'},
@@ -731,6 +731,9 @@ function normalizeFindingText(value){
     .replace(/אפורי/g,'אחורי')
     .replace(/צ\s*קת\s+שחוקות/g,'צלחות שחוקות')
     .replace(/הגוי/g,'היגוי')
+    .replace(/זויות/g,'זוויות')
+    .replace(/זוית/g,'זווית')
+    .replace(/סדוקיםמנורת/g,'סדוקים מנורת')
     .replace(/[()[\]{}:;,./\\-]+/g,' ')
     .replace(/\s+/g,' ')
     .trim();
@@ -777,11 +780,12 @@ function isMetadataLine(line){
     && n.split(/\s+/).length<=5;
   return !n
     || categoryOnly
-    || /^(שם|לקוח|מזמין|תאריך|שעה|מספר רכב|מס רכב|מספר רישוי|מס רישוי|מספר רישיון|מס רישיון|מספר רשיון|מס רשיון|מספר בדיקה|מספר כרטיס|מס כרטיס|מספר מנוע|מס מנוע|מספר שלדה|מס שלדה|סוג מרכב|שילדת מרכב|שלדת מרכב|שנת יצור|שנת ייצור|טלפון|טל|כתובת|סניף|מכון|חתימה|חותמת|בוחן|בודק)\s*[:\-]?/.test(n)
+    || (/^(שם|לקוח|מזמין|תאריך|שעה|מספר רכב|מס רכב|מספר רישוי|מס רישוי|מספר רישיון|מס רישיון|מספר רשיון|מס רשיון|מספר בדיקה|מספר כרטיס|מס כרטיס|מספר מנוע|מס מנוע|מספר שלדה|מס שלדה|סוג מרכב|שילדת מרכב|שלדת מרכב|שנת יצור|שנת ייצור|טלפון|טל|כתובת|סניף|מכון|חתימה|חותמת|בוחן|בודק)\s*[:\-]?/.test(n)&&!/^תאריך (?:ייצור )?מצבר/.test(n))
     || /^(נבדק בנסיעה|בדיקה בנסיעה בלבד)$/.test(n)
     || /^(תנאי|הערות כלליות|הבהרה|כתב ויתור|טופס סיכום|סיכום אחיד|דגם|יצרן|תוצר|קוד דגם|קילומטראז|קמ|צבע|בעלות)\b/.test(n)
     || /(?:computerized\s*vehicle\s*test|vehicle\s*test\s*report|test\s*report)/i.test(String(line||''))
-    || /(כל הזכויות|אין באמור|אחריות החברה|כפוף לתנאים|טופס זה|בהתאם להוראות|משרד התחבורה|רשות הרישוי|רשיון המפעל|רישיון המפעל|פינת רחוב|בעמ|מממ הבוחנים)/.test(n)
+    || /(כל הזכויות|אין באמור|אחריות החברה|כפוף לתנאים|טופס זה|בהתאם להוראות|משרד התחבורה|רשות הרישוי|רשיון המפעל|רישיון המפעל|פינת רחוב|מממ הבוחנים)/.test(n)
+    || /(?:^|\s)בעמ(?:\s|$)/.test(n)
     || /^[\d\s-]+$/.test(n)
     || (/\d/.test(n)&&/(רישוי|רישיון|רשיון|מפעל|כרטיס|מנוע|שלדה|טלפון|כתובת)/.test(n))
     || compact==='סיכוםהבוחן';
@@ -791,7 +795,7 @@ function isPotentialUnknownFindingLine(line){
   const n=normalizeFindingText(line);
   if(!n||isMetadataLine(line)||isExplicitlyNormal(line)||isReportStatusScaffolding(n)) return false;
   if(reportCategoryFromLine(line)||reportSeverityFromLine(line)) return false;
-  const defectSignal=/(לא תקי|אינו תקי|בלתי תקי|לקוי|פגומ|שחוק|בלאי|נזיל|דליפ|חופש|רעש|נקיש|חריק|רעיד|סטי(?:ה|ות)|פגיע|תיקו|להחליף|החלפ|סדק|מעיכ|שריט|שפשופ|קורוז|חלוד|עקומ|קרוע|שבור|שבר|רטיב|חסר|מזיע|עשן|אידוי|לחץ עוקה|רופף|משוחרר|אינו פועל|לא פועל|דולק|חריג|נכשל|תקלה|נזק|שרופ|מעוות)/.test(n);
+  const defectSignal=/(לא תקי|אינו תקי|בלתי תקי|לקוי|פגומ|שחוק|בלאי|נזיל|דליפ|חופש|רעש|נקיש|חריק|רעיד|סטי(?:ה|ות)|פגיע|תיקו|להחליף|הוחלפ|הוחלף|החלפ|סדק|מעיכ|שריט|שפשופ|קורוז|חלוד|עקומ|קרוע|שבור|שבר|רטיב|חסר|מזיע|עשן|אידוי|לחץ עוקה|רופף|משוחרר|אינו פועל|לא פועל|דולק|חריג|נכשל|תקלה|נזק|שרופ|מעוות)/.test(n);
   if(!defectSignal) return false;
   const letters=(n.match(/[א-ת]/g)||[]).length;
   return letters>=5;
@@ -1180,7 +1184,8 @@ function applyExpertCalibration(rule,formula){
     sourceText,
     expertDecision:decision
   };
-  if(decision.id==='oil_burning'&&/לבדוק (?:תצרוכת|צריכת) שמן/.test(normalizeFindingText(sourceText))){
+  const conceptId=decision.sourceConceptId||decision.id;
+  if(conceptId==='oil_burning'&&/לבדוק (?:תצרוכת|צריכת) שמן/.test(normalizeFindingText(sourceText))){
     calibrated.tag='הסתייגות כללית';
     calibrated.tone='clarify';
     calibrated.classification='limitation_or_disclaimer';
@@ -1188,7 +1193,15 @@ function applyExpertCalibration(rule,formula){
     calibrated.meaning='הנוסח ממליץ לבדוק תצרוכת שמן בנסיעה. הוא אינו קובע לבדו שהמנוע שורף שמן.';
     calibrated.decision='אין לספור את המשפט כליקוי עצמאי. יש לייחס משקל רק לממצא ממשי נוסף, אם נרשם לצד ההמלצה.';
   }
-  if(decision.id==='gearbox_mount'){
+  if(/^(?:זוויות|זווית) היגוי(?: כיוון)?$/.test(normalizeFindingText(sourceText))){
+    calibrated.reportSeverity='low';
+    calibrated.tag='משמעות נמוכה';
+    calibrated.tone='clarify';
+    calibrated.classification='maintenance_recommendation';
+    calibrated.meaning='נרשם צורך בכיוון זוויות ההיגוי.';
+    calibrated.decision='יש לבדוק אם נרשמו אבחנות נוספות ולבצע תיקון וכיוון לפי הממצאים.';
+  }
+  if(conceptId==='gearbox_mount'||/תושבת תיבת הילוכים פגומה/.test(normalizeFindingText(sourceText))){
     calibrated.tag='ליקוי נקודתי';
     calibrated.tone='clarify';
     calibrated.reportSeverity='low';
@@ -1662,6 +1675,7 @@ function reportComponentCategory(source,category='',chassisHint=''){
   if(/מידות מרכב/.test(text))return 'מערכת ההיגוי';
   // Structural parts mentioning engines, wheels or suspension remain body parts.
   if(/שלד|מרכב|פחחות|פגוש|כנף|משקוף|קורת|קורה |קורות|ריצפ|רצפ|מכסה (?:תא )?מנוע|דופן.*מנוע|בית גלגל|תיקונ.*(?:פח|צבע)|שמשה|ריפוד|חגורת בטיחות|(?:פגיע(?:ה|ות)|תיקון פגיעה)\s*(?:מאחור|מלפנים|בחזית|בצד|צד|במרכב|בגוף הרכב)/.test(text)) return body;
+  if(/תיקוני? תאונה|פגיעה בעמוד|(?:תיקון|תיקוני|תיקונים|החלפת|הוחלפ[א-ת]*) (?:פח|דלת|מכסה תא מטען)|מעיכות ושריטות סביב הרכב/.test(text))return body;
   if(/מזגן|מיזוג|מערכת אוורור פנימית/.test(text)) return 'מיזוג אוויר';
   // Oil/coolant contamination and pressure from cylinders are engine findings.
   if(/מצתים רטובים בשמן|(?:מים|נוזל קירור) בשמן|מעבר לחץ.*קירור|ראש מנוע|בלוק מנוע|בין (?:ה)?מנוע ל(?:גיר|תיבת)|בין בלוק מנוע לתיבת/.test(text)) return 'מנוע';
@@ -1689,7 +1703,7 @@ function reportComponentCategory(source,category='',chassisHint=''){
   if(/פליטה|ממיר קטליטי|זיהום אוויר|לוכד חלקיקים|אוריאה/.test(text)) return 'מערכת הפליטה ומערכות למניעת זיהום אוויר';
   if(/דלק|קניסטר|קנסטר|מאייד|משנק|הזרק/.test(text)) return 'מערכת דלק';
   if(/מנוע חלון|חלונות חשמל|חוטי חשמל|מערכת חשמל|מולטימדיה|מגבים|צופר|כיוון מראות|נעילת דלתות/.test(text)) return 'חשמל ואבזור';
-  if(/מנוע|שמן מנוע|לחץ שמן|גל ארכובה|גל זיזים|מערכת תזמון|רצועת תיזמון|מערכת שסתומים|לחץ דחיסה|צילינדר/.test(text)) return 'מנוע';
+  if(/(?:תצרוכת|צריכת) שמן|שמן בנסיעה|מנוע|שמן מנוע|לחץ שמן|גל ארכובה|גל זיזים|מערכת תזמון|רצועת תיזמון|מערכת שסתומים|לחץ דחיסה|צילינדר/.test(text)) return 'מנוע';
   return '';
 }
 
@@ -1845,6 +1859,9 @@ function interpretSummaryText(text,catalogRows=loadFormulaOverrides()){
     if(unreliable) unreadable.push(safeUnknownExcerpt(contentLine));
     const diagnosisCategory=reportFindingCategory(contentLine,currentCategory,chassisHint);
     const diagnosisSeverity=diagnosisCategory===currentCategory?currentSeverity:lineSeverity;
+    if(lineSeverity&&reportSystemFamily(diagnosisCategory)==='body'&&reportSystemFamily(currentCategory)!=='body'){
+      currentCategory=diagnosisCategory;currentSeverity=lineSeverity;
+    }
     let observedCandidate=contentLine;
     let rules=findKnowledgeRules(contentLine,diagnosisCategory,catalogRows);
     if(!rules.length&&!unreliable){
@@ -1859,7 +1876,7 @@ function interpretSummaryText(text,catalogRows=loadFormulaOverrides()){
         if(continuedRules.length){rules=continuedRules;observedCandidate=continued;break;}
       }
     }
-    const diagnosisSignal=/(תאונה|שיפו|תיקונ|תיקון|פגיע|הלחמ|חיבור.*לא מקורי|עמוד|משקופ|נקיש|פגומ|זוויות.*היגוי|היגוי.*כיוון|ירידת ערך|הוחלפ|החלפ|לבדוק|סריקת מחשב|תקל|שחוק|רעש|רעיד|צריכת שמן|חסר|לא מתקפל|שריט|מעיכ|פגמי|קרוע|שבור|נזיל|דליפ|חופש)/.test(normalizeFindingText(contentLine));
+    const diagnosisSignal=/(תאונה|שיפו|תיקונ|תיקון|פגיע|הלחמ|חיבור.*לא מקורי|עמוד|משקופ|נקיש|פגומ|זוויות.*היגוי|היגוי.*כיוון|ירידת ערך|הוחלפ|הוחלף|החלפ|לבדוק|סריקת מחשב|תקל|שחוק|רעש|רעיד|צריכת שמן|יבש|יבשים|סדוק|חסר|לא מתקפל|שריט|מעיכ|פגמי|קרוע|שבור|נזיל|דליפ|חופש)/.test(normalizeFindingText(contentLine));
     const fullCoverage=rules.some(rule=>normalizeFindingText(rule.sourceText||rule.matchedTerm||'')===normalizeFindingText(contentLine));
     const clauseCategory=diagnosisCategory||(/תיבת הילוכים|תיבת ההילוכים/.test(contentLine)?'תיבת הילוכים':/במנוע|שמן מנוע/.test(contentLine)?'מנוע':'');
     const ruleCategories=new Set(rules.map(rule=>rule.category));
