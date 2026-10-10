@@ -3598,7 +3598,11 @@ function mergeVerifiedOcrText(primaryText,verifierText,isSummary){
     if(heading){verifierCategory=heading;verifierSeverity=null;}
     const severity=reportSeverityFromLine(candidate.raw);
     if(severity)verifierSeverity=severity;
-    if(isSummary&&reportTextIsUnreliable(candidate.raw)) return;
+    if(isSummary&&(reportTextIsUnreliable(candidate.raw)||reportClauseIsFragment(candidate.raw))) return;
+    // OCR passes differ in spaces, not in the underlying diagnostic clause.
+    // A verifier substring already present in a complete clause adds no evidence.
+    const compact=text=>normalizeFindingText(text).replace(/\s/g,'');
+    if(isSummary&&primaryLines.some(existing=>isUsefulVerifierFinding(existing.raw,true)&&compact(existing.raw).includes(compact(candidate.raw)))){agreements++;return;}
     const addition=isSummary?(verifierCategory?verifierCategory+'\n'+(verifierSeverity&&!severity?(reportSeverityLabels[verifierSeverity]+'\n'):'')+candidate.raw:''):candidate.raw;
     let best=null,bestScore=0;
     primaryLines.forEach(existing=>{
@@ -4127,6 +4131,7 @@ function normalizeFindingText(value){
 
 function reportClauseIsFragment(value){
   const text=normalizeFindingText(value);
+  if(/^(?:אוויר|אויר|אור)\s*דולק(?:ת)?$/.test(text))return true;
   return /^(?:הוחלפ[א-ת]*|החלפ[א-ת]*|שחוק[א-ת]*|פגומ[א-ת]*|ומאחור|ומלפנים|חומר|שמאל|ימין|תקן|לתקן|בדוק|לבדוק|בדיקה|תיקון|בדוק תקן)$/.test(text);
 }
 
@@ -6130,14 +6135,22 @@ function compactAnalysisGroups(result,isComputer=false){
       : compactUniqueTexts(group.items.filter(item=>isComputer||!(item.managerEdited&&(item.managerMeaning||item.managerDecision||item.managerQuestion))).filter(item=>isComputer||item.verbatimDiagnosis||!group.items.some(other=>other.verbatimDiagnosis&&normalizeFindingText(other.sourceText)===normalizeFindingText(item.observedText))).map(item=>conciseFindingFact(item,isComputer)));
     if(isComputer&&!communication&&group.bucket==='active') bullets=bullets.map(line=>`תקלה פעילה בזמן הסריקה: ${line}`);
     if(isComputer&&!communication&&group.bucket==='historical') bullets=bullets.map(line=>`תקלה היסטורית בזיכרון: ${line}`);
+    const details=isComputer?[]:group.items.filter(item=>item.managerEdited&&(item.managerMeaning||item.managerDecision||item.managerQuestion)).map(item=>({fact:item.sourceClauseText?conciseFindingFact(item,false):(item.diagnosisLabel||conciseFindingFact(item,false)),meaning:item.managerMeaning||'',decision:item.managerDecision||'',question:item.managerQuestion||''}));
+    const entries=isComputer?bullets.map(fact=>({fact})):group.items.map(item=>{
+      const explained=item.managerEdited&&(item.managerMeaning||item.managerDecision||item.managerQuestion);
+      const fact=explained?(item.sourceClauseText?conciseFindingFact(item,false):(item.diagnosisLabel||conciseFindingFact(item,false))):conciseFindingFact(item,false);
+      const detail=details.find(entry=>entry.fact===fact);
+      return detail?{fact,detail}:bullets.includes(fact)?{fact}:null;
+    }).filter(Boolean).filter((entry,index,all)=>all.findIndex(other=>other.fact===entry.fact)===index);
     return {
       category:group.category,
       items:group.items,
+      entries,
       severity:group.bucket,
       tone:group.bucket,
       tag:severityTag(group.bucket),
       bullets,
-      details:isComputer?[]:group.items.filter(item=>item.managerEdited&&(item.managerMeaning||item.managerDecision||item.managerQuestion)).map(item=>({fact:item.diagnosisLabel||conciseFindingFact(item,false),meaning:item.managerMeaning||'',decision:item.managerDecision||'',question:item.managerQuestion||''})),
+      details,
       decision:group.items.some(item=>item.managerEdited&&(item.managerMeaning||item.managerDecision||item.managerQuestion))&&!isComputer?'':groupDecision(group.category,group.bucket,group.items)
     };
   });
@@ -6187,7 +6200,7 @@ function corePurchaseSystemForFinding(item){
 function professionalOverallConclusion(result,computerResult=null){
   const groups=compactAnalysisGroups(result,false);
   const describe=bucket=>groups.filter(group=>group.severity===bucket)
-    .map(group=>group.category+': '+compactUniqueTexts([...group.bullets,...(group.details||[]).map(item=>item.fact)]).join('; ')).join('. ');
+    .map(group=>group.category+': '+compactUniqueTexts(compactGroupFacts(group)).join('; ')).join('. ');
   const highFacts=describe('high'),mediumFacts=describe('medium'),lowFacts=describe('low'),reviewFacts=describe('review'),informationFacts=describe('marginal');
   const numberFollowUp=engineNumberFollowUpText(result);
   const numberIsHigh=groups.some(group=>group.severity==='high'&&group.items.some(item=>item.requiresEngineNumberVerification||isEngineNumberVerificationText(item.sourceText||item.matchedTerm||'')));
@@ -6214,16 +6227,24 @@ function professionalOverallConclusionHtml(result,computerResult=null){
   return `<section class="overallProfessionalConclusion"><h4>תמונה מקצועית מסכמת</h4>${blocks}<span class="legalConclusion">${escapeHtml(reportReadingNote+' '+conclusion.disclaimer)}</span></section>`;
 }
 
+function compactGroupEntries(group){
+  return group.entries||[...(group.bullets||[]).map(fact=>({fact})),...(group.details||[]).map(detail=>({fact:detail.fact,detail}))];
+}
+function compactGroupFacts(group){return compactGroupEntries(group).map(entry=>entry.fact);}
 function compactAnalysisHtml(result,isComputer=false){
   const groups=compactAnalysisGroups(result,isComputer);
   const notice=isComputer?computerActiveNoticeHtml(result):'';
   const engineFollowUp=!isComputer?engineNumberFollowUpText(result):'';
   const engineNotice=engineFollowUp?'<div class="info"><b>מספר מנוע — נדרש בירור במוסך מורשה</b><p>'+escapeHtml(engineFollowUp)+'</p></div>':'';
-
   return notice+engineNotice+groups.map(group=>{
-    const bullets=group.bullets.map(line=>`<li>${escapeHtml(line)}</li>`).join('');
-    const details=(group.details||[]).map(item=>`<div class="categorySummaryDecision"><b>${escapeHtml(item.fact)}</b>${item.meaning?`<p><b>משמעות מקצועית:</b> ${escapeHtml(item.meaning)}</p>`:''}${item.decision?`<p><b>המשך בירור:</b> ${escapeHtml(item.decision)}</p>`:''}${item.question?`<p><b>מה לברר:</b> ${escapeHtml(item.question)}</p>`:''}</div>`).join('');
-    return `<section class="categorySummaryCard ${escapeHtml(group.tone||'')}"><div class="categorySummaryHead"><h4>${escapeHtml(group.category)}</h4><span class="meaningTag">${escapeHtml(group.tag||'סיכום')}</span></div><ul>${bullets}</ul>${details}${group.decision?`<p class="categorySummaryDecision"><b>משמעות מקצועית:</b> ${escapeHtml(group.decision)}</p>`:''}</section>`;
+    let content='',list=[];
+    const flush=()=>{if(list.length){content+='<ul>'+list.join('')+'</ul>';list=[];}};
+    compactGroupEntries(group).forEach(entry=>{
+      if(!entry.detail){list.push(`<li>${escapeHtml(entry.fact)}</li>`);return;}
+      flush();const item=entry.detail;
+      content+=`<div class="categorySummaryDecision"><b>${escapeHtml(item.fact)}</b>${item.meaning?`<p><b>משמעות מקצועית:</b> ${escapeHtml(item.meaning)}</p>`:''}${item.decision?`<p><b>המשך בירור:</b> ${escapeHtml(item.decision)}</p>`:''}${item.question?`<p><b>מה לברר:</b> ${escapeHtml(item.question)}</p>`:''}</div>`;
+    });flush();
+    return `<section class="categorySummaryCard ${escapeHtml(group.tone||'')}"><div class="categorySummaryHead"><h4>${escapeHtml(group.category)}</h4><span class="meaningTag">${escapeHtml(group.tag||'סיכום')}</span></div>${content}${group.decision?`<p class="categorySummaryDecision"><b>משמעות מקצועית:</b> ${escapeHtml(group.decision)}</p>`:''}</section>`;
   }).join('');
 }
 
@@ -6242,8 +6263,10 @@ function analysisTextBlock(title,result,computerResult=null){
   if(groups.length){
     groups.forEach(group=>{
       text+=`${group.category} — ${group.tag||'סיכום'}\n`;
-      text+=group.bullets.map(line=>`• ${line}`).join('\n')+'\n';
-      (group.details||[]).forEach(item=>{text+=`${item.fact}\n`;if(item.meaning)text+=`משמעות מקצועית: ${item.meaning}\n`;if(item.decision)text+=`המשך בירור: ${item.decision}\n`;if(item.question)text+=`מה לברר: ${item.question}\n`;});
+      compactGroupEntries(group).forEach(entry=>{
+        if(!entry.detail){text+=`• ${entry.fact}\n`;return;}
+        const item=entry.detail;text+=`${item.fact}\n`;if(item.meaning)text+=`משמעות מקצועית: ${item.meaning}\n`;if(item.decision)text+=`המשך בירור: ${item.decision}\n`;if(item.question)text+=`מה לברר: ${item.question}\n`;
+      });
       if(group.decision) text+=`• משמעות מקצועית: ${group.decision}\n`;
     });
   }
@@ -6667,9 +6690,11 @@ function btPdfAnalysisCards(result,isComputer=false){
   const groups=compactAnalysisGroups(result,isComputer);
   if(!groups.length)return [{text:'לא זוהו ממצאים שניתן לסווג אוטומטית. יש לבדוק מול דוח המקור.',alert:true}];
   const entries=groups.map(group=>{
-    const bullets=[...(group.bullets||[])];
-    (group.details||[]).forEach(item=>{
-      bullets.push(item.fact);
+    const bullets=[];
+    compactGroupEntries(group).forEach(entry=>{
+      bullets.push(entry.fact);
+      if(!entry.detail)return;
+      const item=entry.detail;
       if(item.meaning)bullets.push('משמעות מקצועית: '+item.meaning);
       if(item.decision)bullets.push('המשך בירור: '+item.decision);
       if(item.question)bullets.push('מה לברר: '+item.question);

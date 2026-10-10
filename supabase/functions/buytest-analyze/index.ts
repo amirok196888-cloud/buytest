@@ -741,6 +741,7 @@ function normalizeFindingText(value){
 
 function reportClauseIsFragment(value){
   const text=normalizeFindingText(value);
+  if(/^(?:אוויר|אויר|אור)\s*דולק(?:ת)?$/.test(text))return true;
   return /^(?:הוחלפ[א-ת]*|החלפ[א-ת]*|שחוק[א-ת]*|פגומ[א-ת]*|ומאחור|ומלפנים|חומר|שמאל|ימין|תקן|לתקן|בדוק|לבדוק|בדיקה|תיקון|בדוק תקן)$/.test(text);
 }
 

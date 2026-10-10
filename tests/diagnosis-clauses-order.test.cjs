@@ -89,3 +89,27 @@ test('browser and server share the clause parser and source-order rules',()=>{
   const extract=s=>{const start=s.indexOf('function '+name+'(');return s.slice(start,s.indexOf('\n}\n',start)+3);};assert.equal(extract(html),extract(server),name);
  }
 });
+
+test('the secondary OCR pass cannot reintroduce joined-word duplicates or partial lamp fragments',()=>{
+ const c=engine(),f=table(),primary=c.inspectionVisionTableText(f.annotation,f.borders);
+ const secondary='מערכות הנעה\nצלחותבלם\nתיבת העברת הכוח\nצלחותבלם שחוקות\nצמיגים וחישוקים\nאווירדולקת\nצמיגים וחישוקים\nמשמעות גבוהה\nפגיעה בעמוד אמצעי צדשמאל\nשלדת מרכב\nמשמעות נמוכה\nתיקוני פחחות וצבע עםמילוי חומר\nשלדת מרכב\nמשמעות נמוכה\nתיקון פחאחורי';
+ const merged=c.mergeVerifiedOcrText(primary,secondary,true);assert.equal(merged.added,0);
+ const r=c.interpretSummaryText(merged.text);assert.deepEqual(Array.from(facts(c.compactAnalysisGroups(r))),expected);
+ for(const output of [c.compactAnalysisHtml(r),JSON.stringify(c.btPdfAnalysisCards(r))])assert.ok(!output.includes('אווירדולקת'));
+ const legacy={findings:[{category:'צמיגים וחישוקים',sourceText:'אווירדולקת',classification:'source_diagnosis'}]};assert.equal(c.compactAnalysisGroups(legacy).length,0);
+});
+test('saved explanations interleaved with plain findings preserve all eighteen source clauses in HTML and PDF',()=>{
+ const c=engine(),f=table(),text=c.inspectionVisionTableText(f.annotation,f.borders);
+ const rows=[
+  ['sample-004','מנוע',expected[1],'הסבר שמור לשמן'],
+  ['sample-024','מנוע',expected[0],'הסבר שמור לטיפולים'],
+  ['sample-029','צמיגים וחישוקים','נורת לחץ אוויר דולקת','הסבר שמור לחיישן'],
+  ['sample-017','שלדת מרכב',expected[12],'הסבר שמור לחלקים']
+ ].map(([source_id,category,source_text,meaning])=>({source_kind:'observed',source_id,category,source_text,meaning,report_severity:category==='שלדת מרכב'?'low':'none',classification_type:'recommendation',active:true}));
+ const r=c.applyCustomRules(text,c.applyServerOverrides(c.interpretSummaryText(text,rows),rows),rows);
+ for(const output of [c.compactAnalysisHtml(r),JSON.stringify(c.btPdfAnalysisCards(r))]){
+  let last=-1;for(const fact of expected){const index=output.indexOf(fact);assert.ok(index>last,fact);last=index;}
+  for(const row of rows)assert.ok(output.includes(row.meaning));
+ }
+ assert.deepEqual(Array.from(c.compactAnalysisGroups(r).flatMap(g=>c.compactGroupFacts(g))),expected);
+});
