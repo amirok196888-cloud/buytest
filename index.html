@@ -1184,10 +1184,11 @@ function inspectionVisionTableText(annotation,borders){
   const start=borders.findIndex((y,index)=>y>layout.headerY&&index>0&&borders[index-1]<layout.headerY);
   if(start<0)return '';
   const output=[],categories=new Set();
+  let notesTop=null;
   for(let index=start;index<borders.length-1;index++){
     const row=layout.words.filter(word=>word.y>borders[index]&&word.y<borders[index+1]);
     const heading=inspectionVisionCellText(row.filter(word=>word.x>layout.systemLeft&&word.x<layout.width*0.96));
-    if(/הערות/.test(heading))break;
+    if(/הערות|הערת בוחן/.test(heading)){notesTop=borders[index];break;}
     const category=reportCategoryFromLine(heading);
     if(!category||category==='הערות כלליות')continue;
     categories.add(category);
@@ -1197,6 +1198,14 @@ function inspectionVisionTableText(annotation,borders){
   // A partial or non-table layout keeps the original OCR rather than losing cells.
   if(categories.size<8||!categories.has('מנוע')||!categories.has('שלדת מרכב'))return '';
   const header=inspectionVisionCellText(layout.words.filter(word=>word.y<borders[start-1]));
+  if(notesTop===null){
+    const noteHeading=layout.words.find(word=>word.y>=borders.at(-1)&&/^(?:הערות|הערת)$/.test(word.text));
+    if(noteHeading)notesTop=noteHeading.y-1;
+  }
+  if(notesTop!==null){
+    const notes=inspectionVisionCellText(layout.words.filter(word=>word.y>notesTop));
+    output.push('הערות כלליות',notes.replace(/(?:הערות(?:\s+כלליות)?|הערת בוחן)\s*:?/g,'').trim());
+  }
   return cleanOcrText([header,...output].filter(Boolean).join('\n'));
 }
 
@@ -3587,9 +3596,11 @@ function isUsefulVerifierFinding(line,isSummary){
 }
 
 function mergeVerifiedOcrText(primaryText,verifierText,isSummary){
-  const primary=diagnosticTableText(primaryText);
+  const primarySections=isSummary?reportTextSections(primaryText):{table:diagnosticTableText(primaryText),notes:''};
+  const verifierSections=isSummary?reportTextSections(verifierText):{table:verifierText,notes:''};
+  const primary=primarySections.table;
   const primaryLines=ocrComparisonLines(primary);
-  const verifierLines=ocrComparisonLines(verifierText);
+  const verifierLines=ocrComparisonLines(verifierSections.table);
   const additions=[];
   let agreements=0;
   let verifierCategory='',verifierSeverity=null;
@@ -3623,8 +3634,9 @@ function mergeVerifiedOcrText(primaryText,verifierText,isSummary){
     // Shared category/severity headings do not make different diagnoses duplicates.
     if(!uniqueAdditions.includes(line)) uniqueAdditions.push(line);
   });
+  const notes=primarySections.notes||verifierSections.notes;
   return {
-    text:cleanOcrText([primary,...uniqueAdditions].filter(Boolean).join('\n')),
+    text:cleanOcrText([primary,...uniqueAdditions,notes?'הערות כלליות\n'+notes:''].filter(Boolean).join('\n')),
     added:uniqueAdditions.length,
     agreements,
     completed:Boolean(verifierLines.length)
@@ -3641,9 +3653,12 @@ function cleanOcrText(text){
 
 function diagnosticTableText(text){
   const cleaned=cleanOcrText(text);
-  const marker=/הערות\s*כלליות|במידה\s*וסעיף\s*בטופס\s*הבדיקה\s*האחיד\s*סומן|לחזור\s+לה\s*משך\s+בדיקה\s+לאחר\s+תיקון|יש\s+לברר\s+זמני\s+טיפולים/i;
-  const match=marker.exec(cleaned);
-  return match&&(match.index>180||/^במידה/.test(match[0]))?cleaned.slice(0,match.index).trim():cleaned;
+  const notes=/(?:^|\n)\s*(?:\d+[.\s]*)?(?:הערות(?:\s+כלליות|\s+הבוחן)?|הערת\s+בוחן)\s*(?::|\n|$)/.exec(cleaned);
+  const table=notes?cleaned.slice(0,notes.index):cleaned;
+  const marker=/במידה\s*וסעיף\s*בטופס\s*הבדיקה\s*האחיד\s*סומן|לחזור\s+לה\s*משך\s+בדיקה\s+לאחר\s+תיקון|יש\s+לברר\s+זמני\s+טיפולים/i;
+  const match=marker.exec(table);
+  const diagnostic=match&&(match.index>180||/^במידה/.test(match[0]))?table.slice(0,match.index).trim():table.trim();
+  return cleanOcrText([diagnostic,notes?cleaned.slice(notes.index):''].filter(Boolean).join('\n'));
 }
 
 function clearInspectionFile(kind){
@@ -5218,13 +5233,39 @@ function isSeverityHeadingOnly(value){
   return compact==='משמעותנמוכה'||compact==='משמעותגבוהה'||compact==='ליקוישולי'||compact==='ליקוייםשוליים';
 }
 
+function reportTextSections(text){
+  const cleaned=diagnosticTableText(text);
+  const heading=/(?:^|\n)\s*(?:\d+[.\s]*)?(?:הערות(?:\s+כלליות|\s+הבוחן)?|הערת\s+בוחן)\s*(?::|\n|$)/.exec(cleaned);
+  if(!heading)return {table:cleaned,notes:''};
+  const notes=cleaned.slice(heading.index+heading[0].length).trim();
+  const footer=/במידה\s*וסעיף\s*בטופס\s*הבדיקה\s*האחיד\s*סומן/.exec(notes);
+  return {table:cleaned.slice(0,heading.index).trim(),notes:footer?notes.slice(0,footer.index).trim():notes};
+}
+
+function reportNotesFindings(notes){
+  const findings=[];
+  reportLines(notes).forEach((line,index)=>{
+    const category=reportCategoryFromLine(line),severity=reportSeverityFromLine(line);
+    const fact=reportClauseDisplayText(line,category,severity);
+    const n=normalizeFindingText(fact);
+    if(!n||isMetadataLine(fact)||isReportStatusScaffolding(n)||isExplicitlyNormal(fact)||reportClauseIsFragment(fact)||reportTextIsUnreliable(fact))return;
+    if(/^(?:אין|ללא|לא נמצאו|לא נמצא|לא נרשמו|לא נרשם)\s+(?:סימני\s+|עדות ל)?(?:נזיל|פגיע|תקל|רעש|חופש|מעיכ|שריט|פגמ|קורוז|חלוד|סדק|שבר)/.test(n))return;
+    // Printed conditions and inspection limitations are not defects in this vehicle.
+    if(/אחריות|אחראי|תעודת|ביטוח|השתתפות עצמית|במידה|בכפוף|אינו כולל|לא נבדק|לא נבדקה|לא נבדקו|ללא פירוק|זיופ|דוח מחשב מצורף|מצורף דוח|לחזור להמשך בדיקה|יש לברר זמני טיפולים/.test(n))return;
+    const defect=/(?:פגיע|פגומ|פגמים|פגמי|ליקוי|לקוי|תקל|שחוק|סדוק|קרוע|שבור|נזיל|נזילה|דליפ|חסר|חוסר|דולק|רועש|רעש|נקיש|חופש|מעיכ|שריט|חלוד|קורוזי|ריקבון|תיקונ|תיקון|הוחלפ|החלפת|ריתו|תאונה|לא תקין|אינו פועל|לא פועל|לא מקרר|לא מתקפל|לא עובד)/.test(n);
+    if(!defect)return;
+    findings.push({id:'report-note-'+index,sourceSection:'notes',sourceText:fact,sourceClauseText:fact,observedText:fact,sourceOrder:index,category:reportFindingCategory(fact,'ממצאים נוספים'),classification:'source_diagnosis',reportSeverity:severity||null});
+  });
+  return findings;
+}
+
 function reportComponentCategory(source,category='',chassisHint=''){
   const text=normalizeFindingText(source);
   const body=category==='שלדה נפרדת'||chassisHint==='שלדה נפרדת'?'שלדה נפרדת':'שלדת מרכב';
   if(/מתקן בקורת בלמים/.test(text))return 'מערכת הבלמים (ללא פירוק גלגלים)';
   if(/מידות מרכב/.test(text))return 'מערכת ההיגוי';
   // Structural parts mentioning engines, wheels or suspension remain body parts.
-  if(/שלד|מרכב|פחחות|פגוש|כנף|משקוף|קורת|קורה |קורות|ריצפ|רצפ|מכסה (?:תא )?מנוע|דופן.*מנוע|בית גלגל|תיקונ.*(?:פח|צבע)|שמשה|ריפוד|חגורת בטיחות|(?:פגיע(?:ה|ות)|תיקון פגיעה)\s*(?:מאחור|מלפנים|בחזית|בצד|צד|במרכב|בגוף הרכב)/.test(text)) return body;
+  if(/שלד|מרכב|פחחות|פגיע(?:ה|ות)\s+(?:ב?פח)|פגמ(?:ים|י)\s+(?:ב?צבע|ב?גג)|פגוש|כנף|משקוף|קורת|קורה |קורות|ריצפ|רצפ|מכסה (?:תא )?מנוע|דופן.*מנוע|בית גלגל|תיקונ.*(?:פח|צבע)|שמשה|ריפוד|חגורת בטיחות|(?:פגיע(?:ה|ות)|תיקון פגיעה)\s*(?:מאחור|מלפנים|בחזית|בצד|צד|במרכב|בגוף הרכב)/.test(text)) return body;
   if(/תיקוני? תאונה|פגיעה בעמוד|(?:תיקון|תיקוני|תיקונים|החלפת|הוחלפ[א-ת]*) (?:פח|דלת|מכסה תא מטען)|מעיכות ושריטות סביב הרכב/.test(text))return body;
   if(/מזגן|מיזוג|מערכת אוורור פנימית/.test(text)) return 'מיזוג אוויר';
   // Oil/coolant contamination and pressure from cylinders are engine findings.
@@ -5385,7 +5426,8 @@ function distinctReportFindings(findings){
 
 function interpretSummaryText(text,catalogRows=loadFormulaOverrides()){
   const findings=[],unknown=[],unreadable=[],seen=new Set();
-  text=diagnosticTableText(text);
+  const sections=reportTextSections(text);
+  text=sections.table;
   const compactReport=normalizeFindingText(text).replace(/\s/g,'');
   const chassisHint=compactReport.includes('סוגשלדהשלדהנפרדת')?'שלדה נפרדת':compactReport.includes('סוגשלדהשלדתמרכב')?'שלדת מרכב':'';
   const chassisCategories=['שלדת מרכב','שלדה נפרדת'];
@@ -5471,7 +5513,7 @@ function interpretSummaryText(text,catalogRows=loadFormulaOverrides()){
     }
   });
   const finalFindings=orderFindingsLikeReport(distinctReportFindings(findings.map(finalizeReportFinding).filter(Boolean).filter(item=>!isDeletedFormulaFinding(item,catalogRows))));
-  return applyReportMileageContext(applyEngineWarrantyContext({findings:finalFindings,unknown,unreadable:[...new Set(unreadable)]},text),text);
+  return applyReportMileageContext(applyEngineWarrantyContext({findings:finalFindings,noteFindings:reportNotesFindings(sections.notes),unknown,unreadable:[...new Set(unreadable)]},text),text);
 }
 
 const dtcStatusDefinitions={
@@ -6128,6 +6170,8 @@ function compactAnalysisGroups(result,isComputer=false){
     if(!grouped.has(key)) grouped.set(key,{key,category,bucket,items:[]});
     grouped.get(key).items.push(item);
   });
+  const noteItems=isComputer?[]:(result?.noteFindings||[]).filter(item=>item.sourceSection==='notes'&&!reportClauseIsFragment(item.sourceClauseText||item.sourceText));
+  if(noteItems.length)grouped.set('report-notes',{key:'report-notes',category:'ליקויים שנרשמו בהערות שצריך לתת עליהן את הדעת',bucket:'review',items:noteItems,sourceSection:'notes'});
   return [...grouped.values()].map(group=>{
     const communication=isComputer&&group.items.every(isCommunicationFinding);
     let bullets=communication
@@ -6144,6 +6188,7 @@ function compactAnalysisGroups(result,isComputer=false){
     }).filter(Boolean).filter((entry,index,all)=>all.findIndex(other=>other.fact===entry.fact)===index);
     return {
       category:group.category,
+      sourceSection:group.sourceSection,
       items:group.items,
       entries,
       severity:group.bucket,
@@ -6151,7 +6196,7 @@ function compactAnalysisGroups(result,isComputer=false){
       tag:severityTag(group.bucket),
       bullets,
       details,
-      decision:group.items.some(item=>item.managerEdited&&(item.managerMeaning||item.managerDecision||item.managerQuestion))&&!isComputer?'':groupDecision(group.category,group.bucket,group.items)
+      decision:group.sourceSection==='notes'?'הליקויים ברובריקה זו נרשמו בהערות המכון. יש לברר כל ליקוי מול המכון או בעל המקצוע המתאים.':group.items.some(item=>item.managerEdited&&(item.managerMeaning||item.managerDecision||item.managerQuestion))&&!isComputer?'':groupDecision(group.category,group.bucket,group.items)
     };
   });
 }
@@ -6198,7 +6243,7 @@ function corePurchaseSystemForFinding(item){
 }
 
 function professionalOverallConclusion(result,computerResult=null){
-  const groups=compactAnalysisGroups(result,false);
+  const groups=compactAnalysisGroups(result,false).filter(group=>group.sourceSection!=='notes');
   const describe=bucket=>groups.filter(group=>group.severity===bucket)
     .map(group=>group.category+': '+compactUniqueTexts(compactGroupFacts(group)).join('; ')).join('. ');
   const highFacts=describe('high'),mediumFacts=describe('medium'),lowFacts=describe('low'),reviewFacts=describe('review'),informationFacts=describe('marginal');

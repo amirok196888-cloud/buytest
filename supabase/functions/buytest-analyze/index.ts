@@ -9,7 +9,15 @@ const externalVehicleData = { kmHistory: [] };
 
 function fmtNum(v){return(v===null||v===undefined||v==='')?'—':Number(v).toLocaleString('he-IL')}
 function cleanOcrText(text){return String(text||'').replace(/\r/g,'').replace(/[ \t]+\n/g,'\n').replace(/\n{3,}/g,'\n\n').trim()}
-function diagnosticTableText(text){const cleaned=cleanOcrText(text);const marker=/הערות\s*כלליות|במידה\s*וסעיף\s*בטופס\s*הבדיקה\s*האחיד\s*סומן|לחזור\s+לה\s*משך\s+בדיקה\s+לאחר\s+תיקון|יש\s+לברר\s+זמני\s+טיפולים/i;const match=marker.exec(cleaned);return match&&(match.index>180||/^במידה/.test(match[0]))?cleaned.slice(0,match.index).trim():cleaned}
+function diagnosticTableText(text){
+  const cleaned=cleanOcrText(text);
+  const notes=/(?:^|\n)\s*(?:\d+[.\s]*)?(?:הערות(?:\s+כלליות|\s+הבוחן)?|הערת\s+בוחן)\s*(?::|\n|$)/.exec(cleaned);
+  const table=notes?cleaned.slice(0,notes.index):cleaned;
+  const marker=/במידה\s*וסעיף\s*בטופס\s*הבדיקה\s*האחיד\s*סומן|לחזור\s+לה\s*משך\s+בדיקה\s+לאחר\s+תיקון|יש\s+לברר\s+זמני\s+טיפולים/i;
+  const match=marker.exec(table);
+  const diagnostic=match&&(match.index>180||/^במידה/.test(match[0]))?table.slice(0,match.index).trim():table.trim();
+  return cleanOcrText([diagnostic,notes?cleaned.slice(notes.index):''].filter(Boolean).join('\n'));
+}
 
 const findingKnowledgeBase=[
   {id:'engine-overhaul-evidence',terms:['סימני שיפוץ מנוע','סימני שיפוץ במנוע'],category:'מנוע',tag:'נדרש בירור',tone:'clarify',classification:'repair_history_or_evidence',reportSeverity:'medium',meaning:'נרשמו סימנים לשיפוץ מנוע. יש לברר מה בוצע; סימני שיפוץ אינם מוכיחים לבדם שהמנוע הוחלף.',decision:'יש לברר במוסך את היקף השיפוץ ותיעודו. כאשר נדרשה בדיקת מספר המנוע, יש לאמת גם את התאמת המספר לרישיון.'},
@@ -1738,13 +1746,39 @@ function isSeverityHeadingOnly(value){
   return compact==='משמעותנמוכה'||compact==='משמעותגבוהה'||compact==='ליקוישולי'||compact==='ליקוייםשוליים';
 }
 
+function reportTextSections(text){
+  const cleaned=diagnosticTableText(text);
+  const heading=/(?:^|\n)\s*(?:\d+[.\s]*)?(?:הערות(?:\s+כלליות|\s+הבוחן)?|הערת\s+בוחן)\s*(?::|\n|$)/.exec(cleaned);
+  if(!heading)return {table:cleaned,notes:''};
+  const notes=cleaned.slice(heading.index+heading[0].length).trim();
+  const footer=/במידה\s*וסעיף\s*בטופס\s*הבדיקה\s*האחיד\s*סומן/.exec(notes);
+  return {table:cleaned.slice(0,heading.index).trim(),notes:footer?notes.slice(0,footer.index).trim():notes};
+}
+
+function reportNotesFindings(notes){
+  const findings=[];
+  reportLines(notes).forEach((line,index)=>{
+    const category=reportCategoryFromLine(line),severity=reportSeverityFromLine(line);
+    const fact=reportClauseDisplayText(line,category,severity);
+    const n=normalizeFindingText(fact);
+    if(!n||isMetadataLine(fact)||isReportStatusScaffolding(n)||isExplicitlyNormal(fact)||reportClauseIsFragment(fact)||reportTextIsUnreliable(fact))return;
+    if(/^(?:אין|ללא|לא נמצאו|לא נמצא|לא נרשמו|לא נרשם)\s+(?:סימני\s+|עדות ל)?(?:נזיל|פגיע|תקל|רעש|חופש|מעיכ|שריט|פגמ|קורוז|חלוד|סדק|שבר)/.test(n))return;
+    // Printed conditions and inspection limitations are not defects in this vehicle.
+    if(/אחריות|אחראי|תעודת|ביטוח|השתתפות עצמית|במידה|בכפוף|אינו כולל|לא נבדק|לא נבדקה|לא נבדקו|ללא פירוק|זיופ|דוח מחשב מצורף|מצורף דוח|לחזור להמשך בדיקה|יש לברר זמני טיפולים/.test(n))return;
+    const defect=/(?:פגיע|פגומ|פגמים|פגמי|ליקוי|לקוי|תקל|שחוק|סדוק|קרוע|שבור|נזיל|נזילה|דליפ|חסר|חוסר|דולק|רועש|רעש|נקיש|חופש|מעיכ|שריט|חלוד|קורוזי|ריקבון|תיקונ|תיקון|הוחלפ|החלפת|ריתו|תאונה|לא תקין|אינו פועל|לא פועל|לא מקרר|לא מתקפל|לא עובד)/.test(n);
+    if(!defect)return;
+    findings.push({id:'report-note-'+index,sourceSection:'notes',sourceText:fact,sourceClauseText:fact,observedText:fact,sourceOrder:index,category:reportFindingCategory(fact,'ממצאים נוספים'),classification:'source_diagnosis',reportSeverity:severity||null});
+  });
+  return findings;
+}
+
 function reportComponentCategory(source,category='',chassisHint=''){
   const text=normalizeFindingText(source);
   const body=category==='שלדה נפרדת'||chassisHint==='שלדה נפרדת'?'שלדה נפרדת':'שלדת מרכב';
   if(/מתקן בקורת בלמים/.test(text))return 'מערכת הבלמים (ללא פירוק גלגלים)';
   if(/מידות מרכב/.test(text))return 'מערכת ההיגוי';
   // Structural parts mentioning engines, wheels or suspension remain body parts.
-  if(/שלד|מרכב|פחחות|פגוש|כנף|משקוף|קורת|קורה |קורות|ריצפ|רצפ|מכסה (?:תא )?מנוע|דופן.*מנוע|בית גלגל|תיקונ.*(?:פח|צבע)|שמשה|ריפוד|חגורת בטיחות|(?:פגיע(?:ה|ות)|תיקון פגיעה)\s*(?:מאחור|מלפנים|בחזית|בצד|צד|במרכב|בגוף הרכב)/.test(text)) return body;
+  if(/שלד|מרכב|פחחות|פגיע(?:ה|ות)\s+(?:ב?פח)|פגמ(?:ים|י)\s+(?:ב?צבע|ב?גג)|פגוש|כנף|משקוף|קורת|קורה |קורות|ריצפ|רצפ|מכסה (?:תא )?מנוע|דופן.*מנוע|בית גלגל|תיקונ.*(?:פח|צבע)|שמשה|ריפוד|חגורת בטיחות|(?:פגיע(?:ה|ות)|תיקון פגיעה)\s*(?:מאחור|מלפנים|בחזית|בצד|צד|במרכב|בגוף הרכב)/.test(text)) return body;
   if(/תיקוני? תאונה|פגיעה בעמוד|(?:תיקון|תיקוני|תיקונים|החלפת|הוחלפ[א-ת]*) (?:פח|דלת|מכסה תא מטען)|מעיכות ושריטות סביב הרכב/.test(text))return body;
   if(/מזגן|מיזוג|מערכת אוורור פנימית/.test(text)) return 'מיזוג אוויר';
   // Oil/coolant contamination and pressure from cylinders are engine findings.
@@ -1904,7 +1938,8 @@ function distinctReportFindings(findings){
 
 function interpretSummaryText(text,catalogRows=loadFormulaOverrides()){
   const findings=[],unknown=[],unreadable=[],seen=new Set();
-  text=diagnosticTableText(text);
+  const sections=reportTextSections(text);
+  text=sections.table;
   const compactReport=normalizeFindingText(text).replace(/\s/g,'');
   const chassisHint=compactReport.includes('סוגשלדהשלדהנפרדת')?'שלדה נפרדת':compactReport.includes('סוגשלדהשלדתמרכב')?'שלדת מרכב':'';
   const chassisCategories=['שלדת מרכב','שלדה נפרדת'];
@@ -1990,7 +2025,7 @@ function interpretSummaryText(text,catalogRows=loadFormulaOverrides()){
     }
   });
   const finalFindings=orderFindingsLikeReport(distinctReportFindings(findings.map(finalizeReportFinding).filter(Boolean).filter(item=>!isDeletedFormulaFinding(item,catalogRows))));
-  return applyReportMileageContext(applyEngineWarrantyContext({findings:finalFindings,unknown,unreadable:[...new Set(unreadable)]},text),text);
+  return applyReportMileageContext(applyEngineWarrantyContext({findings:finalFindings,noteFindings:reportNotesFindings(sections.notes),unknown,unreadable:[...new Set(unreadable)]},text),text);
 }
 
 const dtcStatusDefinitions={
@@ -2492,7 +2527,7 @@ function applyCustomRules(text,result,rows){
   const catalogRows=rows.filter(row=>row.active!==false);
   if(!catalogRows.length)return result;
   // Match edited/new wording only in diagnostic clauses, never metadata or disclaimers.
-  const clauses=reportLines(diagnosticTableText(text));
+  const clauses=reportLines(reportTextSections(text).table);
   let findings=[...(result?.findings||[])];
   for(const row of catalogRows){
     const term=normalizeFindingText(row.source_text);

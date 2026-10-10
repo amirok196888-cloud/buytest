@@ -119,3 +119,69 @@ test('orphan OCR fragments remain diagnostic audit data and never appear as conc
  const conclusion=c.professionalOverallConclusion(r).reviewConclusion;assert.ok(!conclusion.includes('אווירדולקת'));assert.ok(!conclusion.includes('שחוקות'));
  assert.ok(!JSON.stringify(c.btPdfAnalysisCards(r)).includes('אווירדולקת'));
 });
+
+test('sheet metal and paint defects cannot inherit electrical category or severity',()=>{
+ const c=engine(),phrase='פגיעות פח ופגמים בצבע ובגג';
+ const r=c.interpretSummaryText('חשמל ואבזור\nמשמעות גבוהה\n'+phrase);
+ assert.ok(r.findings.length);assert.ok(r.findings.every(f=>f.category==='שלדת מרכב'));
+ assert.ok(r.findings.every(f=>f.reportSeverity!=='high'));
+ const legacy={findings:[{category:'חשמל ואבזור',sourceText:phrase}]};
+ for(const result of [r,legacy]){
+  const g=c.compactAnalysisGroups(result);assert.equal(g[0].category,'שלדה ומרכב');
+  for(const out of [c.compactAnalysisHtml(result),JSON.stringify(c.btPdfAnalysisCards(result))]){assert.ok(out.includes(phrase));assert.ok(!out.includes('חשמל ואבזור'));}
+ }
+ assert.equal(c.reportComponentCategory('מנוע חלון לא עובד'),'חשמל ואבזור');
+});
+
+test('all explicit defects in notes occupy one final card across severities and systems',()=>{
+ const c=engine(),heading='ליקויים שנרשמו בהערות שצריך לתת עליהן את הדעת';
+ const notes=['פגיעות פח ופגמים בצבע ובגג','צלחות בלם שחוקות','מנורת לחץ אוויר דולקת','מזגן לא מקרר'];
+ const text='מנוע\nלבדוק תצרוכת שמן בנסיעה\nחשמל ואבזור\nמנוע חלון לא עובד\nהערות כלליות:\nמשמעות גבוהה: '+notes[0]+', '+notes[1]+'\nמשמעות נמוכה: '+notes[2]+', '+notes[3]+'.\nאין אחריות על תיבת הילוכים אוטומטית. לא נבדקה מערכת היברידית. מצורף דוח מחשב. לבדוק מעקב טיפולים. יש לברר זמני טיפולים.';
+ const row={source_kind:'custom',source_id:'notes-only',source_text:notes[1],category:'מערכת הבלמים (ללא פירוק גלגלים)',meaning:'הסבר שמור',active:true};
+ const r=c.applyCustomRules(text,c.applyServerOverrides(c.interpretSummaryText(text,[row]),[row]),[row]);
+ assert.deepEqual(Array.from(r.noteFindings.map(f=>f.sourceText)),notes);
+ assert.ok(r.findings.every(f=>!notes.includes(f.sourceText)));
+ const groups=c.compactAnalysisGroups(r),noteGroups=groups.filter(g=>g.sourceSection==='notes');
+ assert.equal(noteGroups.length,1);assert.equal(groups.at(-1).category,heading);
+ assert.deepEqual(Array.from(c.compactGroupFacts(noteGroups[0])),notes);
+ for(const out of [c.compactAnalysisHtml(r),c.analysisTextBlock('סיכום',r),JSON.stringify(c.btPdfAnalysisCards(r))]){
+  assert.equal(out.split(heading).length-1,1);for(const fact of notes)assert.equal(out.split(fact).length-1,1,fact);
+  assert.ok(!out.includes('אין אחריות'));assert.ok(!out.includes('לא נבדקה מערכת היברידית'));
+ }
+});
+
+test('short examiner notes and wrapped defects survive without manufacturing normal findings',()=>{
+ const c=engine();
+ for(const marker of ['הערות','הערות הבוחן:','הערת בוחן:']){
+  const r=c.interpretSummaryText('מנוע\nתקין\n'+marker+'\nצלחות בלם\nשחוקות, מנורת לחץ אוויר דולקת. אין נזילות שמן. הצמיגים תקינים.');
+  assert.equal(r.findings.length,0);
+  assert.deepEqual(Array.from(r.noteFindings.map(f=>f.sourceText)),['צלחות בלם שחוקות','מנורת לחץ אוויר דולקת']);
+  assert.equal(c.compactAnalysisGroups(r).length,1);
+ }
+ assert.equal(c.compactAnalysisGroups(c.interpretSummaryText('מנוע\nתקין\nהערות כלליות\nאין אחריות על תיבת הילוכים אוטומטית')).length,0);
+});
+
+test('secondary OCR additions remain in table before the single notes section',()=>{
+ const c=engine(),primary='מנוע\nלבדוק מעקב טיפולים\nהערות כלליות\nפגיעות פח ופגמים בצבע ובגג';
+ const secondary='מנוע\nלבדוק תצרוכת שמן בנסיעה\nהערות כלליות\nפגיעות פח ופגמים בצבע ובגג';
+ const merged=c.mergeVerifiedOcrText(primary,secondary,true),r=c.interpretSummaryText(merged.text);
+ assert.ok(r.findings.some(f=>f.sourceText==='לבדוק תצרוכת שמן בנסיעה'));
+ assert.deepEqual(Array.from(r.noteFindings.map(f=>f.sourceText)),['פגיעות פח ופגמים בצבע ובגג']);
+});
+
+test('coordinate OCR retains the notes row without mixing it into the last system',()=>{
+ const c=engine(),f=table(),y=f.borders.at(-1),words=f.annotation.pages[0].blocks[0].paragraphs[0].words;
+ const add=(text,x,y,width)=>words.push({symbols:Array.from(text,text=>({text})),boundingBox:{vertices:[{x,y},{x:x+width,y},{x:x+width,y:y+10},{x,y:y+10}]}});
+ add('הערות',810,y+10,45);add('כלליות',755,y+10,45);
+ add('פגיעות פח ופגמים בצבע ובגג,',70,y+10,350);add('צלחות בלם שחוקות',70,y+30,300);
+ f.borders.push(y+65);f.annotation.pages[0].height=y+100;
+ const text=c.inspectionVisionTableText(f.annotation,f.borders),r=c.interpretSummaryText(text);
+ assert.deepEqual(Array.from(facts(c.compactAnalysisGroups({findings:r.findings}))),expected);
+ assert.deepEqual(Array.from(r.noteFindings.map(f=>f.sourceText)),['פגיעות פח ופגמים בצבע ובגג','צלחות בלם שחוקות']);
+});
+
+test('notes and component classification stay identical in browser and server',()=>{
+ for(const name of ['reportTextSections','reportNotesFindings','reportComponentCategory']){
+  const extract=s=>{const start=s.indexOf('function '+name+'(');return s.slice(start,s.indexOf('\n}\n',start)+3);};assert.equal(extract(html),extract(server),name);
+ }
+});
