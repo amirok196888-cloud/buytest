@@ -3578,7 +3578,7 @@ function ocrLineSimilarity(first,second){
 }
 
 function isUsefulVerifierFinding(line,isSummary){
-  if(!line||isMetadataLine(line)||isExplicitlyNormal(line)||isReportStatusScaffolding(line)) return false;
+  if(!line||reportClauseIsFragment(line)||isMetadataLine(line)||isExplicitlyNormal(line)||isReportStatusScaffolding(line)) return false;
   const n=normalizeFindingText(line);
   if(isSummary) return findKnowledgeRules(line,'').length>0||isPotentialUnknownFindingLine(line)||Boolean(reportSeverityFromLine(line)&&!isSeverityHeadingOnly(line));
   return extractDtcCodes(line).length>0
@@ -4125,6 +4125,37 @@ function normalizeFindingText(value){
     .trim();
 }
 
+function reportClauseIsFragment(value){
+  const text=normalizeFindingText(value);
+  return /^(?:הוחלפ[א-ת]*|החלפ[א-ת]*|שחוק[א-ת]*|פגומ[א-ת]*|ומאחור|ומלפנים|חומר|שמאל|ימין|תקן|לתקן|בדוק|לבדוק|בדיקה|תיקון|בדוק תקן)$/.test(text);
+}
+
+function reportClauseDisplayText(line,category='',severity=null){
+  let value=String(line||'').replace(/[✓✔☑×✕]/g,' ').replace(/^\s*\d+\s*/,'').trim();
+  if(category){
+    const normalized=normalizeFindingText(value),heading=normalizeFindingText(category);
+    if(normalized===heading)return '';
+    if(normalized.startsWith(heading+' ')){
+      const words=heading.split(' ').length;
+      value=value.split(/\s+/).slice(words).join(' ');
+    }
+  }
+  if(severity)value=value.replace(/משמעות\s*(?:גבוהה|בינונית|נמוכה)|ליקויים?\s+שוליים?|ליקוי\s+שולי/g,'');
+  return value.replace(/^(?:\s*[:\-])+\s*/,'').replace(/\(\s+/g,'(').replace(/\s+\)/g,')').replace(/\s*\/\s*/g,'/').replace(/\s+/g,' ').trim();
+}
+
+function reportIndependentClauses(line){
+  // A warning lamp is a separate finding, even if the form omits a comma.
+  // Slashes inside commands and component names are retained, not delimiters.
+  const value=String(line).replace(/סדוקיםמנורת/g,'סדוקים מנורת');
+  return value.split(/\s+(?=(?:מנורת|נורת)\s+לחץ\s+א[וו]?ויר\s+דולקת)/).flatMap(clause=>{
+    const parts=clause.split('/');
+    if(parts.length!==2)return [clause];
+    const independent=parts.every(part=>normalizeFindingText(part).split(' ').length>=2&&reportComponentCategory(part)&&/(פגומ|שחוק|סדוק|דולק|רעש|נזיל|דליפ|חופש|נקיש|הוחלפ)/.test(normalizeFindingText(part)));
+    return independent?parts.map(part=>part.trim()):[clause];
+  }).filter(Boolean);
+}
+
 function reportWrappedContinuation(previous,next){
   if(!previous||!next||reportCategoryFromLine(previous)||reportCategoryFromLine(next)||reportSeverityFromLine(next))return false;
   if(isMetadataLine(previous)||isMetadataLine(next)||reportTextIsUnreliable(previous)||reportTextIsUnreliable(next))return false;
@@ -4165,7 +4196,7 @@ function reportLines(value){
     else lines.push(text);
     hardBoundary=false;
   }
-  return lines.filter(line=>line.length>2);
+  return lines.filter(line=>line.length>2).flatMap(reportIndependentClauses);
 }
 
 function isEngineNumberVerificationText(value){
@@ -4955,6 +4986,9 @@ function compactFindingText(value){
 function findingTextIncludes(normalizedLine,normalizedTerm){
   if(!normalizedLine||!normalizedTerm) return false;
   if(normalizedLine.includes(normalizedTerm)) return true;
+  // Equivalent inspection instructions match knowledge without rewriting evidence.
+  const command=value=>value.replace(/^(?:בדוק|בדיקת|בדיקה)(?:\s+את)?\s+/, 'לבדוק ');
+  if(command(normalizedLine).includes(command(normalizedTerm)))return true;
   const compactTerm=normalizedTerm.replace(/\s/g,'');
   return compactTerm.length>=6&&normalizedLine.replace(/\s/g,'').includes(compactTerm);
 }
@@ -5287,7 +5321,7 @@ function reportConclusionOrder(category){
 }
 
 function orderFindingsLikeReport(findings){
-  return findings.map((item,index)=>({item,index,order:reportConclusionOrder(item.category||'')}))
+  return findings.map((item,index)=>({item,index,order:Number.isFinite(item.sourceOrder)?item.sourceOrder:index}))
     .sort((a,b)=>a.order-b.order||a.index-b.index)
     .map(entry=>entry.item);
 }
@@ -5366,7 +5400,12 @@ function interpretSummaryText(text,catalogRows=loadFormulaOverrides()){
       currentCategory=currentCategory||chassisHint||'שלדת מרכב';
     }
     const contentLine=stripReportScaffolding(line,lineCategory,lineSeverity);
+    const clauseText=reportClauseDisplayText(line,lineCategory,lineSeverity);
     if(!contentLine||isReportStatusScaffolding(contentLine)||isExplicitlyNormal(contentLine)) return;
+    if(reportClauseIsFragment(contentLine)){
+      if(!unknown.includes(clauseText))unknown.push(clauseText);
+      return;
+    }
     const unreliable=reportTextIsUnreliable(contentLine);
     if(unreliable) unreadable.push(safeUnknownExcerpt(contentLine));
     const diagnosisCategory=reportFindingCategory(contentLine,currentCategory,chassisHint);
@@ -5374,19 +5413,19 @@ function interpretSummaryText(text,catalogRows=loadFormulaOverrides()){
     if(lineSeverity&&reportSystemFamily(diagnosisCategory)==='body'&&reportSystemFamily(currentCategory)!=='body'){
       currentCategory=diagnosisCategory;currentSeverity=lineSeverity;
     }
-    let observedCandidate=contentLine;
+    let observedCandidate=clauseText;
     let rules=findKnowledgeRules(contentLine,diagnosisCategory,catalogRows);
-    const diagnosisSignal=/(תאונה|שיפו|תיקונ|תיקון|פגיע|הלחמ|חיבור.*לא מקורי|עמוד|משקופ|נקיש|פגומ|זוויות.*היגוי|היגוי.*כיוון|ירידת ערך|הוחלפ|הוחלף|החלפ|לבדוק|סריקת מחשב|תקל|שחוק|רעש|רעיד|צריכת שמן|יבש|יבשים|סדוק|חסר|לא מתקפל|שריט|מעיכ|פגמי|קרוע|שבור|נזיל|דליפ|חופש)/.test(normalizeFindingText(contentLine));
+    const diagnosisSignal=/(תאונה|שיפו|תיקונ|תיקון|פגיע|הלחמ|חיבור.*לא מקורי|עמוד|משקופ|נקיש|פגומ|זוויות.*היגוי|היגוי.*כיוון|ירידת ערך|הוחלפ|הוחלף|החלפ|לבדוק|בדוק|תקן|לתקן|בדיקה|סריקת מחשב|תקל|שחוק|רעש|רעיד|תצרוכת שמן|צריכת שמן|יבש|יבשים|סדוק|חסר|לא מתקפל|שריט|מעיכ|פגמי|קרוע|שבור|נזיל|דליפ|חופש)/.test(normalizeFindingText(contentLine));
     const fullCoverage=rules.some(rule=>normalizeFindingText(rule.sourceText||rule.matchedTerm||'')===normalizeFindingText(contentLine));
     const clauseCategory=diagnosisCategory||(/תיבת הילוכים|תיבת ההילוכים/.test(contentLine)?'תיבת הילוכים':/במנוע|שמן מנוע/.test(contentLine)?'מנוע':'');
     const ruleCategories=new Set(rules.map(rule=>rule.category));
     const families=new Set([...ruleCategories].map(reportSystemFamily));
     const mixedSystems=families.size>1||Boolean(diagnosisCategory&&rules.some(rule=>reportSystemFamily(rule.category)!==reportSystemFamily(diagnosisCategory)));
     if(mixedSystems&&!unreliable) unreadable.push(safeUnknownExcerpt(contentLine));
-    if(clauseCategory&&!unreliable&&!mixedSystems&&(diagnosisSignal||diagnosisSeverity==='high')&&!fullCoverage&&!isMetadataLine(contentLine)){
+    if(clauseCategory&&!unreliable&&!mixedSystems&&(diagnosisSignal||diagnosisSeverity==='high'||(!rules.length&&diagnosisCategory===currentCategory))&&!fullCoverage&&!isMetadataLine(contentLine)){
       const severity=diagnosisSeverity||rules.find(rule=>rule.category===diagnosisCategory&&rule.reportSeverity)?.reportSeverity||null;
       const sourceRule={id:'report-diagnosis-'+index,category:clauseCategory,
-        sourceText:contentLine,observedText:contentLine,verbatimDiagnosis:true,
+        sourceText:clauseText,observedText:clauseText,verbatimDiagnosis:true,
         classification:'source_diagnosis',reportSeverity:severity,
         tag:reportSeverityLabels[severity]||'אבחנה מהדוח — נדרש בירור',
         tone:severity==='high'?'safety':'clarify',
@@ -5397,7 +5436,9 @@ function interpretSummaryText(text,catalogRows=loadFormulaOverrides()){
     rules=rules.map(rule=>{
       const phrase=rule.sourceText||rule.matchedTerm||'';
       // Isolate grounded phrases from mixed/noisy rows. Never inherit the whole row.
-      return {...rule,observedText:unreliable||mixedSystems?phrase:rule.observedText||observedCandidate};
+      return {...rule,sourceOrder:index,
+        sourceClauseText:!unreliable&&!mixedSystems?clauseText:undefined,
+        observedText:unreliable||mixedSystems?phrase:rule.observedText||observedCandidate};
     });
     if(rules.length){
       rules.forEach(rule=>{
@@ -5908,7 +5949,7 @@ function compactFirstSentence(value,maxLength=210){
 function compactUniqueTexts(values,limit=Infinity){
   const output=[];
   values.filter(Boolean).forEach(value=>{
-    const text=compactFirstSentence(value);
+    const text=String(value).replace(/\s+/g,' ').trim();
     const normalized=normalizeFindingText(text).replace(/[^a-z0-9א-ת]/g,'');
     if(!normalized) return;
     const duplicate=output.some(existing=>normalizeFindingText(existing).replace(/[^a-z0-9א-ת]/g,'')===normalized);
@@ -5974,6 +6015,7 @@ function conciseFindingFact(item,isComputer=false){
     const description=compactFirstSentence((typeof item?.computerDescription==='string'?item.computerDescription:'')||item?.title||item?.matchedTerm||item?.meaning,145);
     return [code,description].filter(Boolean).join(' — ')||'קוד שנקרא בסריקה.';
   }
+  if(item?.sourceClauseText&&!reportClauseIsFragment(item.sourceClauseText))return findingLocationPrefix(item,String(item.sourceClauseText).replace(/\s+/g,' ').trim());
   const source=String(item?.observedText||item?.sourceText||'').replace(/\s+/g,' ').trim();
   const matched=String(item?.matchedTerm||item?.title||'').replace(/\s+/g,' ').trim();
   const canonical=String(item?.sourceText||'').replace(/\s+/g,' ').trim();
@@ -6056,9 +6098,10 @@ function communicationGroupBullet(items,bucket){
 }
 
 function compactAnalysisGroups(result,isComputer=false){
-  const finalized=(result?.findings||[]).map(finalizeReportFinding).filter(Boolean);
+  const finalized=orderFindingsLikeReport((result?.findings||[]).map(finalizeReportFinding).filter(Boolean));
   const findings=(isComputer?finalized:distinctReportFindings(finalized)).filter(item=>{
     if(isComputer) return true;
+    if(reportClauseIsFragment(item.sourceClauseText||item.sourceText||item.matchedTerm))return false;
     const fact=conciseFindingFact(item,false).replace(/[׳״"'`]/g,'').trim();
     return !/^(?:תיקון|תיקוני|תיקונים)$/.test(fact);
   });
@@ -6073,8 +6116,11 @@ function compactAnalysisGroups(result,isComputer=false){
   [...displayed.values()].forEach(item=>{
     const category=compactCategoryLabel(item.category,isComputer,item);
     const bucket=isComputer?computerStatusBucket(item):summarySeverityBucket(item);
-    const key=`${category}__${bucket}`;
-    if(!grouped.has(key)) grouped.set(key,{category,bucket,items:[]});
+    const sourceOrdered=!isComputer&&Number.isFinite(item.sourceOrder);
+    const previous=[...grouped.values()].at(-1);
+    const baseKey=`${category}__${bucket}`;
+    const key=sourceOrdered?(previous?.category===category&&previous?.bucket===bucket?previous.key:baseKey+'__'+grouped.size):baseKey;
+    if(!grouped.has(key)) grouped.set(key,{key,category,bucket,items:[]});
     grouped.get(key).items.push(item);
   });
   return [...grouped.values()].map(group=>{
@@ -6094,9 +6140,6 @@ function compactAnalysisGroups(result,isComputer=false){
       details:isComputer?[]:group.items.filter(item=>item.managerEdited&&(item.managerMeaning||item.managerDecision||item.managerQuestion)).map(item=>({fact:item.diagnosisLabel||conciseFindingFact(item,false),meaning:item.managerMeaning||'',decision:item.managerDecision||'',question:item.managerQuestion||''})),
       decision:group.items.some(item=>item.managerEdited&&(item.managerMeaning||item.managerDecision||item.managerQuestion))&&!isComputer?'':groupDecision(group.category,group.bucket,group.items)
     };
-  }).sort((a,b)=>{
-    const categoryDiff=reportConclusionOrder(a.category)-reportConclusionOrder(b.category);
-    return categoryDiff||((compactSeverityRank[b.severity]||0)-(compactSeverityRank[a.severity]||0));
   });
 }
 

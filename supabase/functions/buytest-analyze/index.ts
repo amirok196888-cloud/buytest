@@ -739,6 +739,37 @@ function normalizeFindingText(value){
     .trim();
 }
 
+function reportClauseIsFragment(value){
+  const text=normalizeFindingText(value);
+  return /^(?:הוחלפ[א-ת]*|החלפ[א-ת]*|שחוק[א-ת]*|פגומ[א-ת]*|ומאחור|ומלפנים|חומר|שמאל|ימין|תקן|לתקן|בדוק|לבדוק|בדיקה|תיקון|בדוק תקן)$/.test(text);
+}
+
+function reportClauseDisplayText(line,category='',severity=null){
+  let value=String(line||'').replace(/[✓✔☑×✕]/g,' ').replace(/^\s*\d+\s*/,'').trim();
+  if(category){
+    const normalized=normalizeFindingText(value),heading=normalizeFindingText(category);
+    if(normalized===heading)return '';
+    if(normalized.startsWith(heading+' ')){
+      const words=heading.split(' ').length;
+      value=value.split(/\s+/).slice(words).join(' ');
+    }
+  }
+  if(severity)value=value.replace(/משמעות\s*(?:גבוהה|בינונית|נמוכה)|ליקויים?\s+שוליים?|ליקוי\s+שולי/g,'');
+  return value.replace(/^(?:\s*[:\-])+\s*/,'').replace(/\(\s+/g,'(').replace(/\s+\)/g,')').replace(/\s*\/\s*/g,'/').replace(/\s+/g,' ').trim();
+}
+
+function reportIndependentClauses(line){
+  // A warning lamp is a separate finding, even if the form omits a comma.
+  // Slashes inside commands and component names are retained, not delimiters.
+  const value=String(line).replace(/סדוקיםמנורת/g,'סדוקים מנורת');
+  return value.split(/\s+(?=(?:מנורת|נורת)\s+לחץ\s+א[וו]?ויר\s+דולקת)/).flatMap(clause=>{
+    const parts=clause.split('/');
+    if(parts.length!==2)return [clause];
+    const independent=parts.every(part=>normalizeFindingText(part).split(' ').length>=2&&reportComponentCategory(part)&&/(פגומ|שחוק|סדוק|דולק|רעש|נזיל|דליפ|חופש|נקיש|הוחלפ)/.test(normalizeFindingText(part)));
+    return independent?parts.map(part=>part.trim()):[clause];
+  }).filter(Boolean);
+}
+
 function reportWrappedContinuation(previous,next){
   if(!previous||!next||reportCategoryFromLine(previous)||reportCategoryFromLine(next)||reportSeverityFromLine(next))return false;
   if(isMetadataLine(previous)||isMetadataLine(next)||reportTextIsUnreliable(previous)||reportTextIsUnreliable(next))return false;
@@ -779,7 +810,7 @@ function reportLines(value){
     else lines.push(text);
     hardBoundary=false;
   }
-  return lines.filter(line=>line.length>2);
+  return lines.filter(line=>line.length>2).flatMap(reportIndependentClauses);
 }
 
 function isEngineNumberVerificationText(value){
@@ -1479,6 +1510,9 @@ function compactFindingText(value){
 function findingTextIncludes(normalizedLine,normalizedTerm){
   if(!normalizedLine||!normalizedTerm) return false;
   if(normalizedLine.includes(normalizedTerm)) return true;
+  // Equivalent inspection instructions match knowledge without rewriting evidence.
+  const command=value=>value.replace(/^(?:בדוק|בדיקת|בדיקה)(?:\s+את)?\s+/, 'לבדוק ');
+  if(command(normalizedLine).includes(command(normalizedTerm)))return true;
   const compactTerm=normalizedTerm.replace(/\s/g,'');
   return compactTerm.length>=6&&normalizedLine.replace(/\s/g,'').includes(compactTerm);
 }
@@ -1810,7 +1844,7 @@ function reportConclusionOrder(category){
 }
 
 function orderFindingsLikeReport(findings){
-  return findings.map((item,index)=>({item,index,order:reportConclusionOrder(item.category||'')}))
+  return findings.map((item,index)=>({item,index,order:Number.isFinite(item.sourceOrder)?item.sourceOrder:index}))
     .sort((a,b)=>a.order-b.order||a.index-b.index)
     .map(entry=>entry.item);
 }
@@ -1889,7 +1923,12 @@ function interpretSummaryText(text,catalogRows=loadFormulaOverrides()){
       currentCategory=currentCategory||chassisHint||'שלדת מרכב';
     }
     const contentLine=stripReportScaffolding(line,lineCategory,lineSeverity);
+    const clauseText=reportClauseDisplayText(line,lineCategory,lineSeverity);
     if(!contentLine||isReportStatusScaffolding(contentLine)||isExplicitlyNormal(contentLine)) return;
+    if(reportClauseIsFragment(contentLine)){
+      if(!unknown.includes(clauseText))unknown.push(clauseText);
+      return;
+    }
     const unreliable=reportTextIsUnreliable(contentLine);
     if(unreliable) unreadable.push(safeUnknownExcerpt(contentLine));
     const diagnosisCategory=reportFindingCategory(contentLine,currentCategory,chassisHint);
@@ -1897,19 +1936,19 @@ function interpretSummaryText(text,catalogRows=loadFormulaOverrides()){
     if(lineSeverity&&reportSystemFamily(diagnosisCategory)==='body'&&reportSystemFamily(currentCategory)!=='body'){
       currentCategory=diagnosisCategory;currentSeverity=lineSeverity;
     }
-    let observedCandidate=contentLine;
+    let observedCandidate=clauseText;
     let rules=findKnowledgeRules(contentLine,diagnosisCategory,catalogRows);
-    const diagnosisSignal=/(תאונה|שיפו|תיקונ|תיקון|פגיע|הלחמ|חיבור.*לא מקורי|עמוד|משקופ|נקיש|פגומ|זוויות.*היגוי|היגוי.*כיוון|ירידת ערך|הוחלפ|הוחלף|החלפ|לבדוק|סריקת מחשב|תקל|שחוק|רעש|רעיד|צריכת שמן|יבש|יבשים|סדוק|חסר|לא מתקפל|שריט|מעיכ|פגמי|קרוע|שבור|נזיל|דליפ|חופש)/.test(normalizeFindingText(contentLine));
+    const diagnosisSignal=/(תאונה|שיפו|תיקונ|תיקון|פגיע|הלחמ|חיבור.*לא מקורי|עמוד|משקופ|נקיש|פגומ|זוויות.*היגוי|היגוי.*כיוון|ירידת ערך|הוחלפ|הוחלף|החלפ|לבדוק|בדוק|תקן|לתקן|בדיקה|סריקת מחשב|תקל|שחוק|רעש|רעיד|תצרוכת שמן|צריכת שמן|יבש|יבשים|סדוק|חסר|לא מתקפל|שריט|מעיכ|פגמי|קרוע|שבור|נזיל|דליפ|חופש)/.test(normalizeFindingText(contentLine));
     const fullCoverage=rules.some(rule=>normalizeFindingText(rule.sourceText||rule.matchedTerm||'')===normalizeFindingText(contentLine));
     const clauseCategory=diagnosisCategory||(/תיבת הילוכים|תיבת ההילוכים/.test(contentLine)?'תיבת הילוכים':/במנוע|שמן מנוע/.test(contentLine)?'מנוע':'');
     const ruleCategories=new Set(rules.map(rule=>rule.category));
     const families=new Set([...ruleCategories].map(reportSystemFamily));
     const mixedSystems=families.size>1||Boolean(diagnosisCategory&&rules.some(rule=>reportSystemFamily(rule.category)!==reportSystemFamily(diagnosisCategory)));
     if(mixedSystems&&!unreliable) unreadable.push(safeUnknownExcerpt(contentLine));
-    if(clauseCategory&&!unreliable&&!mixedSystems&&(diagnosisSignal||diagnosisSeverity==='high')&&!fullCoverage&&!isMetadataLine(contentLine)){
+    if(clauseCategory&&!unreliable&&!mixedSystems&&(diagnosisSignal||diagnosisSeverity==='high'||(!rules.length&&diagnosisCategory===currentCategory))&&!fullCoverage&&!isMetadataLine(contentLine)){
       const severity=diagnosisSeverity||rules.find(rule=>rule.category===diagnosisCategory&&rule.reportSeverity)?.reportSeverity||null;
       const sourceRule={id:'report-diagnosis-'+index,category:clauseCategory,
-        sourceText:contentLine,observedText:contentLine,verbatimDiagnosis:true,
+        sourceText:clauseText,observedText:clauseText,verbatimDiagnosis:true,
         classification:'source_diagnosis',reportSeverity:severity,
         tag:reportSeverityLabels[severity]||'אבחנה מהדוח — נדרש בירור',
         tone:severity==='high'?'safety':'clarify',
@@ -1920,7 +1959,9 @@ function interpretSummaryText(text,catalogRows=loadFormulaOverrides()){
     rules=rules.map(rule=>{
       const phrase=rule.sourceText||rule.matchedTerm||'';
       // Isolate grounded phrases from mixed/noisy rows. Never inherit the whole row.
-      return {...rule,observedText:unreliable||mixedSystems?phrase:rule.observedText||observedCandidate};
+      return {...rule,sourceOrder:index,
+        sourceClauseText:!unreliable&&!mixedSystems?clauseText:undefined,
+        observedText:unreliable||mixedSystems?phrase:rule.observedText||observedCandidate};
     });
     if(rules.length){
       rules.forEach(rule=>{
@@ -2450,7 +2491,7 @@ function applyCustomRules(text,result,rows){
   const catalogRows=rows.filter(row=>row.active!==false);
   if(!catalogRows.length)return result;
   // Match edited/new wording only in diagnostic clauses, never metadata or disclaimers.
-  const clauses=diagnosticTableText(text).split(/[\n,;]+/).map(line=>line.trim()).filter(Boolean);
+  const clauses=reportLines(diagnosticTableText(text));
   let findings=[...(result?.findings||[])];
   for(const row of catalogRows){
     const term=normalizeFindingText(row.source_text);
@@ -2460,7 +2501,7 @@ function applyCustomRules(text,result,rows){
     const id=overrideFindingId(row);
     let existing=findings.find(item=>item.id===id||serverOverrideForFinding(item,[row]));
     if(!existing){
-      existing={id,category:row.category,sourceText:row.source_text,observedText:evidence,
+      existing={id,category:row.category,sourceText:row.source_text,observedText:evidence,sourceOrder:clauses.indexOf(evidence),
         classification:row.classification_type,reportSeverity:row.report_severity,
         tag:expertSeverityLabels[row.report_severity]||formulaClassificationLabels[row.classification_type]||'סיווג מקצועי',
         tone:['safety','high'].includes(row.report_severity)?'safety':'clarify'};
