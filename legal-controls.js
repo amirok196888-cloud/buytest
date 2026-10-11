@@ -26,6 +26,10 @@
   }
   root.BuyTestLegal={canTrack,requireUpload,noticeVersion};
   root.document.addEventListener('DOMContentLoaded',()=>{
+    // Legal controls must stay available when a service hides the main app shell.
+    const modal=root.document.getElementById('legalModal');if(modal)root.document.body.append(modal);
+    const links=root.document.querySelector('.legalLinks'),landing=root.document.getElementById('marketingLanding');
+    if(links&&landing)landing.insertAdjacentElement('afterend',links);
     root.document.querySelectorAll('[data-buytest-marketing-consent]').forEach(input=>{
       input.checked=canTrack();
       input.addEventListener('change',()=>{
