@@ -49,6 +49,7 @@ function reset(){
     status(source?'דוח העבר הביטוחי נשמר במכשיר.':'');
   }
   async function read(input){
+    if(window.BuyTestLegal&&!BuyTestLegal.requireUpload('insuranceLegalAccept')){input.value='';return;}
     if(window.btReportIdentityReady&&!window.btReportIdentityReady()){input.value='';return;}
     const selected=Array.from(input.files||[]);input.value='';if(!selected.length)return;
     version++;files=[];pendingFiles=[];
@@ -67,6 +68,7 @@ function reset(){
     status('הקובץ נבחר. אחרי העלאת הדוחות לחץ על „פענוח דוחות” כדי להתחיל בפענוח המשותף.');
   }
   async function interpretPending(){
+    if(window.BuyTestLegal&&!BuyTestLegal.requireUpload('insuranceLegalAccept'))return false;
     if(!pendingFiles.length)return;
     const selected=pendingFiles.slice(),p=plate(),run=++version;
     files=[];

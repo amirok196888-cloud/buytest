@@ -5,6 +5,7 @@ function openBuyTestTour(){const modal=document.getElementById('buytestTour');do
 function closeBuyTestTour(){document.getElementById('buytestTour').close();document.getElementById('buytestTourFrame').removeAttribute('src');}
 let btLicenseImageUrl='',btLicenseReadVersion=0;
 async function readBuyTestLicense(input){
+ if(window.BuyTestLegal&&!BuyTestLegal.requireUpload('licenseLegalAccept')){input.value='';return;}
  if(window.BuyTestBundle&&!BuyTestBundle.hasChecklist()){input.value='';await BuyTestBundle.unlock('checklist');return;}
  const file=input.files?.[0],version=++btLicenseReadVersion,status=document.getElementById('btLicenseStatus'),preview=document.getElementById('btLicensePreview');
  document.getElementById('btLicenseReview').hidden=true;document.getElementById('btLicenseResults').textContent='';preview.hidden=true;

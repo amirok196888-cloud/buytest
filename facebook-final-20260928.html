@@ -31,8 +31,9 @@
 <link rel="apple-touch-icon" href="buytest-logo-2026.png">
 <title>BuyTest | פענוח עבר ביטוחי וסיכומי בדיקות רכב</title>
 <script src="/internal-traffic.js?v=1"></script>
-<!-- Meta Pixel Code -->
+<script src="/legal-controls.js?v=1"></script>
 <script>
+if(window.BuyTestLegal.canTrack()) {
 !function(f,b,e,v,n,t,s)
 {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
 n.callMethod.apply(n,arguments):n.queue.push(arguments)};
@@ -43,17 +44,15 @@ s.parentNode.insertBefore(t,s)}(window,document,'script',
 'https://connect.facebook.net/en_US/fbevents.js');
 fbq('init','1944984039489234');
 if(!BuyTestInternalTraffic.blocked()) fbq('track','PageView');
-</script>
-<!-- End Meta Pixel Code -->
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18445003355"></script>
-<script>
+
+const marketingTag=document.createElement('script');marketingTag.async=true;marketingTag.src='https://www.googletagmanager.com/gtag/js?id=AW-18445003355';document.head.append(marketingTag);
 window.dataLayer=window.dataLayer||[];
 function gtag(){dataLayer.push(arguments)}
 gtag('js',new Date());
 if(!BuyTestInternalTraffic.blocked()) gtag('config','AW-18445003355');
+
+}
 </script>
-<!-- End Google tag -->
 <style>
 :root{--bg:#09151d;--card:#132a35;--card2:#0d2029;--line:#2a4652;--txt:#f7fafb;--muted:#aebcc3;--a:#28cba2;--warn:#f3c35e;--bad:#f47f7f}
 *{box-sizing:border-box}html,body{max-width:100%;overflow-x:hidden}body{margin:0;background:linear-gradient(180deg,#07131a,#0d1c25 40%,#08151d);color:var(--txt);font-family:Arial,system-ui,sans-serif}
@@ -661,7 +660,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
   </p>
 
   <div style="margin:16px 0;text-align:center;">
-    <div class="btLicenseUpload"><h3>הרישיון של הרכב שאתם בודקים</h3><p>העלו צילום ברור של הרישיון. אשרו את הפרטים שנקראו לפני ההשוואה למאגר.</p><label for="btLicenseFile">צילום או בחירת תמונה</label><input id="btLicenseFile" type="file" accept="image/*" onchange="readBuyTestLicense(this)"><p class="sub">התמונה נשלחת לשירות זיהוי הטקסט של Google דרך BuyTest. אפשר להסתיר שם, כתובת ומספר זהות לפני ההעלאה.</p><img id="btLicensePreview" alt="רישיון הרכב שהעליתם" hidden style="max-width:100%;max-height:320px;object-fit:contain"><p id="btLicenseStatus" role="status" aria-live="polite"></p><div id="btLicenseReview" hidden><p>ודאו שהערכים תואמים לצילום. שדה שלא נקרא נשאר ריק.</p><label for="btLicensePlate">מספר רכב ברישיון</label><input id="btLicensePlate" inputmode="numeric" maxlength="8"><label for="btLicenseKm">קילומטראז׳ ברישיון</label><input id="btLicenseKm" type="number" min="0"><label for="btLicenseDate">תאריך מדידת הקילומטראז׳ ברישיון</label><input id="btLicenseDate" type="date"><button class="primary full" type="button" onclick="compareBuyTestLicense()">אישרתי את הפרטים — השוואה למאגר</button><div id="btLicenseResults" role="status"></div></div></div></div>
+    <div class="btLicenseUpload"><div class="legalConsent legalCompact"><label><input type="checkbox" id="licenseLegalAccept"><span>אני מאשר/ת את <button type="button" onclick="openLegal('terms')">ההבהרות המשפטיות</button> ואת <button type="button" onclick="openLegal('privacy')">מדיניות הפרטיות</button>, ויש לי הרשאה לעיבוד הרישיון.</span></label></div><h3>הרישיון של הרכב שאתם בודקים</h3><p>העלו צילום ברור של הרישיון. אשרו את הפרטים שנקראו לפני ההשוואה למאגר.</p><label for="btLicenseFile">צילום או בחירת תמונה</label><input id="btLicenseFile" type="file" accept="image/*" onchange="readBuyTestLicense(this)"><p class="sub">התמונה נשלחת לשירות זיהוי הטקסט של Google דרך BuyTest. אפשר להסתיר שם, כתובת ומספר זהות לפני ההעלאה.</p><img id="btLicensePreview" alt="רישיון הרכב שהעליתם" hidden style="max-width:100%;max-height:320px;object-fit:contain"><p id="btLicenseStatus" role="status" aria-live="polite"></p><div id="btLicenseReview" hidden><p>ודאו שהערכים תואמים לצילום. שדה שלא נקרא נשאר ריק.</p><label for="btLicensePlate">מספר רכב ברישיון</label><input id="btLicensePlate" inputmode="numeric" maxlength="8"><label for="btLicenseKm">קילומטראז׳ ברישיון</label><input id="btLicenseKm" type="number" min="0"><label for="btLicenseDate">תאריך מדידת הקילומטראז׳ ברישיון</label><input id="btLicenseDate" type="date"><button class="primary full" type="button" onclick="compareBuyTestLicense()">אישרתי את הפרטים — השוואה למאגר</button><div id="btLicenseResults" role="status"></div></div></div></div>
   <div class="licenseDetails" style="display:block">
   <h3>הרישיון אצלך? בדוק את הסעיפים הבאים:</h3>
   <div style="display:grid;gap:10px;">
@@ -728,7 +727,7 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 <div class="inspectionHeaderGrid">
   <div class="field inspectionOwnerField"><label for="inspectionOwnerName">שם מזמין/ת בדיקת המכון</label><input id="inspectionOwnerName" autocomplete="name" placeholder="השם שמופיע בהזמנת הבדיקה"></div>
 </div>
-<input type="checkbox" id="inspectionOwnership" checked hidden>
+<div class="legalConsent legalCompact"><label><input type="checkbox" id="inspectionOwnership"><span>אני מאשר/ת את <button type="button" onclick="openLegal('terms')">ההבהרות המשפטיות</button> ואת <button type="button" onclick="openLegal('privacy')">מדיניות הפרטיות</button>, ויש לי הרשאה לעיבוד המסמכים שאעלה.</span></label></div>
 
 <div class="afterGrid">
   <div class="uploadPanel required">
@@ -856,36 +855,54 @@ src="https://www.facebook.com/tr?id=1944984039489234&amp;ev=PageView&amp;noscrip
 <div class="feedbackStatus" id="feedbackThanks" role="status" aria-live="polite"></div>
 </section>
 <div class="legalLinks">
-<button onclick="openLegal('terms')">תנאי שימוש</button>
+<button onclick="openLegal('terms')">הבהרות משפטיות</button>
 <button onclick="openLegal('privacy')">מדיניות פרטיות</button>
+<button onclick="openLegal('accessibility')">נגישות</button>
 <button onclick="openLegal('cancel')">ביטול עסקה והחזרים</button>
 </div>
 <div class="legalModal" id="legalModal" role="dialog" aria-modal="true" aria-labelledby="legalTitle" onclick="if(event.target===this)closeLegal()">
   <div class="legalSheet">
+    <div id="accessibilityText" class="legalPage" style="display:none"><h2>מידע בנושא נגישות</h2><p>BuyTest מאפשר פנייה לעמוס רוקח לקבלת סיוע בשימוש באתר או במידע שבו, בדוא״ל <a href="mailto:buytest2026@gmail.com">buytest2026@gmail.com</a> או <a href="https://wa.me/972552997673">בוואטסאפ העסקי</a>.</p><p>אם נתקלתם בקושי, ציינו את העמוד, הפעולה, המכשיר והדפדפן, ונבחן דרך לסייע. חלונות ההבהרות מאפשרים סגירה באמצעות Escape וניווט במקלדת. ניתן לקרוא את התנאים והפרטיות גם בעמודים נפרדים.</p><p>טרם הושלמה בדיקת נגישות מלאה. מסמכי PDF מסוימים וסיכומים המבוססים על תמונות עשויים שלא להיות נגישים לקורא מסך; ניתן לבקש סיוע בקבלת המידע. אין כאן הצהרה על עמידה מלאה בתקן או על קיומו של פטור. תחולת החובות והפטורים טעונה בדיקה לפי מאפייני העסק.</p></div>
     <button class="legalClose" type="button" onclick="closeLegal()" aria-label="סגירת החלון">סגירה</button>
     <div id="termsText" class="legalPage">
-      <h2 id="legalTitle">תנאי שימוש</h2>
-      <p>BuyTest הוא כלי להכנה מודרכת לפני בדיקת רכב ולהסבר של סיכום הבוחן לאחריה. השירות אינו בודק את הרכב פיזית, אינו מהווה חוות דעת מקצועית או שמאות, אינו מאשר תקינות או בטיחות ואינו מחליף בדיקה במכון מוסמך.</p>
-      <p>נתוני הרכב מתקבלים ממאגרים חיצוניים, ובהם מאגרי משרד התחבורה. המידע עלול להיות חלקי, חסר, שגוי או לא מעודכן. המשתמש אחראי לאמת כל פרט מהותי מול רישיון הרכב, המוכר והגורמים המוסמכים.</p>
-      <p>BuyTest אינו נותן הערכת שווי, אומדן עלות תיקון, קביעת ירידת ערך או המלצה לקנות או לא לקנות. כל הסבר מבוסס על הטקסט שהמשתמש העלה ועל כללי המאגר, וההחלטה כיצד לפעול נשארת בידי המשתמש לאחר בירור עם בעלי המקצוע המתאימים.</p>
-      <p>זיהוי טקסט מתמונה עלול לשגות. המערכת מנתחת אוטומטית רק קטעים שנקראו ברמת ודאות מספקת; קטע שלא נקרא או שלא נמצא לו פירוש מקצועי לא ייכלל במסקנות. נתון ממוחשב ללא טווח ייחוס או סימון מפורש לא יקבל קביעה שאינה נתמכת בדף.</p>
-      <p><b>טל״ח:</b> בפענוח אוטומטי עלולות להתרחש טעויות זיהוי, תמלול, שיוך או פרשנות. במקרה של אי־התאמה, דוח המקור גובר. אין להסתמך על ממצא שאינו מופיע בדוח המקורי, ויש לאמת כל ממצא מהותי מול הדוח ובעל מקצוע מתאים. הבהרה זו אינה גורעת מזכויות המשתמש לפי דין.</p>
-      <p>בהעלאת דוח המשתמש מצהיר שהבדיקה הוזמנה על שמו או שיש לו הרשאה מתאימה מבעל הבדיקה לעשות שימוש בקובץ לצורך השירות. BuyTest אינו טוען לבעלות בדוח המכון ואינו מפרסם או מצרף את טופס המקור לפלט. המשתמש מתבקש להעלות רק את אזור סיכום הבוחן, ללא לוגו ופרטים אישיים שאינם דרושים.</p>
-      <p>BuyTest אינו קשור למכון הבדיקה ואינו מדבר בשמו. ההסבר נגזר מן הטקסט שזוהה בדוח וממאגר הסיווג המקצועי של המערכת. הסיווג אינו ביקורת, דירוג או קביעה לגבי מקצועיות המכון, דיוק עבודתו או התנהלותו. ניסוח שמסווג כ„הסתייגות כללית” או „מגבלת בדיקה” מתאר את סוג המשפט בלבד ואינו מייחס למכון כוונה פסולה.</p>
-      <p>אימות רישיון הרכב וחמש השאלות למוכר ניתנים ללא תשלום. הפענוח של דוח המכון והבדיקה הממוחשבת וההתייעצות האישית בוואטסאפ הם שירות משולב בתשלום לרכב אחד. ההתייעצות פתוחה למשך 48 שעות ממועד השלמת הפענוח. השירות מבוסס על המידע שהמשתמש מסר בלבד ואינו בדיקה פיזית, שמאות, הערכת עלויות, המלצה לקנות או לא לקנות או קביעה לגבי מכון בדיקה.</p>
-      <p>התשלום מתבצע בדף המאובטח של Cardcom. שירות שמתייחס לרכב מסוים משויך למספר הרכב שהוזן; ייעוץ כללי לפני רכישה אינו מחייב מספר רכב. הגישה לשירות שנרכש נפתחת לאחר אישור התשלום למשך 48 שעות.</p>
-      <p>כל הזכויות באתר, בתוכן, במבנה הבדיקה, ברשימות הבדיקה, בעיצוב ובסימני BuyTest שמורות ל־BuyTest. אין להעתיק, להפיץ או לעשות בהם שימוש מסחרי ללא אישור מראש ובכתב.</p>
+<h2 id="legalTitle">הבהרות משפטיות ותנאי שימוש</h2>
+<p>עודכן: 11.10.2026. מפעיל האתר ובעל השליטה במידע: עמוס רוקח, BuyTest. לפניות: <a href="mailto:buytest2026@gmail.com">buytest2026@gmail.com</a> או <a href="https://wa.me/972552997673">וואטסאפ עסקי</a>.</p>
+<p><strong>השימוש באתר באחריותו של המשתמש בלבד.</strong> המשתמש אחראי לאמת את המידע והממצאים מול דוחות המקור ובעלי המקצוע המתאימים לפני קבלת החלטה. אין להסתמך על פלט האתר לבדו לצורך רכישת רכב, תיקון, הערכת בטיחות או החלטה כספית.</p>
+<p><strong>הפענוח החינמי מבוצע באופן אוטומטי.</strong> קריאת המסמכים, שיוך הממצאים והפקת ההסברים נעשים באמצעות מערכת ממוחשבת ומאגר ידע. פענוח אוטומטי אינו בדיקה אישית של עמוס רוקח ואינו מאושר על ידו לכל דוח בנפרד. ייעוץ אישי שנרכש בנפרד ניתן על ידי עמוס ואינו פענוח אוטומטי.</p>
+<p>BuyTest הוא כלי להכנה מודרכת לפני בדיקת רכב ולהסבר של סיכום הבוחן לאחריה. השירות אינו בודק את הרכב פיזית, אינו מאשר תקינות או בטיחות ואינו מחליף בדיקה במכון מוסמך, אבחון במוסך או חוות דעת שמאית. הפלט האוטומטי אינו חוות דעת מקצועית פרטנית על הרכב.</p>
+<p>נתונים ממאגרים חיצוניים, ובהם משרד התחבורה, עשויים להיות חלקיים, חסרים או לא מעודכנים. נתון חסר, היעדר ממצא או אי־זיהוי תקלה אינם אישור שהרכב תקין, בטוח או ללא עבר תאונות. יש לאמת נתונים מול הרישיון, דוח המקור והגורמים המתאימים.</p>
+<p><strong>מגבלות הפענוח והאחריות:</strong> בעיבוד אוטומטי עלולות להתרחש טעויות זיהוי, תמלול, השמטה, שיוך או פרשנות. במקרה של אי־התאמה דוח המקור גובר. בכפוף להוראות הדין שאין להתנות עליהן, BuyTest אינו מתחייב לשלמות או לדיוק הפלט האוטומטי ואינו נוטל אחריות להחלטות המשתמש ולנזק שנגרם מהסתמכות על הפלט לבדו ללא אימות מתאים. אין באמור פטור מאחריות שלא ניתן לפטור ממנה לפי דין או ויתור על זכויות המשתמש לפי דין; מתן השירות בחינם אינו מבטל זכויות אלה.</p>
+<p>BuyTest אינו נותן הערכת שווי, אומדן עלות תיקון, קביעת ירידת ערך או המלצה לקנות או לא לקנות. ההסבר מבוסס על המסמך והמידע שנמסרו; כשהמידע אינו קריא או אינו מספיק, יש להשלים בירור ולא להסיק תקינות.</p>
+<p>העלאת מסמך מותרת רק אם יש למשתמש הרשאה לשימוש בו ולעיבוד המידע הכלול בו לצורך השירות, לרבות מידע על אדם אחר. יש להסיר פרטים שאינם נחוצים כגון מספר זהות, חתימה, כתובת וטלפון. אישור ההבהרות והפרטיות נדרש לפני שליחת מסמכים לעיבוד.</p>
+<p>BuyTest אינו קשור למכון הבדיקה ואינו מדבר בשמו. סיווג ממצא או הסתייגות אינו קביעה שהמכון טעה, התרשל או פעל שלא כשורה. זכויות בדוחות המקור שייכות לבעלי הזכויות בהם.</p>
+<p>נתוני הרכב הזמינים, הצ׳קליסט ופענוח דוח המכון, העבר הביטוחי ופלט המחשב ניתנים בחינם. הפקת דוח אצל ספק חיצוני אינה כלולה ועשויה להיות בתשלום לפי תנאיו. ייעוץ אישי בוואטסאפ נרכש בנפרד במחיר כולל של 99 ₪, ללא חידוש אוטומטי וללא ליווי פיזי.</p>
+<p>חלון הייעוץ נמשך 48 שעות רצופות ממועד אישור התשלום, כולל שעות ללא מענה. שעות המענה: ימים א׳–ה׳ 09:00–18:00, יום ו׳ 09:00–13:00, לפי שעון ישראל; בשבתות ובחגים אין מענה. אין התחייבות למענה מיידי. הייעוץ מתייחס לרכב אחד, או לשאלה כללית לפני בחירת רכב. אם לא ניתן מענה במסגרת השירות שנרכש, אפשר לפנות להסדרת מענה או החזר, בלי לגרוע מזכויות לפי דין.</p>
+<p>התשלום מעובד בדף המאובטח של Cardcom. פרטי הכרטיס אינם מתקבלים או נשמרים ב־BuyTest. תנאי הביטול וההחזרים המופיעים באתר הם חלק מתנאי השירות.</p>
+<p>מסמך שהועלה לצורך שירות אינו מקנה הרשאה לפרסום. פרסום דוגמה דורש הרשאה נפרדת מתאימה והסרת פרטים מזהים, תוך שמירה על זכויות צדדים שלישיים. דוגמאות באתר אינן קביעה לגבי רכב אחר או הבטחת תוצאה.</p>
+<p>כל הזכויות בתוכן המקורי, במאגר הידע ובסימני BuyTest שמורות לבעליהן. ניתן להשתמש בפלט שהופק עבור המשתמש לצורך הבירור שלו. אין להעתיק את מאגר הידע או לעשות בתוכן האתר שימוש מסחרי ללא הרשאה.</p>
     </div>
     <div id="privacyText" class="legalPage" style="display:none">
-      <h2>מדיניות פרטיות</h2>
-      <p>מספר הרכב שנבדק נשלח למאגרי המידע הציבוריים הדרושים להצגת הנתונים. לצורך זיהוי הטקסט, תמונות או עמודי PDF מסיכום הבוחן ומהבדיקה הממוחשבת עשויים להישלח אל Google Cloud Vision דרך שירות מאובטח של BuyTest. לאחר הפענוח מתבצעת בדיקת אימות מקומית בדפדפן באמצעות Tesseract; אם Vision אינו זמין, המנוע המקומי עשוי לשמש כגיבוי. בגרסה זו BuyTest אינו שומר את קובצי הדוח בשרת שלו, והם אינם מצורפים ל־PDF המופק.</p>
-      <p>שם מזמין/ת הבדיקה והטקסט שזוהה בקובץ משמשים רק לביצוע התהליך ולהפקת הסיכום. אין לצלם מספר זהות, חתימה, כתובת, טלפון, לוגו או מידע אישי שאינו נחוץ. השימוש בשירותי הזיהוי כפוף גם לתנאי השירות ולמדיניות הפרטיות של ספק השירות.</p>
-      <p>לצורך מדידת פעילות האתר נשמרים מזהים אקראיים של דפדפן וביקור. מספר הרכב עשוי להישמר כדי למדוד בדיקות ולשייך אליהן נתונים. לצורך בניית היסטוריית קילומטראז׳ נשמרים מספר הרכב, הקילומטראז׳ האחרון שמתקבל ממשרד התחבורה, וקילומטראז׳ שנקרא מסיכום בדיקה שהמשתמש העלה, בצירוף תאריך ומקור הנתון. קובץ הדוח והטקסט המלא שלו אינם נשמרים במאגר היסטוריית הקילומטראז׳. כתובת IP אינה נשמרת במאגר זה. תגובה שנשלחת בטופס נשמרת במערכת BuyTest יחד עם הדירוג ועם שם, מייל או מספר רכב רק אם המשתמש בחר למסור אותם; המידע מוצג לבעל האתר באזור המנהל לצורך מענה ושיפור השירות. לצורך מדידת פרסום ושיפור קמפיינים נעשה שימוש גם ב־Meta Pixel וב־Google Ads/Google Tag, שעשויים להעביר ל־Meta ול־Google מידע טכני על ביקור ופעולות באתר בהתאם למדיניות שלהם. נתוני התשלום מעובדים בדף המאובטח של Cardcom ובהתאם למדיניות שלו. BuyTest אינו מקבל ואינו שומר את מספר הכרטיס. בעל השליטה במידע הוא עמוס רוקח, מפעיל BuyTest. לפנייה בנושא פרטיות, עיון או תיקון מידע אפשר לכתוב ל־buytest2026@gmail.com.</p>
+<h2>מדיניות פרטיות</h2>
+<p>עודכן: 11.10.2026. בעל השליטה במידע: עמוס רוקח, BuyTest. לפניות בנושא פרטיות, עיון, תיקון או בקשת מחיקה: <a href="mailto:buytest2026@gmail.com">buytest2026@gmail.com</a>. בקשה תיבחן לאחר זיהוי מידתי, בהתאם לדין; מחיקה עשויה להיות מוגבלת בחובות שמירה או בזכויות אחרים.</p>
+<p>מסירת המידע לצורך השימוש באתר היא לבחירת המשתמש ואינה חובה חוקית. ללא מספר רכב אי אפשר לשייך נתונים לרכב; ללא מסמך והרשאה לעיבודו אי אפשר לפענח אותו; ללא פרטי קשר ותשלום אי אפשר להשלים רכישת ייעוץ או לחזור לפנייה. אין צורך למסור מידע אישי שאינו דרוש.</p>
+<p>מספר הרכב נשלח למאגרי המידע הציבוריים לצורך הצגת נתונים. בעת פענוח מסמכים וצילום רישיון, עמודי המסמך נשלחים אל Google Cloud Vision דרך שירות BuyTest לצורך זיהוי טקסט. הטקסט שנקרא עשוי להישלח לשירות הפענוח של BuyTest המתארח ב־Supabase. אימות נוסף באמצעות Tesseract נעשה בדפדפן. ספקי התשתית והעיבוד עשויים לפעול מחוץ לישראל; תנאי העיבוד והשמירה אצלם כפופים גם למדיניותם. אין הבטחה שספק חיצוני אינו שומר נתוני תפעול.</p>
+<p>קובצי הדוח מועברים לעיבוד; השירות אינו יוצר מהם ארכיון קבצים במאגר BuyTest. פלט הפענוח, טקסטים שנקראו, פרטי המזמין ותיק הרכב עשויים להישמר במכשיר באמצעות אחסון הדפדפן עד למחיקתם או ניקוי נתוני האתר. מסמכים שהורדתם או שלחתם בוואטסאפ נשמרים גם במקומות שבחרתם ואינם נמחקים באמצעות האתר.</p>
+<p>בשרת נשמרים נתוני פעילות השירות ומזהים אקראיים של דפדפן וביקור, וכן מספר רכב, קילומטראז׳, תאריך ומקור הנתון לצורך היסטוריית קילומטראז׳. מאגר ההיסטוריה אינו שומר את קובץ הדוח או את מלוא הטקסט שלו. נתוני טופס התגובה, כולל דירוג ופרטים שנמסרו מרצון, נשמרים לצורך מענה ושיפור השירות. פרטי רכישת ייעוץ ואישור העסקה נשמרים לצורך אספקת השירות, טיפול בפניות, תיעוד עסקאות וחובות לפי דין. המידע נגיש למפעיל ולספקים הנדרשים לביצוע השירות, בהתאם לתפקידם.</p>
+<p>למידע בשרת אין כרגע מחיקה אוטומטית במועד קבוע. שמירה ומחיקה מצריכות טיפול של מפעיל האתר בהתאם לצורך ולחובות לפי דין. ניתן לפנות לבירור המידע שנשמר ולבקשת מחיקתו. נתוני חשבונאות או נתונים הדרושים לבירור מחלוקת עשויים להישמר גם לאחר סיום השירות.</p>
+<p>מדידה פנימית של שימוש ותפעול האתר נפרדת ממעקב פרסומי. כלי Meta Pixel ו־Google Ads/Google Tag יופעלו רק לאחר בחירה מפורשת במעקב פרסומי בהמשך עמוד זה. סירוב אינו מונע שימוש בשירות. ניתן לשנות את הבחירה בכל עת; שינוי הבחירה טוען מחדש את העמוד. ספקי הפרסום עשויים לקבל מזהים ומידע על ביקורים ופעולות, בהתאם למדיניותם.</p>
+<p><label><input type="checkbox" data-buytest-marketing-consent> אני מסכים/ה להפעלת כלי המעקב הפרסומי של Meta ו־Google.</label></p>
+<p><button type="button" data-buytest-clear-local>מחיקת תיקי הרכב השמורים בדפדפן זה</button></p>
+<p>המחיקה מסירה תיקי רכב שנשמרו בדפדפן הזה בלבד. היא אינה מוחקת מידע בשרת, קבצים שהורדו, הודעות וואטסאפ, תשלומים או הגדרות מנהל.</p>
+<p>Cardcom מעבד את התשלום ופרטי הכרטיס בדף שלו. BuyTest שומר פרטי הזמנה ואישור תשלום ואינו מקבל או שומר מספר כרטיס. הודעות ומסמכים שתבחרו לשלוח בוואטסאפ יועברו גם לשירות WhatsApp לפי תנאיו.</p>
+<p>העלאת מסמך אינה הסכמה לפרסומו. דוגמה פומבית תפורסם רק בהרשאה מתאימה ונפרדת ולאחר הסרת פרטים מזהים. כדי לצמצם חשיפה יש להשחיר פרטים שאינם נדרשים כבר לפני ההעלאה.</p>
     </div>
     <div id="cancelText" class="legalPage" style="display:none">
-      <h2>ביטול עסקה והחזרים</h2>
-      <p>לבקשת ביטול או לבירור עסקה יש לפנות ל־buytest2026@gmail.com ולציין שם, תאריך הרכישה ומספר הרכב אם הייעוץ מתייחס לרכב מסוים. הבקשה תטופל בהתאם להוראות הדין, לסוג השירות ולשאלה אם השירות הדיגיטלי כבר החל או סופק. החזר שאושר יבוצע לאמצעי התשלום באמצעות Cardcom.</p>
-      <p>אימות רישיון הרכב וחמש השאלות למוכר ניתנים בחינם. הפקה ופענוח של דוח עבר ביטוחי עולים 39 ₪. פענוח אוטומטי של דוח המכון וסיכום PDF ניתנים בחינם. התייעצות אישית עולה 149 ₪, ללא עבר ביטוחי. הייעוץ מתקיים עם עמוס רוקח בוואטסאפ למשך 48 שעות. מפעיל השירות: עמוס רוקח, BuyTest. כתובת קשר: buytest2026@gmail.com.</p>
+<h2>ביטול עסקה והחזרים</h2>
+<p>פענוח הדוחות והצ׳קליסט חינם; תשלום נדרש רק לייעוץ אישי נפרד, במחיר כולל של 99 ₪. ספק חיצוני להפקת דוח קובע את תנאי העסקה שלו.</p>
+<p>לשליחת הודעת ביטול או לבירור עסקה ניתן לפנות ל־<a href="mailto:buytest2026@gmail.com">buytest2026@gmail.com</a> או דרך <a href="https://wa.me/972552997673">הוואטסאפ העסקי</a>. ציינו שם, תאריך רכישה ופרט המאפשר לזהות את העסקה; מספר רכב נדרש רק אם העסקה התייחסה אליו. אין צורך לשלוח פרטי כרטיס.</p>
+<p>זכויות הביטול הן בהתאם לחוק הגנת הצרכן ולהוראות הדין. ככל שמדובר בעסקת מכר מרחוק לשירות חד־פעמי שחלים עליה תנאי הביטול שבחוק, ניתן לבטל בתוך 14 ימים ממועד העסקה או קבלת מסמך פרטי העסקה, לפי המאוחר, ובלבד שנותרו לפחות שני ימים שאינם ימי מנוחה לפני מועד השירות. זכויות מורחבות לאוכלוסיות הזכאיות לכך חלות לפי תנאי הדין. פתיחת גישה באתר כשלעצמה אינה ויתור על זכות ביטול הקבועה בדין.</p>
+<p>בביטול כדין עשויים להיגבות דמי ביטול עד 5% ממחיר העסקה או 100 ₪, לפי הנמוך, ורק כאשר הדין מאפשר זאת. לא ייגבו דמי ביטול במקרה שבו הדין שולל אותם, לרבות אי־אספקת השירות במועד או אי־התאמה לפרטים שנמסרו. השבה הנדרשת בדין תבוצע במועד הקבוע בו, ובביטול לפי הוראות מכר מרחוק בתוך 14 ימים מקבלת הודעת הביטול.</p>
+<p>לייעוץ שנקבע לביצוע מיידי או שכבר ניתן ייבחנו תנאי הביטול לפי מאפייני העסקה והדין. אין מדיניות גורפת של „אין החזרים”. אם לא ניתן מענה במסגרת הייעוץ שנרכש, פנו להסדרת השירות או החזר. ההחזר יבוצע לאמצעי התשלום ככל האפשר. הוראות הדין גוברות על תנאים אלה.</p>
     </div>
   </div>
 </div>
@@ -945,15 +962,15 @@ let buyTestFeedbackItems=[];
 let buyTestFeedbackLoaded=false;
 let balcarSummaryText='';
 function buyTestMetaTrack(eventName,parameters={}){
-  if(typeof window.fbq!=='function'||BuyTestInternalTraffic.blocked()) return;
+  if(typeof window.fbq!=='function'||!window.BuyTestLegal.canTrack()||BuyTestInternalTraffic.blocked()) return;
   try{window.fbq('track',eventName,parameters)}catch(error){console.warn('BuyTest Meta event skipped:',error)}
 }
 function buyTestMetaTrackCustom(eventName,parameters={}){
-  if(typeof window.fbq!=='function'||BuyTestInternalTraffic.blocked()) return;
+  if(typeof window.fbq!=='function'||!window.BuyTestLegal.canTrack()||BuyTestInternalTraffic.blocked()) return;
   try{window.fbq('trackCustom',eventName,parameters)}catch(error){console.warn('BuyTest Meta event skipped:',error)}
 }
 function buyTestGoogleTrackFreeStartedOnce(vehiclePlate){
-  if(typeof window.gtag!=='function'||BuyTestInternalTraffic.blocked()) return;
+  if(typeof window.gtag!=='function'||!window.BuyTestLegal.canTrack()||BuyTestInternalTraffic.blocked()) return;
   const plate=String(vehiclePlate||'').replace(/\D/g,'');
   const storageKey=BUYTEST_GOOGLE_FREE_STARTED_KEY_PREFIX+(plate||'unknown');
   try{if(sessionStorage.getItem(storageKey)==='1') return}catch(_error){}
@@ -963,7 +980,7 @@ function buyTestGoogleTrackFreeStartedOnce(vehiclePlate){
   }catch(error){console.warn('BuyTest Google Ads conversion skipped:',error)}
 }
 function buyTestGoogleTrackFreeCompletedOnce(vehiclePlate){
-  if(typeof window.gtag!=='function'||BuyTestInternalTraffic.blocked()) return;
+  if(typeof window.gtag!=='function'||!window.BuyTestLegal.canTrack()||BuyTestInternalTraffic.blocked()) return;
   const plate=String(vehiclePlate||'').replace(/\D/g,'');
   const storageKey=BUYTEST_GOOGLE_FREE_COMPLETED_KEY_PREFIX+(plate||'unknown');
   try{if(sessionStorage.getItem(storageKey)==='1') return}catch(_error){}
@@ -982,7 +999,7 @@ function trackBuyTestFreeCompletedOnce(vehiclePlate){
   buyTestGoogleTrackFreeCompletedOnce(normalizedPlate);
 }
 function buyTestGoogleTrackCheckoutOnce(payment,plan){
-  if(typeof window.gtag!=='function'||BuyTestInternalTraffic.blocked()) return;
+  if(typeof window.gtag!=='function'||!window.BuyTestLegal.canTrack()||BuyTestInternalTraffic.blocked()) return;
   if(!payment?.orderId) return;
   const storageKey=BUYTEST_GOOGLE_CHECKOUT_KEY_PREFIX+String(payment.orderId);
   try{if(sessionStorage.getItem(storageKey)==='1') return}catch(_error){}
@@ -1006,7 +1023,7 @@ function buyTestMetaTrackPurchaseOnce(payment){
   try{localStorage.setItem(storageKey,'1')}catch(_error){}
 }
 function buyTestGoogleTrackPurchaseOnce(payment){
-  if(typeof window.gtag!=='function'||BuyTestInternalTraffic.blocked()) return;
+  if(typeof window.gtag!=='function'||!window.BuyTestLegal.canTrack()||BuyTestInternalTraffic.blocked()) return;
   if(!payment?.orderId) return;
   const storageKey=BUYTEST_GOOGLE_PURCHASE_KEY_PREFIX+String(payment.orderId);
   try{if(localStorage.getItem(storageKey)==='1') return}catch(_error){}
@@ -2011,13 +2028,26 @@ async function submitFeedback(){
     button.textContent='שלח תגובה';
   }
 }
+let legalReturnFocus=null;
 function openLegal(which){
+  if(!document.getElementById('legalModal').classList.contains('open'))legalReturnFocus=document.activeElement;
   document.querySelectorAll('.legalPage').forEach(x=>x.style.display='none');
-  const map={terms:'termsText',privacy:'privacyText',cancel:'cancelText'};
+  const map={terms:'termsText',privacy:'privacyText',cancel:'cancelText',accessibility:'accessibilityText'};
   document.getElementById(map[which]||'termsText').style.display='block';
   document.getElementById('legalModal').classList.add('open');
+  const page=document.getElementById(map[which]||'termsText');
+  document.querySelectorAll('#legalModal h2').forEach(h=>h.removeAttribute('id'));
+  const heading=page.querySelector('h2');if(heading){heading.id='activeLegalTitle';document.getElementById('legalModal').setAttribute('aria-labelledby','activeLegalTitle');}
+  document.querySelector('#legalModal .legalClose').focus();
 }
-function closeLegal(){document.getElementById('legalModal').classList.remove('open')}
+function closeLegal(){document.getElementById('legalModal').classList.remove('open');legalReturnFocus?.focus();}
+document.addEventListener('keydown',event=>{
+  if(event.key!=='Tab'||!document.getElementById('legalModal').classList.contains('open'))return;
+  const focusable=Array.from(document.querySelectorAll('#legalModal button,#legalModal a[href],#legalModal input')).filter(el=>el.getClientRects().length);
+  const first=focusable[0],last=focusable[focusable.length-1];
+  if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+  else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+});
 function showInsuranceStart(){
   const insuranceStart=document.getElementById('insuranceStartSection');
   if(insuranceStart) insuranceStart.style.display='block';
@@ -3507,6 +3537,7 @@ function clearInspectionFile(kind){
 }
 
 async function handleInspectionFile(input,kind){
+  if(window.BuyTestLegal&&!BuyTestLegal.requireUpload('inspectionOwnership')){input.value='';return;}
   const isSummary=kind==='summary';
   const files=Array.from(input.files||[]);
   const selectedFiles=isSummary?files.slice(0,1):files.slice(0,6);
@@ -5767,6 +5798,7 @@ function inspectionRequesterAdvisoryHtml(advisory){
 }
 
 async function analyseInspectionReport(){
+  if(window.BuyTestLegal&&!BuyTestLegal.requireUpload('inspectionOwnership'))return;
   if(document.getElementById('analyseReportButton')?.disabled)return;
   const reportContext=trackBuyTestReportStage.capture();
   const analysisPlate=plate();
