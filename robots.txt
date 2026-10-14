@@ -2,4 +2,5 @@ User-agent: *
 Allow: /
 
 Sitemap: https://buytest.co.il/sitemap.xml
+Sitemap: https://buytest.co.il/articles-feed.xml
 # BuyTest checklist flow deployment: 2026-09-16

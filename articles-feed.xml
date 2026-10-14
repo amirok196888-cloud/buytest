@@ -1,0 +1,111 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:feed xmlns:ns0="http://www.w3.org/2005/Atom" xml:lang="he">
+  <ns0:id>https://buytest.co.il/articles/</ns0:id>
+  <ns0:title>BuyTest — מאמרים על בדיקת רכב לפני קנייה</ns0:title>
+  <ns0:updated>2026-10-13T00:00:00Z</ns0:updated>
+  <ns0:subtitle>הסברים מקצועיים לקריאת דוחות בדיקה ולקניית רכב</ns0:subtitle>
+  <ns0:link rel="self" href="https://buytest.co.il/articles-feed.xml" />
+  <ns0:link rel="alternate" href="https://buytest.co.il/articles/" />
+  <ns0:link rel="hub" href="https://pubsubhubbub.appspot.com/" />
+  <ns0:author>
+    <ns0:name>עמוס רוקח</ns0:name>
+  </ns0:author>
+  <ns0:entry>
+    <ns0:id>https://buytest.co.il/articles/chassis-damage-low-vs-high-significance/</ns0:id>
+    <ns0:title>פגיעה בשלדה: מה ההבדל בין משמעות נמוכה למשמעות גבוהה?</ns0:title>
+    <ns0:updated>2026-10-13T00:00:00Z</ns0:updated>
+    <ns0:link rel="alternate" href="https://buytest.co.il/articles/chassis-damage-low-vs-high-significance/" type="text/html" />
+    <ns0:summary type="text">בדוח הבדיקה כתוב „משמעות נמוכה” או „משמעות גבוהה”? ההבדל אינו רק במחיר הרכב. קראו איך מבנה הרכב מגן על הנוסעים, מה חשוב לברר על הפגיעה ולמה מראה יפה ונסיעה ישרה אינם מספיקים.</ns0:summary>
+  </ns0:entry>
+  <ns0:entry>
+    <ns0:id>https://buytest.co.il/articles/car-prepurchase-checklist/</ns0:id>
+    <ns0:title>בדיקת רכב לפני קניה, כמה צעדים מקדימים שיחסכו לך הרבה כסף וזמן</ns0:title>
+    <ns0:updated>2026-10-08T00:00:00Z</ns0:updated>
+    <ns0:link rel="alternate" href="https://buytest.co.il/articles/car-prepurchase-checklist/" type="text/html" />
+    <ns0:summary type="text">לפני שקובעים בדיקה במכון, בדקו את פרטי הרכב, העבר הביטוחי בבלק״ר, דברי המוכר וסימנים שכדאי לברר. מדריך מעשי לקונה רכב.</ns0:summary>
+  </ns0:entry>
+  <ns0:entry>
+    <ns0:id>https://buytest.co.il/articles/total-loss-vs-constructive-total-loss/index.html/</ns0:id>
+    <ns0:title>טוטאלוס או אובדן להלכה – מה ההבדל?</ns0:title>
+    <ns0:updated>2026-10-04T00:00:00Z</ns0:updated>
+    <ns0:link rel="alternate" href="https://buytest.co.il/articles/total-loss-vs-constructive-total-loss/index.html/" type="text/html" />
+    <ns0:summary type="text">מה ההבדל בין טוטאלוס לאובדן להלכה, מה המשמעות עבור הקונה ומה חשוב לבדוק לפני רכישת רכב שעבר תאונה קשה.</ns0:summary>
+  </ns0:entry>
+  <ns0:entry>
+    <ns0:id>https://buytest.co.il/articles/car-buying-advice-before-and-after-inspection/</ns0:id>
+    <ns0:title>ייעוץ לפני קניית רכב: מה כדאי לברר לפני הבדיקה במכון, ואחריה?</ns0:title>
+    <ns0:updated>2026-10-03T00:00:00Z</ns0:updated>
+    <ns0:link rel="alternate" href="https://buytest.co.il/articles/car-buying-advice-before-and-after-inspection/" type="text/html" />
+    <ns0:summary type="text">מה כדאי לשאול לפני בדיקת קנייה, ואיך להבין את הדוח אחריה? ייעוץ רכב, שאלות לבוחן וההבדל בין ליקוי, המלצה והסתייגות של המכון.</ns0:summary>
+  </ns0:entry>
+  <ns0:entry>
+    <ns0:id>https://buytest.co.il/articles/checks-before-car-inspection/</ns0:id>
+    <ns0:title>לפני בדיקת קנייה במכון: בדיקות מקדימות שיכולות לחסוך כסף וזמן</ns0:title>
+    <ns0:updated>2026-09-30T00:00:00Z</ns0:updated>
+    <ns0:link rel="alternate" href="https://buytest.co.il/articles/checks-before-car-inspection/" type="text/html" />
+    <ns0:summary type="text">מחפשים רכב משומש? בדיקת נתוני משרד התחבורה, עבר תאונות, שאלות למוכר וקריאת דוח קיים יכולות לעזור לסנן רכבים לפני שמשלמים על בדיקת מכון.</ns0:summary>
+  </ns0:entry>
+  <ns0:entry>
+    <ns0:id>https://buytest.co.il/articles/insurance-history-report-reliability/</ns0:id>
+    <ns0:title>דוח סליקה לרכב: לסמוך עליו? בגדול כן — אבל עם הסתייגות</ns0:title>
+    <ns0:updated>2026-09-29T00:00:00Z</ns0:updated>
+    <ns0:link rel="alternate" href="https://buytest.co.il/articles/insurance-history-report-reliability/" type="text/html" />
+    <ns0:summary type="text">דוח סליקה לרכב לפני קנייה: מה אפשר ללמוד מתביעות, ירידת ערך ואובדן להלכה, מה הדוח לא מגלה, ומתי צריך לברר את הנזק בבדיקת הרכב.</ns0:summary>
+  </ns0:entry>
+  <ns0:entry>
+    <ns0:id>https://buytest.co.il/articles/tires-before-buying-a-car/</ns0:id>
+    <ns0:title>מה הצמיגים מספרים על הרכב שאתם עומדים לקנות?</ns0:title>
+    <ns0:updated>2026-09-28T00:00:00Z</ns0:updated>
+    <ns0:link rel="alternate" href="https://buytest.co.il/articles/tires-before-buying-a-car/" type="text/html" />
+    <ns0:summary type="text">מה הצמיגים מגלים בבדיקת קנייה? שחיקה צדדית, בולמים, סדקים וגיל הצמיג — וגם איכות, מחיר והוצאות שכדאי להביא בחשבון.</ns0:summary>
+  </ns0:entry>
+  <ns0:entry>
+    <ns0:id>https://buytest.co.il/articles/understanding-vehicle-inspection-report/</ns0:id>
+    <ns0:title>מה באמת אומר סיכום בדיקת הרכב שלכם?</ns0:title>
+    <ns0:updated>2026-09-26T00:00:00Z</ns0:updated>
+    <ns0:link rel="alternate" href="https://buytest.co.il/articles/understanding-vehicle-inspection-report/" type="text/html" />
+    <ns0:summary type="text">איך לקרוא את סיכום בדיקת הרכב: רעשים במנוע, כיוון גלגלים ורעידות בתיבת ההילוכים — והשאלות שכדאי לשאול לפני הקנייה.</ns0:summary>
+  </ns0:entry>
+  <ns0:entry>
+    <ns0:id>https://buytest.co.il/articles/vehicle-inspection-warranty/</ns0:id>
+    <ns0:title>אחריות על בדיקת הרכב? לא מה שאתם חושבים!</ns0:title>
+    <ns0:updated>2026-09-24T00:00:00Z</ns0:updated>
+    <ns0:link rel="alternate" href="https://buytest.co.il/articles/vehicle-inspection-warranty/" type="text/html" />
+    <ns0:summary type="text">אילו החרגות אחריות מוצדקות בבדיקת רכב, ומתי ליקוי נקודתי אינו מעיד על תקלה במכלול שלם? עמוס רוקח מסביר.</ns0:summary>
+  </ns0:entry>
+  <ns0:entry>
+    <ns0:id>https://buytest.co.il/articles/profession-180-examiner-certificate/</ns0:id>
+    <ns0:title>משרד התחבורה ביטל את תעודת בוחן הקנייה – ומי בודק היום את הרכב שלכם?</ns0:title>
+    <ns0:updated>2026-09-21T00:00:00Z</ns0:updated>
+    <ns0:link rel="alternate" href="https://buytest.co.il/articles/profession-180-examiner-certificate/" type="text/html" />
+    <ns0:summary type="text">מ־1 בינואר 2026 בוטלה הדרישה לתעודת בודק קנייה ומכירה. מה נשאר ממקצוע 180, מי רשאי לנהל מכון ומה חשוב לבדוק לפני רכישת רכב.</ns0:summary>
+  </ns0:entry>
+  <ns0:entry>
+    <ns0:id>https://buytest.co.il/articles/inspection-report-disclaimers/</ns0:id>
+    <ns0:title>טופס סיכום בדיקת רכב: ממצאים או כסת״ח?</ns0:title>
+    <ns0:updated>2026-09-21T00:00:00Z</ns0:updated>
+    <ns0:link rel="alternate" href="https://buytest.co.il/articles/inspection-report-disclaimers/" type="text/html" />
+    <ns0:summary type="text">טופס בדיקת רכב כולל לעיתים הערות אוטומטיות והסתייגויות רחבות. כך מבדילים בין ממצא אמיתי, בלאי סביר וכסת״ח.</ns0:summary>
+  </ns0:entry>
+  <ns0:entry>
+    <ns0:id>https://buytest.co.il/articles/reset-fault-codes-before-inspection/</ns0:id>
+    <ns0:title>נורות התקלה כבויות – אבל מחשב הרכב אופס לפני הבדיקה</ns0:title>
+    <ns0:updated>2026-09-20T00:00:00Z</ns0:updated>
+    <ns0:link rel="alternate" href="https://buytest.co.il/articles/reset-fault-codes-before-inspection/" type="text/html" />
+    <ns0:summary type="text">נורות התקלה כבויות, אבל מחשב הרכב אופס לפני בדיקת הקנייה. עמוס רוקח מסביר מדוע איפוס סמוך לבדיקה מחייב נסיעה ארוכה ובדיקה במוסך מורשה.</ns0:summary>
+  </ns0:entry>
+  <ns0:entry>
+    <ns0:id>https://buytest.co.il/articles/chassis-edge-court-case/</ns0:id>
+    <ns0:title>משמעות שולית או משמעות נמוכה? המקרה שהגיע לבית המשפט</ns0:title>
+    <ns0:updated>2026-09-20T00:00:00Z</ns0:updated>
+    <ns0:link rel="alternate" href="https://buytest.co.il/articles/chassis-edge-court-case/" type="text/html" />
+    <ns0:summary type="text">פגיעה בקצה השלדה סווגה אחרת בשני דוחות בדיקה, והבדיקה שנצמדה לאוגדן משרד התחבורה התקבלה בבית המשפט. סיפור מקצועי מאת עמוס רוקח.</ns0:summary>
+  </ns0:entry>
+  <ns0:entry>
+    <ns0:id>https://buytest.co.il/articles/no-chassis-damage/</ns0:id>
+    <ns0:title>קצה שלדה בדוח הבדיקה — מבינים לפני שמחליטים</ns0:title>
+    <ns0:updated>2026-09-19T00:00:00Z</ns0:updated>
+    <ns0:link rel="alternate" href="https://buytest.co.il/articles/no-chassis-damage/" type="text/html" />
+    <ns0:summary type="text">מה ההבדל בין פגיעה בקצה שלדה לפגיעה משמעותית, מתי נדרשת בדיקה גאומטרית, ולמה ירידת הערך בשוק יכולה להיות גבוהה מקביעת השמאי?</ns0:summary>
+  </ns0:entry>
+</ns0:feed>
