@@ -2,7 +2,7 @@
 <ns0:feed xmlns:ns0="http://www.w3.org/2005/Atom" xml:lang="he">
   <ns0:id>https://buytest.co.il/articles/</ns0:id>
   <ns0:title>BuyTest — מאמרים על בדיקת רכב לפני קנייה</ns0:title>
-  <ns0:updated>2026-10-13T00:00:00Z</ns0:updated>
+  <ns0:updated>2026-10-17T00:00:00Z</ns0:updated>
   <ns0:subtitle>הסברים מקצועיים לקריאת דוחות בדיקה ולקניית רכב</ns0:subtitle>
   <ns0:link rel="self" href="https://buytest.co.il/articles-feed.xml" />
   <ns0:link rel="alternate" href="https://buytest.co.il/articles/" />
@@ -10,6 +10,7 @@
   <ns0:author>
     <ns0:name>עמוס רוקח</ns0:name>
   </ns0:author>
+  <ns0:entry><ns0:id>https://buytest.co.il/articles/hybrid-electric-prepurchase-inspection/</ns0:id><ns0:title>בדיקת רכב היברידי או חשמלי לפני קנייה: חיבור למחשב אינו מספיק</ns0:title><ns0:updated>2026-10-17T00:00:00Z</ns0:updated><ns0:link rel="alternate" href="https://buytest.co.il/articles/hybrid-electric-prepurchase-inspection/" type="text/html" /><ns0:summary type="text">קונים רכב היברידי או חשמלי משומש? חיבור למחשב והיעדר קודי תקלה אינם בדיקת בריאות הסוללה. עמוס רוקח מסביר מה לברר במכון, אילו בדיקות להשלים ומה לדרוש בכתב לפני שסוגרים עסקה.</ns0:summary></ns0:entry>
   <ns0:entry>
     <ns0:id>https://buytest.co.il/articles/chassis-damage-low-vs-high-significance/</ns0:id>
     <ns0:title>פגיעה בשלדה: מה ההבדל בין משמעות נמוכה למשמעות גבוהה?</ns0:title>
